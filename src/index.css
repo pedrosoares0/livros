@@ -1,0 +1,147 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --font-display: 'Instrument Serif', Georgia, serif;
+    --font-heading: 'Cinzel', serif;
+    --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    --font-score: 'Nunito', system-ui, -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background-color: #f5f5f7;
+    color: #1d1d1f;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+}
+
+.font-score {
+  font-family: var(--font-score);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Glassmorphism & Apple Materials */
+.apple-glass {
+  background: rgba(22, 24, 33, 0.65);
+  backdrop-filter: blur(24px) saturate(190%);
+  -webkit-backdrop-filter: blur(24px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.apple-glass-card {
+  background: rgba(26, 29, 41, 0.55);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.apple-acrylic-orange {
+  background: linear-gradient(180deg, rgba(245, 158, 11, 0.42) 0%, rgba(217, 119, 6, 0.28) 100%);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  border: 1px solid rgba(251, 191, 36, 0.35);
+  box-shadow: 0 8px 24px -4px rgba(217, 119, 6, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.3);
+}
+
+.apple-acrylic-blue {
+  background: linear-gradient(180deg, rgba(56, 189, 248, 0.38) 0%, rgba(14, 165, 233, 0.24) 100%);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  box-shadow: 0 8px 24px -4px rgba(14, 165, 233, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.3);
+}
+
+.apple-acrylic-purple {
+  background: linear-gradient(180deg, rgba(168, 85, 247, 0.38) 0%, rgba(147, 51, 234, 0.24) 100%);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  border: 1px solid rgba(192, 132, 252, 0.35);
+  box-shadow: 0 8px 24px -4px rgba(147, 51, 234, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.3);
+}
+
+.apple-acrylic-emerald {
+  background: linear-gradient(180deg, rgba(16, 185, 129, 0.38) 0%, rgba(5, 150, 105, 0.24) 100%);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  border: 1px solid rgba(52, 211, 153, 0.35);
+  box-shadow: 0 8px 24px -4px rgba(5, 150, 105, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.3);
+}
+
+/* Apple Intelligence Shimmer & Wave Glow */
+@keyframes appleGlowRotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes applePulseIntensity {
+  0%, 100% {
+    opacity: 0.65;
+    transform: scale(1);
+    filter: blur(18px);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.02);
+    filter: blur(24px);
+  }
+}
+
+@keyframes shimmerWave {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.siri-gradient-border {
+  background: conic-gradient(
+    from 180deg at 50% 50%,
+    #3b82f6 0deg,
+    #8b5cf6 65deg,
+    #ec4899 125deg,
+    #f59e0b 195deg,
+    #10b981 255deg,
+    #06b6d4 315deg,
+    #3b82f6 360deg
+  );
+  animation: appleGlowRotate 7s linear infinite;
+}
+
+.siri-active-glow {
+  animation: applePulseIntensity 2.5s ease-in-out infinite alternate;
+}
+
+/* Custom subtle scrollbar */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* 3D Book perspective */
+.book-cover-3d {
+  transform: perspective(600px) rotateY(-8deg);
+  box-shadow: -6px 6px 18px rgba(0, 0, 0, 0.5), -1px 1px 4px rgba(255, 255, 255, 0.1);
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.book-cover-3d:hover {
+  transform: perspective(600px) rotateY(-2deg) translateY(-6px) scale(1.04);
+  box-shadow: -10px 12px 28px rgba(0, 0, 0, 0.6), 0 0 15px rgba(255, 255, 255, 0.15);
+}

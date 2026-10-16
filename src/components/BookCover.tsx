@@ -1,0 +1,108 @@
+import React, { useState } from 'react';
+
+interface BookCoverProps {
+  title: string;
+  author: string;
+  coverUrl?: string;
+  notaEncaixe?: number;
+  className?: string;
+}
+
+const COVER_PALETTES = [
+  { bg: 'from-amber-950 via-stone-900 to-black', text: 'text-amber-200', border: 'border-amber-500/30' },
+  { bg: 'from-blue-950 via-slate-900 to-black', text: 'text-sky-200', border: 'border-sky-500/30' },
+  { bg: 'from-emerald-950 via-zinc-900 to-black', text: 'text-emerald-200', border: 'border-emerald-500/30' },
+  { bg: 'from-purple-950 via-neutral-900 to-black', text: 'text-purple-200', border: 'border-purple-500/30' },
+  { bg: 'from-red-950 via-stone-900 to-black', text: 'text-rose-200', border: 'border-rose-500/30' },
+];
+
+export const BookCover: React.FC<BookCoverProps> = ({
+  title,
+  author,
+  coverUrl,
+  notaEncaixe,
+  className = '',
+}) => {
+  const [hasError, setHasError] = useState(false);
+
+  // Deterministic palette based on title hash for fallback
+  const charSum = title.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  const palette = COVER_PALETTES[charSum % COVER_PALETTES.length];
+
+  return (
+    <div
+      className={`relative rounded-md overflow-hidden shadow-xl select-none transition-all duration-300 group-hover:scale-105 ${className}`}
+      style={{
+        aspectRatio: '2 / 3',
+        boxShadow: '0 8px 20px -4px rgba(0, 0, 0, 0.4), inset -2px 0 5px rgba(255, 255, 255, 0.1)',
+      }}
+    >
+      {/* Real Image or Typographic Leather Cover */}
+      {!hasError && coverUrl ? (
+        <img
+          src={coverUrl}
+          alt={title}
+          onError={() => setHasError(true)}
+          className="w-full h-full object-cover select-none pointer-events-none"
+          loading="lazy"
+        />
+      ) : (
+        <div
+          className={`w-full h-full bg-gradient-to-br ${palette.bg} p-3 flex flex-col justify-between border ${palette.border} relative overflow-hidden`}
+        >
+          {/* Subtle cloth texture overlay */}
+          <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:8px_8px]" />
+
+          {/* Top ornamental line */}
+          <div className="border-b border-white/20 pb-1 z-10">
+            <span className="text-[8px] uppercase tracking-widest text-neutral-400 font-mono block truncate">
+              {author}
+            </span>
+          </div>
+
+          {/* Title */}
+          <div className="my-auto z-10 py-1">
+            <h4
+              className={`text-xs font-serif font-bold ${palette.text} leading-tight line-clamp-3 tracking-tight`}
+              style={{ fontFamily: "'Cinzel', serif" }}
+            >
+              {title}
+            </h4>
+          </div>
+
+          {/* Bottom ornament */}
+          <div className="border-t border-white/20 pt-1 flex items-center justify-between z-10">
+            <span className="text-[7px] text-neutral-400 font-mono uppercase">
+              Protocolo
+            </span>
+            <div className="w-1.5 h-1.5 rounded-full bg-white/30" />
+          </div>
+        </div>
+      )}
+
+      {/* Realistic 3D Book Spine Shadow (Left crease) */}
+      <div className="absolute top-0 bottom-0 left-0 w-3 pointer-events-none bg-gradient-to-r from-black/50 via-black/15 to-transparent z-10" />
+
+      {/* Subtle Right edge highlight */}
+      <div className="absolute top-0 bottom-0 right-0 w-[1px] pointer-events-none bg-white/25 z-10" />
+
+      {/* Glossy top sheen */}
+      <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-white/20 pointer-events-none z-10" />
+
+      {/* Fit Score Badge on Cover */}
+      {notaEncaixe !== undefined && (
+        <div
+          className={`absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded-md text-[11px] font-score font-black shadow-lg backdrop-blur-md border z-20 ${
+            notaEncaixe >= 8
+              ? 'bg-amber-500/90 text-white border-amber-300/60'
+              : notaEncaixe >= 6
+              ? 'bg-sky-500/90 text-white border-sky-300/60'
+              : 'bg-rose-500/90 text-white border-rose-300/60'
+          }`}
+        >
+          {notaEncaixe}
+        </div>
+      )}
+    </div>
+  );
+};
