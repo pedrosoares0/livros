@@ -32,6 +32,7 @@ export interface BookEvaluation {
   genres: string[];
   userStatus?: 'loved' | 'disliked' | 'wishlist' | 'analyzed';
   categoryShelf?: string;
+  createdAt?: string;
 }
 
 export interface UserPreferences {

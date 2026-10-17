@@ -1,10 +1,10 @@
 import React from 'react';
-import { BookOpen, FolderArchive, Award, Plus } from 'lucide-react';
-import { motion } from 'motion/react';
+import { Sparkles, History, Award } from 'lucide-react';
+import { PearlButton } from './PearlButton';
 
 interface BottomNavBarProps {
-  activeTab: 'shelves' | 'folders' | 'ranking';
-  onSelectTab: (tab: 'shelves' | 'folders' | 'ranking') => void;
+  activeTab: 'discover' | 'history' | 'ranking';
+  onSelectTab: (tab: 'discover' | 'history' | 'ranking') => void;
   onOpenEvaluate: () => void;
 }
 
@@ -16,58 +16,54 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
   return (
     <nav
       aria-label="Navegação Principal"
-      className="fixed bottom-5 left-1/2 -translate-x-1/2 z-40 w-[88%] max-w-xs sm:max-w-sm pointer-events-auto"
+      className="fixed bottom-5 left-1/2 -translate-x-1/2 z-40 w-[90%] max-w-xs sm:max-w-sm pointer-events-auto"
     >
       <div
         className="flex items-center justify-between px-3 py-1.5 rounded-full border"
         style={{
-          background: 'rgba(255, 255, 255, 0.68)',
+          background: 'rgba(255, 255, 255, 0.72)',
           backdropFilter: 'blur(30px) saturate(200%)',
           WebkitBackdropFilter: 'blur(30px) saturate(200%)',
           borderColor: 'rgba(255, 255, 255, 0.85)',
           boxShadow: '0 16px 40px -8px rgba(0, 0, 0, 0.12), 0 2px 8px -2px rgba(0, 0, 0, 0.04), inset 0 1px 1px rgba(255, 255, 255, 0.95)',
         }}
       >
-        {/* Tab 1: Estantes */}
+        {/* Tab 1: Descobrir / Avaliador */}
         <button
-          onClick={() => onSelectTab('shelves')}
+          onClick={() => onSelectTab('discover')}
           className={`flex flex-col items-center justify-center py-1.5 px-3 rounded-full transition-all duration-150 select-none cursor-pointer active:scale-[0.93] ${
-            activeTab === 'shelves'
+            activeTab === 'discover'
               ? 'text-[#1d1d1f] font-bold bg-neutral-200/50'
               : 'text-[#86868b] hover:text-[#1d1d1f]'
           }`}
         >
-          <BookOpen className="w-4 h-4 mb-0.5" strokeWidth={activeTab === 'shelves' ? 2.3 : 1.75} />
-          <span className="text-[10px] tracking-tight">Estantes</span>
+          <Sparkles className="w-4 h-4 mb-0.5" strokeWidth={activeTab === 'discover' ? 2.3 : 1.75} />
+          <span className="text-[10px] tracking-tight">Descobrir</span>
         </button>
 
-        {/* Tab 2: Pastas 3D */}
-        <button
-          onClick={() => onSelectTab('folders')}
-          className={`flex flex-col items-center justify-center py-1.5 px-3 rounded-full transition-all duration-150 select-none cursor-pointer active:scale-[0.93] ${
-            activeTab === 'folders'
-              ? 'text-[#1d1d1f] font-bold bg-neutral-200/50'
-              : 'text-[#86868b] hover:text-[#1d1d1f]'
-          }`}
-        >
-          <FolderArchive className="w-4 h-4 mb-0.5" strokeWidth={activeTab === 'folders' ? 2.3 : 1.75} />
-          <span className="text-[10px] tracking-tight">Pastas 3D</span>
-        </button>
-
-        {/* Center Action: + Only */}
-        <div className="px-1 shrink-0">
-          <motion.button
-            whileTap={{ scale: 0.90 }}
+        {/* Center Action: Pearl Button (+) */}
+        <div className="px-1 shrink-0 -my-1">
+          <PearlButton
+            size="nav"
+            showIconOnly={true}
             onClick={onOpenEvaluate}
-            aria-label="Avaliar novo livro"
-            className="w-10 h-10 rounded-full bg-[#1d1d1f] text-white shadow-md hover:bg-black transition-colors cursor-pointer select-none flex items-center justify-center"
-            style={{
-              boxShadow: '0 6px 16px -2px rgba(0, 0, 0, 0.35)',
-            }}
-          >
-            <Plus className="w-5 h-5 text-white" strokeWidth={2.5} />
-          </motion.button>
+            aria-label="Avaliar nova obra"
+            title="Avaliar nova obra"
+          />
         </div>
+
+        {/* Tab 2: Histórico (Substituiu Pastas 3D) */}
+        <button
+          onClick={() => onSelectTab('history')}
+          className={`flex flex-col items-center justify-center py-1.5 px-3 rounded-full transition-all duration-150 select-none cursor-pointer active:scale-[0.93] ${
+            activeTab === 'history'
+              ? 'text-[#1d1d1f] font-bold bg-neutral-200/50'
+              : 'text-[#86868b] hover:text-[#1d1d1f]'
+          }`}
+        >
+          <History className="w-4 h-4 mb-0.5" strokeWidth={activeTab === 'history' ? 2.3 : 1.75} />
+          <span className="text-[10px] tracking-tight">Histórico</span>
+        </button>
 
         {/* Tab 3: Ranking */}
         <button

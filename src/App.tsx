@@ -1,51 +1,76 @@
-import React, { useState } from 'react';
-import { Search } from 'lucide-react';
-import { INITIAL_BOOKS } from './data/initialBooks';
+import { useState, useEffect } from 'react';
 import { BookEvaluation } from './types';
-import { BookShelf } from './components/BookShelf';
-import { FolderOrganizer } from './components/FolderOrganizer';
+import { DiscoverView } from './components/DiscoverView';
+import { HistoryView } from './components/HistoryView';
 import { RankingView } from './components/RankingView';
 import { FichaModal } from './components/FichaModal';
 import { EvaluateModal } from './components/EvaluateModal';
 import { ProfileModal } from './components/ProfileModal';
 import { BottomNavBar } from './components/BottomNavBar';
+import { evaluateBook } from './services/evaluator';
+import { 
+  fetchEvaluations, 
+  saveEvaluation, 
+  deleteEvaluation,
+  getLocalEvaluations 
+} from './services/supabase';
 
 export function App() {
-  const [books, setBooks] = useState<BookEvaluation[]>(INITIAL_BOOKS);
-  const [activeTab, setActiveTab] = useState<'shelves' | 'folders' | 'ranking'>('shelves');
+  const [books, setBooks] = useState<BookEvaluation[]>(() => getLocalEvaluations());
+  const [activeTab, setActiveTab] = useState<'discover' | 'history' | 'ranking'>('discover');
   const [selectedBook, setSelectedBook] = useState<BookEvaluation | null>(null);
   const [isEvaluateOpen, setIsEvaluateOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [wishlistIds, setWishlistIds] = useState<Set<string>>(
-    new Set(INITIAL_BOOKS.filter((b) => b.userStatus === 'wishlist').map((b) => b.id))
-  );
+  const [wishlistIds, setWishlistIds] = useState<Set<string>>(new Set());
 
-  // Group books by shelf categories
-  const sciFiBooks = books.filter(
-    (b) => b.categoryShelf === 'Ficção Científica' || b.genres.some((g) => g.includes('Ficção'))
-  );
-  const classicsDrama = books.filter(
-    (b) => b.categoryShelf === 'Clássicos & Drama Humano' || b.genres.some((g) => g.includes('Clássico'))
-  );
-  const darkFantasyDystopia = books.filter(
-    (b) => b.categoryShelf === 'Fantasia Sombria & Distopia' || b.genres.some((g) => g.includes('Distopia'))
-  );
-  const graphicNovels = books.filter(
-    (b) => b.categoryShelf === 'Graphic Novels & Contos' || b.genres.some((g) => g.includes('Graphic Novel'))
-  );
-  const recentAnalyzed = books.filter((b) => b.userStatus === 'analyzed');
+  // Load evaluations from Supabase on mount
+  useEffect(() => {
+    let isMounted = true;
+    fetchEvaluations().then((loaded) => {
+      if (isMounted && loaded) {
+        setBooks(loaded);
+      }
+    });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
-  const handleBookEvaluated = (newBook: BookEvaluation) => {
-    setBooks((prev) => [newBook, ...prev]);
+  const handleBookEvaluated = async (newBook: BookEvaluation) => {
+    setBooks((prev) => [newBook, ...prev.filter((b) => b.id !== newBook.id)]);
     setSelectedBook(newBook);
+    await saveEvaluation(newBook);
   };
 
-  const handleBulkEvaluated = (newBooks: BookEvaluation[]) => {
+  const handleBulkEvaluated = async (newBooks: BookEvaluation[]) => {
     setBooks((prev) => [...newBooks, ...prev]);
-    setActiveTab('ranking');
+    setActiveTab('history');
     if (newBooks.length > 0) {
       setSelectedBook(newBooks[0]);
     }
+    for (const b of newBooks) {
+      await saveEvaluation(b);
+    }
+  };
+
+  const handleDeleteBook = async (id: string) => {
+    setBooks((prev) => prev.filter((b) => b.id !== id));
+    if (selectedBook?.id === id) {
+      setSelectedBook(null);
+    }
+    await deleteEvaluation(id);
+  };
+
+  const handleEvaluateDirect = async (title: string, rawBook?: Partial<BookEvaluation>) => {
+    const evaluation = evaluateBook({
+      title,
+      author: rawBook?.author,
+      pages: rawBook?.pages,
+      description: rawBook?.resumo,
+      genres: rawBook?.genres,
+      coverUrl: rawBook?.coverUrl,
+    });
+    await handleBookEvaluated(evaluation);
   };
 
   const handleToggleWishlist = (book: BookEvaluation) => {
@@ -63,7 +88,7 @@ export function App() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-start bg-[#f5f5f7] text-[#1d1d1f] antialiased">
       {/* Mobile-First Frame (Clean Apple Container) */}
-      <div className="w-full max-w-md sm:max-w-xl md:max-w-2xl min-h-screen flex flex-col bg-[#ffffff] border-x border-neutral-200/80 shadow-[0_0_40px_rgba(0,0,0,0.04)] relative pb-28">
+      <div className="w-full max-w-md sm:max-w-xl md:max-w-2xl min-h-screen flex flex-col bg-[#ffffff] border-x border-neutral-200/80 shadow-[0_0_40px_rgba(0,0,0,0.04)] relative pb-24">
         
         {/* Minimalist Apple Header */}
         <header className="px-6 pt-6 pb-2 text-center">
@@ -71,75 +96,30 @@ export function App() {
             className="text-2xl sm:text-3xl font-extrabold tracking-widest font-serif uppercase text-[#1d1d1f]"
             style={{ fontFamily: "'Cinzel', serif" }}
           >
-            LIVROS
+            PROTOCOLO
           </h1>
+          <p className="text-[11px] font-medium tracking-wide text-[#86868b] uppercase pt-0.5">
+            Avaliador Pessoal de Livros & HQs
+          </p>
         </header>
-
-        {/* Clean Apple Quick Search Bar */}
-        <div className="px-6 pb-2">
-          <button
-            onClick={() => setIsEvaluateOpen(true)}
-            aria-label="Abrir busca e avaliador de livros"
-            className="w-full py-2.5 px-4 rounded-2xl flex items-center justify-between text-left transition-all duration-150 active:scale-[0.99] group bg-neutral-100 hover:bg-neutral-200/70 border border-neutral-200/80 cursor-pointer shadow-sm"
-          >
-            <div className="flex items-center gap-2.5 text-[#86868b] group-hover:text-[#1d1d1f]">
-              <Search className="w-4 h-4 text-[#86868b]" />
-              <span className="text-xs font-medium">Digite o título, autor ou ISBN...</span>
-            </div>
-            <div className="px-2.5 py-0.5 rounded-lg text-[10px] font-semibold bg-white text-[#1d1d1f] border border-neutral-200 shadow-xs">
-              Avaliar
-            </div>
-          </button>
-        </div>
 
         {/* Main Content Views */}
         <main className="flex-1 py-1">
-          {activeTab === 'shelves' && (
-            <div className="space-y-4">
-              {recentAnalyzed.length > 0 && (
-                <BookShelf
-                  title="Avaliados Recentemente"
-                  books={recentAnalyzed}
-                  onSelectBook={setSelectedBook}
-                />
-              )}
-
-              {/* Shelf 1: Ficção Científica & Existencial */}
-              <BookShelf
-                title="Ficção Científica & Existencial"
-                books={sciFiBooks}
-                onSelectBook={setSelectedBook}
-              />
-
-              {/* Shelf 2: Clássicos & Drama Humano Pesado */}
-              <BookShelf
-                title="Clássicos & Drama Humano Pesado"
-                books={classicsDrama}
-                onSelectBook={setSelectedBook}
-              />
-
-              {/* Shelf 3: Fantasia Sombria & Distopias */}
-              <BookShelf
-                title="Fantasia Sombria & Distopias"
-                books={darkFantasyDystopia}
-                onSelectBook={setSelectedBook}
-              />
-
-              {/* Shelf 4: Graphic Novels & Fábulas */}
-              {graphicNovels.length > 0 && (
-                <BookShelf
-                  title="Graphic Novels & Fábulas"
-                  books={graphicNovels}
-                  onSelectBook={setSelectedBook}
-                />
-              )}
-            </div>
-          )}
-
-          {activeTab === 'folders' && (
-            <FolderOrganizer
+          {activeTab === 'discover' && (
+            <DiscoverView
               books={books}
               onSelectBook={setSelectedBook}
+              onEvaluateDirect={handleEvaluateDirect}
+              onOpenBulk={() => setIsEvaluateOpen(true)}
+            />
+          )}
+
+          {activeTab === 'history' && (
+            <HistoryView
+              books={books}
+              onSelectBook={setSelectedBook}
+              onDeleteBook={handleDeleteBook}
+              onOpenEvaluate={() => setIsEvaluateOpen(true)}
             />
           )}
 
