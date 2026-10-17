@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { BookEvaluation } from './types';
 import { INITIAL_BOOKS } from './data/initialBooks';
 import { DiscoverView } from './components/DiscoverView';
-import { HistoryView } from './components/HistoryView';
 import { BookShelf } from './components/BookShelf';
 import { FichaModal } from './components/FichaModal';
 import { EvaluateModal } from './components/EvaluateModal';
@@ -11,13 +10,12 @@ import { BottomNavBar } from './components/BottomNavBar';
 import { 
   fetchEvaluations, 
   saveEvaluation, 
-  deleteEvaluation,
   getLocalEvaluations 
 } from './services/supabase';
 
 export function App() {
   const [books, setBooks] = useState<BookEvaluation[]>(() => getLocalEvaluations());
-  const [activeTab, setActiveTab] = useState<'discover' | 'history' | 'shelves'>('discover');
+  const [activeTab, setActiveTab] = useState<'discover' | 'shelves'>('discover');
   const [selectedBook, setSelectedBook] = useState<BookEvaluation | null>(null);
   const [isEvaluateOpen, setIsEvaluateOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -44,21 +42,13 @@ export function App() {
 
   const handleBulkEvaluated = async (newBooks: BookEvaluation[]) => {
     setBooks((prev) => [...newBooks, ...prev]);
-    setActiveTab('history');
+    setActiveTab('discover');
     if (newBooks.length > 0) {
       setSelectedBook(newBooks[0]);
     }
     for (const b of newBooks) {
       await saveEvaluation(b);
     }
-  };
-
-  const handleDeleteBook = async (id: string) => {
-    setBooks((prev) => prev.filter((b) => b.id !== id));
-    if (selectedBook?.id === id) {
-      setSelectedBook(null);
-    }
-    await deleteEvaluation(id);
   };
 
   const handleToggleWishlist = (book: BookEvaluation) => {
@@ -100,15 +90,15 @@ export function App() {
       {/* Mobile-First Frame (Clean Apple Container) */}
       <div className="w-full max-w-md sm:max-w-xl md:max-w-2xl min-h-screen flex flex-col bg-[#ffffff] border-x border-neutral-200/80 shadow-[0_0_40px_rgba(0,0,0,0.04)] relative pb-24">
         
-        {/* Minimalist Apple Header */}
-        <header className="px-6 pt-6 pb-2 text-center select-none">
+        {/* Minimalist Apple Header with Instrument Serif font */}
+        <header className="px-6 pt-7 pb-2 text-center select-none">
           <h1
-            className="text-2xl sm:text-3xl font-extrabold tracking-widest font-serif uppercase text-[#1d1d1f]"
-            style={{ fontFamily: "'Cinzel', serif" }}
+            className="text-4xl sm:text-5xl font-normal tracking-tight text-[#1d1d1f]"
+            style={{ fontFamily: "'Instrument Serif', serif" }}
           >
-            PROTOCOLO
+            Veredito
           </h1>
-          <p className="text-[11px] font-medium tracking-wide text-[#86868b] uppercase pt-0.5">
+          <p className="text-[11px] font-medium tracking-wider text-[#86868b] uppercase pt-0.5">
             Avaliador Pessoal de Livros & HQs
           </p>
         </header>
@@ -119,15 +109,6 @@ export function App() {
             <DiscoverView
               books={books}
               onSelectBook={setSelectedBook}
-              onOpenEvaluate={() => setIsEvaluateOpen(true)}
-            />
-          )}
-
-          {activeTab === 'history' && (
-            <HistoryView
-              books={books}
-              onSelectBook={setSelectedBook}
-              onDeleteBook={handleDeleteBook}
               onOpenEvaluate={() => setIsEvaluateOpen(true)}
             />
           )}
@@ -171,14 +152,14 @@ export function App() {
           )}
         </main>
 
-        {/* Apple-style Bottom Navigation Bar */}
+        {/* Apple-style Bottom Navigation Bar (Início, +, Estante) */}
         <BottomNavBar
           activeTab={activeTab}
           onSelectTab={setActiveTab}
           onOpenEvaluate={() => setIsEvaluateOpen(true)}
         />
 
-        {/* Ficha Protocolo Modal */}
+        {/* Ficha Veredito Modal */}
         <FichaModal
           book={selectedBook}
           onClose={() => setSelectedBook(null)}

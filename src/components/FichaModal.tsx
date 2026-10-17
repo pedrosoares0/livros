@@ -160,7 +160,7 @@ ${book.resumo}
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-[#1d1d1f]" />
               <span className="text-xs font-bold uppercase tracking-wider text-[#86868b]">
-                Ficha Protocolo
+                Ficha Veredito
               </span>
             </div>
             <div className="flex items-center gap-1.5">

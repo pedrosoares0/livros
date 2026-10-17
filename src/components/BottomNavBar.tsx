@@ -1,10 +1,10 @@
 import React from 'react';
-import { BookOpen, History, Library } from 'lucide-react';
+import { BookOpen, Library } from 'lucide-react';
 import { PearlButton } from './PearlButton';
 
 interface BottomNavBarProps {
-  activeTab: 'discover' | 'history' | 'shelves';
-  onSelectTab: (tab: 'discover' | 'history' | 'shelves') => void;
+  activeTab: 'discover' | 'shelves';
+  onSelectTab: (tab: 'discover' | 'shelves') => void;
   onOpenEvaluate: () => void;
 }
 
@@ -16,10 +16,10 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
   return (
     <nav
       aria-label="Navegação Principal"
-      className="fixed bottom-5 left-1/2 -translate-x-1/2 z-40 w-[90%] max-w-xs sm:max-w-sm pointer-events-auto"
+      className="fixed bottom-5 left-1/2 -translate-x-1/2 z-40 w-[84%] max-w-xs sm:max-w-sm pointer-events-auto"
     >
       <div
-        className="flex items-center justify-between px-3 py-1.5 rounded-full border"
+        className="flex items-center justify-between px-4 py-1.5 rounded-full border"
         style={{
           background: 'rgba(255, 255, 255, 0.72)',
           backdropFilter: 'blur(30px) saturate(200%)',
@@ -31,7 +31,7 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
         {/* Tab 1: Início */}
         <button
           onClick={() => onSelectTab('discover')}
-          className={`flex flex-col items-center justify-center py-1.5 px-3 rounded-full transition-all duration-150 select-none cursor-pointer active:scale-[0.93] ${
+          className={`flex flex-col items-center justify-center py-1.5 px-4 rounded-full transition-all duration-150 select-none cursor-pointer active:scale-[0.93] ${
             activeTab === 'discover'
               ? 'text-[#1d1d1f] font-bold bg-neutral-200/50'
               : 'text-[#86868b] hover:text-[#1d1d1f]'
@@ -52,23 +52,10 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
           />
         </div>
 
-        {/* Tab 2: Histórico */}
-        <button
-          onClick={() => onSelectTab('history')}
-          className={`flex flex-col items-center justify-center py-1.5 px-3 rounded-full transition-all duration-150 select-none cursor-pointer active:scale-[0.93] ${
-            activeTab === 'history'
-              ? 'text-[#1d1d1f] font-bold bg-neutral-200/50'
-              : 'text-[#86868b] hover:text-[#1d1d1f]'
-          }`}
-        >
-          <History className="w-4 h-4 mb-0.5" strokeWidth={activeTab === 'history' ? 2.3 : 1.75} />
-          <span className="text-[10px] tracking-tight">Histórico</span>
-        </button>
-
-        {/* Tab 3: Estante (Restaurada no lugar do Ranking) */}
+        {/* Tab 2: Estante */}
         <button
           onClick={() => onSelectTab('shelves')}
-          className={`flex flex-col items-center justify-center py-1.5 px-3 rounded-full transition-all duration-150 select-none cursor-pointer active:scale-[0.93] ${
+          className={`flex flex-col items-center justify-center py-1.5 px-4 rounded-full transition-all duration-150 select-none cursor-pointer active:scale-[0.93] ${
             activeTab === 'shelves'
               ? 'text-[#1d1d1f] font-bold bg-neutral-200/50'
               : 'text-[#86868b] hover:text-[#1d1d1f]'
