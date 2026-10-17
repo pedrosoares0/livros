@@ -1,0 +1,23 @@
+{
+  "name": "Protocolo — Avaliador Pessoal de Livros",
+  "short_name": "Protocolo",
+  "description": "Avaliador pessoal de livros, HQs e coletâneas.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f5f5f7",
+  "theme_color": "#f5f5f7",
+  "icons": [
+    {
+      "src": "/icon2.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon2.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
