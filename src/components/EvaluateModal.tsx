@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Search, ListPlus, X, ArrowRight, Loader2, BookOpen } from 'lucide-react';
+import { Search, ListPlus, X, Loader2, BookOpen, Check } from 'lucide-react';
 import confetti from 'canvas-confetti';
-import { searchBookApi, evaluateBook, evaluateBulkList } from '../services/evaluator';
+import { searchBookApi, evaluateBulkList, evaluateBook } from '../services/evaluator';
+import { evaluateWithGemini } from '../services/geminiEvaluator';
 import { BookEvaluation } from '../types';
 import { BookCover } from './BookCover';
+import { PearlButton } from './PearlButton';
 
 interface EvaluateModalProps {
   isOpen: boolean;
@@ -12,6 +14,13 @@ interface EvaluateModalProps {
   onBookEvaluated: (book: BookEvaluation) => void;
   onBulkEvaluated: (books: BookEvaluation[]) => void;
 }
+
+const EVALUATION_STEPS = [
+  'Localizando edição em português e premissa...',
+  'Analisando estrutura, ritmo e temas...',
+  'Consultando o Gemini com o seu perfil...',
+  'Calibrando Nota Técnica e Nota de Encaixe...',
+];
 
 export const EvaluateModal: React.FC<EvaluateModalProps> = ({
   isOpen,
@@ -23,6 +32,7 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
   const [query, setQuery] = useState('');
   const [bulkText, setBulkText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [loadingStepIndex, setLoadingStepIndex] = useState(0);
   const [apiSuggestions, setApiSuggestions] = useState<Partial<BookEvaluation>[]>([]);
 
   if (!isOpen) return null;
@@ -42,57 +52,71 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
     }
   };
 
-  const handleSelectBook = (rawBook: Partial<BookEvaluation>) => {
+  const runEvaluationWithProgress = async (
+    title: string,
+    extraContext?: { author?: string; description?: string; coverUrl?: string; pages?: number; genres?: string[] }
+  ) => {
     setIsLoading(true);
-    setTimeout(() => {
-      const evaluation = evaluateBook({
-        title: rawBook.title || 'Livro',
-        author: rawBook.author,
-        pages: rawBook.pages,
-        description: rawBook.resumo,
-        genres: rawBook.genres,
-        coverUrl: rawBook.coverUrl,
-      });
+    setLoadingStepIndex(0);
 
-      if (evaluation.notaEncaixe >= 9.0) {
+    const stepInterval = setInterval(() => {
+      setLoadingStepIndex((prev) => (prev < EVALUATION_STEPS.length - 1 ? prev + 1 : prev));
+    }, 700);
+
+    try {
+      // 1. Try real Gemini 3.8 Flash evaluation with user taste profile
+      let evaluation: BookEvaluation;
+      try {
+        evaluation = await evaluateWithGemini(title, extraContext);
+      } catch (geminiError) {
+        console.warn('Gemini call failed, using calibrated fallback engine:', geminiError);
+        evaluation = evaluateBook({
+          title,
+          author: extraContext?.author,
+          pages: extraContext?.pages,
+          description: extraContext?.description,
+          genres: extraContext?.genres,
+          coverUrl: extraContext?.coverUrl,
+        });
+      }
+
+      // Ensure minimum thinking time so user can see the analysis steps
+      await new Promise((resolve) => setTimeout(resolve, 800));
+
+      if (evaluation.notaEncaixe >= 8.5) {
         confetti({
           particleCount: 50,
           spread: 60,
           origin: { y: 0.6 },
-          colors: ['#1d1d1f', '#d97706', '#0284c7'],
+          colors: ['#1d1d1f', '#10b981', '#f59e0b'],
         });
       }
 
       onBookEvaluated(evaluation);
-      setIsLoading(false);
       onClose();
-    }, 280);
+    } catch (err) {
+      console.error('Fatal evaluation error:', err);
+    } finally {
+      clearInterval(stepInterval);
+      setIsLoading(false);
+      setLoadingStepIndex(0);
+    }
+  };
+
+  const handleSelectBook = (rawBook: Partial<BookEvaluation>) => {
+    runEvaluationWithProgress(rawBook.title || 'Livro', {
+      author: rawBook.author,
+      description: rawBook.resumo,
+      coverUrl: rawBook.coverUrl,
+      pages: rawBook.pages,
+      genres: rawBook.genres,
+    });
   };
 
   const handleDirectEvaluate = (e: React.FormEvent) => {
     e.preventDefault();
     if (!query.trim()) return;
-
-    setIsLoading(true);
-    setTimeout(() => {
-      const evaluation = evaluateBook({
-        title: query.trim(),
-        description: `Obra avaliada pelo perfil pessoal: ${query}.`,
-      });
-
-      if (evaluation.notaEncaixe >= 9.0) {
-        confetti({
-          particleCount: 50,
-          spread: 60,
-          origin: { y: 0.6 },
-          colors: ['#1d1d1f', '#d97706', '#0284c7'],
-        });
-      }
-
-      onBookEvaluated(evaluation);
-      setIsLoading(false);
-      onClose();
-    }, 300);
+    runEvaluationWithProgress(query.trim());
   };
 
   const handleBulkSubmit = (e: React.FormEvent) => {
@@ -105,78 +129,110 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
       onBulkEvaluated(results);
       setIsLoading(false);
       onClose();
-    }, 450);
+    }, 1200);
   };
 
   return (
     <AnimatePresence>
       <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 overflow-hidden">
-        {/* Apple Translucent Dimming Backdrop */}
+        {/* Backdrop */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
-          onClick={onClose}
+          onClick={() => !isLoading && onClose()}
           className="absolute inset-0 bg-black/40 backdrop-blur-sm z-10"
         />
 
-        {/* Apple Modal Card */}
+        {/* Modal Window */}
         <motion.div
           initial={{ y: 24, opacity: 0, scale: 0.98 }}
           animate={{ y: 0, opacity: 1, scale: 1 }}
           exit={{ y: 20, opacity: 0, scale: 0.98 }}
           transition={{ type: 'spring', damping: 28, stiffness: 320 }}
-          className="relative z-20 w-full max-w-lg bg-[#ffffff] border border-black/[0.08] rounded-t-3xl sm:rounded-3xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.25)] overflow-hidden text-[#1d1d1f] flex flex-col max-h-[90vh]"
+          className="relative w-full max-w-lg max-h-[90vh] bg-white border border-neutral-200/90 rounded-t-3xl sm:rounded-3xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.25)] flex flex-col overflow-hidden text-[#1d1d1f] z-20"
         >
-          {/* Header */}
-          <div className="flex items-center justify-between px-6 pt-5 pb-3 border-b border-black/[0.06] bg-[#ffffff]/90 backdrop-blur-md">
-            <div className="flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-full bg-neutral-100 flex items-center justify-center text-[#1d1d1f]">
-                <BookOpen className="w-4 h-4" strokeWidth={2} />
-              </div>
-              <h2 className="text-base font-bold tracking-tight text-[#1d1d1f]">
-                Avaliar com o Protocolo
-              </h2>
+          {/* Header Bar */}
+          <div className="flex items-center justify-between px-6 pt-4 pb-3 border-b border-neutral-100 bg-white/90 backdrop-blur-lg sticky top-0 z-20">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-[#1d1d1f]" />
+              <span className="text-xs font-bold uppercase tracking-wider text-[#86868b]">
+                Avaliador do Protocolo
+              </span>
             </div>
-            <button
-              onClick={onClose}
-              aria-label="Fechar"
-              className="p-1.5 rounded-full hover:bg-neutral-100 text-[#86868b] hover:text-[#1d1d1f] transition-all duration-150 active:scale-90"
-            >
-              <X className="w-5 h-5" />
-            </button>
+            {!isLoading && (
+              <button
+                onClick={onClose}
+                aria-label="Fechar"
+                className="p-1.5 rounded-full hover:bg-neutral-100 text-[#86868b] hover:text-[#1d1d1f] transition-all duration-150 active:scale-90 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            )}
           </div>
 
           {/* Mode Switcher Tabs */}
-          <div className="flex p-1 mx-6 mt-4 rounded-xl bg-neutral-100 border border-neutral-200/70">
-            <button
-              onClick={() => setTab('single')}
-              className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition-all duration-150 flex items-center justify-center gap-2 select-none active:scale-[0.98] ${
-                tab === 'single'
-                  ? 'bg-white text-[#1d1d1f] shadow-sm font-bold'
-                  : 'text-[#86868b] hover:text-[#1d1d1f]'
-              }`}
-            >
-              <Search className="w-3.5 h-3.5" />
-              <span>Livro Único</span>
-            </button>
-            <button
-              onClick={() => setTab('bulk')}
-              className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition-all duration-150 flex items-center justify-center gap-2 select-none active:scale-[0.98] ${
-                tab === 'bulk'
-                  ? 'bg-white text-[#1d1d1f] shadow-sm font-bold'
-                  : 'text-[#86868b] hover:text-[#1d1d1f]'
-              }`}
-            >
-              <ListPlus className="w-3.5 h-3.5" />
-              <span>Colar Lista em Massa</span>
-            </button>
-          </div>
+          {!isLoading && (
+            <div className="flex p-1 mx-6 mt-4 rounded-xl bg-neutral-100 border border-neutral-200/70">
+              <button
+                onClick={() => setTab('single')}
+                className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition-all duration-150 flex items-center justify-center gap-2 select-none active:scale-[0.98] cursor-pointer ${
+                  tab === 'single'
+                    ? 'bg-white text-[#1d1d1f] shadow-xs font-bold'
+                    : 'text-[#86868b] hover:text-[#1d1d1f]'
+                }`}
+              >
+                <Search className="w-3.5 h-3.5" />
+                <span>Livro Único</span>
+              </button>
+              <button
+                onClick={() => setTab('bulk')}
+                className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition-all duration-150 flex items-center justify-center gap-2 select-none active:scale-[0.98] cursor-pointer ${
+                  tab === 'bulk'
+                    ? 'bg-white text-[#1d1d1f] shadow-xs font-bold'
+                    : 'text-[#86868b] hover:text-[#1d1d1f]'
+                }`}
+              >
+                <ListPlus className="w-3.5 h-3.5" />
+                <span>Colar Lista em Lote</span>
+              </button>
+            </div>
+          )}
 
-          {/* Form Content */}
+          {/* Content Area */}
           <div className="p-6 overflow-y-auto hide-scrollbar space-y-4">
-            {tab === 'single' ? (
+            {isLoading ? (
+              /* Thoughtful Stepped Evaluation Loading State */
+              <div className="py-10 px-4 text-center space-y-5">
+                <div className="relative w-14 h-14 mx-auto flex items-center justify-center">
+                  <div className="absolute inset-0 rounded-full border-2 border-neutral-200 animate-ping opacity-30" />
+                  <div className="w-12 h-12 rounded-full border-2 border-neutral-300 border-t-neutral-900 animate-spin" />
+                  <BookOpen className="w-5 h-5 text-neutral-800 absolute" />
+                </div>
+
+                <div className="space-y-1.5">
+                  <h3 className="text-sm font-bold text-[#1d1d1f]">
+                    Avaliando com base no seu perfil
+                  </h3>
+                  <p className="text-xs text-[#86868b] font-medium transition-all duration-300">
+                    {EVALUATION_STEPS[loadingStepIndex]}
+                  </p>
+                </div>
+
+                {/* Progress Indicators */}
+                <div className="flex justify-center gap-1.5 pt-2">
+                  {EVALUATION_STEPS.map((_, i) => (
+                    <div
+                      key={i}
+                      className={`h-1 rounded-full transition-all duration-300 ${
+                        i <= loadingStepIndex ? 'w-6 bg-neutral-900' : 'w-2 bg-neutral-200'
+                      }`}
+                    />
+                  ))}
+                </div>
+              </div>
+            ) : tab === 'single' ? (
               <div className="space-y-4">
                 <form onSubmit={handleDirectEvaluate} className="space-y-3">
                   <label className="text-xs font-semibold text-[#1d1d1f] block">
@@ -188,44 +244,40 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                       type="text"
                       value={query}
                       onChange={(e) => handleInputChange(e.target.value)}
-                      placeholder="Ex: 1984, Duna, Vidas Secas, 9788535914849..."
+                      placeholder="Ex: 1984, Duna, Vidas Secas, O Processo..."
                       className="w-full pl-11 pr-4 py-3 rounded-2xl bg-neutral-100/80 focus:bg-white border border-neutral-200/90 focus:border-neutral-400 focus:ring-2 focus:ring-black/5 text-[#1d1d1f] placeholder-[#86868b] text-sm focus:outline-none transition-all duration-150"
+                      autoFocus
                     />
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#86868b]" />
                   </div>
 
-                  <div className="flex items-center justify-between text-[11px] text-[#86868b] pt-1">
-                    <span>Google Books API (pt-BR) & BrasilAPI (CBL)</span>
-                    <button
+                  <div className="flex items-center justify-between pt-1">
+                    <span className="text-[11px] text-[#86868b]">Motor Gemini 3.8 Flash calibrado</span>
+                    <PearlButton
                       type="submit"
-                      disabled={!query.trim() || isLoading}
-                      className="px-4 py-2 rounded-xl bg-[#1d1d1f] text-white font-semibold text-xs hover:bg-black transition-all active:scale-[0.97] flex items-center gap-1.5 disabled:opacity-40 cursor-pointer shadow-sm"
-                    >
-                      {isLoading ? (
-                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                      ) : (
-                        <ArrowRight className="w-3.5 h-3.5" />
-                      )}
-                      <span>Avaliar Direto</span>
-                    </button>
+                      disabled={!query.trim()}
+                      label="Avaliar livro"
+                      size="nav"
+                      className="disabled:opacity-40"
+                    />
                   </div>
                 </form>
 
                 {/* Suggestions from Books API */}
                 {apiSuggestions.length > 0 && (
-                  <div className="space-y-2.5 pt-3 border-t border-neutral-200/60">
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-[#86868b] block">
+                  <div className="space-y-2 pt-3 border-t border-neutral-200/60">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#86868b] block">
                       Edições em Português Encontradas ({apiSuggestions.length})
                     </span>
 
-                    <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
+                    <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
                       {apiSuggestions.map((book, idx) => (
                         <div
                           key={book.id || idx}
                           onClick={() => handleSelectBook(book)}
                           className="flex items-center gap-3.5 p-2.5 rounded-2xl bg-neutral-50 hover:bg-neutral-100/80 border border-neutral-200/60 hover:border-neutral-300 cursor-pointer transition-all duration-150 active:scale-[0.98]"
                         >
-                          <div className="w-11 h-16 shrink-0">
+                          <div className="w-10 h-14 shrink-0">
                             <BookCover
                               title={book.title || 'Livro'}
                               author={book.author || 'Autor'}
@@ -240,14 +292,14 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                             <p className="text-[11px] text-[#86868b] truncate">
                               {book.author}
                             </p>
-                            <span className="text-[10px] text-[#86868b] font-mono">
-                              ~{book.pages} páginas {book.year ? `• ${book.year}` : ''}
+                            <span className="text-[10px] text-[#86868b] font-score">
+                              ~{book.pages} páginas
                             </span>
                           </div>
 
-                          <button className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-neutral-200/80 hover:bg-neutral-300 text-[#1d1d1f] shrink-0 transition-colors">
+                          <span className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-neutral-200/80 hover:bg-neutral-300 text-[#1d1d1f] shrink-0 transition-colors">
                             Avaliar
-                          </button>
+                          </span>
                         </div>
                       ))}
                     </div>
@@ -258,42 +310,30 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
               <form onSubmit={handleBulkSubmit} className="space-y-3.5">
                 <div className="space-y-1">
                   <label className="text-xs font-semibold text-[#1d1d1f] block">
-                    Cole uma lista de livros (um por linha):
+                    Cole sua lista (um livro por linha):
                   </label>
                   <p className="text-[11px] text-[#86868b]">
-                    O Protocolo irá analisar e classificar todos em ordem decrescente de Nota de Encaixe.
+                    Exemplo: <em>Duna - Frank Herbert</em> ou apenas <em>1984</em>.
                   </p>
                 </div>
 
                 <textarea
-                  rows={6}
                   value={bulkText}
                   onChange={(e) => setBulkText(e.target.value)}
-                  placeholder="1984 — George Orwell&#10;A Estrada — Cormac McCarthy&#10;O Velho e o Mar — Hemingway&#10;Vidas Secas — Graciliano Ramos&#10;Flores para Algernon"
-                  className="w-full p-3.5 rounded-2xl bg-neutral-100/80 focus:bg-white border border-neutral-200/90 focus:border-neutral-400 focus:ring-2 focus:ring-black/5 text-[#1d1d1f] placeholder-[#86868b] text-xs font-mono focus:outline-none transition-all resize-none"
+                  placeholder={`Vidas Secas - Graciliano Ramos&#10;1984 - George Orwell&#10;A Estrada - Cormac McCarthy&#10;Kallocaína - Karin Boye`}
+                  rows={6}
+                  className="w-full p-3.5 rounded-2xl bg-neutral-100/80 focus:bg-white border border-neutral-200/90 focus:border-neutral-400 focus:ring-2 focus:ring-black/5 text-[#1d1d1f] placeholder-[#86868b] text-xs font-mono focus:outline-none transition-all duration-150 resize-none leading-relaxed"
                 />
 
-                <div className="p-3 rounded-xl bg-amber-50 border border-amber-200/60 text-amber-900 text-xs flex items-start gap-2">
-                  <span className="font-bold shrink-0">💡</span>
-                  <span>
-                    O algoritmo aplica os pesos do seu perfil e reordena automaticamente os livros do maior para o menor encaixe.
-                  </span>
+                <div className="flex justify-end pt-1">
+                  <PearlButton
+                    type="submit"
+                    disabled={!bulkText.trim()}
+                    label="Avaliar Lista Completa"
+                    size="nav"
+                    className="disabled:opacity-40"
+                  />
                 </div>
-
-                <button
-                  type="submit"
-                  disabled={!bulkText.trim() || isLoading}
-                  className="w-full py-3 rounded-2xl bg-[#1d1d1f] text-white font-bold text-xs hover:bg-black transition-all active:scale-[0.97] flex items-center justify-center gap-2 disabled:opacity-40 shadow-md cursor-pointer"
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Analisando Lista no Protocolo...</span>
-                    </>
-                  ) : (
-                    <span>Calibrar e Ordenar Lista</span>
-                  )}
-                </button>
               </form>
             )}
           </div>

@@ -1,10 +1,10 @@
 import React from 'react';
-import { Sparkles, History, Award } from 'lucide-react';
+import { BookOpen, History, Library } from 'lucide-react';
 import { PearlButton } from './PearlButton';
 
 interface BottomNavBarProps {
-  activeTab: 'discover' | 'history' | 'ranking';
-  onSelectTab: (tab: 'discover' | 'history' | 'ranking') => void;
+  activeTab: 'discover' | 'history' | 'shelves';
+  onSelectTab: (tab: 'discover' | 'history' | 'shelves') => void;
   onOpenEvaluate: () => void;
 }
 
@@ -28,7 +28,7 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
           boxShadow: '0 16px 40px -8px rgba(0, 0, 0, 0.12), 0 2px 8px -2px rgba(0, 0, 0, 0.04), inset 0 1px 1px rgba(255, 255, 255, 0.95)',
         }}
       >
-        {/* Tab 1: Descobrir / Avaliador */}
+        {/* Tab 1: Início */}
         <button
           onClick={() => onSelectTab('discover')}
           className={`flex flex-col items-center justify-center py-1.5 px-3 rounded-full transition-all duration-150 select-none cursor-pointer active:scale-[0.93] ${
@@ -37,22 +37,22 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
               : 'text-[#86868b] hover:text-[#1d1d1f]'
           }`}
         >
-          <Sparkles className="w-4 h-4 mb-0.5" strokeWidth={activeTab === 'discover' ? 2.3 : 1.75} />
-          <span className="text-[10px] tracking-tight">Descobrir</span>
+          <BookOpen className="w-4 h-4 mb-0.5" strokeWidth={activeTab === 'discover' ? 2.3 : 1.75} />
+          <span className="text-[10px] tracking-tight">Início</span>
         </button>
 
-        {/* Center Action: Pearl Button (+) */}
+        {/* Center Action: Pearl Button with ONLY '+' */}
         <div className="px-1 shrink-0 -my-1">
           <PearlButton
             size="nav"
             showIconOnly={true}
             onClick={onOpenEvaluate}
-            aria-label="Avaliar nova obra"
-            title="Avaliar nova obra"
+            aria-label="Avaliar novo livro"
+            title="Avaliar novo livro"
           />
         </div>
 
-        {/* Tab 2: Histórico (Substituiu Pastas 3D) */}
+        {/* Tab 2: Histórico */}
         <button
           onClick={() => onSelectTab('history')}
           className={`flex flex-col items-center justify-center py-1.5 px-3 rounded-full transition-all duration-150 select-none cursor-pointer active:scale-[0.93] ${
@@ -65,17 +65,17 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
           <span className="text-[10px] tracking-tight">Histórico</span>
         </button>
 
-        {/* Tab 3: Ranking */}
+        {/* Tab 3: Estante (Restaurada no lugar do Ranking) */}
         <button
-          onClick={() => onSelectTab('ranking')}
+          onClick={() => onSelectTab('shelves')}
           className={`flex flex-col items-center justify-center py-1.5 px-3 rounded-full transition-all duration-150 select-none cursor-pointer active:scale-[0.93] ${
-            activeTab === 'ranking'
+            activeTab === 'shelves'
               ? 'text-[#1d1d1f] font-bold bg-neutral-200/50'
               : 'text-[#86868b] hover:text-[#1d1d1f]'
           }`}
         >
-          <Award className="w-4 h-4 mb-0.5" strokeWidth={activeTab === 'ranking' ? 2.3 : 1.75} />
-          <span className="text-[10px] tracking-tight">Ranking</span>
+          <Library className="w-4 h-4 mb-0.5" strokeWidth={activeTab === 'shelves' ? 2.3 : 1.75} />
+          <span className="text-[10px] tracking-tight">Estante</span>
         </button>
       </div>
     </nav>

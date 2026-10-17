@@ -3,6 +3,7 @@ import { BookEvaluation } from '../types';
 import { Search, Trash2, Clock, CheckCircle2, AlertTriangle, XCircle, ArrowUpDown } from 'lucide-react';
 import { BookCover } from './BookCover';
 import { ScoreBadge } from './ScoreBadge';
+import { PearlButton } from './PearlButton';
 
 interface HistoryViewProps {
   books: BookEvaluation[];
@@ -41,23 +42,23 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
   const getVereditoPill = (tipo: 'leia' | 'ressalvas' | 'evite') => {
     if (tipo === 'leia') {
       return (
-        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500 text-white border border-emerald-400">
-          <CheckCircle2 className="w-3 h-3" />
+        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-neutral-900 text-white">
+          <CheckCircle2 className="w-3 h-3 text-emerald-400" />
           LEIA
         </span>
       );
     }
     if (tipo === 'ressalvas') {
       return (
-        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-400 text-amber-950 border border-amber-300">
-          <AlertTriangle className="w-3 h-3" />
+        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-neutral-100 text-neutral-800 border border-neutral-200">
+          <AlertTriangle className="w-3 h-3 text-amber-500" />
           RESSALVAS
         </span>
       );
     }
     return (
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500 text-white border border-rose-400">
-        <XCircle className="w-3 h-3" />
+      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-neutral-100 text-neutral-800 border border-neutral-200">
+        <XCircle className="w-3 h-3 text-rose-500" />
         EVITE
       </span>
     );
@@ -124,13 +125,13 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
         </div>
       </div>
 
-      {/* Filter Tabs */}
+      {/* Unified Monochrome Apple Filter Tabs */}
       <div className="flex items-center gap-1.5 overflow-x-auto pb-1 hide-scrollbar">
         <button
           onClick={() => setFilterType('all')}
           className={`px-3 py-1 rounded-full text-[11px] font-semibold whitespace-nowrap transition-all duration-150 cursor-pointer active:scale-95 ${
             filterType === 'all'
-              ? 'bg-[#1d1d1f] text-white'
+              ? 'bg-[#1d1d1f] text-white shadow-xs'
               : 'bg-neutral-100 text-[#86868b] hover:text-[#1d1d1f] border border-neutral-200/60'
           }`}
         >
@@ -140,8 +141,8 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
           onClick={() => setFilterType('leia')}
           className={`px-3 py-1 rounded-full text-[11px] font-semibold whitespace-nowrap transition-all duration-150 cursor-pointer active:scale-95 ${
             filterType === 'leia'
-              ? 'bg-emerald-600 text-white'
-              : 'bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-200'
+              ? 'bg-[#1d1d1f] text-white shadow-xs'
+              : 'bg-neutral-100 text-[#86868b] hover:text-[#1d1d1f] border border-neutral-200/60'
           }`}
         >
           Recomendados (LEIA)
@@ -150,8 +151,8 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
           onClick={() => setFilterType('ressalvas')}
           className={`px-3 py-1 rounded-full text-[11px] font-semibold whitespace-nowrap transition-all duration-150 cursor-pointer active:scale-95 ${
             filterType === 'ressalvas'
-              ? 'bg-amber-500 text-white'
-              : 'bg-amber-50 text-amber-800 hover:bg-amber-100 border border-amber-200'
+              ? 'bg-[#1d1d1f] text-white shadow-xs'
+              : 'bg-neutral-100 text-[#86868b] hover:text-[#1d1d1f] border border-neutral-200/60'
           }`}
         >
           Com Ressalvas
@@ -160,8 +161,8 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
           onClick={() => setFilterType('evite')}
           className={`px-3 py-1 rounded-full text-[11px] font-semibold whitespace-nowrap transition-all duration-150 cursor-pointer active:scale-95 ${
             filterType === 'evite'
-              ? 'bg-rose-600 text-white'
-              : 'bg-rose-50 text-rose-800 hover:bg-rose-100 border border-rose-200'
+              ? 'bg-[#1d1d1f] text-white shadow-xs'
+              : 'bg-neutral-100 text-[#86868b] hover:text-[#1d1d1f] border border-neutral-200/60'
           }`}
         >
           Reprovados (EVITE)
@@ -170,20 +171,22 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
 
       {/* Empty State */}
       {filtered.length === 0 && (
-        <div className="text-center py-12 px-4 rounded-3xl bg-neutral-50/80 border border-neutral-200/80 space-y-3">
+        <div className="text-center py-12 px-4 rounded-3xl bg-neutral-50/80 border border-neutral-200/80 space-y-4">
           <Clock className="w-10 h-10 text-neutral-300 mx-auto stroke-1" />
-          <h3 className="text-sm font-bold text-[#1d1d1f]">
-            {search ? 'Nenhum resultado para esta busca' : 'Nenhuma avaliação encontrada'}
-          </h3>
-          <p className="text-xs text-[#86868b] max-w-sm mx-auto">
-            Digite o título de qualquer livro para gerar uma ficha calibrada instantaneamente.
-          </p>
-          <button
-            onClick={onOpenEvaluate}
-            className="mt-2 px-4 py-2 rounded-xl bg-[#1d1d1f] text-white text-xs font-semibold hover:bg-black transition-all active:scale-95 cursor-pointer shadow-sm"
-          >
-            Avaliar Primeiro Livro
-          </button>
+          <div className="space-y-1">
+            <h3 className="text-sm font-bold text-[#1d1d1f]">
+              {search ? 'Nenhum resultado para esta busca' : 'Nenhuma avaliação encontrada'}
+            </h3>
+            <p className="text-xs text-[#86868b] max-w-sm mx-auto">
+              Digite o título de qualquer livro para gerar uma ficha calibrada pelo Gemini.
+            </p>
+          </div>
+          <div className="pt-2 flex justify-center">
+            <PearlButton
+              label="Avaliar livro"
+              onClick={onOpenEvaluate}
+            />
+          </div>
         </div>
       )}
 

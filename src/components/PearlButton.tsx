@@ -7,7 +7,7 @@ type PearlButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
 };
 
 export const PearlButton: React.FC<PearlButtonProps> = ({
-  label = "Avaliar Obra",
+  label = "Avaliar livro",
   size = 'default',
   showIconOnly = false,
   className = "",
@@ -36,10 +36,11 @@ export const PearlButton: React.FC<PearlButtonProps> = ({
           display: inline-flex;
           align-items: center;
           justify-content: center;
+          user-select: none;
         }
         .pearl-button .wrap {
           font-weight: 600;
-          color: rgba(255, 255, 255, 0.9);
+          color: rgba(255, 255, 255, 0.95);
           border-radius: inherit;
           position: relative;
           overflow: hidden;
@@ -50,37 +51,27 @@ export const PearlButton: React.FC<PearlButtonProps> = ({
           justify-content: center;
         }
         .pearl-button.size-default .wrap {
-          font-size: 16px;
-          padding: 14px 28px;
+          font-size: 15px;
+          padding: 14px 32px;
         }
         .pearl-button.size-nav .wrap {
           font-size: 13px;
           padding: 8px 16px;
         }
         .pearl-button.size-nav.icon-only .wrap {
-          font-size: 18px;
-          padding: 10px;
+          font-size: 20px;
+          padding: 0;
           width: 44px;
           height: 44px;
-        }
-        .pearl-button .wrap p span:nth-child(2) {
-          display: none;
-        }
-        .pearl-button:hover .wrap p span:nth-child(1) {
-          display: none;
-        }
-        .pearl-button:hover .wrap p span:nth-child(2) {
-          display: inline-block;
         }
         .pearl-button .wrap p {
           display: flex;
           align-items: center;
-          gap: 8px;
+          justify-content: center;
+          gap: 6px;
           margin: 0;
           transition: all 0.2s ease;
           transform: translateY(1%);
-          -webkit-mask-image: linear-gradient(to bottom, white 60%, rgba(255,255,255,0.7));
-                  mask-image: linear-gradient(to bottom, white 60%, rgba(255,255,255,0.7));
         }
         .pearl-button .wrap::before,
         .pearl-button .wrap::after {
@@ -128,7 +119,7 @@ export const PearlButton: React.FC<PearlButtonProps> = ({
           transform: translateY(3%);
         }
         .pearl-button:hover .wrap p {
-          transform: translateY(-2%);
+          transform: translateY(-1%);
         }
         .pearl-button:active {
           transform: translateY(2px) scale(0.98);
@@ -147,12 +138,10 @@ export const PearlButton: React.FC<PearlButtonProps> = ({
       >
         <div className="wrap">
           <p>
-            <span className="text-[13px] leading-none">✧</span>
-            <span className="text-[13px] leading-none">✦</span>
             {showIconOnly ? (
-              <span className="text-[17px] font-bold leading-none -ml-0.5 text-white/95">+</span>
+              <span className="text-[22px] font-bold leading-none text-white/95 select-none">+</span>
             ) : (
-              <span className="tracking-tight">{label}</span>
+              <span className="tracking-tight text-white/95">{label}</span>
             )}
           </p>
         </div>
