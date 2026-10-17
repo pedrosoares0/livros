@@ -11,25 +11,25 @@ PERFIL DO USUÁRIO:
 - Gêneros favoritos: Ficção científica conceitual/filosófica/existencial, fantasia sombria, worldbuilding denso e consistente, distopias, clássicos da literatura, contos e novelas densas, fábulas/alegorias sombrias, horror psicológico, drama humano pesado (guerra, culpa, trauma, luto, obsessão, poder, dilemas éticos/morais com consequências definitivas, personagens moralmente ambíguos).
 - Obras que o usuário amou (referência 9 a 10):
   * Senhor das Moscas (Golding) — Técnica 9, Encaixe 10
-  * A Revolução dos Bichos (Orwell)
-  * De Quanta Terra Precisa o Homem? (Tolstói)
-  * Flores para Algernon (Daniel Keyes)
-  * O Inferno de Dante
-  * Noites Brancas (Dostoiévski)
-  * A Chegada / Histórias da sua Vida (Ted Chiang)
-  * O Gato Preto (Poe)
-  * O Estranho Misterioso (Mark Twain/Dostoiévski)
-  * O Cair da Noite (Asimov)
-  * Contos de Beedle, o Bardo (Rowling)
-  * Colapso (Roberto Denser)
-  * Entre Quatro Paredes (Sartre)
-  * Diário de um Homem Supérfluo (Turguêniev)
-  * A Menina do Outro Lado (Nagabe)
-- Obras que o usuário REJEITOU ou abandonou:
-  * O Velho e o Mar (Hemingway) — parece profundo, mas soa raso, prolixo, lento e sem payoff.
-  * Encontro com Rama (Clarke) — devagar e abaixo das expectativas.
-  * Carta ao Pai (Kafka) — bem escrito, mas sem impacto emocional.
-  * As Fontes do Paraíso (Clarke) — hard sci-fi contemplativo demais.
+  * A Revolução dos Bichos (Orwell) — Técnica 9, Encaixe 10
+  * De Quanta Terra Precisa o Homem? (Tolstói) — Técnica 10, Encaixe 10
+  * Flores para Algernon (Daniel Keyes) — Técnica 10, Encaixe 10
+  * O Inferno de Dante — Técnica 10, Encaixe 10
+  * Noites Brancas (Dostoiévski) — Técnica 9.5, Encaixe 10
+  * A Chegada / Histórias da sua Vida (Ted Chiang) — Técnica 10, Encaixe 10
+  * O Gato Preto (Edgar Allan Poe) — Técnica 9.5, Encaixe 10
+  * O Estranho Misterioso (Mark Twain) — Técnica 9, Encaixe 10
+  * O Cair da Noite (Isaac Asimov) — Técnica 9, Encaixe 10
+  * Contos de Beedle, o Bardo (Rowling) — Técnica 8.5, Encaixe 9.5
+  * Colapso (Roberto Denser / DarkSide) — Técnica 8.5, Encaixe 9.5
+  * Entre Quatro Paredes (Sartre) — Técnica 9.5, Encaixe 10
+  * Diário de um Homem Supérfluo (Turguêniev) — Técnica 9.5, Encaixe 10
+  * A Menina do Outro Lado (Nagabe / DarkSide) — Técnica 9, Encaixe 9.5
+- Obras que o usuário REJEITOU (com notas do próprio leitor):
+  * O Velho e o Mar (Hemingway) — tenta ser profundo mas soa super raso, fraco, prolixo e lento; tenta dizer muito mas no final não diz nada.
+  * Encontro com Rama (Clarke) — decepcionante, muito devagar, personagens burocráticos.
+  * Carta ao Pai (Kafka) — muito bem escrito e ritmo ok, mas puramente formal e sem emoção, não tocou em nada.
+  * As Fontes do Paraíso (Clarke) — hard sci-fi contemplativo demais, ritmo arrastado sem impacto dramático.
 - Pesos negativos: romance como motor central, tramas fofas/cozy/acolhedoras, jovem adulto (YA) genérico/colegial, misticismo leve, comédia romântica, autoajuda disfarçada de ficção, prolixidade sem tensão dramática.
 - REGRA CRÍTICA: Qualidade técnica alta NÃO compensa um tom que o usuário rejeita. Uma obra pode ter Nota Técnica 8.5 e Nota de Encaixe 2.0 se tiver elementos que o usuário odeia (como romance piegas ou ritmo lento vazio).
 
@@ -76,7 +76,7 @@ Você DEVE responder ESTRITAMENTE em formato JSON com as seguintes chaves:
   "pages": 250, // número aproximado de páginas da edição brasileira mais comum
   "genres": ["Ficção Científica", "Distopia"],
   "resumo": "2 a 3 linhas focando clima, tema e premissa sem spoilers",
-  "movieComparisons": ["Filme 1", "Filme 2"], // 1 ou 2 filmes para visualizar a atmosfera/vibe
+  "movieComparisons": ["Filme 1", "Filme 2", "Filme 3"], // Forneça de 2 até 4 indicações de filmes do cinema mundial (de qualquer país ou época) que capturem a atmosfera, tom, ritmo ou conflito da obra
   "adaptacoes": "Menção curta a adaptações existentes em cinema, série, anime, HQ, ou 'Nenhuma adaptação conhecida'",
   "criteria": {
     "genericidade": 1.0, // 0 = extremamente original, 10 = clichê
@@ -137,7 +137,7 @@ Você DEVE responder ESTRITAMENTE em formato JSON com as seguintes chaves:
     coverUrl,
     genres: parsed.genres || ['Ficção'],
     resumo: parsed.resumo || '',
-    movieComparisons: Array.isArray(parsed.movieComparisons) ? parsed.movieComparisons.slice(0, 2) : [],
+    movieComparisons: Array.isArray(parsed.movieComparisons) ? parsed.movieComparisons.slice(0, 4) : [],
     adaptacoes: parsed.adaptacoes || 'Nenhuma adaptação conhecida',
     criteria: {
       genericidade: Number(parsed.criteria?.genericidade) || 5,

@@ -8,6 +8,7 @@ import {
 import { BookEvaluation } from '../types';
 import { BookCover } from './BookCover';
 import { ScoreBadge, getScoreTone } from './ScoreBadge';
+import { MovieThumb } from './MovieThumb';
 
 interface FichaModalProps {
   book: BookEvaluation | null;
@@ -274,31 +275,34 @@ ${book.resumo}
               </p>
             </div>
 
-            {/* Vibe Cinematográfica & Adaptações */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-              <div className="p-3 rounded-xl bg-neutral-50 border border-neutral-200/70 space-y-1.5">
+            {/* Vibe Cinematográfica Mundial (2 a 4 filmes com thumbnails visuais) */}
+            <div className="p-3.5 rounded-2xl bg-neutral-50/90 border border-neutral-200/80 space-y-2.5">
+              <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1.5 text-xs font-bold text-[#1d1d1f]">
                   <Film className="w-3.5 h-3.5 text-amber-700" />
-                  <span>Vibe de Filmes</span>
+                  <span>Vibe de Filmes (Cinema Mundial)</span>
                 </div>
-                <div className="flex flex-wrap gap-1.5">
-                  {book.movieComparisons.map((m, i) => (
-                    <span key={i} className="px-2 py-0.5 rounded-md bg-amber-100/70 border border-amber-200 text-xs font-semibold text-amber-900">
-                      {m}
-                    </span>
-                  ))}
-                </div>
+                <span className="text-[10px] text-[#86868b] font-medium">
+                  {book.movieComparisons.length} indicações
+                </span>
               </div>
+              
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                {book.movieComparisons.slice(0, 4).map((movie, i) => (
+                  <MovieThumb key={i} title={movie} />
+                ))}
+              </div>
+            </div>
 
-              <div className="p-3 rounded-xl bg-neutral-50 border border-neutral-200/70 space-y-1">
-                <div className="flex items-center gap-1.5 text-xs font-bold text-[#1d1d1f]">
-                  <Sparkles className="w-3.5 h-3.5 text-purple-700" />
-                  <span>Adaptações</span>
-                </div>
-                <p className="text-xs text-[#1d1d1f] leading-snug">
-                  {book.adaptacoes}
-                </p>
+            {/* Adaptações */}
+            <div className="p-3 rounded-xl bg-neutral-50 border border-neutral-200/70 space-y-1">
+              <div className="flex items-center gap-1.5 text-xs font-bold text-[#1d1d1f]">
+                <Sparkles className="w-3.5 h-3.5 text-purple-700" />
+                <span>Adaptações & Mídia</span>
               </div>
+              <p className="text-xs text-[#1d1d1f] leading-snug">
+                {book.adaptacoes}
+              </p>
             </div>
 
             {/* Critérios do Protocolo — Dashboard Visual Intuitivo */}
@@ -313,24 +317,24 @@ ${book.resumo}
                 </span>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 {criteriaList.map((crit, idx) => (
                   <div
                     key={idx}
-                    className="p-2.5 rounded-xl bg-neutral-50 hover:bg-neutral-100/70 border border-neutral-200/70 transition-all space-y-1.5"
+                    className="p-3 rounded-xl bg-neutral-50 hover:bg-neutral-100/70 border border-neutral-200/70 transition-all space-y-2"
                   >
                     <div className="flex items-center justify-between gap-1">
                       <div className="flex items-center gap-1.5 min-w-0">
                         {crit.icon}
-                        <span className="text-xs font-semibold text-[#1d1d1f] truncate">
+                        <span className="text-xs sm:text-[13px] font-bold text-[#1d1d1f] truncate">
                           {crit.label}
                         </span>
                       </div>
-                      <ScoreBadge score={crit.score} size="xs" />
+                      <ScoreBadge score={crit.score} size="criteria" />
                     </div>
 
                     {/* Progress track */}
-                    <div className="w-full bg-neutral-200/80 h-1.5 rounded-full overflow-hidden">
+                    <div className="w-full bg-neutral-200/80 h-2 rounded-full overflow-hidden">
                       <div
                         className={`h-full rounded-full transition-all duration-300 ${
                           crit.tone === 'green'
@@ -343,8 +347,8 @@ ${book.resumo}
                       />
                     </div>
 
-                    <div className="flex items-center justify-between text-[10px]">
-                      <span className={`font-semibold ${
+                    <div className="flex items-center justify-between text-[11px]">
+                      <span className={`font-bold ${
                         crit.tone === 'green'
                           ? 'text-emerald-700'
                           : crit.tone === 'yellow'

@@ -2,7 +2,7 @@ import React from 'react';
 
 interface ScoreBadgeProps {
   score: number;
-  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'criteria';
   className?: string;
   label?: string;
 }
@@ -27,6 +27,7 @@ export const ScoreBadge: React.FC<ScoreBadgeProps> = ({
     md: 'px-2.5 py-1 text-xs rounded-lg min-w-[28px]',
     lg: 'px-3 py-1 text-sm rounded-xl min-w-[34px]',
     xl: 'px-4 py-2 text-2xl rounded-2xl min-w-[56px]',
+    criteria: 'px-2.5 py-0.5 text-xs sm:text-sm font-black rounded-lg min-w-[30px] h-6 sm:h-7 flex items-center justify-center',
   };
 
   const toneStyles = {

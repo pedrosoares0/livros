@@ -3,6 +3,7 @@ import { BookEvaluation } from './types';
 import { INITIAL_BOOKS } from './data/initialBooks';
 import { DiscoverView } from './components/DiscoverView';
 import { BookShelf } from './components/BookShelf';
+import { EstanteView } from './components/EstanteView';
 import { FichaModal } from './components/FichaModal';
 import { EvaluateModal } from './components/EvaluateModal';
 import { ProfileModal } from './components/ProfileModal';
@@ -90,15 +91,15 @@ export function App() {
       {/* Mobile-First Frame (Clean Apple Container) */}
       <div className="w-full max-w-md sm:max-w-xl md:max-w-2xl min-h-screen flex flex-col bg-[#ffffff] border-x border-neutral-200/80 shadow-[0_0_40px_rgba(0,0,0,0.04)] relative pb-24">
         
-        {/* Minimalist Apple Header with Instrument Serif font */}
+        {/* Minimalist Apple Header with Instrument Serif font in italic and larger */}
         <header className="px-6 pt-7 pb-2 text-center select-none">
           <h1
-            className="text-4xl sm:text-5xl font-normal tracking-tight text-[#1d1d1f]"
+            className="text-5xl sm:text-6xl font-normal italic tracking-tight text-[#1d1d1f] leading-none"
             style={{ fontFamily: "'Instrument Serif', serif" }}
           >
-            Veredito
+            Protocolo
           </h1>
-          <p className="text-[11px] font-medium tracking-wider text-[#86868b] uppercase pt-0.5">
+          <p className="text-[11px] font-medium tracking-wider text-[#86868b] uppercase pt-1.5">
             Avaliador Pessoal de Livros & HQs
           </p>
         </header>
@@ -114,41 +115,10 @@ export function App() {
           )}
 
           {activeTab === 'shelves' && (
-            <div className="space-y-4 pb-12">
-              {recentEvaluated.length > 0 && (
-                <BookShelf
-                  title="Avaliados Recentemente"
-                  books={recentEvaluated}
-                  onSelectBook={setSelectedBook}
-                />
-              )}
-
-              <BookShelf
-                title="Ficção Científica & Existencial"
-                books={sciFiBooks}
-                onSelectBook={setSelectedBook}
-              />
-
-              <BookShelf
-                title="Clássicos & Drama Humano"
-                books={classicsDrama}
-                onSelectBook={setSelectedBook}
-              />
-
-              <BookShelf
-                title="Fantasia Sombria & Distopias"
-                books={darkFantasyDystopia}
-                onSelectBook={setSelectedBook}
-              />
-
-              {graphicNovels.length > 0 && (
-                <BookShelf
-                  title="Graphic Novels & Contos"
-                  books={graphicNovels}
-                  onSelectBook={setSelectedBook}
-                />
-              )}
-            </div>
+            <EstanteView
+              books={allShelfBooks}
+              onSelectBook={setSelectedBook}
+            />
           )}
         </main>
 
