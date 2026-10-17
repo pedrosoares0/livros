@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { FolderComponent } from './FolderComponent';
 import { BookEvaluation } from '../types';
 import { BookCover } from './BookCover';
+import { ScoreBadge } from './ScoreBadge';
 
 interface FolderOrganizerProps {
   books: BookEvaluation[];
@@ -151,17 +152,7 @@ export const FolderOrganizer: React.FC<FolderOrganizerProps> = ({
                   <h4 className="text-sm font-bold text-[#1d1d1f] truncate group-hover:text-black transition-colors">
                     {book.title}
                   </h4>
-                  <span
-                    className={`px-2 py-0.5 rounded-md text-[11px] font-score font-extrabold shrink-0 ${
-                      book.notaEncaixe >= 8
-                        ? 'bg-amber-50 text-amber-800 border border-amber-200'
-                        : book.notaEncaixe >= 6
-                        ? 'bg-sky-50 text-sky-800 border border-sky-200'
-                        : 'bg-rose-50 text-rose-800 border border-rose-200'
-                    }`}
-                  >
-                    {book.notaEncaixe}/10
-                  </span>
+                  <ScoreBadge score={book.notaEncaixe} size="sm" />
                 </div>
 
                 <p className="text-xs text-[#86868b] truncate">
@@ -175,7 +166,7 @@ export const FolderOrganizer: React.FC<FolderOrganizerProps> = ({
                 <div className="flex items-center gap-2 pt-0.5 text-[10px] text-[#86868b] font-score">
                   <span>~{book.pages} págs</span>
                   <span>•</span>
-                  <span>Técnica: {book.notaTecnica}/10</span>
+                  <span>Técnica: {book.notaTecnica}</span>
                 </div>
               </div>
             </div>

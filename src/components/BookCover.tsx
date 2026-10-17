@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { ScoreBadge } from './ScoreBadge';
 
 interface BookCoverProps {
   title: string;
@@ -91,16 +92,8 @@ export const BookCover: React.FC<BookCoverProps> = ({
 
       {/* Fit Score Badge on Cover */}
       {notaEncaixe !== undefined && (
-        <div
-          className={`absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded-md text-[11px] font-score font-black shadow-lg backdrop-blur-md border z-20 ${
-            notaEncaixe >= 8
-              ? 'bg-amber-500/90 text-white border-amber-300/60'
-              : notaEncaixe >= 6
-              ? 'bg-sky-500/90 text-white border-sky-300/60'
-              : 'bg-rose-500/90 text-white border-rose-300/60'
-          }`}
-        >
-          {notaEncaixe}
+        <div className="absolute top-1.5 right-1.5 z-20">
+          <ScoreBadge score={notaEncaixe} size="sm" />
         </div>
       )}
     </div>

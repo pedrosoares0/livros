@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { BookEvaluation } from '../types';
 import { Search } from 'lucide-react';
 import { BookCover } from './BookCover';
+import { ScoreBadge } from './ScoreBadge';
 
 interface RankingViewProps {
   books: BookEvaluation[];
@@ -134,26 +135,14 @@ export const RankingView: React.FC<RankingViewProps> = ({ books, onSelectBook })
 
               {/* Score Badges */}
               <div className="flex items-center justify-end gap-3 pl-9 sm:pl-0 shrink-0">
-                <div className="text-right">
-                  <span className="text-[9px] text-[#86868b] block uppercase">Técnica</span>
-                  <span className="text-sm font-bold font-score text-[#1d1d1f]">
-                    {book.notaTecnica}/10
-                  </span>
+                <div className="text-right flex flex-col items-end">
+                  <span className="text-[9px] text-[#86868b] block uppercase font-medium mb-0.5">Técnica</span>
+                  <ScoreBadge score={book.notaTecnica} size="sm" />
                 </div>
 
-                <div className="text-right">
-                  <span className="text-[9px] text-[#86868b] block uppercase">Encaixe</span>
-                  <span
-                    className={`text-base font-black font-score px-2 py-0.5 rounded-lg border ${
-                      book.notaEncaixe >= 8
-                        ? 'bg-amber-50 text-amber-800 border-amber-200'
-                        : book.notaEncaixe >= 6
-                        ? 'bg-sky-50 text-sky-800 border-sky-200'
-                        : 'bg-rose-50 text-rose-800 border-rose-200'
-                    }`}
-                  >
-                    {book.notaEncaixe}
-                  </span>
+                <div className="text-right flex flex-col items-end">
+                  <span className="text-[9px] text-[#86868b] block uppercase font-medium mb-0.5">Encaixe</span>
+                  <ScoreBadge score={book.notaEncaixe} size="md" />
                 </div>
               </div>
             </div>
