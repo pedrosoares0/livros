@@ -11,6 +11,7 @@ import { BookCover } from './BookCover';
 import { ScoreBadge, getScoreTone } from './ScoreBadge';
 import { MovieThumb } from './MovieThumb';
 import { fetchAlternativeCovers } from '../services/coverSearch';
+import { INITIAL_BOOKS } from '../data/initialBooks';
 
 interface FichaModalProps {
   book: BookEvaluation | null;
@@ -40,7 +41,11 @@ export const FichaModal: React.FC<FichaModalProps> = ({
     setIsCoverPickerOpen((prev) => !prev);
     if (!hasFetchedCovers) {
       setIsLoadingCovers(true);
-      const results = await fetchAlternativeCovers(book.title, book.author, book.coverUrl);
+      const initialMatch = INITIAL_BOOKS.find(
+        (ib) => ib.id === book.id || ib.title.toLowerCase() === book.title.toLowerCase()
+      );
+      const originalTitle = book.originalTitle || initialMatch?.originalTitle;
+      const results = await fetchAlternativeCovers(book.title, book.author, book.coverUrl, originalTitle);
       setAlternativeCovers(results);
       setIsLoadingCovers(false);
       setHasFetchedCovers(true);

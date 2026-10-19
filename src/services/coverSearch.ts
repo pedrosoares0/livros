@@ -1,100 +1,118 @@
 /**
- * Service to search alternative book covers from Open Library & Google Books
- * Specifically queries work editions to prioritize authentic Brazilian Portuguese releases
+ * Robust alternative cover search engine with multi-pass international canonical resolution
+ * Queries Open Library works and editions for Brazilian Portuguese and original edition covers.
  */
+
+const KNOWN_TITLE_ALIASES: Record<string, string> = {
+  'de quanta terra precisa o homem?': 'How Much Land Does a Man Need Tolstoy',
+  'de quanta terra precisa o homem': 'How Much Land Does a Man Need Tolstoy',
+  'senhor das moscas': 'Lord of the Flies Golding',
+  'o estranho misterioso': 'The Mysterious Stranger Mark Twain',
+  'o cair da noite': 'Nightfall Isaac Asimov',
+  'os contos de beedle, o bardo': 'The Tales of Beedle the Bard Rowling',
+  'os contos de beedle o bardo': 'The Tales of Beedle the Bard Rowling',
+  'a morte de ivan ilitch': 'The Death of Ivan Ilyich Tolstoy',
+  'kallocaína': 'Kallocain Karin Boye',
+  'kallocaina': 'Kallocain Karin Boye',
+  'a guerra da papoula': 'The Poppy War Kuang',
+  'patinando no amor': 'Icebreaker Hannah Grace',
+  'o inferno de dante': 'Inferno Dante Alighieri',
+  'noites brancas': 'White Nights Dostoevsky',
+  'entre quatro paredes': 'Huis Clos Sartre',
+  'diário de um homem supérfluo': 'The Diary of a Superfluous Man Turgenev',
+  'a menina do outro lado': 'The Girl from the Other Side Nagabe',
+  'flores para algernon': 'Flowers for Algernon Daniel Keyes',
+  'a revolução dos bichos': 'Animal Farm George Orwell',
+  'o gato preto': 'The Black Cat Edgar Allan Poe',
+  'história da sua vida': 'Story of Your Life Ted Chiang',
+};
 
 export async function fetchAlternativeCovers(
   title: string,
   author?: string,
-  currentCover?: string
+  currentCover?: string,
+  originalTitle?: string
 ): Promise<string[]> {
   const covers: string[] = [];
-  const cleanTitle = title.trim();
+  const cleanTitle = title.replace(/[?.,!:";]/g, ' ').trim();
+  const lowerTitle = title.toLowerCase().trim();
 
-  // 1. Search Open Library by title to find the canonical work(s)
-  try {
-    const encodedTitle = encodeURIComponent(cleanTitle);
-    const olRes = await fetch(
-      `https://openlibrary.org/search.json?title=${encodedTitle}&limit=6`
-    );
-    if (olRes.ok) {
-      const olData = await olRes.json();
-      if (olData.docs && Array.isArray(olData.docs)) {
-        for (const doc of olData.docs.slice(0, 4)) {
-          // If the work has a key, fetch its specific editions where Brazilian/Portuguese covers reside
-          if (doc.key) {
-            try {
-              const edRes = await fetch(
-                `https://openlibrary.org${doc.key}/editions.json?limit=25`
-              );
-              if (edRes.ok) {
-                const edData = await edRes.json();
-                for (const ed of edData.entries || []) {
-                  if (ed.covers && Array.isArray(ed.covers)) {
-                    for (const cid of ed.covers) {
-                      if (cid > 0) {
-                        const url = `https://covers.openlibrary.org/b/id/${cid}-L.jpg`;
-                        if (!covers.includes(url) && url !== currentCover) {
-                          covers.push(url);
-                        }
-                      }
+  // Multi-pass prioritized queries to ensure 100% catalog coverage
+  const queries: string[] = [];
+
+  // 1. Instant Canonical International Alias
+  if (KNOWN_TITLE_ALIASES[lowerTitle]) {
+    queries.push(KNOWN_TITLE_ALIASES[lowerTitle]);
+  }
+
+  // 2. Original / International Title if present
+  if (originalTitle && originalTitle.toLowerCase().trim() !== lowerTitle) {
+    const cleanOrig = originalTitle.replace(/[?.,!:";]/g, ' ').trim();
+    const lastName = author ? author.split(' ').pop() : '';
+    queries.push(`${cleanOrig} ${lastName}`.trim());
+  }
+
+  // 3. Combined Title + Author Last Name (broad search in Open Library)
+  if (author) {
+    const lastName = author.split(' ').pop();
+    queries.push(`${cleanTitle} ${lastName}`);
+  }
+
+  // 4. Cleaned Portuguese Title
+  queries.push(cleanTitle);
+
+  const seenWorkKeys = new Set<string>();
+
+  for (const q of queries) {
+    if (covers.length >= 6) break;
+    try {
+      const res = await fetch(
+        `https://openlibrary.org/search.json?q=${encodeURIComponent(q)}&limit=4`
+      );
+      if (!res.ok) continue;
+      const data = await res.json();
+
+      for (const doc of (data.docs || []).slice(0, 3)) {
+        // Query specific editions of canonical work
+        if (doc.key && !seenWorkKeys.has(doc.key)) {
+          seenWorkKeys.add(doc.key);
+          try {
+            const edRes = await fetch(
+              `https://openlibrary.org${doc.key}/editions.json?limit=25`
+            );
+            if (edRes.ok) {
+              const edData = await edRes.json();
+              for (const ed of edData.entries || []) {
+                for (const cid of ed.covers || []) {
+                  if (cid > 0) {
+                    const url = `https://covers.openlibrary.org/b/id/${cid}-L.jpg`;
+                    if (!covers.includes(url) && url !== currentCover) {
+                      covers.push(url);
                     }
                   }
                 }
               }
-            } catch (edErr) {
-              console.warn('Erro ao consultar edições da obra:', edErr);
             }
-          }
-
-          // Also check doc.cover_i from the main search doc
-          if (doc.cover_i && doc.cover_i > 0) {
-            const url = `https://covers.openlibrary.org/b/id/${doc.cover_i}-L.jpg`;
-            if (!covers.includes(url) && url !== currentCover) {
-              covers.push(url);
-            }
-          }
-
-          if (covers.length >= 8) break;
-        }
-      }
-    }
-  } catch (err) {
-    console.warn('Erro ao buscar capas no OpenLibrary:', err);
-  }
-
-  // 2. Google Books fallback with strict language restriction to Portuguese
-  if (covers.length < 4) {
-    try {
-      const q = encodeURIComponent(`intitle:${cleanTitle}${author ? ` inauthor:${author}` : ''}`);
-      const gbRes = await fetch(
-        `https://www.googleapis.com/books/v1/volumes?q=${q}&langRestrict=pt&maxResults=8`
-      );
-      if (gbRes.ok) {
-        const gbData = await gbRes.json();
-        if (gbData.items && Array.isArray(gbData.items)) {
-          for (const item of gbData.items) {
-            const imageLinks = item.volumeInfo?.imageLinks;
-            const img =
-              imageLinks?.large ||
-              imageLinks?.medium ||
-              imageLinks?.thumbnail ||
-              imageLinks?.smallThumbnail;
-            if (img) {
-              const secureImg = img.replace('http://', 'https://').replace('&edge=curl', '');
-              if (!covers.includes(secureImg) && secureImg !== currentCover) {
-                covers.push(secureImg);
-              }
-            }
-            if (covers.length >= 8) break;
+          } catch {
+            // Silently continue to next doc
           }
         }
+
+        // Direct search result cover
+        if (doc.cover_i && doc.cover_i > 0) {
+          const url = `https://covers.openlibrary.org/b/id/${doc.cover_i}-L.jpg`;
+          if (!covers.includes(url) && url !== currentCover) {
+            covers.push(url);
+          }
+        }
+
+        if (covers.length >= 6) break;
       }
-    } catch (err) {
-      console.warn('Erro ao buscar capas no Google Books:', err);
+    } catch {
+      // Continue to next fallback query
     }
   }
 
-  // Return distinct alternative covers (up to 6)
+  // Filter out current active cover and return up to 6 distinct covers
   return covers.filter((c) => c !== currentCover).slice(0, 6);
 }

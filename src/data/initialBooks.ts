@@ -101,7 +101,7 @@ export const INITIAL_BOOKS: BookEvaluation[] = [
     id: 'de-quanta-terra-precisa-o-homem',
     title: 'De Quanta Terra Precisa o Homem?',
     author: 'Liev Tolstói',
-    originalTitle: 'Mnogo li cheloveku zemli nuzhno?',
+    originalTitle: 'How Much Land Does a Man Need?',
     year: 1886,
     pages: 64,
     coverUrl: 'https://covers.openlibrary.org/b/id/12031152-L.jpg',
