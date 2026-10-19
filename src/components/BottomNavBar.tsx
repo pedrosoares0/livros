@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { Plus } from 'lucide-react';
+import { PearlButton } from './PearlButton';
 
 interface BottomNavBarProps {
   activeTab: 'discover' | 'shelves';
@@ -62,25 +62,15 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
           </span>
         </button>
 
-        {/* Center Action: Sleek Tactile Rounded-Rectangular Evaluate Button */}
-        <div className="px-2 shrink-0">
-          <button
+        {/* Center Action: Rectangular Pearl Button */}
+        <div className="px-1.5 shrink-0">
+          <PearlButton
+            size="nav-rect"
+            label="Avaliar"
             onClick={onOpenEvaluate}
             aria-label="Avaliar novo livro ou HQ"
             title="Avaliar novo livro"
-            className="group relative flex items-center justify-center gap-1.5 px-4 h-11 rounded-2xl select-none cursor-pointer transition-all duration-150 active:scale-95 shadow-[0_4px_16px_rgba(0,0,0,0.22),0_1px_2px_rgba(0,0,0,0.12)] border border-white/20"
-            style={{
-              background: 'linear-gradient(180deg, #2c2c2e 0%, #161617 100%)',
-            }}
-          >
-            {/* Subtle top glossy highlight reflection */}
-            <div className="absolute inset-x-1.5 top-0.5 h-[1px] bg-gradient-to-r from-transparent via-white/40 to-transparent pointer-events-none rounded-full" />
-            
-            <Plus className="w-4 h-4 text-white stroke-[2.5] transition-transform duration-200 group-hover:rotate-90" />
-            <span className="text-xs font-bold text-white tracking-tight pr-0.5">
-              Avaliar
-            </span>
-          </button>
+          />
         </div>
 
         {/* Tab 2: Estante */}

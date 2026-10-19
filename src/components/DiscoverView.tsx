@@ -1,5 +1,5 @@
 import React from 'react';
-import { BookOpen, CheckCircle2, AlertTriangle, XCircle, Sparkles } from 'lucide-react';
+import { BookOpen } from 'lucide-react';
 import { BookEvaluation } from '../types';
 import { BookCover } from './BookCover';
 import { ScoreBadge } from './ScoreBadge';
@@ -18,31 +18,6 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
 }) => {
   const topMatches = books.filter((b) => b.notaEncaixe >= 8);
   const recentEvaluations = books.slice(0, 10);
-
-  const renderVereditoMiniPill = (tipo: 'leia' | 'ressalvas' | 'evite') => {
-    if (tipo === 'leia') {
-      return (
-        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-          <CheckCircle2 className="w-2.5 h-2.5" />
-          <span>LEIA</span>
-        </span>
-      );
-    }
-    if (tipo === 'ressalvas') {
-      return (
-        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
-          <AlertTriangle className="w-2.5 h-2.5" />
-          <span>RESSALVAS</span>
-        </span>
-      );
-    }
-    return (
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
-        <XCircle className="w-2.5 h-2.5" />
-        <span>EVITE</span>
-      </span>
-    );
-  };
 
   return (
     <div className="w-full space-y-7 px-5 sm:px-6 pt-3 pb-24">
@@ -73,12 +48,9 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
       {topMatches.length > 0 && (
         <div className="space-y-3.5 pt-1">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-              <h3 className="text-xs font-bold uppercase tracking-wider text-[#1d1d1f]">
-                Recomendações de Alto Encaixe
-              </h3>
-            </div>
+            <h3 className="text-xs font-bold uppercase tracking-wider text-[#1d1d1f]">
+              Recomendações de Alto Encaixe
+            </h3>
             <span className="text-xs font-semibold text-[#86868b]">
               {topMatches.length} {topMatches.length === 1 ? 'obra' : 'obras'}
             </span>
@@ -116,9 +88,9 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
         </div>
       )}
 
-      {/* Últimas Avaliações — Visual Apple Card List */}
+      {/* Últimas Avaliações — Large Visual Cards */}
       {recentEvaluations.length > 0 && (
-        <div className="space-y-3 pt-2">
+        <div className="space-y-3.5 pt-2">
           <div className="flex items-center justify-between">
             <h3 className="text-xs font-bold uppercase tracking-wider text-[#86868b]">
               Últimas Avaliações
@@ -128,15 +100,15 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
             </span>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-3.5">
             {recentEvaluations.map((book) => (
               <div
                 key={book.id}
                 onClick={() => onSelectBook(book)}
-                className="p-3 sm:p-3.5 rounded-2xl bg-white hover:bg-neutral-50/90 border border-neutral-200/80 hover:border-neutral-300 transition-all duration-200 cursor-pointer flex items-center gap-3.5 sm:gap-4 group active:scale-[0.99] shadow-xs hover:shadow-sm"
+                className="p-4 sm:p-5 rounded-2xl bg-white hover:bg-neutral-50/90 border border-neutral-200/80 hover:border-neutral-300 transition-all duration-200 cursor-pointer flex items-center gap-4 sm:gap-5 group active:scale-[0.99] shadow-xs hover:shadow-sm"
               >
-                {/* Visual Book Cover with Prominent Sizing */}
-                <div className="w-14 sm:w-16 shrink-0">
+                {/* Large Visual Book Cover */}
+                <div className="w-20 sm:w-24 shrink-0 transition-transform duration-200 group-hover:scale-[1.02]">
                   <BookCover
                     title={book.title}
                     author={book.author}
@@ -144,34 +116,31 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
                   />
                 </div>
 
-                {/* Rich Details */}
-                <div className="flex-1 min-w-0 space-y-1.5">
-                  <div className="flex items-start justify-between gap-2">
+                {/* Rich Book Details */}
+                <div className="flex-1 min-w-0 space-y-2">
+                  <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <h4 className="text-sm font-bold text-[#1d1d1f] truncate group-hover:text-black leading-snug">
+                      <h4 className="text-base sm:text-lg font-bold text-[#1d1d1f] truncate group-hover:text-black leading-snug">
                         {book.title}
                       </h4>
-                      <p className="text-xs text-[#86868b] truncate">
+                      <p className="text-xs sm:text-sm text-[#86868b] truncate pt-0.5">
                         {book.author} {book.year ? `• ${book.year}` : ''} {book.pages ? `• ~${book.pages} págs` : ''}
                       </p>
                     </div>
 
-                    {/* Prominent Score Badge */}
+                    {/* Prominent Large Score Badge */}
                     <div className="shrink-0 flex flex-col items-end">
-                      <ScoreBadge score={book.notaEncaixe} size="md" />
-                      <span className="text-[9px] font-semibold text-[#86868b] mt-0.5">
+                      <ScoreBadge score={book.notaEncaixe} size="lg" />
+                      <span className="text-[9px] font-bold text-[#86868b] uppercase tracking-wider mt-1">
                         Encaixe
                       </span>
                     </div>
                   </div>
 
-                  {/* Veredito Preview & Pill */}
-                  <div className="flex items-center gap-2 pt-0.5">
-                    {renderVereditoMiniPill(book.vereditoTipo)}
-                    <p className="text-[11px] text-[#6e6e73] italic truncate flex-1">
-                      "{book.veredito}"
-                    </p>
-                  </div>
+                  {/* Veredito Quote without any fake badges */}
+                  <p className="text-xs sm:text-sm text-[#515154] italic leading-relaxed line-clamp-2 border-l-2 border-neutral-200 pl-2.5">
+                    "{book.veredito}"
+                  </p>
                 </div>
               </div>
             ))}
