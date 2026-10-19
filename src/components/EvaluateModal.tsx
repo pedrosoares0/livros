@@ -211,14 +211,8 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
           transition={{ type: 'spring', damping: 28, stiffness: 320 }}
           className="relative w-full max-w-lg max-h-[90vh] bg-white border border-neutral-200/90 rounded-t-3xl sm:rounded-3xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.25)] flex flex-col overflow-hidden text-[#1d1d1f] z-20"
         >
-          {/* Header Bar */}
-          <div className="flex items-center justify-between px-6 pt-4 pb-3 border-b border-neutral-100 bg-white/90 backdrop-blur-lg sticky top-0 z-20">
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-[#1d1d1f]" />
-              <span className="text-xs font-bold uppercase tracking-wider text-[#1d1d1f]">
-                Avaliador do Veredito
-              </span>
-            </div>
+          {/* Clean Top Action Bar with Close Button */}
+          <div className="flex items-center justify-end px-6 pt-3.5 pb-1 sticky top-0 z-20 bg-white/95 backdrop-blur-md">
             {!isLoading && (
               <button
                 onClick={onClose}
@@ -397,17 +391,17 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                       </span>
                     </div>
 
-                    <div className="space-y-2.5 max-h-72 overflow-y-auto pr-1">
+                    <div className="space-y-2.5 max-h-80 overflow-y-auto pr-1">
                       {apiSuggestions.map((book, idx) => {
                         const isAlready = findAlreadyEvaluated(book.title || '');
                         return (
                           <div
                             key={book.id || idx}
                             onClick={() => handleSelectBook(book)}
-                            className="group flex items-center gap-4 p-3 rounded-2xl bg-neutral-50 hover:bg-neutral-100/90 border border-neutral-200/70 hover:border-neutral-300 cursor-pointer transition-all duration-200 active:scale-[0.98] shadow-2xs hover:shadow-xs"
+                            className="group flex items-center gap-4 sm:gap-4.5 p-3 sm:p-3.5 rounded-2xl bg-neutral-50 hover:bg-neutral-100/90 border border-neutral-200/70 hover:border-neutral-300 cursor-pointer transition-all duration-200 active:scale-[0.98] shadow-2xs hover:shadow-xs"
                           >
                             {/* Generous Large Cover with 2:3 Aspect Ratio */}
-                            <div className="w-20 sm:w-24 shrink-0 transition-transform duration-200 group-hover:scale-105">
+                            <div className="w-24 sm:w-28 shrink-0 transition-transform duration-200 group-hover:scale-105">
                               <BookCover
                                 title={book.title || 'Livro'}
                                 author={book.author || 'Autor'}
