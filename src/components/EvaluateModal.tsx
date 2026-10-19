@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Search, ListPlus, X, BookOpen, ChevronRight, AlertTriangle, Check, Loader2 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { searchBookApi, evaluateBulkList, evaluateBook } from '../services/evaluator';
-import { evaluateWithGemini } from '../services/geminiEvaluator';
+import { evaluateWithGemini, evaluateBulkWithGemini } from '../services/geminiEvaluator';
 import { BookEvaluation } from '../types';
 import { BookCover } from './BookCover';
 import { AceternityButton } from './AceternityButton';
@@ -41,6 +41,7 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
   const [isSearching, setIsSearching] = useState(false);
   const [loadingStepIndex, setLoadingStepIndex] = useState(0);
   const [duplicateWarning, setDuplicateWarning] = useState<BookEvaluation | null>(null);
+  const [evalError, setEvalError] = useState<string | null>(null);
   const [apiSuggestions, setApiSuggestions] = useState<Partial<BookEvaluation>[]>([]);
 
   const searchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -121,6 +122,7 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
     title: string,
     extraContext?: { author?: string; description?: string; coverUrl?: string; pages?: number; genres?: string[] }
   ) => {
+    setEvalError(null);
     setIsLoading(true);
     setLoadingStepIndex(0);
 
@@ -129,22 +131,9 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
     }, 700);
 
     try {
-      let evaluation: BookEvaluation;
-      try {
-        evaluation = await evaluateWithGemini(title, extraContext);
-      } catch (geminiError) {
-        console.warn('Gemini call failed, using calibrated fallback engine:', geminiError);
-        evaluation = evaluateBook({
-          title,
-          author: extraContext?.author,
-          pages: extraContext?.pages,
-          description: extraContext?.description,
-          genres: extraContext?.genres,
-          coverUrl: extraContext?.coverUrl,
-        });
-      }
+      const evaluation = await evaluateWithGemini(title, extraContext);
 
-      await new Promise((resolve) => setTimeout(resolve, 800));
+      await new Promise((resolve) => setTimeout(resolve, 600));
 
       if (evaluation.notaEncaixe >= 8) {
         confetti({
@@ -157,8 +146,11 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
 
       onBookEvaluated(evaluation);
       onClose();
-    } catch (err) {
+    } catch (err: any) {
       console.error('Fatal evaluation error:', err);
+      setEvalError(
+        'Falha ao obter avaliação da IA do Gemini. Por favor, tente novamente em alguns segundos.'
+      );
     } finally {
       clearInterval(stepInterval);
       setIsLoading(false);
@@ -169,6 +161,7 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
   const handleSelectBook = (rawBook: Partial<BookEvaluation>) => {
     // Dismiss mobile keyboard on selection
     (document.activeElement as HTMLElement)?.blur();
+    setEvalError(null);
 
     const existing = findAlreadyEvaluated(rawBook.title || query);
     if (existing) {
@@ -191,6 +184,7 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
 
     // Dismiss mobile keyboard on submit
     (document.activeElement as HTMLElement)?.blur();
+    setEvalError(null);
 
     const existing = findAlreadyEvaluated(query.trim());
     if (existing) {
@@ -201,15 +195,29 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
     runEvaluationWithProgress(query.trim());
   };
 
-  const handleBulkSubmit = (e: React.FormEvent) => {
+  const handleBulkSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!bulkText.trim()) return;
 
     (document.activeElement as HTMLElement)?.blur();
-
+    setEvalError(null);
     setIsLoading(true);
-    setTimeout(() => {
-      const results = evaluateBulkList(bulkText);
+    setLoadingStepIndex(0);
+
+    const stepInterval = setInterval(() => {
+      setLoadingStepIndex((prev) => (prev < EVALUATION_STEPS.length - 1 ? prev + 1 : prev));
+    }, 700);
+
+    try {
+      const lines = bulkText.split(/[\n;]+/).map((l) => l.trim()).filter((l) => l.length > 2);
+      let results: BookEvaluation[];
+      try {
+        results = await evaluateBulkWithGemini(lines);
+      } catch (geminiError) {
+        console.warn('Gemini bulk call failed, falling back:', geminiError);
+        results = evaluateBulkList(bulkText);
+      }
+
       const newOnly = results.filter((b) => !findAlreadyEvaluated(b.title));
       if (newOnly.length === 0 && results.length > 0) {
         const firstDup = findAlreadyEvaluated(results[0].title);
@@ -220,9 +228,15 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
         }
       }
       onBulkEvaluated(newOnly.length > 0 ? newOnly : results);
-      setIsLoading(false);
       onClose();
-    }, 1200);
+    } catch (err: any) {
+      console.error('Bulk error:', err);
+      setEvalError('Falha ao avaliar a lista com a IA. Tente novamente.');
+    } finally {
+      clearInterval(stepInterval);
+      setIsLoading(false);
+      setLoadingStepIndex(0);
+    }
   };
 
   return (
@@ -374,6 +388,32 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                           </AceternityButton>
                         )}
                       </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* Evaluation Error Banner */}
+                <AnimatePresence>
+                  {evalError && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -8, scale: 0.98 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -8, scale: 0.98 }}
+                      className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200/90 text-rose-950 text-xs flex items-center justify-between gap-3 shadow-2xs"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-6 h-6 rounded-full bg-rose-100 flex items-center justify-center shrink-0">
+                          <AlertTriangle className="w-3.5 h-3.5 text-rose-700" />
+                        </div>
+                        <span className="leading-snug font-medium text-[11px] text-rose-900">{evalError}</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setEvalError(null)}
+                        className="text-rose-700 hover:text-rose-950 text-[11px] font-bold px-2 py-1 rounded-lg hover:bg-rose-100/70 transition-colors cursor-pointer shrink-0"
+                      >
+                        Fechar
+                      </button>
                     </motion.div>
                   )}
                 </AnimatePresence>

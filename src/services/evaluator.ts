@@ -345,13 +345,21 @@ export function evaluateBook(
     worldbuilding = 3;
   }
 
-  // 6. Ritmo & Qualidade Técnica
-  const pages = rawBook.pages || 240;
+  // 6. Ritmo & Páginas
+  let defaultPages = 320;
+  if (text.includes('sanderson') || text.includes('tolkien') || text.includes('guerra e paz') || text.includes('ritmo da guerra') || text.includes('caminho dos reis') || text.includes('palavras de radiância')) {
+    defaultPages = 1200;
+  }
+  const pages = rawBook.pages && rawBook.pages > 30 ? rawBook.pages : defaultPages;
+
   let ritmo = 7;
   let ritmoDescricao = 'Leitura ágil com boa cadência dramática.';
   if (pages < 180) {
     ritmo = 8;
     ritmoDescricao = 'Tiro curto: leitura rápida de fim de semana, com alta densidade.';
+  } else if (pages > 700) {
+    ritmo = 4;
+    ritmoDescricao = 'Extremamente extenso e detalhado, ritmo cadenciado com desenvolvimento lento de mundo e cerco.';
   } else if (pages > 500) {
     ritmo = 5;
     ritmoDescricao = 'Mais lento e introspectivo, exige fôlego para mergulhar no mundo.';
@@ -448,7 +456,9 @@ export function evaluateBook(
 
   // Comparações com filmes do perfil
   const movieComparisons: string[] = [];
-  if (tomSombrio >= 8 && impactoEmocional >= 8) {
+  if (text.includes('sanderson') || text.includes('alta fantasia') || text.includes('stormlight') || text.includes('cosmere') || (text.includes('fantasia') && text.includes('guerra'))) {
+    movieComparisons.push('Duna', 'O Senhor dos Anéis: As Duas Torres', 'O Resgate do Soldado Ryan');
+  } else if (tomSombrio >= 8 && impactoEmocional >= 8) {
     movieComparisons.push('Seven', 'Manchester à Beira-Mar');
   } else if (text.includes('sci-fi') || text.includes('futuro') || worldbuilding >= 8) {
     movieComparisons.push('Blade Runner 2049', 'Interestelar');
@@ -457,7 +467,7 @@ export function evaluateBook(
   } else if (text.includes('distopia')) {
     movieComparisons.push('Clube da Luta', 'Planeta dos Macacos');
   } else {
-    movieComparisons.push('After Hours', 'Bastardos Inglórios');
+    movieComparisons.push('O Homem do Norte', 'Duna');
   }
 
   // Resumo sintetizado em 2 a 3 linhas sem spoilers
