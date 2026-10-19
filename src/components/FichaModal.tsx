@@ -84,42 +84,42 @@ ${book.resumo}
     {
       label: 'Originalidade',
       score: originalidade,
-      icon: <Compass className="w-3.5 h-3.5 text-amber-600" />,
+      icon: <Compass className="w-4 h-4 text-black stroke-[2.25]" />,
       tag: originalidade >= 8 ? 'Inovador' : originalidade >= 5 ? 'Equilibrado' : 'Clichê',
       tone: getScoreTone(originalidade),
     },
     {
       label: 'Qualidade Técnica',
       score: book.criteria.qualidadeTecnica,
-      icon: <Feather className="w-3.5 h-3.5 text-blue-600" />,
+      icon: <Feather className="w-4 h-4 text-black stroke-[2.25]" />,
       tag: book.criteria.qualidadeTecnica >= 8 ? 'Primorosa' : book.criteria.qualidadeTecnica >= 5 ? 'Competente' : 'Irregular',
       tone: getScoreTone(book.criteria.qualidadeTecnica),
     },
     {
       label: 'Worldbuilding',
       score: book.criteria.worldbuilding,
-      icon: <BookOpen className="w-3.5 h-3.5 text-purple-600" />,
+      icon: <BookOpen className="w-4 h-4 text-black stroke-[2.25]" />,
       tag: book.criteria.worldbuilding >= 8 ? 'Imersivo' : book.criteria.worldbuilding >= 5 ? 'Funcional' : 'Minimalista',
       tone: getScoreTone(book.criteria.worldbuilding),
     },
     {
       label: 'Ritmo / Pacing',
       score: book.criteria.ritmo,
-      icon: <Zap className="w-3.5 h-3.5 text-amber-600" />,
+      icon: <Zap className="w-4 h-4 text-black stroke-[2.25]" />,
       tag: book.criteria.ritmoDescricao || (book.criteria.ritmo >= 8 ? 'Excelente' : 'Cadenciado'),
       tone: getScoreTone(book.criteria.ritmo),
     },
     {
       label: 'Tom Sombrio',
       score: book.criteria.tomSombrio,
-      icon: <Moon className="w-3.5 h-3.5 text-stone-700" />,
+      icon: <Moon className="w-4 h-4 text-black stroke-[2.25]" />,
       tag: book.criteria.tomSombrio >= 8 ? 'Visceral' : book.criteria.tomSombrio >= 5 ? 'Sóbrio' : 'Leve',
       tone: getScoreTone(book.criteria.tomSombrio),
     },
     {
       label: 'Impacto Emocional',
       score: book.criteria.impactoEmocional,
-      icon: <HeartHandshake className="w-3.5 h-3.5 text-rose-600" />,
+      icon: <HeartHandshake className="w-4 h-4 text-black stroke-[2.25]" />,
       tag: book.criteria.impactoEmocional >= 8 ? 'Profundo' : book.criteria.impactoEmocional >= 5 ? 'Sensível' : 'Neutro',
       tone: getScoreTone(book.criteria.impactoEmocional),
     },
@@ -304,30 +304,33 @@ ${book.resumo}
                 {criteriaList.map((crit, idx) => (
                   <div
                     key={idx}
-                    className="p-3 rounded-xl bg-neutral-50 hover:bg-neutral-100/70 border border-neutral-200/70 transition-all space-y-2"
+                    className="p-3.5 rounded-xl bg-neutral-50 hover:bg-neutral-100/70 border border-neutral-200/70 transition-all space-y-2.5"
                   >
-                    <div className="flex items-center justify-between gap-1">
-                      <div className="flex items-center gap-1.5 min-w-0">
+                    <div className="flex items-center justify-between gap-1.5">
+                      <div className="flex items-center gap-2 min-w-0">
                         {crit.icon}
-                        <span className="text-xs sm:text-[13px] font-bold text-[#1d1d1f] truncate">
+                        <span className="text-sm sm:text-[15px] font-bold text-[#1d1d1f] tracking-tight truncate">
                           {crit.label}
                         </span>
                       </div>
                       <ScoreBadge score={crit.score} size="criteria" />
                     </div>
 
-                    {/* Progress track */}
-                    <div className="w-full bg-neutral-200/80 h-2 rounded-full overflow-hidden">
+                    {/* 3D Tactile Progress Track */}
+                    <div className="w-full h-3 rounded-full overflow-hidden bg-neutral-200/90 shadow-[inset_0_1.5px_2.5px_rgba(0,0,0,0.18),0_1px_1px_rgba(255,255,255,0.8)] border border-neutral-300/40 p-[1.5px]">
                       <div
-                        className={`h-full rounded-full transition-all duration-300 ${
+                        className={`h-full rounded-full transition-all duration-300 relative overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.22),inset_0_1px_1px_rgba(255,255,255,0.7),inset_0_-1px_1px_rgba(0,0,0,0.25)] ${
                           crit.tone === 'green'
-                            ? 'bg-emerald-500'
+                            ? 'bg-gradient-to-b from-emerald-400 via-emerald-500 to-emerald-600'
                             : crit.tone === 'yellow'
-                            ? 'bg-amber-400'
-                            : 'bg-rose-500'
+                            ? 'bg-gradient-to-b from-amber-300 via-amber-400 to-amber-500'
+                            : 'bg-gradient-to-b from-rose-400 via-rose-500 to-rose-600'
                         }`}
                         style={{ width: `${Math.min(100, Math.max(8, crit.score * 10))}%` }}
-                      />
+                      >
+                        {/* 3D Specular highlight reflection */}
+                        <div className="absolute inset-x-0 top-0 h-[45%] bg-gradient-to-b from-white/55 to-transparent rounded-t-full pointer-events-none" />
+                      </div>
                     </div>
 
                     <div className="flex items-center justify-between text-[11px]">

@@ -24,16 +24,16 @@ export const EstanteView: React.FC<EstanteViewProps> = ({
 }) => {
   const [selectedFilter, setSelectedFilter] = useState<FilterOption>('all');
 
-  const filterChips: { id: FilterOption; label: string; icon?: string }[] = [
+  const filterChips: { id: FilterOption; label: string }[] = [
     { id: 'all', label: 'Todas as Prateleiras' },
-    { id: 'obras-primas', label: 'Obras-Primas (10/10)', icon: '👑' },
-    { id: 'recomendados', label: 'Recomendados (8 - 9)', icon: '🎯' },
-    { id: 'ressalvas', label: 'Com Ressalvas (5 - 7)', icon: '⚠️' },
-    { id: 'rejeicao', label: 'Zona de Rejeição (≤ 4)', icon: '🚫' },
-    { id: 'scifi', label: 'Sci-Fi & Existencial', icon: '🚀' },
-    { id: 'classicos', label: 'Clássicos & Filosofia', icon: '🏛️' },
-    { id: 'darkside', label: 'DarkSide & Sombrios', icon: '🌑' },
-    { id: 'curtos', label: 'Contos & Obras Curtas', icon: '⚡' },
+    { id: 'obras-primas', label: 'Obras-Primas' },
+    { id: 'recomendados', label: 'Recomendados' },
+    { id: 'ressalvas', label: 'Vale com Ressalvas' },
+    { id: 'rejeicao', label: 'Zona de Rejeição' },
+    { id: 'scifi', label: 'Sci-Fi & Existencial' },
+    { id: 'classicos', label: 'Clássicos & Filosofia' },
+    { id: 'darkside', label: 'DarkSide & Sombrios' },
+    { id: 'curtos', label: 'Contos & Obras Curtas' },
   ];
 
   // Helper matching functions for dynamic, intelligent categorization
@@ -113,7 +113,6 @@ export const EstanteView: React.FC<EstanteViewProps> = ({
                     : 'bg-neutral-100/90 text-[#86868b] hover:text-[#1d1d1f] hover:bg-neutral-200/80 border border-neutral-200/60'
                 }`}
               >
-                {chip.icon && <span className="text-[11px]">{chip.icon}</span>}
                 <span>{chip.label}</span>
               </button>
             );
@@ -133,9 +132,9 @@ export const EstanteView: React.FC<EstanteViewProps> = ({
             />
           )}
 
-          {/* Obras-Primas / Favoritos 10/10 */}
+          {/* Obras-Primas / Favoritos */}
           <BookShelf
-            title="Obras-Primas & Favoritos (Nota 10)"
+            title="Obras-Primas & Favoritos"
             books={obrasPrimasBooks}
             onSelectBook={onSelectBook}
           />
@@ -161,19 +160,19 @@ export const EstanteView: React.FC<EstanteViewProps> = ({
             onSelectBook={onSelectBook}
           />
 
-          {/* Livros com Ressalvas (ex: avaliações nota 5 a 7 como Choppenhauer) */}
+          {/* Livros com Ressalvas */}
           {ressalvasBooks.length > 0 && (
             <BookShelf
-              title="Vale com Ressalvas (Notas 5 a 7)"
+              title="Vale com Ressalvas"
               books={ressalvasBooks}
               onSelectBook={onSelectBook}
             />
           )}
 
-          {/* Zona de Rejeição / Evite (O Velho e o Mar, Rama, Carta ao Pai, etc.) */}
+          {/* Zona de Rejeição / Evite */}
           {rejeicaoBooks.length > 0 && (
             <BookShelf
-              title="Zona de Rejeição & Evite (Nota ≤ 4)"
+              title="Zona de Rejeição & Evite"
               books={rejeicaoBooks}
               onSelectBook={onSelectBook}
             />
@@ -183,7 +182,7 @@ export const EstanteView: React.FC<EstanteViewProps> = ({
 
       {selectedFilter === 'obras-primas' && (
         <BookShelf
-          title="Obras-Primas do Leitor (10/10)"
+          title="Obras-Primas do Leitor"
           books={obrasPrimasBooks}
           onSelectBook={onSelectBook}
         />
@@ -191,7 +190,7 @@ export const EstanteView: React.FC<EstanteViewProps> = ({
 
       {selectedFilter === 'recomendados' && (
         <BookShelf
-          title="Recomendados pelo Veredito (Nota 8 a 9)"
+          title="Recomendados pelo Veredito"
           books={recomendadosBooks}
           onSelectBook={onSelectBook}
         />
@@ -199,7 +198,7 @@ export const EstanteView: React.FC<EstanteViewProps> = ({
 
       {selectedFilter === 'ressalvas' && (
         <BookShelf
-          title="Vale com Ressalvas (Nota 5 a 7)"
+          title="Vale com Ressalvas"
           books={ressalvasBooks}
           onSelectBook={onSelectBook}
         />
@@ -207,7 +206,7 @@ export const EstanteView: React.FC<EstanteViewProps> = ({
 
       {selectedFilter === 'rejeicao' && (
         <BookShelf
-          title="Zona de Rejeição (Nota ≤ 4)"
+          title="Zona de Rejeição"
           books={rejeicaoBooks}
           onSelectBook={onSelectBook}
         />
@@ -239,7 +238,7 @@ export const EstanteView: React.FC<EstanteViewProps> = ({
 
       {selectedFilter === 'curtos' && (
         <BookShelf
-          title="Contos & Obras Curtas (até 180 págs)"
+          title="Contos & Obras Curtas"
           books={curtosBooks}
           onSelectBook={onSelectBook}
         />

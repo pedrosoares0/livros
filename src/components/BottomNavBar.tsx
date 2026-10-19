@@ -14,21 +14,30 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
   onOpenEvaluate,
 }) => {
   return (
-    <nav
-      aria-label="Navegação Principal"
-      className="fixed bottom-5 left-1/2 -translate-x-1/2 z-40 w-[92%] max-w-sm pointer-events-auto"
-    >
-      <div
-        className="flex items-center justify-between p-1.5 rounded-[28px] border"
-        style={{
-          background: 'rgba(255, 255, 255, 0.84)',
-          backdropFilter: 'blur(36px) saturate(210%)',
-          WebkitBackdropFilter: 'blur(36px) saturate(210%)',
-          borderColor: 'rgba(255, 255, 255, 0.95)',
-          boxShadow:
-            '0 18px 45px -10px rgba(0, 0, 0, 0.14), 0 2px 10px -2px rgba(0, 0, 0, 0.05), inset 0 1px 1.5px rgba(255, 255, 255, 1)',
-        }}
+    <>
+      {/* Liquid Glass Filter Definition */}
+      <svg className="fixed w-0 h-0 pointer-events-none opacity-0" aria-hidden="true">
+        <filter id="lg-filter">
+          <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="3" result="noise" />
+          <feDisplacementMap in="SourceGraphic" in2="noise" scale="5" xChannelSelector="R" yChannelSelector="G" />
+        </filter>
+      </svg>
+
+      <nav
+        aria-label="Navegação Principal"
+        className="fixed bottom-5 left-1/2 -translate-x-1/2 z-40 w-[92%] max-w-[420px] pointer-events-auto"
       >
+        <div
+          className="flex items-center justify-between p-2 select-none"
+          style={{
+            borderRadius: '120px',
+            background: 'rgba(255, 255, 255, 0.07)',
+            backdropFilter: 'blur(16px) saturate(1.8) brightness(1.15) contrast(1.05)',
+            WebkitBackdropFilter: 'blur(16px) saturate(1.8) brightness(1.15) contrast(1.05)',
+            boxShadow:
+              'inset 0 0 0 1px rgba(255, 255, 255, 0.15), inset 1.5px 1.5px 0 rgba(255, 255, 255, 0.5), inset 0 0 12px rgba(255, 255, 255, 0.2), 0 8px 32px rgba(0, 0, 0, 0.2)',
+          }}
+        >
         {/* Tab 1: Início */}
         <button
           onClick={() => onSelectTab('discover')}
@@ -110,5 +119,6 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
         </button>
       </div>
     </nav>
+  </>
   );
 };

@@ -1,5 +1,5 @@
-import React from 'react';
-import { BookOpen } from 'lucide-react';
+import React, { useState } from 'react';
+import { BookOpen, ArrowUpDown } from 'lucide-react';
 import { BookEvaluation } from '../types';
 import { BookCover } from './BookCover';
 import { ScoreBadge } from './ScoreBadge';
@@ -16,7 +16,12 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
   onSelectBook,
   onOpenEvaluate,
 }) => {
-  const topMatches = books.filter((b) => b.notaEncaixe >= 8);
+  const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
+
+  const topMatches = books
+    .filter((b) => b.notaEncaixe >= 8)
+    .sort((a, b) => (sortOrder === 'desc' ? b.notaEncaixe - a.notaEncaixe : a.notaEncaixe - b.notaEncaixe));
+
   const recentEvaluations = books.slice(0, 10);
 
   return (
@@ -44,16 +49,26 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
         </div>
       </div>
 
-      {/* Obras de Alto Encaixe (Nota de Encaixe >= 8) */}
+      {/* Obras de Alto Encaixe com Filtro Interativo Maior/Menor Nota */}
       {topMatches.length > 0 && (
         <div className="space-y-3.5 pt-1">
           <div className="flex items-center justify-between">
             <h3 className="text-xs font-bold uppercase tracking-wider text-[#1d1d1f]">
               Recomendações de Alto Encaixe
             </h3>
-            <span className="text-xs font-semibold text-[#86868b]">
-              {topMatches.length} {topMatches.length === 1 ? 'obra' : 'obras'}
-            </span>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setSortOrder((prev) => (prev === 'desc' ? 'asc' : 'desc'))}
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white border border-neutral-200/90 hover:border-neutral-300 text-[11px] font-semibold text-[#1d1d1f] hover:bg-neutral-50 active:scale-95 transition-all shadow-2xs cursor-pointer select-none"
+                title="Alternar ordenação da maior para a menor nota ou vice-versa"
+              >
+                <ArrowUpDown className="w-3 h-3 text-[#86868b]" />
+                <span>{sortOrder === 'desc' ? 'Maior Nota' : 'Menor Nota'}</span>
+              </button>
+              <span className="text-xs font-semibold text-[#86868b]">
+                {topMatches.length} {topMatches.length === 1 ? 'obra' : 'obras'}
+              </span>
+            </div>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3.5">
@@ -61,7 +76,7 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
               <div
                 key={book.id}
                 onClick={() => onSelectBook(book)}
-                className="p-3.5 rounded-2xl bg-white hover:bg-neutral-50/80 border border-neutral-200/80 hover:border-neutral-300 transition-all duration-200 cursor-pointer flex flex-col justify-between group active:scale-[0.98] shadow-xs hover:shadow-sm"
+                className="p-3.5 rounded-2xl bg-white hover:bg-neutral-50/80 border border-white hover:border-white transition-all duration-200 cursor-pointer flex flex-col justify-between group active:scale-[0.98] shadow-xs hover:shadow-sm"
               >
                 <div className="w-full mb-2.5">
                   <BookCover
@@ -88,7 +103,7 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
         </div>
       )}
 
-      {/* Últimas Avaliações — Large Visual Cards */}
+      {/* Últimas Avaliações — Large Visual Cards com Borda Branca */}
       {recentEvaluations.length > 0 && (
         <div className="space-y-3.5 pt-2">
           <div className="flex items-center justify-between">
@@ -105,7 +120,7 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
               <div
                 key={book.id}
                 onClick={() => onSelectBook(book)}
-                className="p-4 sm:p-5 rounded-2xl bg-white hover:bg-neutral-50/90 border border-neutral-200/80 hover:border-neutral-300 transition-all duration-200 cursor-pointer flex items-center gap-4 sm:gap-5 group active:scale-[0.99] shadow-xs hover:shadow-sm"
+                className="p-4 sm:p-5 rounded-2xl bg-white hover:bg-neutral-50/90 border border-white hover:border-white transition-all duration-200 cursor-pointer flex items-center gap-4 sm:gap-5 group active:scale-[0.99] shadow-xs hover:shadow-sm"
               >
                 {/* Large Visual Book Cover */}
                 <div className="w-20 sm:w-24 shrink-0 transition-transform duration-200 group-hover:scale-[1.02]">
