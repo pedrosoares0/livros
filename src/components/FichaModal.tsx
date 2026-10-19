@@ -76,6 +76,26 @@ export const FichaModal: React.FC<FichaModalProps> = ({
     onClose();
   };
 
+  // Keyboard Escape listener for seamless dismissal
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [onClose]);
+
+  // Lock body scroll while modal is active for native app feel
+  useEffect(() => {
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, []);
+
   // Derived inverted metrics for unified 0-10 intuitive scale (higher = better fit)
   const originalidade = Math.round((10 - book.criteria.genericidade) * 10) / 10;
 
@@ -177,45 +197,53 @@ ${book.resumo}
   ];
 
   return (
-    <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 overflow-hidden">
-        {/* Backdrop */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
-          onClick={onClose}
-          className="absolute inset-0 bg-black/40 backdrop-blur-sm z-10"
-        />
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 overflow-hidden">
+      {/* Backdrop with smooth opacity fade */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.22, ease: [0.32, 0.72, 0, 1] }}
+        onClick={onClose}
+        className="absolute inset-0 bg-black/45 backdrop-blur-sm z-10 cursor-pointer"
+      />
 
-        {/* Modal Container */}
-        <motion.div
-          initial={{ y: 24, opacity: 0, scale: 0.98 }}
-          animate={{ y: 0, opacity: 1, scale: 1 }}
-          exit={{ y: 20, opacity: 0, scale: 0.98 }}
-          transition={{ type: 'spring', damping: 28, stiffness: 320 }}
-          className="relative w-full max-w-lg max-h-[92vh] sm:max-h-[88vh] bg-[#ffffff] border border-black/[0.08] rounded-t-3xl sm:rounded-3xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.25)] flex flex-col overflow-hidden text-[#1d1d1f] z-20"
-        >
-          {/* Minimalist Top Action Bar without 'Ficha Veredito' label */}
-          <div className="flex items-center justify-end px-6 pt-3.5 pb-2 bg-[#ffffff]/90 backdrop-blur-lg sticky top-0 z-20">
-            <div className="flex items-center gap-1.5">
-              <button
-                onClick={copyFichaToClipboard}
-                title="Copiar Ficha"
-                className="p-2 rounded-full hover:bg-neutral-100 text-[#86868b] hover:text-[#1d1d1f] transition-all duration-150 active:scale-90 cursor-pointer"
-              >
-                <Share2 className="w-4 h-4" />
-              </button>
-              <button
-                onClick={onClose}
-                aria-label="Fechar"
-                className="p-2 rounded-full hover:bg-neutral-100 text-[#86868b] hover:text-[#1d1d1f] transition-all duration-150 active:scale-90 cursor-pointer"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
+      {/* Modal Container with Aceternity-grade Spring physics */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.94, y: 24 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 16 }}
+        transition={{
+          type: 'spring',
+          damping: 28,
+          stiffness: 320,
+          mass: 0.85,
+        }}
+        className="relative w-full max-w-lg max-h-[92vh] sm:max-h-[88vh] bg-[#ffffff] border border-black/[0.08] rounded-t-3xl sm:rounded-3xl shadow-[0_25px_65px_-15px_rgba(0,0,0,0.25)] flex flex-col overflow-hidden text-[#1d1d1f] z-20 will-change-transform"
+      >
+        {/* Minimalist Top Action Bar */}
+        <div className="flex items-center justify-end px-6 pt-3.5 pb-2 bg-[#ffffff]/90 backdrop-blur-lg sticky top-0 z-20">
+          <div className="flex items-center gap-1.5">
+            <motion.button
+              whileHover={{ scale: 1.08 }}
+              whileTap={{ scale: 0.92 }}
+              onClick={copyFichaToClipboard}
+              title="Copiar Ficha"
+              className="p-2 rounded-full hover:bg-neutral-100 text-[#86868b] hover:text-[#1d1d1f] transition-colors cursor-pointer"
+            >
+              <Share2 className="w-4 h-4" />
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.08 }}
+              whileTap={{ scale: 0.92 }}
+              onClick={onClose}
+              aria-label="Fechar"
+              className="p-2 rounded-full hover:bg-neutral-100 text-[#86868b] hover:text-[#1d1d1f] transition-colors cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </motion.button>
           </div>
+        </div>
 
           {/* Scrollable Content */}
           <div className="overflow-y-auto px-6 py-5 space-y-4 hide-scrollbar">
@@ -247,14 +275,21 @@ ${book.resumo}
                   </button>
                 </div>
 
-                {/* Alternative Covers Selector Drawer */}
-                {isCoverPickerOpen && (
-                  <div className="w-full mt-3 p-3 rounded-2xl bg-neutral-50/95 border border-neutral-200/90 space-y-2 shadow-xs">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-[#1d1d1f]">
-                        Edições Disponíveis (até 4)
-                      </span>
-                    </div>
+                {/* Alternative Covers Selector Drawer with AnimatePresence */}
+                <AnimatePresence>
+                  {isCoverPickerOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.22, ease: [0.32, 0.72, 0, 1] }}
+                      className="w-full mt-3 p-3 rounded-2xl bg-neutral-50/95 border border-neutral-200/90 space-y-2 shadow-xs overflow-hidden"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-[#1d1d1f]">
+                          Edições Disponíveis
+                        </span>
+                      </div>
 
                     {isLoadingCovers ? (
                       <div className="py-5 text-center text-xs text-[#86868b] flex flex-col items-center gap-2">
@@ -268,28 +303,31 @@ ${book.resumo}
                     ) : (
                       <div className="grid grid-cols-2 gap-2">
                         {alternativeCovers.map((coverUrl, idx) => (
-                          <div
-                            key={idx}
-                            onClick={() => handleSelectCover(coverUrl)}
-                            className="group relative cursor-pointer rounded-lg overflow-hidden border-2 border-neutral-200 hover:border-black active:scale-95 transition-all shadow-xs"
-                          >
-                            <img
-                              src={coverUrl}
-                              alt={`Opção ${idx + 1}`}
-                              className="w-full aspect-[2/3] object-cover"
-                              loading="lazy"
-                            />
-                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 flex items-center justify-center transition-all">
-                              <span className="opacity-0 group-hover:opacity-100 px-2 py-0.5 rounded bg-black/80 text-white text-[9px] font-bold">
-                                Aplicar
-                              </span>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )}
+                            <motion.div
+                              key={idx}
+                              whileHover={{ scale: 1.03 }}
+                              whileTap={{ scale: 0.97 }}
+                              onClick={() => handleSelectCover(coverUrl)}
+                              className="group relative cursor-pointer rounded-lg overflow-hidden border-2 border-neutral-200 hover:border-black transition-colors shadow-xs"
+                            >
+                              <img
+                                src={coverUrl}
+                                alt={`Opção ${idx + 1}`}
+                                className="w-full aspect-[2/3] object-cover"
+                                loading="lazy"
+                              />
+                              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 flex items-center justify-center transition-all">
+                                <span className="opacity-0 group-hover:opacity-100 px-2 py-0.5 rounded bg-black/80 text-white text-[9px] font-bold">
+                                  Aplicar
+                                </span>
+                              </div>
+                            </motion.div>
+                          ))}
+                        </div>
+                      )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
 
               <div className="flex-1 text-center sm:text-left space-y-2 min-w-0">
@@ -456,9 +494,11 @@ ${book.resumo}
           <div className="p-4 border-t border-black/[0.06] bg-[#ffffff] flex items-center gap-2.5">
             {/* Salvar Button (creates/adds to Salvos shelf) */}
             {onSaveToWishlist && (
-              <button
+              <motion.button
+                whileHover={{ scale: 1.01 }}
+                whileTap={{ scale: 0.97 }}
                 onClick={() => onSaveToWishlist(book)}
-                className={`flex-1 py-2.5 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all active:scale-[0.97] cursor-pointer ${
+                className={`flex-1 py-2.5 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer ${
                   isSaved
                     ? 'bg-emerald-50 text-emerald-800 border border-emerald-300 shadow-2xs'
                     : 'bg-neutral-100 text-[#1d1d1f] hover:bg-neutral-200/80 border border-neutral-200/80'
@@ -466,25 +506,29 @@ ${book.resumo}
               >
                 <Bookmark className={`w-3.5 h-3.5 ${isSaved ? 'fill-emerald-800' : ''}`} />
                 <span>{isSaved ? 'Salvo' : 'Salvar'}</span>
-              </button>
+              </motion.button>
             )}
 
             {/* Copiar Ficha */}
-            <button
+            <motion.button
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.97 }}
               onClick={copyFichaToClipboard}
-              className="py-2.5 px-3.5 rounded-xl text-xs font-semibold bg-[#1d1d1f] text-white hover:bg-black transition-all active:scale-[0.97] flex items-center justify-center gap-1.5 shrink-0 shadow-2xs cursor-pointer"
+              className="py-2.5 px-3.5 rounded-xl text-xs font-semibold bg-[#1d1d1f] text-white hover:bg-black transition-colors flex items-center justify-center gap-1.5 shrink-0 shadow-2xs cursor-pointer"
             >
               <Copy className="w-3.5 h-3.5" />
               <span>Copiar Ficha</span>
-            </button>
+            </motion.button>
 
             {/* Excluir Livro do Programa */}
             {onDeleteBook && (
-              <button
+              <motion.button
+                whileHover={{ scale: 1.01 }}
+                whileTap={{ scale: 0.97 }}
                 onClick={handleDeleteBook}
                 title={confirmDelete ? "Clique novamente para confirmar a exclusão definitiva" : "Excluir livro do Veredito"}
                 aria-label="Excluir livro"
-                className={`py-2.5 px-3 rounded-xl text-xs font-semibold transition-all active:scale-[0.97] flex items-center justify-center gap-1.5 shrink-0 cursor-pointer shadow-2xs ${
+                className={`py-2.5 px-3 rounded-xl text-xs font-semibold transition-colors flex items-center justify-center gap-1.5 shrink-0 cursor-pointer shadow-2xs ${
                   confirmDelete
                     ? 'text-white bg-rose-600 hover:bg-rose-700 border border-rose-700'
                     : 'text-rose-600 bg-rose-50 hover:bg-rose-100 border border-rose-200/80'
@@ -492,11 +536,10 @@ ${book.resumo}
               >
                 <Trash2 className="w-3.5 h-3.5" />
                 <span>{confirmDelete ? 'Confirmar exclusão?' : 'Excluir'}</span>
-              </button>
+              </motion.button>
             )}
           </div>
         </motion.div>
       </div>
-    </AnimatePresence>
-  );
+    );
 };

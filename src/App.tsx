@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { AnimatePresence } from 'motion/react';
 import { BookEvaluation } from './types';
 import { DiscoverView } from './components/DiscoverView';
 import { EstanteView } from './components/EstanteView';
@@ -164,14 +165,19 @@ export function App() {
         />
 
         {/* Ficha Veredito Modal */}
-        <FichaModal
-          book={selectedBook}
-          onClose={() => setSelectedBook(null)}
-          onSaveToWishlist={handleToggleSave}
-          isSaved={selectedBook ? savedBookIds.has(selectedBook.id) : false}
-          onDeleteBook={handleDeleteBook}
-          onUpdateCover={handleUpdateBookCover}
-        />
+        <AnimatePresence>
+          {selectedBook && (
+            <FichaModal
+              key={selectedBook.id}
+              book={selectedBook}
+              onClose={() => setSelectedBook(null)}
+              onSaveToWishlist={handleToggleSave}
+              isSaved={savedBookIds.has(selectedBook.id)}
+              onDeleteBook={handleDeleteBook}
+              onUpdateCover={handleUpdateBookCover}
+            />
+          )}
+        </AnimatePresence>
 
         {/* Evaluator Engine Search & Bulk Modal */}
         <EvaluateModal
