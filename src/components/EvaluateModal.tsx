@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Search, ListPlus, X, BookOpen, ChevronRight, AlertTriangle, Check, Loader2 } from 'lucide-react';
+import { Search, ListPlus, X, BookOpen, ChevronRight, AlertTriangle, Check, Loader2, Sparkles } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { searchBookApi, evaluateBulkList, evaluateBook } from '../services/evaluator';
 import { evaluateWithGemini, evaluateBulkWithGemini } from '../services/geminiEvaluator';
@@ -43,6 +43,7 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
   const [duplicateWarning, setDuplicateWarning] = useState<BookEvaluation | null>(null);
   const [evalError, setEvalError] = useState<string | null>(null);
   const [apiSuggestions, setApiSuggestions] = useState<Partial<BookEvaluation>[]>([]);
+  const [bookToConfirm, setBookToConfirm] = useState<Partial<BookEvaluation> | null>(null);
 
   const searchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -116,6 +117,7 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
     setApiSuggestions([]);
     setIsSearching(false);
     setDuplicateWarning(null);
+    setBookToConfirm(null);
   };
 
   const runEvaluationWithProgress = async (
@@ -158,7 +160,7 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
     }
   };
 
-  const handleSelectBook = (rawBook: Partial<BookEvaluation>) => {
+  const handleRequestEvaluation = (rawBook: Partial<BookEvaluation>) => {
     // Dismiss mobile keyboard on selection
     (document.activeElement as HTMLElement)?.blur();
     setEvalError(null);
@@ -169,30 +171,40 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
       return;
     }
     setDuplicateWarning(null);
-    runEvaluationWithProgress(rawBook.title || 'Livro', {
-      author: rawBook.author,
-      description: rawBook.resumo,
-      coverUrl: rawBook.coverUrl,
-      pages: rawBook.pages,
-      genres: rawBook.genres,
+    setBookToConfirm(rawBook);
+  };
+
+  const handleConfirmEvaluation = () => {
+    if (!bookToConfirm) return;
+    const target = bookToConfirm;
+    setBookToConfirm(null);
+
+    runEvaluationWithProgress(target.title || query.trim() || 'Livro', {
+      author: target.author,
+      description: target.resumo,
+      coverUrl: target.coverUrl,
+      pages: target.pages,
+      genres: target.genres,
     });
   };
 
-  const handleDirectEvaluate = (e: React.FormEvent) => {
+  const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!query.trim()) return;
-
-    // Dismiss mobile keyboard on submit
     (document.activeElement as HTMLElement)?.blur();
-    setEvalError(null);
 
-    const existing = findAlreadyEvaluated(query.trim());
-    if (existing) {
-      setDuplicateWarning(existing);
-      return;
+    // Se o usuário apertar Enter no teclado e não houver sugestões prontas
+    if (apiSuggestions.length === 0 && query.trim().length >= 3 && !isSearching) {
+      const existing = findAlreadyEvaluated(query.trim());
+      if (existing) {
+        setDuplicateWarning(existing);
+        return;
+      }
+      setBookToConfirm({
+        title: query.trim(),
+        author: 'Autor a consultar',
+        coverUrl: undefined,
+      });
     }
-    setDuplicateWarning(null);
-    runEvaluationWithProgress(query.trim());
   };
 
   const handleBulkSubmit = async (e: React.FormEvent) => {
@@ -418,53 +430,41 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                   )}
                 </AnimatePresence>
 
-                {/* Integrated Search Bar with Inline Action Button (Immune to Keyboard Height) */}
-                <form onSubmit={handleDirectEvaluate} className="space-y-2">
+                {/* Integrated Search Bar (No inline Avaliar button, preventing accidental taps) */}
+                <form onSubmit={handleSearchSubmit} className="space-y-1.5">
                   <label className="text-xs font-semibold text-[#1d1d1f] block">
-                    Digite o título do livro ou ISBN:
+                    Pesquise por título, autor ou ISBN:
                   </label>
 
-                  <div className="flex items-center gap-2">
-                    <div className="relative flex-1">
-                      <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#86868b] pointer-events-none" />
-                      <input
-                        type="text"
-                        value={query}
-                        onChange={(e) => handleInputChange(e.target.value)}
-                        placeholder="Ex: Noite na Taverna, Duna..."
-                        className="w-full pl-10 pr-9 py-2.5 rounded-xl bg-neutral-100/90 focus:bg-white border border-neutral-200/90 focus:border-neutral-900 focus:ring-2 focus:ring-black/5 text-[#1d1d1f] placeholder-[#86868b] text-[16px] sm:text-sm focus:outline-none transition-all duration-150"
-                        autoComplete="off"
-                        autoCorrect="off"
-                        autoCapitalize="words"
-                        spellCheck={false}
-                        enterKeyHint="search"
-                      />
+                  <div className="relative w-full">
+                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#86868b] pointer-events-none" />
+                    <input
+                      type="text"
+                      value={query}
+                      onChange={(e) => handleInputChange(e.target.value)}
+                      placeholder="Ex: O massacre da família Hope, Duna, 1984..."
+                      className="w-full pl-10 pr-9 py-2.5 rounded-xl bg-neutral-100/90 focus:bg-white border border-neutral-200/90 focus:border-neutral-900 focus:ring-2 focus:ring-black/5 text-[#1d1d1f] placeholder-[#86868b] text-[16px] sm:text-sm focus:outline-none transition-all duration-150"
+                      autoComplete="off"
+                      autoCorrect="off"
+                      autoCapitalize="words"
+                      spellCheck={false}
+                      enterKeyHint="search"
+                    />
 
-                      {isSearching ? (
-                        <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center justify-center">
-                          <Loader2 className="w-4 h-4 text-neutral-600 animate-spin" />
-                        </div>
-                      ) : query.trim().length > 0 ? (
-                        <button
-                          type="button"
-                          onClick={handleClearQuery}
-                          className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-[#86868b] hover:text-[#1d1d1f] rounded-full hover:bg-neutral-200/60 transition-colors cursor-pointer"
-                          aria-label="Limpar campo"
-                        >
-                          <X className="w-3.5 h-3.5" />
-                        </button>
-                      ) : null}
-                    </div>
-
-                    <AceternityButton
-                      type="submit"
-                      variant="primary"
-                      size="md"
-                      disabled={!query.trim()}
-                      className="shrink-0 font-bold px-3.5 py-2.5 text-xs"
-                    >
-                      Avaliar
-                    </AceternityButton>
+                    {isSearching ? (
+                      <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center justify-center">
+                        <Loader2 className="w-4 h-4 text-neutral-600 animate-spin" />
+                      </div>
+                    ) : query.trim().length > 0 ? (
+                      <button
+                        type="button"
+                        onClick={handleClearQuery}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-[#86868b] hover:text-[#1d1d1f] rounded-full hover:bg-neutral-200/60 transition-colors cursor-pointer"
+                        aria-label="Limpar campo"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    ) : null}
                   </div>
                 </form>
 
@@ -476,7 +476,7 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                         Edições Encontradas ({apiSuggestions.length})
                       </span>
                       <span className="text-[10px] text-[#86868b]">
-                        Toque para selecionar
+                        Selecione para avaliar
                       </span>
                     </div>
 
@@ -490,11 +490,11 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                         return (
                           <div
                             key={book.id || idx}
-                            onClick={() => handleSelectBook(book)}
-                            className="group flex items-center gap-3 p-2.5 rounded-2xl bg-neutral-50 hover:bg-neutral-100/90 active:bg-neutral-200/60 border border-neutral-200/70 hover:border-neutral-300 cursor-pointer transition-all active:scale-[0.98] shadow-2xs"
+                            onClick={() => handleRequestEvaluation(book)}
+                            className="group flex items-center gap-3 p-2.5 rounded-2xl bg-neutral-50 hover:bg-neutral-100/90 active:bg-neutral-200/60 border border-neutral-200/70 hover:border-neutral-300 cursor-pointer transition-all active:scale-[0.99] shadow-2xs"
                           >
                             {/* Generous Cover with 2:3 Aspect Ratio */}
-                            <div className="w-16 sm:w-20 shrink-0">
+                            <div className="w-14 sm:w-16 shrink-0">
                               <BookCover
                                 title={book.title || 'Livro'}
                                 author={book.author || 'Autor'}
@@ -510,7 +510,7 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                               <p className="text-[11px] text-[#86868b] truncate">
                                 {book.author}
                               </p>
-                              <div className="flex items-center gap-1.5 pt-0.5">
+                              <div className="flex items-center gap-1.5 pt-0.5 flex-wrap">
                                 {isAlready ? (
                                   <span className="text-[9px] font-bold text-amber-800 bg-amber-100 border border-amber-200/80 px-1.5 py-0.5 rounded-md flex items-center gap-1">
                                     <Check className="w-2.5 h-2.5 text-amber-700" />
@@ -529,8 +529,32 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                               </div>
                             </div>
 
-                            <div className="shrink-0 p-1 text-[#86868b] group-hover:text-[#1d1d1f] group-hover:translate-x-0.5 transition-all">
-                              <ChevronRight className="w-4 h-4 stroke-[2]" />
+                            {/* Botão de Avaliar ao lado de cada livro */}
+                            <div className="shrink-0 flex items-center">
+                              {isAlready ? (
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    onClose();
+                                    onOpenBook?.(isAlready);
+                                  }}
+                                  className="px-2.5 py-1 text-[11px] font-semibold text-neutral-700 hover:text-black bg-neutral-200/70 hover:bg-neutral-200 rounded-lg transition-colors cursor-pointer"
+                                >
+                                  Ver Ficha
+                                </button>
+                              ) : (
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleRequestEvaluation(book);
+                                  }}
+                                  className="px-3 py-1.5 text-xs font-bold rounded-xl bg-[#1d1d1f] text-white hover:bg-black active:scale-95 transition-all shadow-2xs cursor-pointer flex items-center gap-1"
+                                >
+                                  <span>Avaliar</span>
+                                </button>
+                              )}
                             </div>
                           </div>
                         );
@@ -538,13 +562,26 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                     </div>
                   </div>
                 ) : query.trim().length >= 3 && !isSearching ? (
-                  <div className="p-3 rounded-xl bg-neutral-50 border border-neutral-200/60 text-center space-y-1">
-                    <p className="text-xs font-semibold text-[#1d1d1f]">
-                      Nenhuma edição direta encontrada
+                  <div className="p-4 rounded-2xl bg-neutral-50/90 border border-neutral-200/70 text-center space-y-2">
+                    <p className="text-xs font-bold text-[#1d1d1f]">
+                      Nenhuma edição direta encontrada no acervo
                     </p>
-                    <p className="text-[11px] text-[#86868b]">
-                      Toque no botão <strong>Avaliar</strong> ao lado para consultar a IA diretamente.
+                    <p className="text-[11px] text-[#86868b] max-w-xs mx-auto leading-relaxed">
+                      Deseja consultar a IA diretamente para avaliar <strong>"{query.trim()}"</strong>?
                     </p>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        handleRequestEvaluation({
+                          title: query.trim(),
+                          author: 'Autor a consultar',
+                        })
+                      }
+                      className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold rounded-xl bg-[#1d1d1f] text-white hover:bg-black active:scale-95 transition-all shadow-xs cursor-pointer mt-1"
+                    >
+                      <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                      <span>Avaliar "{query.trim()}" com a IA</span>
+                    </button>
                   </div>
                 ) : null}
               </div>
@@ -581,6 +618,97 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
               </form>
             )}
           </div>
+
+          {/* Confirmation Modal Alert */}
+          <AnimatePresence>
+            {bookToConfirm && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.16 }}
+                className="absolute inset-0 z-40 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4"
+              >
+                <motion.div
+                  initial={{ scale: 0.92, opacity: 0, y: 14 }}
+                  animate={{ scale: 1, opacity: 1, y: 0 }}
+                  exit={{ scale: 0.94, opacity: 0, y: 10 }}
+                  transition={{ type: 'spring', damping: 25, stiffness: 380 }}
+                  className="w-full max-w-xs sm:max-w-sm bg-white rounded-3xl shadow-2xl border border-neutral-200/90 p-5 space-y-3.5 text-center overflow-hidden"
+                >
+                  <div className="flex items-center justify-between pb-1 border-b border-neutral-100">
+                    <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-neutral-500">
+                      <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                      <span>Confirmar Avaliação</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setBookToConfirm(null)}
+                      className="p-1 -mr-1 rounded-full text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 transition-colors cursor-pointer"
+                      aria-label="Cancelar"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  {/* Capa do Livro */}
+                  <div className="w-24 sm:w-28 mx-auto drop-shadow-lg rounded-md overflow-hidden">
+                    <BookCover
+                      title={bookToConfirm.title || 'Livro'}
+                      author={bookToConfirm.author || 'Autor'}
+                      coverUrl={bookToConfirm.coverUrl}
+                    />
+                  </div>
+
+                  {/* Título e Autor */}
+                  <div className="space-y-1">
+                    <h3 className="text-sm sm:text-base font-bold text-[#1d1d1f] leading-snug line-clamp-2 px-1">
+                      {bookToConfirm.title}
+                    </h3>
+                    <p className="text-xs text-[#86868b]">
+                      de <strong className="text-neutral-800 font-semibold">{bookToConfirm.author || 'Autor a verificar'}</strong>
+                    </p>
+
+                    <div className="flex items-center justify-center gap-1.5 pt-0.5 flex-wrap">
+                      {bookToConfirm.year && (
+                        <span className="text-[10px] font-medium text-neutral-600 bg-neutral-100 px-2 py-0.5 rounded-md">
+                          {bookToConfirm.year}
+                        </span>
+                      )}
+                      {bookToConfirm.pages && (
+                        <span className="text-[10px] font-medium text-neutral-600 bg-neutral-100 px-2 py-0.5 rounded-md">
+                          ~{bookToConfirm.pages} págs
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  <p className="text-[11px] text-[#86868b] leading-relaxed px-1">
+                    Deseja avaliar esta obra com o perfil literário do Veredito? A IA calibrará as notas técnica e de encaixe.
+                  </p>
+
+                  {/* Botões de Ação */}
+                  <div className="flex items-center gap-2 pt-1">
+                    <button
+                      type="button"
+                      onClick={() => setBookToConfirm(null)}
+                      className="flex-1 py-2.5 text-xs font-semibold text-neutral-600 hover:text-neutral-900 bg-neutral-100 hover:bg-neutral-200/70 rounded-xl transition-all active:scale-[0.98] cursor-pointer"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleConfirmEvaluation}
+                      className="flex-1 py-2.5 text-xs font-bold text-white bg-[#1d1d1f] hover:bg-black rounded-xl shadow-md transition-all active:scale-[0.98] cursor-pointer flex items-center justify-center gap-1.5"
+                    >
+                      <span>Avaliar Livro</span>
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </motion.div>
       </div>
     </AnimatePresence>
