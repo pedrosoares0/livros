@@ -1,18 +1,20 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Search, ListPlus, X, BookOpen, ChevronRight } from 'lucide-react';
+import { Search, ListPlus, X, BookOpen, ChevronRight, AlertTriangle, Check } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { searchBookApi, evaluateBulkList, evaluateBook } from '../services/evaluator';
 import { evaluateWithGemini } from '../services/geminiEvaluator';
 import { BookEvaluation } from '../types';
 import { BookCover } from './BookCover';
-import { PearlButton } from './PearlButton';
+import { AceternityButton } from './AceternityButton';
 
 interface EvaluateModalProps {
   isOpen: boolean;
   onClose: () => void;
   onBookEvaluated: (book: BookEvaluation) => void;
   onBulkEvaluated: (books: BookEvaluation[]) => void;
+  existingBooks?: BookEvaluation[];
+  onOpenBook?: (book: BookEvaluation) => void;
 }
 
 const EVALUATION_STEPS = [
@@ -27,18 +29,46 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
   onClose,
   onBookEvaluated,
   onBulkEvaluated,
+  existingBooks = [],
+  onOpenBook,
 }) => {
   const [tab, setTab] = useState<'single' | 'bulk'>('single');
   const [query, setQuery] = useState('');
   const [bulkText, setBulkText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [loadingStepIndex, setLoadingStepIndex] = useState(0);
+  const [duplicateWarning, setDuplicateWarning] = useState<BookEvaluation | null>(null);
   const [apiSuggestions, setApiSuggestions] = useState<Partial<BookEvaluation>[]>([]);
 
-  if (!isOpen) return null;
+  const normalizeText = (text: string) =>
+    text
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^\w\s]/gi, '')
+      .trim();
+
+  const findAlreadyEvaluated = (targetTitle: string): BookEvaluation | null => {
+    if (!existingBooks || existingBooks.length === 0) return null;
+    const normTarget = normalizeText(targetTitle);
+    if (!normTarget || normTarget.length < 3) return null;
+
+    return (
+      existingBooks.find((b) => {
+        const normTitle = normalizeText(b.title);
+        if (normTitle === normTarget) return true;
+        if (b.originalTitle && normalizeText(b.originalTitle) === normTarget) return true;
+        if (normTarget.length >= 4 && normTitle.length >= 4) {
+          if (normTitle.includes(normTarget) || normTarget.includes(normTitle)) return true;
+        }
+        return false;
+      }) || null
+    );
+  };
 
   const handleInputChange = async (val: string) => {
     setQuery(val);
+    if (duplicateWarning) setDuplicateWarning(null);
 
     if (val.trim().length >= 3) {
       try {
@@ -55,6 +85,7 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
   const handleClearQuery = () => {
     setQuery('');
     setApiSuggestions([]);
+    setDuplicateWarning(null);
   };
 
   const runEvaluationWithProgress = async (
@@ -109,6 +140,12 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
   };
 
   const handleSelectBook = (rawBook: Partial<BookEvaluation>) => {
+    const existing = findAlreadyEvaluated(rawBook.title || query);
+    if (existing) {
+      setDuplicateWarning(existing);
+      return;
+    }
+    setDuplicateWarning(null);
     runEvaluationWithProgress(rawBook.title || 'Livro', {
       author: rawBook.author,
       description: rawBook.resumo,
@@ -121,6 +158,12 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
   const handleDirectEvaluate = (e: React.FormEvent) => {
     e.preventDefault();
     if (!query.trim()) return;
+    const existing = findAlreadyEvaluated(query.trim());
+    if (existing) {
+      setDuplicateWarning(existing);
+      return;
+    }
+    setDuplicateWarning(null);
     runEvaluationWithProgress(query.trim());
   };
 
@@ -131,7 +174,17 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
     setIsLoading(true);
     setTimeout(() => {
       const results = evaluateBulkList(bulkText);
-      onBulkEvaluated(results);
+      // Filter out any titles already evaluated
+      const newOnly = results.filter((b) => !findAlreadyEvaluated(b.title));
+      if (newOnly.length === 0 && results.length > 0) {
+        const firstDup = findAlreadyEvaluated(results[0].title);
+        if (firstDup) {
+          setDuplicateWarning(firstDup);
+          setIsLoading(false);
+          return;
+        }
+      }
+      onBulkEvaluated(newOnly.length > 0 ? newOnly : results);
       setIsLoading(false);
       onClose();
     }, 1200);
@@ -239,6 +292,61 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
               </div>
             ) : tab === 'single' ? (
               <div className="space-y-4">
+                {/* Duplicate Book Warning Banner */}
+                <AnimatePresence>
+                  {duplicateWarning && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10, scale: 0.98 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -8, scale: 0.98 }}
+                      transition={{ type: 'spring', damping: 25, stiffness: 400 }}
+                      className="p-4 rounded-2xl bg-amber-50/95 border border-amber-200 shadow-sm flex flex-col gap-3"
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center shrink-0 mt-0.5">
+                          <AlertTriangle className="w-4 h-4 text-amber-800" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-[10px] uppercase font-bold tracking-wider text-amber-800 bg-amber-200/60 px-2 py-0.5 rounded-full">
+                              Já avaliado
+                            </span>
+                          </div>
+                          <h4 className="text-sm font-bold text-amber-950 mt-1">
+                            Esse livro já foi avaliado
+                          </h4>
+                          <p className="text-xs text-amber-900/80 mt-0.5 leading-relaxed">
+                            <strong>"{duplicateWarning.title}"</strong> ({duplicateWarning.author}) já está cadastrado no seu acervo do Veredito com Nota de Encaixe <strong>{Math.floor(duplicateWarning.notaEncaixe)}</strong>.
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-end gap-2 pt-2 border-t border-amber-200/70">
+                        <button
+                          type="button"
+                          onClick={() => setDuplicateWarning(null)}
+                          className="px-3 py-1.5 text-xs font-semibold text-amber-800 hover:text-amber-950 rounded-lg hover:bg-amber-100 transition-colors cursor-pointer"
+                        >
+                          Tentar outro
+                        </button>
+                        {onOpenBook && (
+                          <AceternityButton
+                            variant="primary"
+                            size="sm"
+                            onClick={() => {
+                              onClose();
+                              onOpenBook(duplicateWarning);
+                            }}
+                            className="!bg-amber-950 hover:!bg-black !text-white text-xs font-bold"
+                          >
+                            Ver Ficha Existente
+                          </AceternityButton>
+                        )}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
                 <form onSubmit={handleDirectEvaluate} className="space-y-3">
                   <label className="text-xs font-semibold text-[#1d1d1f] block">
                     Digite o título do livro ou ISBN:
@@ -266,13 +374,14 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                   </div>
 
                   <div className="flex items-center justify-end pt-1">
-                    <PearlButton
+                    <AceternityButton
                       type="submit"
+                      variant="primary"
+                      size="md"
                       disabled={!query.trim()}
-                      label="Avaliar livro"
-                      size="nav"
-                      className="disabled:opacity-40"
-                    />
+                    >
+                      Avaliar livro
+                    </AceternityButton>
                   </div>
                 </form>
 
@@ -289,49 +398,59 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                     </div>
 
                     <div className="space-y-2.5 max-h-72 overflow-y-auto pr-1">
-                      {apiSuggestions.map((book, idx) => (
-                        <div
-                          key={book.id || idx}
-                          onClick={() => handleSelectBook(book)}
-                          className="group flex items-center gap-4 p-3 rounded-2xl bg-neutral-50 hover:bg-neutral-100/90 border border-neutral-200/70 hover:border-neutral-300 cursor-pointer transition-all duration-200 active:scale-[0.98] shadow-2xs hover:shadow-xs"
-                        >
-                          {/* Generous Large Cover with 2:3 Aspect Ratio */}
-                          <div className="w-20 sm:w-24 shrink-0 transition-transform duration-200 group-hover:scale-105">
-                            <BookCover
-                              title={book.title || 'Livro'}
-                              author={book.author || 'Autor'}
-                              coverUrl={book.coverUrl}
-                            />
-                          </div>
+                      {apiSuggestions.map((book, idx) => {
+                        const isAlready = findAlreadyEvaluated(book.title || '');
+                        return (
+                          <div
+                            key={book.id || idx}
+                            onClick={() => handleSelectBook(book)}
+                            className="group flex items-center gap-4 p-3 rounded-2xl bg-neutral-50 hover:bg-neutral-100/90 border border-neutral-200/70 hover:border-neutral-300 cursor-pointer transition-all duration-200 active:scale-[0.98] shadow-2xs hover:shadow-xs"
+                          >
+                            {/* Generous Large Cover with 2:3 Aspect Ratio */}
+                            <div className="w-20 sm:w-24 shrink-0 transition-transform duration-200 group-hover:scale-105">
+                              <BookCover
+                                title={book.title || 'Livro'}
+                                author={book.author || 'Autor'}
+                                coverUrl={book.coverUrl}
+                              />
+                            </div>
 
-                          {/* Descriptive Metadata */}
-                          <div className="flex-1 min-w-0 space-y-1">
-                            <h4 className="text-sm font-bold text-[#1d1d1f] truncate group-hover:text-black leading-snug">
-                              {book.title}
-                            </h4>
-                            <p className="text-xs text-[#86868b] truncate">
-                              {book.author}
-                            </p>
-                            <div className="flex items-center gap-2 pt-0.5">
-                              {book.pages && (
-                                <span className="text-[10px] font-medium text-[#6e6e73] bg-neutral-200/60 px-2 py-0.5 rounded-md">
-                                  ~{book.pages} págs
-                                </span>
-                              )}
-                              {book.year && (
-                                <span className="text-[10px] font-medium text-[#6e6e73]">
-                                  {book.year}
-                                </span>
-                              )}
+                            {/* Descriptive Metadata */}
+                            <div className="flex-1 min-w-0 space-y-1">
+                              <div className="flex items-center gap-2">
+                                <h4 className="text-sm font-bold text-[#1d1d1f] truncate group-hover:text-black leading-snug">
+                                  {book.title}
+                                </h4>
+                              </div>
+                              <p className="text-xs text-[#86868b] truncate">
+                                {book.author}
+                              </p>
+                              <div className="flex items-center gap-2 pt-0.5">
+                                {isAlready ? (
+                                  <span className="text-[10px] font-bold text-amber-800 bg-amber-100 border border-amber-200/80 px-2 py-0.5 rounded-md flex items-center gap-1">
+                                    <Check className="w-3 h-3 text-amber-700" />
+                                    Já avaliado
+                                  </span>
+                                ) : book.pages ? (
+                                  <span className="text-[10px] font-medium text-[#6e6e73] bg-neutral-200/60 px-2 py-0.5 rounded-md">
+                                    ~{book.pages} págs
+                                  </span>
+                                ) : null}
+                                {book.year && (
+                                  <span className="text-[10px] font-medium text-[#6e6e73]">
+                                    {book.year}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Subtle Elegant Action Indicator */}
+                            <div className="shrink-0 p-2 text-[#86868b] group-hover:text-[#1d1d1f] group-hover:translate-x-0.5 transition-all">
+                              <ChevronRight className="w-5 h-5 stroke-[2]" />
                             </div>
                           </div>
-
-                          {/* Subtle Elegant Action Indicator */}
-                          <div className="shrink-0 p-2 text-[#86868b] group-hover:text-[#1d1d1f] group-hover:translate-x-0.5 transition-all">
-                            <ChevronRight className="w-5 h-5 stroke-[2]" />
-                          </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
                 )}
@@ -356,13 +475,14 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                 />
 
                 <div className="flex justify-end pt-1">
-                  <PearlButton
+                  <AceternityButton
                     type="submit"
+                    variant="primary"
+                    size="md"
                     disabled={!bulkText.trim()}
-                    label="Avaliar Lista Completa"
-                    size="nav"
-                    className="disabled:opacity-40"
-                  />
+                  >
+                    Avaliar Lista Completa
+                  </AceternityButton>
                 </div>
               </form>
             )}
@@ -372,3 +492,4 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
     </AnimatePresence>
   );
 };
+

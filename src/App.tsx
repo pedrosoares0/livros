@@ -187,6 +187,11 @@ export function App() {
           onClose={() => setIsEvaluateOpen(false)}
           onBookEvaluated={handleBookEvaluated}
           onBulkEvaluated={handleBulkEvaluated}
+          existingBooks={books}
+          onOpenBook={(book) => {
+            setIsEvaluateOpen(false);
+            setSelectedBook(book);
+          }}
         />
 
         {/* Calibrated Profile & Criteria Modal */}

@@ -12,6 +12,8 @@ import { ScoreBadge, getScoreTone } from './ScoreBadge';
 import { MovieThumb } from './MovieThumb';
 import { fetchAlternativeCovers } from '../services/coverSearch';
 import { INITIAL_BOOKS } from '../data/initialBooks';
+import { AceternityButton } from './AceternityButton';
+import { CopyButton } from './CopyButton';
 
 interface FichaModalProps {
   book: BookEvaluation | null;
@@ -52,11 +54,15 @@ export const FichaModal: React.FC<FichaModalProps> = ({
     }
   };
 
+  const [showCoverAlert, setShowCoverAlert] = useState(false);
+
   const handleSelectCover = (newCoverUrl: string) => {
     if (onUpdateCover) {
       onUpdateCover(book.id, newCoverUrl);
     }
     setIsCoverPickerOpen(false);
+    setShowCoverAlert(true);
+    setTimeout(() => setShowCoverAlert(false), 2800);
   };
 
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -104,8 +110,8 @@ export const FichaModal: React.FC<FichaModalProps> = ({
   // Derived inverted metrics for unified 0-10 intuitive scale (higher = better fit)
   const originalidade = Math.floor(10 - book.criteria.genericidade);
 
-  const copyFichaToClipboard = () => {
-    const text = `📋 VEREDITO — Ficha de Avaliação
+  const generateFichaText = () => {
+    return `📋 VEREDITO — Ficha de Avaliação
 📖 Obra: ${book.title} (${book.author})
 📄 Páginas: ~${book.pages} (ed. brasileira)
 ⭐ Nota Técnica: ${Math.floor(book.notaTecnica)}
@@ -126,9 +132,11 @@ ${book.resumo}
 • Impacto Emocional: ${Math.floor(book.criteria.impactoEmocional)}
 
 🎯 Análise: ${book.justificativaEncaixe}`;
+  };
 
-    navigator.clipboard.writeText(text);
-    alert('Ficha copiada para a área de transferência!');
+  const copyFichaToClipboard = async () => {
+    const text = generateFichaText();
+    await navigator.clipboard.writeText(text);
   };
 
   const getVereditoBadge = () => {
@@ -226,6 +234,22 @@ ${book.resumo}
         }}
         className="relative w-full max-w-lg max-h-[92vh] sm:max-h-[88vh] bg-[#ffffff] border border-black/[0.08] rounded-t-3xl sm:rounded-3xl shadow-[0_25px_65px_-15px_rgba(0,0,0,0.25)] flex flex-col overflow-hidden text-[#1d1d1f] z-20 will-change-transform"
       >
+        {/* Cover Change Success Alert */}
+        <AnimatePresence>
+          {showCoverAlert && (
+            <motion.div
+              initial={{ opacity: 0, y: -20, scale: 0.94 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -12, scale: 0.94 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 420 }}
+              className="absolute top-3 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full bg-[#1d1d1f] text-white shadow-xl flex items-center gap-2 text-xs font-semibold border border-white/10 pointer-events-none select-none"
+            >
+              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+              <span>Capa alterada com sucesso!</span>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Minimalist Top Action Bar */}
         <div className="flex items-center justify-end px-6 pt-3.5 pb-2 bg-[#ffffff]/90 backdrop-blur-lg sticky top-0 z-20">
           <div className="flex items-center gap-1.5">
@@ -495,53 +519,44 @@ ${book.resumo}
             </div>
           </div>
 
-          {/* Footer Actions */}
+          {/* Footer Actions — Aceternity Button System */}
           <div className="p-4 border-t border-black/[0.06] bg-[#ffffff] flex items-center gap-2.5">
             {/* Salvar Button (creates/adds to Salvos shelf) */}
             {onSaveToWishlist && (
-              <motion.button
-                whileHover={{ scale: 1.01 }}
-                whileTap={{ scale: 0.97 }}
+              <AceternityButton
+                variant={isSaved ? "outline" : "secondary"}
+                size="md"
                 onClick={() => onSaveToWishlist(book)}
-                className={`flex-1 py-2.5 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer ${
-                  isSaved
-                    ? 'bg-emerald-50 text-emerald-800 border border-emerald-300 shadow-2xs'
-                    : 'bg-neutral-100 text-[#1d1d1f] hover:bg-neutral-200/80 border border-neutral-200/80'
-                }`}
+                className={`flex-1 ${isSaved ? '!bg-emerald-50 !text-emerald-800 !border-emerald-300' : ''}`}
               >
-                <Bookmark className={`w-3.5 h-3.5 ${isSaved ? 'fill-emerald-800' : ''}`} />
+                <Bookmark className={`w-3.5 h-3.5 ${isSaved ? 'fill-emerald-800 text-emerald-800' : ''}`} />
                 <span>{isSaved ? 'Salvo' : 'Salvar'}</span>
-              </motion.button>
+              </AceternityButton>
             )}
 
-            {/* Copiar Ficha */}
-            <motion.button
-              whileHover={{ scale: 1.01 }}
-              whileTap={{ scale: 0.97 }}
-              onClick={copyFichaToClipboard}
-              className="py-2.5 px-3.5 rounded-xl text-xs font-semibold bg-[#1d1d1f] text-white hover:bg-black transition-colors flex items-center justify-center gap-1.5 shrink-0 shadow-2xs cursor-pointer"
-            >
-              <Copy className="w-3.5 h-3.5" />
-              <span>Copiar Ficha</span>
-            </motion.button>
+            {/* Copiar Button with Animated Icon Swap */}
+            <CopyButton
+              variant="primary"
+              size="md"
+              text={generateFichaText}
+              idleLabel="Copiar"
+              doneLabel="Copiado!"
+              className="shrink-0"
+            />
 
-            {/* Excluir Livro do Programa */}
+            {/* Excluir Livro */}
             {onDeleteBook && (
-              <motion.button
-                whileHover={{ scale: 1.01 }}
-                whileTap={{ scale: 0.97 }}
+              <AceternityButton
+                variant="destructive"
+                size="md"
                 onClick={handleDeleteBook}
                 title={confirmDelete ? "Clique novamente para confirmar a exclusão definitiva" : "Excluir livro do Veredito"}
                 aria-label="Excluir livro"
-                className={`py-2.5 px-3 rounded-xl text-xs font-semibold transition-colors flex items-center justify-center gap-1.5 shrink-0 cursor-pointer shadow-2xs ${
-                  confirmDelete
-                    ? 'text-white bg-rose-600 hover:bg-rose-700 border border-rose-700'
-                    : 'text-rose-600 bg-rose-50 hover:bg-rose-100 border border-rose-200/80'
-                }`}
+                className={`shrink-0 ${confirmDelete ? '!bg-rose-600 !text-white !border-rose-700' : ''}`}
               >
                 <Trash2 className="w-3.5 h-3.5" />
-                <span>{confirmDelete ? 'Confirmar exclusão?' : 'Excluir'}</span>
-              </motion.button>
+                <span>{confirmDelete ? 'Confirmar?' : 'Excluir'}</span>
+              </AceternityButton>
             )}
           </div>
         </motion.div>
