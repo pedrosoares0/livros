@@ -44,6 +44,7 @@ Exemplos de calibração calibrados:
 export interface GeminiEvaluationResponse {
   title: string;
   author: string;
+  originalTitle?: string;
   pages: number;
   resumo: string;
   movieComparisons: string[];
@@ -73,6 +74,7 @@ Você DEVE responder ESTRITAMENTE em formato JSON com as seguintes chaves:
 {
   "title": "${bookTitle}",
   "author": "Nome do autor",
+  "originalTitle": "Título original ou internacional/inglês da obra (ex: To Kill a Mockingbird, Flowers for Algernon)",
   "pages": 250, // número aproximado de páginas da edição brasileira mais comum
   "genres": ["Ficção Científica", "Distopia"],
   "resumo": "2 a 3 linhas focando clima, tema e premissa sem spoilers",
@@ -133,6 +135,7 @@ Você DEVE responder ESTRITAMENTE em formato JSON com as seguintes chaves:
     id,
     title: parsed.title || bookTitle,
     author: parsed.author || extraContext?.author || 'Autor não informado',
+    originalTitle: parsed.originalTitle || undefined,
     pages: parsed.pages || 200,
     coverUrl,
     genres: parsed.genres || ['Ficção'],

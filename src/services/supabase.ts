@@ -14,6 +14,7 @@ export const mapRowToEvaluation = (row: any): BookEvaluation => ({
   id: row.id,
   title: row.title,
   author: row.author,
+  originalTitle: row.original_title || row.criteria?.originalTitle || undefined,
   pages: row.pages || 0,
   coverUrl: row.cover_url || '',
   year: row.year || undefined,
@@ -57,6 +58,7 @@ export const mapEvaluationToRow = (b: BookEvaluation) => ({
   adaptacoes: b.adaptacoes || '',
   criteria: {
     ...(b.criteria || {}),
+    originalTitle: b.originalTitle || undefined,
     isSaved: Boolean(b.isSaved || b.userStatus === 'wishlist'),
     userStatus: b.userStatus || (b.isSaved ? 'wishlist' : undefined),
     categoryShelf: b.categoryShelf || undefined,
