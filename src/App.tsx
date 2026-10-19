@@ -20,7 +20,14 @@ export function App() {
   const [selectedBook, setSelectedBook] = useState<BookEvaluation | null>(null);
   const [isEvaluateOpen, setIsEvaluateOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [wishlistIds, setWishlistIds] = useState<Set<string>>(new Set());
+  const [savedBookIds, setSavedBookIds] = useState<Set<string>>(() => {
+    try {
+      const raw = localStorage.getItem('veredito_saved_books');
+      return raw ? new Set(JSON.parse(raw)) : new Set();
+    } catch {
+      return new Set();
+    }
+  });
 
   // Load evaluations from Supabase on mount
   useEffect(() => {
@@ -52,16 +59,41 @@ export function App() {
     }
   };
 
-  const handleToggleWishlist = (book: BookEvaluation) => {
-    setWishlistIds((prev) => {
+  const handleToggleSave = (book: BookEvaluation) => {
+    setSavedBookIds((prev) => {
       const next = new Set(prev);
       if (next.has(book.id)) {
         next.delete(book.id);
       } else {
         next.add(book.id);
       }
+      try {
+        localStorage.setItem('veredito_saved_books', JSON.stringify([...next]));
+      } catch {}
       return next;
     });
+  };
+
+  const handleDeleteBook = (bookId: string) => {
+    setBooks((prev) => prev.filter((b) => b.id !== bookId));
+    setSavedBookIds((prev) => {
+      const next = new Set(prev);
+      next.delete(bookId);
+      try {
+        localStorage.setItem('veredito_saved_books', JSON.stringify([...next]));
+      } catch {}
+      return next;
+    });
+    if (selectedBook?.id === bookId) {
+      setSelectedBook(null);
+    }
+  };
+
+  const handleUpdateBookCover = (bookId: string, newCoverUrl: string) => {
+    setBooks((prev) =>
+      prev.map((b) => (b.id === bookId ? { ...b, coverUrl: newCoverUrl } : b))
+    );
+    setSelectedBook((prev) => (prev && prev.id === bookId ? { ...prev, coverUrl: newCoverUrl } : prev));
   };
 
   // Merge evaluated books with initial favorite catalog for the Estante view
@@ -71,20 +103,6 @@ export function App() {
       (init) => !books.some((b) => b.id === init.id || b.title.toLowerCase() === init.title.toLowerCase())
     ),
   ];
-
-  const recentEvaluated = books;
-  const sciFiBooks = allShelfBooks.filter(
-    (b) => b.categoryShelf === 'Ficção Científica' || b.genres.some((g) => g.toLowerCase().includes('ficção'))
-  );
-  const classicsDrama = allShelfBooks.filter(
-    (b) => b.categoryShelf === 'Clássicos & Drama Humano' || b.genres.some((g) => g.toLowerCase().includes('clássico'))
-  );
-  const darkFantasyDystopia = allShelfBooks.filter(
-    (b) => b.categoryShelf === 'Fantasia Sombria & Distopia' || b.genres.some((g) => g.toLowerCase().includes('distopia'))
-  );
-  const graphicNovels = allShelfBooks.filter(
-    (b) => b.categoryShelf === 'Graphic Novels & Contos' || b.genres.some((g) => g.toLowerCase().includes('graphic'))
-  );
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-start bg-[#f5f5f7] text-[#1d1d1f] antialiased">
@@ -118,6 +136,7 @@ export function App() {
             <EstanteView
               books={allShelfBooks}
               onSelectBook={setSelectedBook}
+              savedBookIds={savedBookIds}
             />
           )}
         </main>
@@ -133,8 +152,10 @@ export function App() {
         <FichaModal
           book={selectedBook}
           onClose={() => setSelectedBook(null)}
-          onSaveToWishlist={handleToggleWishlist}
-          isSaved={selectedBook ? wishlistIds.has(selectedBook.id) : false}
+          onSaveToWishlist={handleToggleSave}
+          isSaved={selectedBook ? savedBookIds.has(selectedBook.id) : false}
+          onDeleteBook={handleDeleteBook}
+          onUpdateCover={handleUpdateBookCover}
         />
 
         {/* Evaluator Engine Search & Bulk Modal */}

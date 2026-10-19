@@ -5,10 +5,12 @@ import { BookShelf } from './BookShelf';
 interface EstanteViewProps {
   books: BookEvaluation[];
   onSelectBook: (book: BookEvaluation) => void;
+  savedBookIds?: Set<string>;
 }
 
 type FilterOption = 
   | 'all' 
+  | 'salvos'
   | 'obras-primas' 
   | 'recomendados' 
   | 'ressalvas' 
@@ -21,11 +23,15 @@ type FilterOption =
 export const EstanteView: React.FC<EstanteViewProps> = ({
   books,
   onSelectBook,
+  savedBookIds,
 }) => {
   const [selectedFilter, setSelectedFilter] = useState<FilterOption>('all');
 
+  const savedBooks = books.filter((b) => savedBookIds?.has(b.id));
+
   const filterChips: { id: FilterOption; label: string }[] = [
     { id: 'all', label: 'Todas as Prateleiras' },
+    ...(savedBooks.length > 0 ? [{ id: 'salvos' as FilterOption, label: `Salvos (${savedBooks.length})` }] : []),
     { id: 'obras-primas', label: 'Obras-Primas' },
     { id: 'recomendados', label: 'Recomendados' },
     { id: 'ressalvas', label: 'Vale com Ressalvas' },
@@ -123,6 +129,15 @@ export const EstanteView: React.FC<EstanteViewProps> = ({
       {/* Dynamic Shelf Presentation */}
       {selectedFilter === 'all' && (
         <div className="space-y-4">
+          {/* Prateleira de Livros Salvos pelo Usuário */}
+          {savedBooks.length > 0 && (
+            <BookShelf
+              title="Salvos"
+              books={savedBooks}
+              onSelectBook={onSelectBook}
+            />
+          )}
+
           {/* Se houver livros avaliados recentemente */}
           {recentlyEvaluated.length > 0 && (
             <BookShelf
@@ -178,6 +193,14 @@ export const EstanteView: React.FC<EstanteViewProps> = ({
             />
           )}
         </div>
+      )}
+
+      {selectedFilter === 'salvos' && (
+        <BookShelf
+          title="Salvos"
+          books={savedBooks}
+          onSelectBook={onSelectBook}
+        />
       )}
 
       {selectedFilter === 'obras-primas' && (

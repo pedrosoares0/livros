@@ -1,20 +1,24 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   X, Film, BookOpen, AlertTriangle, CheckCircle2, 
   XCircle, Copy, Share2, Bookmark, Gauge,
-  Feather, Compass, Zap, Moon, HeartHandshake
+  Feather, Compass, Zap, Moon, HeartHandshake,
+  Trash2, Image as ImageIcon
 } from 'lucide-react';
 import { BookEvaluation } from '../types';
 import { BookCover } from './BookCover';
 import { ScoreBadge, getScoreTone } from './ScoreBadge';
 import { MovieThumb } from './MovieThumb';
+import { fetchAlternativeCovers } from '../services/coverSearch';
 
 interface FichaModalProps {
   book: BookEvaluation | null;
   onClose: () => void;
   onSaveToWishlist?: (book: BookEvaluation) => void;
   isSaved?: boolean;
+  onDeleteBook?: (bookId: string) => void;
+  onUpdateCover?: (bookId: string, newCoverUrl: string) => void;
 }
 
 export const FichaModal: React.FC<FichaModalProps> = ({
@@ -22,8 +26,42 @@ export const FichaModal: React.FC<FichaModalProps> = ({
   onClose,
   onSaveToWishlist,
   isSaved = false,
+  onDeleteBook,
+  onUpdateCover,
 }) => {
   if (!book) return null;
+
+  const [isCoverPickerOpen, setIsCoverPickerOpen] = useState(false);
+  const [isLoadingCovers, setIsLoadingCovers] = useState(false);
+  const [alternativeCovers, setAlternativeCovers] = useState<string[]>([]);
+  const [hasFetchedCovers, setHasFetchedCovers] = useState(false);
+
+  const handleOpenCoverPicker = async () => {
+    setIsCoverPickerOpen((prev) => !prev);
+    if (!hasFetchedCovers) {
+      setIsLoadingCovers(true);
+      const results = await fetchAlternativeCovers(book.title, book.author, book.coverUrl);
+      setAlternativeCovers(results);
+      setIsLoadingCovers(false);
+      setHasFetchedCovers(true);
+    }
+  };
+
+  const handleSelectCover = (newCoverUrl: string) => {
+    if (onUpdateCover) {
+      onUpdateCover(book.id, newCoverUrl);
+    }
+    setIsCoverPickerOpen(false);
+  };
+
+  const handleDeleteBook = () => {
+    if (window.confirm(`Tem certeza que deseja excluir "${book.title}" do Veredito?`)) {
+      if (onDeleteBook) {
+        onDeleteBook(book.id);
+      }
+      onClose();
+    }
+  };
 
   // Derived inverted metrics for unified 0-10 intuitive scale (higher = better fit)
   const originalidade = Math.round((10 - book.criteria.genericidade) * 10) / 10;
@@ -146,26 +184,20 @@ ${book.resumo}
           transition={{ type: 'spring', damping: 28, stiffness: 320 }}
           className="relative w-full max-w-lg max-h-[92vh] sm:max-h-[88vh] bg-[#ffffff] border border-black/[0.08] rounded-t-3xl sm:rounded-3xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.25)] flex flex-col overflow-hidden text-[#1d1d1f] z-20"
         >
-          {/* Header Bar */}
-          <div className="flex items-center justify-between px-6 pt-4 pb-3 border-b border-black/[0.06] bg-[#ffffff]/90 backdrop-blur-lg sticky top-0 z-20">
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-[#1d1d1f]" />
-              <span className="text-xs font-bold uppercase tracking-wider text-[#86868b]">
-                Ficha Veredito
-              </span>
-            </div>
+          {/* Minimalist Top Action Bar without 'Ficha Veredito' label */}
+          <div className="flex items-center justify-end px-6 pt-3.5 pb-2 bg-[#ffffff]/90 backdrop-blur-lg sticky top-0 z-20">
             <div className="flex items-center gap-1.5">
               <button
                 onClick={copyFichaToClipboard}
                 title="Copiar Ficha"
-                className="p-2 rounded-full hover:bg-neutral-100 text-[#86868b] hover:text-[#1d1d1f] transition-all duration-150 active:scale-90"
+                className="p-2 rounded-full hover:bg-neutral-100 text-[#86868b] hover:text-[#1d1d1f] transition-all duration-150 active:scale-90 cursor-pointer"
               >
                 <Share2 className="w-4 h-4" />
               </button>
               <button
                 onClick={onClose}
                 aria-label="Fechar"
-                className="p-2 rounded-full hover:bg-neutral-100 text-[#86868b] hover:text-[#1d1d1f] transition-all duration-150 active:scale-90"
+                className="p-2 rounded-full hover:bg-neutral-100 text-[#86868b] hover:text-[#1d1d1f] transition-all duration-150 active:scale-90 cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -174,20 +206,89 @@ ${book.resumo}
 
           {/* Scrollable Content */}
           <div className="overflow-y-auto px-6 py-5 space-y-4 hide-scrollbar">
-            {/* Hero Section: Cover + Dual Scores + Title */}
-            <div className="flex flex-col sm:flex-row gap-5 items-center sm:items-start">
-              {/* Enriched Large Book Cover */}
-              <div className="relative shrink-0 w-36 sm:w-44">
-                <BookCover
-                  title={book.title}
-                  author={book.author}
-                  coverUrl={book.coverUrl}
-                />
-                <div className="mt-2 text-center">
-                  <span className="px-2.5 py-1 bg-neutral-100 border border-neutral-200 rounded-lg text-[11px] font-score font-semibold text-[#86868b] inline-block">
+            {/* Hero Section: Extra-Large Cover with Ambient Colored Glow + Dual Scores + Title */}
+            <div className="flex flex-col sm:flex-row gap-6 items-center sm:items-start">
+              {/* Extra-Large Book Cover with Soft Color-Matched Backlight Glow */}
+              <div className="relative shrink-0 w-48 sm:w-56 flex flex-col items-center">
+                {/* Ambient Soft Glow matching the book cover palette */}
+                {book.coverUrl && (
+                  <div
+                    className="absolute -inset-3 rounded-2xl opacity-45 blur-2xl scale-95 pointer-events-none -z-10 transition-all duration-300"
+                    style={{
+                      backgroundImage: `url(${book.coverUrl})`,
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center',
+                    }}
+                  />
+                )}
+
+                <div className="w-full">
+                  <BookCover
+                    title={book.title}
+                    author={book.author}
+                    coverUrl={book.coverUrl}
+                  />
+                </div>
+
+                <div className="mt-2.5 flex items-center gap-2">
+                  <span className="px-2.5 py-1 bg-neutral-100 border border-neutral-200/90 rounded-lg text-[10px] font-score font-semibold text-[#86868b] inline-block">
                     ~{book.pages} págs
                   </span>
+
+                  {/* Alterar Capa Action */}
+                  <button
+                    onClick={handleOpenCoverPicker}
+                    className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-neutral-100 hover:bg-neutral-200/80 border border-neutral-200/90 text-[10px] font-semibold text-[#1d1d1f] transition-all cursor-pointer active:scale-95 shadow-2xs"
+                    title="Buscar e selecionar capa alternativa"
+                  >
+                    <ImageIcon className="w-3 h-3 text-[#86868b]" />
+                    <span>{isCoverPickerOpen ? 'Fechar capas' : 'Alterar capa'}</span>
+                  </button>
                 </div>
+
+                {/* Alternative Covers Selector Drawer */}
+                {isCoverPickerOpen && (
+                  <div className="w-full mt-3 p-3 rounded-2xl bg-neutral-50/95 border border-neutral-200/90 space-y-2 shadow-xs">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-[#1d1d1f]">
+                        Edições Disponíveis (até 4)
+                      </span>
+                    </div>
+
+                    {isLoadingCovers ? (
+                      <div className="py-5 text-center text-xs text-[#86868b] flex flex-col items-center gap-2">
+                        <div className="w-4 h-4 border-2 border-neutral-300 border-t-neutral-800 rounded-full animate-spin" />
+                        <span className="text-[11px]">Buscando capas na API...</span>
+                      </div>
+                    ) : alternativeCovers.length === 0 ? (
+                      <p className="text-[11px] text-[#86868b] text-center py-3">
+                        Nenhuma capa alternativa encontrada.
+                      </p>
+                    ) : (
+                      <div className="grid grid-cols-2 gap-2">
+                        {alternativeCovers.map((coverUrl, idx) => (
+                          <div
+                            key={idx}
+                            onClick={() => handleSelectCover(coverUrl)}
+                            className="group relative cursor-pointer rounded-lg overflow-hidden border-2 border-neutral-200 hover:border-black active:scale-95 transition-all shadow-xs"
+                          >
+                            <img
+                              src={coverUrl}
+                              alt={`Opção ${idx + 1}`}
+                              className="w-full aspect-[2/3] object-cover"
+                              loading="lazy"
+                            />
+                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 flex items-center justify-center transition-all">
+                              <span className="opacity-0 group-hover:opacity-100 px-2 py-0.5 rounded bg-black/80 text-white text-[9px] font-bold">
+                                Aplicar
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
               <div className="flex-1 text-center sm:text-left space-y-2 min-w-0">
@@ -351,28 +452,43 @@ ${book.resumo}
           </div>
 
           {/* Footer Actions */}
-          <div className="p-4 border-t border-black/[0.06] bg-[#ffffff] flex items-center gap-3">
+          <div className="p-4 border-t border-black/[0.06] bg-[#ffffff] flex items-center gap-2.5">
+            {/* Salvar Button (creates/adds to Salvos shelf) */}
             {onSaveToWishlist && (
               <button
                 onClick={() => onSaveToWishlist(book)}
-                className={`flex-1 py-2.5 px-4 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-all active:scale-[0.97] cursor-pointer ${
+                className={`flex-1 py-2.5 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all active:scale-[0.97] cursor-pointer ${
                   isSaved
-                    ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                    ? 'bg-emerald-50 text-emerald-800 border border-emerald-300 shadow-2xs'
                     : 'bg-neutral-100 text-[#1d1d1f] hover:bg-neutral-200/80 border border-neutral-200/80'
                 }`}
               >
-                <Bookmark className="w-4 h-4" />
-                <span>{isSaved ? 'Salvo na Wishlist' : 'Adicionar à Wishlist'}</span>
+                <Bookmark className={`w-3.5 h-3.5 ${isSaved ? 'fill-emerald-800' : ''}`} />
+                <span>{isSaved ? 'Salvo' : 'Salvar'}</span>
               </button>
             )}
 
+            {/* Copiar Ficha */}
             <button
               onClick={copyFichaToClipboard}
-              className="py-2.5 px-5 rounded-xl text-xs font-semibold bg-[#1d1d1f] text-white hover:bg-black transition-all active:scale-[0.97] flex items-center gap-1.5 shrink-0 shadow-sm cursor-pointer"
+              className="py-2.5 px-3.5 rounded-xl text-xs font-semibold bg-[#1d1d1f] text-white hover:bg-black transition-all active:scale-[0.97] flex items-center justify-center gap-1.5 shrink-0 shadow-2xs cursor-pointer"
             >
-              <Copy className="w-4 h-4" />
+              <Copy className="w-3.5 h-3.5" />
               <span>Copiar Ficha</span>
             </button>
+
+            {/* Excluir Livro do Programa */}
+            {onDeleteBook && (
+              <button
+                onClick={handleDeleteBook}
+                title="Excluir livro do Veredito"
+                aria-label="Excluir livro"
+                className="py-2.5 px-3 rounded-xl text-xs font-semibold text-rose-600 bg-rose-50 hover:bg-rose-100 border border-rose-200/80 transition-all active:scale-[0.97] flex items-center justify-center gap-1.5 shrink-0 cursor-pointer shadow-2xs"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Excluir</span>
+              </button>
+            )}
           </div>
         </motion.div>
       </div>
