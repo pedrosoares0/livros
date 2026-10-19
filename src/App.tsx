@@ -97,7 +97,7 @@ export function App() {
             className="text-5xl sm:text-6xl font-normal italic tracking-tight text-[#1d1d1f] leading-none"
             style={{ fontFamily: "'Instrument Serif', serif" }}
           >
-            Protocolo
+            Veredito
           </h1>
           <p className="text-[11px] font-medium tracking-wider text-[#86868b] uppercase pt-1.5">
             Avaliador Pessoal de Livros & HQs

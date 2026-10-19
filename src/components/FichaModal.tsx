@@ -30,7 +30,7 @@ export const FichaModal: React.FC<FichaModalProps> = ({
   const maturidade = Math.round((10 - book.criteria.infantilidade) * 10) / 10;
 
   const copyFichaToClipboard = () => {
-    const text = `📋 PROTOCOLO — Ficha de Avaliação
+    const text = `📋 VEREDITO — Ficha de Avaliação
 📖 Obra: ${book.title} (${book.author})
 📄 Páginas: ~${book.pages} (ed. brasileira)
 ⭐ Nota Técnica: ${book.notaTecnica}
@@ -40,7 +40,7 @@ export const FichaModal: React.FC<FichaModalProps> = ({
 📝 Resumo:
 ${book.resumo}
 
-🎬 Vibe Cinematográfica: ${book.movieComparisons.join(' • ')}
+🎬 Filmes: ${book.movieComparisons.join(' • ')}
 🎭 Adaptações: ${book.adaptacoes}
 
 📊 Critérios:
@@ -275,15 +275,15 @@ ${book.resumo}
               </p>
             </div>
 
-            {/* Vibe Cinematográfica Mundial (2 a 4 filmes com thumbnails visuais) */}
+            {/* Filmes com atmosfera equivalente (2 a 4 filmes com thumbnails visuais via TMDb) */}
             <div className="p-3.5 rounded-2xl bg-neutral-50/90 border border-neutral-200/80 space-y-2.5">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1.5 text-xs font-bold text-[#1d1d1f]">
                   <Film className="w-3.5 h-3.5 text-amber-700" />
-                  <span>Vibe de Filmes (Cinema Mundial)</span>
+                  <span>Filmes</span>
                 </div>
                 <span className="text-[10px] text-[#86868b] font-medium">
-                  {book.movieComparisons.length} indicações
+                  {book.movieComparisons.length} {book.movieComparisons.length === 1 ? 'indicação' : 'indicações'}
                 </span>
               </div>
               
@@ -305,15 +305,15 @@ ${book.resumo}
               </p>
             </div>
 
-            {/* Critérios do Protocolo — Dashboard Visual Intuitivo */}
+            {/* Critérios do Veredito — Dashboard Visual Intuitivo */}
             <div className="space-y-2 pt-1">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#86868b]">
                   <Gauge className="w-3.5 h-3.5 text-[#1d1d1f]" />
-                  <span>Critérios do Protocolo</span>
+                  <span>Critérios do Veredito</span>
                 </div>
                 <span className="text-[10px] text-[#86868b] font-score">
-                  Visual Telemetry
+                  Telemetria
                 </span>
               </div>
 

@@ -37,16 +37,23 @@ export const EstanteView: React.FC<EstanteViewProps> = ({
   ];
 
   // Helper matching functions for dynamic, intelligent categorization
-  const isObrasPrimas = (b: BookEvaluation) => b.notaEncaixe >= 9.5 || b.userStatus === 'loved';
-  const isRecomendados = (b: BookEvaluation) => b.notaEncaixe >= 8 && b.notaEncaixe < 9.5;
-  const isRessalvas = (b: BookEvaluation) => (b.notaEncaixe >= 5 && b.notaEncaixe < 8) || b.vereditoTipo === 'ressalvas';
-  const isRejeicao = (b: BookEvaluation) => b.notaEncaixe < 5 || b.userStatus === 'disliked' || b.vereditoTipo === 'evite';
+  const isRejeicao = (b: BookEvaluation) =>
+    b.notaEncaixe < 5 || b.userStatus === 'disliked' || b.vereditoTipo === 'evite';
+
+  const isObrasPrimas = (b: BookEvaluation) =>
+    !isRejeicao(b) && (b.notaEncaixe >= 9.5 || b.userStatus === 'loved');
+
+  const isRecomendados = (b: BookEvaluation) =>
+    !isRejeicao(b) && !isObrasPrimas(b) && b.notaEncaixe >= 8 && b.notaEncaixe < 9.5;
+
+  const isRessalvas = (b: BookEvaluation) =>
+    !isRejeicao(b) && !isObrasPrimas(b) && !isRecomendados(b) && ((b.notaEncaixe >= 5 && b.notaEncaixe < 8) || b.vereditoTipo === 'ressalvas');
 
   const isSciFi = (b: BookEvaluation) => 
     b.categoryShelf === 'Ficção Científica' || 
     b.genres.some((g) => {
       const gl = g.toLowerCase();
-      return gl.includes('ficção') || gl.includes('sci-fi') || gl.includes('espaço') || gl.includes('distopia');
+      return gl.includes('ficção') || gl.includes('sci-fi') || gl.includes('espaço') || gl.includes('distopia') || gl.includes('cyberpunk');
     });
 
   const isClassicos = (b: BookEvaluation) =>
@@ -72,7 +79,13 @@ export const EstanteView: React.FC<EstanteViewProps> = ({
     });
 
   // Calculate shelves dynamically
-  const recentlyEvaluated = books.filter((b) => b.id.startsWith('eval-'));
+  const recentlyEvaluated = books.filter(
+    (b) =>
+      b.userStatus === 'analyzed' ||
+      b.id.startsWith('eval-') ||
+      b.id.startsWith('book-') ||
+      b.id.startsWith('cbl-')
+  );
   const obrasPrimasBooks = books.filter(isObrasPrimas);
   const recomendadosBooks = books.filter(isRecomendados);
   const ressalvasBooks = books.filter(isRessalvas);
@@ -178,7 +191,7 @@ export const EstanteView: React.FC<EstanteViewProps> = ({
 
       {selectedFilter === 'recomendados' && (
         <BookShelf
-          title="Recomendados pelo Protocolo (Nota 8 a 9)"
+          title="Recomendados pelo Veredito (Nota 8 a 9)"
           books={recomendadosBooks}
           onSelectBook={onSelectBook}
         />

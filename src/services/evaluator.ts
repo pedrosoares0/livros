@@ -36,7 +36,7 @@ const BRAZILIAN_EDITIONS_CATALOG: Partial<BookEvaluation>[] = [
     author: 'William Gibson',
     year: 1984,
     pages: 320,
-    coverUrl: 'https://covers.openlibrary.org/b/id/8389778-L.jpg', // Edição Aleph
+    coverUrl: 'https://covers.openlibrary.org/b/id/13838027-L.jpg', // Edição Aleph pt-BR
     genres: ['Cyberpunk', 'Ficção Científica'],
     resumo: 'Case, um hacker decadente de Chiba City com o sistema nervoso queimado por trair seus chefes, recebe uma última chance de redenção em troca de invadir uma poderosa inteligência artificial corporativa.',
   },
@@ -138,6 +138,16 @@ export async function searchBookApi(query: string): Promise<Partial<BookEvaluati
         b.title?.toLowerCase().includes(cleanQuery) ||
         b.author?.toLowerCase().includes(cleanQuery)
     )
+    .sort((a, b) => {
+      // Priorizar correspondência exata de título ou início
+      const aTitle = a.title?.toLowerCase() || '';
+      const bTitle = b.title?.toLowerCase() || '';
+      if (aTitle === cleanQuery) return -1;
+      if (bTitle === cleanQuery) return 1;
+      if (aTitle.startsWith(cleanQuery) && !bTitle.startsWith(cleanQuery)) return -1;
+      if (bTitle.startsWith(cleanQuery) && !aTitle.startsWith(cleanQuery)) return 1;
+      return 0;
+    })
     .map((b) => ({
       id: b.id,
       title: b.title,
@@ -149,41 +159,51 @@ export async function searchBookApi(query: string): Promise<Partial<BookEvaluati
       resumo: b.resumo,
     }));
 
-  if (localMatches.length >= 4) {
-    return localMatches.slice(0, 6);
+  // Se já temos correspondência exata ou forte local, mantemos no topo
+  if (localMatches.length >= 5) {
+    return localMatches.slice(0, 8);
   }
 
-  // 3. Consulta à Google Books API com restrição de idioma para edições em Português
+  // 3. Consulta à Google Books API com restrição rígida de idioma (pt-BR / pt)
   try {
-    const encoded = encodeURIComponent(query.trim());
+    const encoded = encodeURIComponent(`${query.trim()}`);
     const res = await fetch(
-      `https://www.googleapis.com/books/v1/volumes?q=${encoded}&langRestrict=pt&maxResults=6`
+      `https://www.googleapis.com/books/v1/volumes?q=${encoded}&langRestrict=pt&printType=books&maxResults=8`
     );
     if (res.ok) {
       const data = await res.json();
       if (data.items && data.items.length > 0) {
-        const googleResults = data.items.map((item: any) => {
-          const info = item.volumeInfo || {};
-          let cover =
-            info.imageLinks?.extraLarge ||
-            info.imageLinks?.large ||
-            info.imageLinks?.medium ||
-            info.imageLinks?.thumbnail ||
-            '';
-          if (cover.startsWith('http://')) {
-            cover = cover.replace('http://', 'https://');
-          }
-          return {
-            id: item.id,
-            title: info.title || query,
-            author: info.authors ? info.authors.join(', ') : 'Autor desconhecido',
-            year: info.publishedDate ? parseInt(info.publishedDate.substring(0, 4)) : undefined,
-            pages: info.pageCount && info.pageCount > 20 ? info.pageCount : 240,
-            coverUrl: cover,
-            genres: info.categories || ['Literatura'],
-            resumo: info.description || '',
-          };
-        });
+        const googleResults = data.items
+          .filter((item: any) => {
+            const lang = item.volumeInfo?.language;
+            // Descartar obras explicitamente em idiomas estrangeiros
+            if (lang && !['pt', 'pt-BR', 'pt-PT'].includes(lang)) {
+              return false;
+            }
+            return true;
+          })
+          .map((item: any) => {
+            const info = item.volumeInfo || {};
+            let cover =
+              info.imageLinks?.extraLarge ||
+              info.imageLinks?.large ||
+              info.imageLinks?.medium ||
+              info.imageLinks?.thumbnail ||
+              '';
+            if (cover.startsWith('http://')) {
+              cover = cover.replace('http://', 'https://');
+            }
+            return {
+              id: item.id,
+              title: info.title || query,
+              author: info.authors ? info.authors.join(', ') : 'Autor desconhecido',
+              year: info.publishedDate ? parseInt(info.publishedDate.substring(0, 4)) : undefined,
+              pages: info.pageCount && info.pageCount > 20 ? info.pageCount : 240,
+              coverUrl: cover,
+              genres: info.categories || ['Literatura'],
+              resumo: info.description || '',
+            };
+          });
 
         const combined = [...localMatches];
         for (const gr of googleResults) {
@@ -191,34 +211,44 @@ export async function searchBookApi(query: string): Promise<Partial<BookEvaluati
             combined.push(gr);
           }
         }
-        return combined.slice(0, 8);
+        if (combined.length >= 4) {
+          return combined.slice(0, 8);
+        }
       }
     }
   } catch (err) {
     console.warn('Google Books indisponível, tentando OpenLibrary por:', err);
   }
 
-  // 4. Fallback OpenLibrary com filtro de idioma português (language=por)
+  // 4. Fallback OpenLibrary com filtro estrito de idioma português (language=por)
   try {
     const encoded = encodeURIComponent(query.trim());
-    const olRes = await fetch(`https://openlibrary.org/search.json?q=${encoded}&language=por&limit=6`);
+    const olRes = await fetch(`https://openlibrary.org/search.json?q=${encoded}&language=por&limit=8`);
     if (olRes.ok) {
       const olData = await olRes.json();
       if (olData.docs && olData.docs.length > 0) {
-        const olResults = olData.docs.map((doc: any, i: number) => ({
-          id: `ol-${doc.key || i}`,
-          title: doc.title,
-          author: doc.author_name ? doc.author_name.join(', ') : 'Autor desconhecido',
-          year: doc.first_publish_year,
-          pages: doc.number_of_pages_median || 240,
-          coverUrl: doc.cover_i
-            ? `https://covers.openlibrary.org/b/id/${doc.cover_i}-L.jpg`
-            : doc.isbn && doc.isbn[0]
-            ? `https://covers.openlibrary.org/b/isbn/${doc.isbn[0]}-L.jpg`
-            : '',
-          genres: doc.subject ? doc.subject.slice(0, 2) : ['Literatura'],
-          resumo: '',
-        }));
+        const olResults = olData.docs
+          .filter((doc: any) => {
+            // Confirmar que possui referência em português
+            if (doc.language && Array.isArray(doc.language) && !doc.language.includes('por')) {
+              return false;
+            }
+            return true;
+          })
+          .map((doc: any, i: number) => ({
+            id: `ol-${doc.key || i}`,
+            title: doc.title,
+            author: doc.author_name ? doc.author_name.join(', ') : 'Autor desconhecido',
+            year: doc.first_publish_year,
+            pages: doc.number_of_pages_median || 240,
+            coverUrl: doc.cover_i
+              ? `https://covers.openlibrary.org/b/id/${doc.cover_i}-L.jpg`
+              : doc.isbn && doc.isbn[0]
+              ? `https://covers.openlibrary.org/b/isbn/${doc.isbn[0]}-L.jpg`
+              : '',
+            genres: doc.subject ? doc.subject.slice(0, 2) : ['Literatura'],
+            resumo: '',
+          }));
 
         const combined = [...localMatches];
         for (const ol of olResults) {
@@ -236,7 +266,7 @@ export async function searchBookApi(query: string): Promise<Partial<BookEvaluati
   return localMatches;
 }
 
-// Calibração e avaliação inteligente com base no algoritmo do Protocolo
+// Calibração e avaliação inteligente com base no algoritmo do Veredito
 export function evaluateBook(
   rawBook: {
     title: string;
@@ -494,7 +524,7 @@ export function evaluateBulkList(rawText: string): BookEvaluation[] {
       title,
       author,
       pages: 250,
-      description: `Avaliação do Protocolo para "${title}". Premissa com foco em tensão psicológica, moralidade e identidade estilística.`,
+      description: `Avaliação do Veredito para "${title}". Premissa com foco em tensão psicológica, moralidade e identidade estilística.`,
     });
   });
 

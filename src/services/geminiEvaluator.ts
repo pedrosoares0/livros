@@ -4,7 +4,7 @@ const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || 'AQ.Ab8RN6LNzoEEpQ
 const GEMINI_MODEL = 'gemini-3.8-flash';
 
 const USER_PROFILE_PROMPT = `
-Você é o motor de avaliação do app "Protocolo", responsável por avaliar livros, HQs e coletâneas para um leitor pessoal exigente.
+Você é o motor de avaliação do app "Veredito", responsável por avaliar livros, HQs e coletâneas para um leitor pessoal exigente.
 
 PERFIL DO USUÁRIO:
 - Preferência de formato: Livros curtos a médios em português (pt-BR), seriedade, densidade, humor sutil e inteligente quando houver. Aprecia graphic novels, adaptações visuais e forte identidade estética.

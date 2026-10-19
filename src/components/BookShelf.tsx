@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { BookEvaluation } from '../types';
 import { BookCover } from './BookCover';
@@ -15,11 +15,61 @@ export const BookShelf: React.FC<BookShelfProps> = ({
   onSelectBook,
 }) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const isDraggingRef = useRef(false);
+  const startXRef = useRef(0);
+  const scrollLeftRef = useRef(0);
+  const dragDistanceRef = useRef(0);
 
   const scroll = (direction: 'left' | 'right') => {
     if (!scrollContainerRef.current) return;
-    const offset = direction === 'left' ? -300 : 300;
+    const offset = direction === 'left' ? -320 : 320;
     scrollContainerRef.current.scrollBy({ left: offset, behavior: 'smooth' });
+  };
+
+  // Smooth mouse-wheel scrolling translated to horizontal motion
+  const handleWheel = (e: React.WheelEvent) => {
+    if (!scrollContainerRef.current) return;
+    if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+      scrollContainerRef.current.scrollBy({
+        left: e.deltaY * 1.2,
+        behavior: 'smooth',
+      });
+    }
+  };
+
+  // Direct manipulation: Smooth Grab & Drag with 1:1 tracking
+  const handlePointerDown = (e: React.PointerEvent) => {
+    if (!scrollContainerRef.current) return;
+    isDraggingRef.current = true;
+    dragDistanceRef.current = 0;
+    startXRef.current = e.pageX - scrollContainerRef.current.offsetLeft;
+    scrollLeftRef.current = scrollContainerRef.current.scrollLeft;
+    scrollContainerRef.current.setPointerCapture(e.pointerId);
+  };
+
+  const handlePointerMove = (e: React.PointerEvent) => {
+    if (!isDraggingRef.current || !scrollContainerRef.current) return;
+    const x = e.pageX - scrollContainerRef.current.offsetLeft;
+    const walk = (x - startXRef.current) * 1.1;
+    dragDistanceRef.current = Math.abs(x - startXRef.current);
+    scrollContainerRef.current.scrollLeft = scrollLeftRef.current - walk;
+  };
+
+  const handlePointerUp = (e: React.PointerEvent) => {
+    if (!isDraggingRef.current || !scrollContainerRef.current) return;
+    isDraggingRef.current = false;
+    try {
+      scrollContainerRef.current.releasePointerCapture(e.pointerId);
+    } catch {
+      // Ignore pointer capture release
+    }
+  };
+
+  const handleBookClick = (book: BookEvaluation) => {
+    // Only open if not a drag action (threshold of 6px)
+    if (dragDistanceRef.current < 6) {
+      onSelectBook(book);
+    }
   };
 
   return (
@@ -38,14 +88,14 @@ export const BookShelf: React.FC<BookShelfProps> = ({
             <button
               onClick={() => scroll('left')}
               aria-label="Rolar para esquerda"
-              className="p-1.5 rounded-full text-[#86868b] hover:text-[#1d1d1f] hover:bg-neutral-200/60 transition-all duration-150 active:scale-95"
+              className="p-1.5 rounded-full text-[#86868b] hover:text-[#1d1d1f] hover:bg-neutral-200/60 transition-all duration-150 active:scale-95 cursor-pointer"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
             <button
               onClick={() => scroll('right')}
               aria-label="Rolar para direita"
-              className="p-1.5 rounded-full text-[#86868b] hover:text-[#1d1d1f] hover:bg-neutral-200/60 transition-all duration-150 active:scale-95"
+              className="p-1.5 rounded-full text-[#86868b] hover:text-[#1d1d1f] hover:bg-neutral-200/60 transition-all duration-150 active:scale-95 cursor-pointer"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
@@ -53,22 +103,32 @@ export const BookShelf: React.FC<BookShelfProps> = ({
         </div>
       </div>
 
-      {/* Books Container with Standardized Frosted Gray Shelf Bar Physically Overlapping the Books */}
+      {/* Books Container with Authentic Apple Shelf Base */}
       <div className="relative w-full overflow-hidden">
-        {/* Horizontal Book Row - Enlarged, NO names underneath */}
+        {/* Horizontal Book Row - Smooth Momentum & Pointer Tracking */}
         <div
           ref={scrollContainerRef}
-          className="flex items-end gap-5 overflow-x-auto pt-3 pb-8 px-6 hide-scrollbar scroll-smooth"
+          onWheel={handleWheel}
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+          onPointerCancel={handlePointerUp}
+          className="flex items-end gap-5 overflow-x-auto pt-3 pb-5 px-6 hide-scrollbar cursor-grab active:cursor-grabbing"
+          style={{
+            WebkitOverflowScrolling: 'touch',
+            scrollBehavior: 'smooth',
+            overscrollBehaviorX: 'contain',
+          }}
         >
           {books.map((book) => (
             <div
               key={book.id}
-              onClick={() => onSelectBook(book)}
-              className="group relative flex flex-col items-center shrink-0 cursor-pointer transition-transform duration-200 active:scale-[0.97]"
-              style={{ width: '154px' }}
+              onClick={() => handleBookClick(book)}
+              className="group relative flex flex-col items-center shrink-0 cursor-pointer transition-transform duration-200 active:scale-[0.98]"
+              style={{ width: '150px' }}
             >
-              {/* Authentic Book Cover - Enlarged (154px x 231px) */}
-              <div className="w-[154px] h-[231px] transition-transform duration-200 group-hover:-translate-y-1.5">
+              {/* Authentic Book Cover - Full artwork visible */}
+              <div className="w-[150px] h-[225px] transition-transform duration-200 group-hover:-translate-y-2 relative z-10">
                 <BookCover
                   title={book.title}
                   author={book.author}
@@ -76,38 +136,23 @@ export const BookShelf: React.FC<BookShelfProps> = ({
                   notaEncaixe={book.notaEncaixe}
                 />
               </div>
+
+              {/* Realistic Contact Shadow on Shelf */}
+              <div className="w-full h-3 bg-black/20 blur-sm rounded-full -mt-1.5 transition-all duration-200 group-hover:scale-90 group-hover:opacity-40" />
             </div>
           ))}
         </div>
 
-        {/* Standardized Soft Frosted Gray Acrylic Lip (COVERING THE LOWER PART OF THE BOOKS) */}
-        <div
-          className="absolute left-4 right-4 pointer-events-none z-20"
-          style={{ bottom: '18px' }}
-        >
+        {/* Minimalist Apple Books Architectural Shelf Ledge (Underneath the books) */}
+        <div className="px-5 -mt-1 pointer-events-none">
           <div
-            className="w-full h-14 rounded-2xl flex items-center justify-between px-3.5 border shadow-sm"
+            className="w-full h-2 rounded-full border"
             style={{
-              background: 'rgba(235, 238, 245, 0.48)',
-              backdropFilter: 'blur(20px) saturate(180%)',
-              WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-              borderColor: 'rgba(255, 255, 255, 0.90)',
-              boxShadow: '0 6px 20px -3px rgba(0, 0, 0, 0.05), inset 0 1px 1px rgba(255, 255, 255, 0.95), inset 0 -1px 1px rgba(0, 0, 0, 0.03)',
+              background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(225, 228, 235, 0.85) 100%)',
+              borderColor: 'rgba(210, 215, 225, 0.7)',
+              boxShadow: '0 4px 10px rgba(0, 0, 0, 0.04), inset 0 1px 1px rgba(255, 255, 255, 1)',
             }}
-          >
-            {/* Left Silver Screw Rivet */}
-            <div className="w-4 h-4 rounded-full bg-gradient-to-tr from-neutral-300 via-neutral-100 to-neutral-400 shadow-[0_1px_3px_rgba(0,0,0,0.15)] border border-white/90 flex items-center justify-center">
-              <div className="w-2.5 h-[1.5px] bg-neutral-600/80 rotate-45 rounded-full" />
-            </div>
-
-            {/* Glossy specular highlight in acrylic bar */}
-            <div className="h-[1px] flex-1 mx-4 bg-gradient-to-r from-transparent via-white/90 to-transparent" />
-
-            {/* Right Silver Screw Rivet */}
-            <div className="w-4 h-4 rounded-full bg-gradient-to-tr from-neutral-300 via-neutral-100 to-neutral-400 shadow-[0_1px_3px_rgba(0,0,0,0.15)] border border-white/90 flex items-center justify-center">
-              <div className="w-2.5 h-[1.5px] bg-neutral-600/80 -rotate-45 rounded-full" />
-            </div>
-          </div>
+          />
         </div>
       </div>
     </section>

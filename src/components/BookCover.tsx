@@ -74,7 +74,7 @@ export const BookCover: React.FC<BookCoverProps> = ({
           {/* Bottom ornament */}
           <div className="border-t border-white/20 pt-1 flex items-center justify-between z-10">
             <span className="text-[7px] text-neutral-400 font-mono uppercase">
-              Protocolo
+              Veredito
             </span>
             <div className="w-1.5 h-1.5 rounded-full bg-white/30" />
           </div>

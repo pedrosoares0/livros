@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Search, ListPlus, X, Loader2, BookOpen, Check } from 'lucide-react';
+import { Search, ListPlus, X, BookOpen, ChevronRight } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { searchBookApi, evaluateBulkList, evaluateBook } from '../services/evaluator';
 import { evaluateWithGemini } from '../services/geminiEvaluator';
@@ -50,6 +50,11 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
     } else {
       setApiSuggestions([]);
     }
+  };
+
+  const handleClearQuery = () => {
+    setQuery('');
+    setApiSuggestions([]);
   };
 
   const runEvaluationWithProgress = async (
@@ -157,8 +162,8 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
           <div className="flex items-center justify-between px-6 pt-4 pb-3 border-b border-neutral-100 bg-white/90 backdrop-blur-lg sticky top-0 z-20">
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-[#1d1d1f]" />
-              <span className="text-xs font-bold uppercase tracking-wider text-[#86868b]">
-                Avaliador do Protocolo
+              <span className="text-xs font-bold uppercase tracking-wider text-[#1d1d1f]">
+                Avaliador do Veredito
               </span>
             </div>
             {!isLoading && (
@@ -204,7 +209,7 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
           <div className="p-6 overflow-y-auto hide-scrollbar space-y-4">
             {isLoading ? (
               /* Thoughtful Stepped Evaluation Loading State */
-              <div className="py-10 px-4 text-center space-y-5">
+              <div className="py-12 px-4 text-center space-y-5">
                 <div className="relative w-14 h-14 mx-auto flex items-center justify-center">
                   <div className="absolute inset-0 rounded-full border-2 border-neutral-200 animate-ping opacity-30" />
                   <div className="w-12 h-12 rounded-full border-2 border-neutral-300 border-t-neutral-900 animate-spin" />
@@ -244,15 +249,24 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                       type="text"
                       value={query}
                       onChange={(e) => handleInputChange(e.target.value)}
-                      placeholder="Ex: 1984, Duna, Vidas Secas, O Processo..."
-                      className="w-full pl-11 pr-4 py-3 rounded-2xl bg-neutral-100/80 focus:bg-white border border-neutral-200/90 focus:border-neutral-400 focus:ring-2 focus:ring-black/5 text-[#1d1d1f] placeholder-[#86868b] text-sm focus:outline-none transition-all duration-150"
+                      placeholder="Ex: Neuromancer, Duna, 1984, Vidas Secas..."
+                      className="w-full pl-11 pr-10 py-3 rounded-2xl bg-neutral-100/80 focus:bg-white border border-neutral-200/90 focus:border-neutral-400 focus:ring-2 focus:ring-black/5 text-[#1d1d1f] placeholder-[#86868b] text-sm focus:outline-none transition-all duration-150"
                       autoFocus
                     />
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#86868b]" />
+                    {query.trim().length > 0 && (
+                      <button
+                        type="button"
+                        onClick={handleClearQuery}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-[#86868b] hover:text-[#1d1d1f] rounded-full hover:bg-neutral-200/60 transition-colors cursor-pointer"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    )}
                   </div>
 
                   <div className="flex items-center justify-between pt-1">
-                    <span className="text-[11px] text-[#86868b]">Motor Gemini 3.8 Flash calibrado</span>
+                    <span className="text-[11px] text-[#86868b]">Motor Gemini calibrado</span>
                     <PearlButton
                       type="submit"
                       disabled={!query.trim()}
@@ -263,21 +277,27 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                   </div>
                 </form>
 
-                {/* Suggestions from Books API */}
+                {/* Suggestions from Books API with Generous Visual Covers */}
                 {apiSuggestions.length > 0 && (
-                  <div className="space-y-2 pt-3 border-t border-neutral-200/60">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#86868b] block">
-                      Edições em Português Encontradas ({apiSuggestions.length})
-                    </span>
+                  <div className="space-y-2.5 pt-3 border-t border-neutral-200/60">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-[#86868b]">
+                        Edições em Português ({apiSuggestions.length})
+                      </span>
+                      <span className="text-[10px] text-[#86868b]">
+                        Toque no livro para avaliar
+                      </span>
+                    </div>
 
-                    <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
+                    <div className="space-y-2.5 max-h-72 overflow-y-auto pr-1">
                       {apiSuggestions.map((book, idx) => (
                         <div
                           key={book.id || idx}
                           onClick={() => handleSelectBook(book)}
-                          className="flex items-center gap-3.5 p-2.5 rounded-2xl bg-neutral-50 hover:bg-neutral-100/80 border border-neutral-200/60 hover:border-neutral-300 cursor-pointer transition-all duration-150 active:scale-[0.98]"
+                          className="group flex items-center gap-4 p-3 rounded-2xl bg-neutral-50 hover:bg-neutral-100/90 border border-neutral-200/70 hover:border-neutral-300 cursor-pointer transition-all duration-200 active:scale-[0.98] shadow-2xs hover:shadow-xs"
                         >
-                          <div className="w-10 h-14 shrink-0">
+                          {/* Generous Cover with Aspect Ratio */}
+                          <div className="w-16 h-24 shrink-0 transition-transform duration-200 group-hover:scale-105">
                             <BookCover
                               title={book.title || 'Livro'}
                               author={book.author || 'Autor'}
@@ -285,21 +305,32 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                             />
                           </div>
 
-                          <div className="flex-1 min-w-0">
-                            <h4 className="text-xs font-bold text-[#1d1d1f] truncate">
+                          {/* Descriptive Metadata */}
+                          <div className="flex-1 min-w-0 space-y-1">
+                            <h4 className="text-sm font-bold text-[#1d1d1f] truncate group-hover:text-black leading-snug">
                               {book.title}
                             </h4>
-                            <p className="text-[11px] text-[#86868b] truncate">
+                            <p className="text-xs text-[#86868b] truncate">
                               {book.author}
                             </p>
-                            <span className="text-[10px] text-[#86868b] font-score">
-                              ~{book.pages} páginas
-                            </span>
+                            <div className="flex items-center gap-2 pt-0.5">
+                              {book.pages && (
+                                <span className="text-[10px] font-medium text-[#6e6e73] bg-neutral-200/60 px-2 py-0.5 rounded-md">
+                                  ~{book.pages} págs
+                                </span>
+                              )}
+                              {book.year && (
+                                <span className="text-[10px] font-medium text-[#6e6e73]">
+                                  {book.year}
+                                </span>
+                              )}
+                            </div>
                           </div>
 
-                          <span className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-neutral-200/80 hover:bg-neutral-300 text-[#1d1d1f] shrink-0 transition-colors">
-                            Avaliar
-                          </span>
+                          {/* Subtle Elegant Action Indicator */}
+                          <div className="shrink-0 p-2 text-[#86868b] group-hover:text-[#1d1d1f] group-hover:translate-x-0.5 transition-all">
+                            <ChevronRight className="w-5 h-5 stroke-[2]" />
+                          </div>
                         </div>
                       ))}
                     </div>
