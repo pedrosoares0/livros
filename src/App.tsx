@@ -15,6 +15,7 @@ import {
   updateBookCoverInDb,
   getLocalEvaluations 
 } from './services/supabase';
+import { prefetchBookCovers } from './services/imagePrefetch';
 
 export function App() {
   const [books, setBooks] = useState<BookEvaluation[]>(() => getLocalEvaluations());
@@ -37,6 +38,7 @@ export function App() {
     fetchEvaluations().then((loaded) => {
       if (isMounted && loaded) {
         setBooks(loaded);
+        prefetchBookCovers(loaded.map((b) => b.coverUrl));
         const serverSavedIds = new Set(loaded.filter((b) => b.isSaved).map((b) => b.id));
         setSavedBookIds((prev) => {
           const merged = new Set([...prev, ...serverSavedIds]);
@@ -138,23 +140,23 @@ export function App() {
           </p>
         </header>
 
-        {/* Main Content Views */}
+        {/* Main Content Views — Persistent mounted DOM for zero-reload instant tab switching */}
         <main className="flex-1 py-1">
-          {activeTab === 'discover' && (
+          <div className={activeTab === 'discover' ? 'block' : 'hidden'}>
             <DiscoverView
               books={books}
               onSelectBook={setSelectedBook}
               onOpenEvaluate={() => setIsEvaluateOpen(true)}
             />
-          )}
+          </div>
 
-          {activeTab === 'shelves' && (
+          <div className={activeTab === 'shelves' ? 'block' : 'hidden'}>
             <EstanteView
               books={allShelfBooks}
               onSelectBook={setSelectedBook}
               savedBookIds={savedBookIds}
             />
-          )}
+          </div>
         </main>
 
         {/* Apple-style Bottom Navigation Bar (Início, +, Estante) */}

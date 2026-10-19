@@ -878,3 +878,16 @@ export const INITIAL_BOOKS: BookEvaluation[] = [
     categoryShelf: 'Outros'
   }
 ];
+
+export const INITIAL_BOOK_IDS = new Set<string>(INITIAL_BOOKS.map((b) => b.id));
+
+export const isUserEvaluation = (b: BookEvaluation) => {
+  return (
+    !INITIAL_BOOK_IDS.has(b.id) ||
+    b.id.startsWith('eval-') ||
+    b.id.startsWith('book-') ||
+    b.id.startsWith('cbl-') ||
+    b.userStatus === 'analyzed'
+  );
+};
+

@@ -46,6 +46,7 @@ export const BookCover: React.FC<BookCoverProps> = ({
           onError={() => setHasError(true)}
           className="w-full h-full object-cover select-none pointer-events-none"
           loading="lazy"
+          decoding="async"
         />
       ) : (
         <div

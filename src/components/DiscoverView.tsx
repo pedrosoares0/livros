@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { BookOpen, ArrowUpDown } from 'lucide-react';
 import { BookEvaluation } from '../types';
+import { isUserEvaluation } from '../data/initialBooks';
 import { BookCover } from './BookCover';
 import { ScoreBadge } from './ScoreBadge';
 import { PearlButton } from './PearlButton';
@@ -18,11 +19,16 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
 }) => {
   const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
 
-  const topMatches = books
-    .filter((b) => b.notaEncaixe >= 8)
+  // Apenas as avaliações reais do usuário (exclui catálogo inicial, que fica na Estante)
+  const userEvaluations = books.filter(isUserEvaluation);
+
+  // Recomendações: apenas avaliações do usuário com nota de encaixe a partir de 7
+  const topMatches = userEvaluations
+    .filter((b) => b.notaEncaixe >= 7)
     .sort((a, b) => (sortOrder === 'desc' ? b.notaEncaixe - a.notaEncaixe : a.notaEncaixe - b.notaEncaixe));
 
-  const recentEvaluations = books.slice(0, 10);
+  // Últimas avaliações: todas as avaliações do usuário
+  const recentEvaluations = userEvaluations;
 
   return (
     <div className="w-full space-y-7 px-5 sm:px-6 pt-3 pb-24">
@@ -49,14 +55,14 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
         </div>
       </div>
 
-      {/* Empty State when database has no evaluations yet */}
-      {books.length === 0 && (
+      {/* Empty State when user has no evaluations yet */}
+      {userEvaluations.length === 0 && (
         <div className="py-10 text-center space-y-2">
           <p className="text-sm font-semibold text-[#1d1d1f]">
-            Nenhum livro avaliado ainda
+            Nenhuma avaliação pessoal ainda
           </p>
           <p className="text-xs text-[#86868b] max-w-xs mx-auto">
-            Utilize o botão acima para pesquisar e avaliar livros. Suas avaliações e prateleiras são sincronizadas em tempo real com o banco de dados.
+            Utilize o botão acima para avaliar livros. Suas avaliações aparecerão aqui e seu catálogo completo está organizado na aba Estante.
           </p>
         </div>
       )}
