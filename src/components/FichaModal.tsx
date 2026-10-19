@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { 
   X, Film, BookOpen, AlertTriangle, CheckCircle2, 
   XCircle, Copy, Share2, Bookmark, Gauge,
-  Sparkles, ShieldCheck, Feather, Compass, Zap, Moon, HeartHandshake
+  Feather, Compass, Zap, Moon, HeartHandshake
 } from 'lucide-react';
 import { BookEvaluation } from '../types';
 import { BookCover } from './BookCover';
@@ -27,7 +27,6 @@ export const FichaModal: React.FC<FichaModalProps> = ({
 
   // Derived inverted metrics for unified 0-10 intuitive scale (higher = better fit)
   const originalidade = Math.round((10 - book.criteria.genericidade) * 10) / 10;
-  const maturidade = Math.round((10 - book.criteria.infantilidade) * 10) / 10;
 
   const copyFichaToClipboard = () => {
     const text = `📋 VEREDITO — Ficha de Avaliação
@@ -40,12 +39,10 @@ export const FichaModal: React.FC<FichaModalProps> = ({
 📝 Resumo:
 ${book.resumo}
 
-🎬 Filmes: ${book.movieComparisons.join(' • ')}
-🎭 Adaptações: ${book.adaptacoes}
+🎬 Filmes: ${book.movieComparisons.slice(0, 3).join(' • ')}
 
 📊 Critérios:
 • Originalidade: ${originalidade}
-• Maturidade: ${maturidade} (${book.criteria.infantilidadeStatus.toUpperCase()})
 • Técnica / Prosa: ${book.criteria.qualidadeTecnica}
 • Worldbuilding: ${book.criteria.worldbuilding}
 • Ritmo: ${book.criteria.ritmo} (${book.criteria.ritmoDescricao})
@@ -87,16 +84,9 @@ ${book.resumo}
     {
       label: 'Originalidade',
       score: originalidade,
-      icon: <Sparkles className="w-3.5 h-3.5 text-amber-500" />,
+      icon: <Compass className="w-3.5 h-3.5 text-amber-600" />,
       tag: originalidade >= 8 ? 'Inovador' : originalidade >= 5 ? 'Equilibrado' : 'Clichê',
       tone: getScoreTone(originalidade),
-    },
-    {
-      label: 'Maturidade',
-      score: maturidade,
-      icon: <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />,
-      tag: maturidade >= 8 ? 'Adulto (Ideal)' : maturidade >= 5 ? 'Aceitável' : 'Juvenil / Bobo',
-      tone: getScoreTone(maturidade),
     },
     {
       label: 'Qualidade Técnica',
@@ -108,7 +98,7 @@ ${book.resumo}
     {
       label: 'Worldbuilding',
       score: book.criteria.worldbuilding,
-      icon: <Compass className="w-3.5 h-3.5 text-purple-600" />,
+      icon: <BookOpen className="w-3.5 h-3.5 text-purple-600" />,
       tag: book.criteria.worldbuilding >= 8 ? 'Imersivo' : book.criteria.worldbuilding >= 5 ? 'Funcional' : 'Minimalista',
       tone: getScoreTone(book.criteria.worldbuilding),
     },
@@ -186,14 +176,15 @@ ${book.resumo}
           <div className="overflow-y-auto px-6 py-5 space-y-4 hide-scrollbar">
             {/* Hero Section: Cover + Dual Scores + Title */}
             <div className="flex flex-col sm:flex-row gap-5 items-center sm:items-start">
-              <div className="relative shrink-0 w-28 sm:w-32">
+              {/* Enriched Large Book Cover */}
+              <div className="relative shrink-0 w-36 sm:w-44">
                 <BookCover
                   title={book.title}
                   author={book.author}
                   coverUrl={book.coverUrl}
                 />
                 <div className="mt-2 text-center">
-                  <span className="px-2 py-0.5 bg-neutral-100 border border-neutral-200 rounded-md text-[10px] font-score font-semibold text-[#86868b] block">
+                  <span className="px-2.5 py-1 bg-neutral-100 border border-neutral-200 rounded-lg text-[11px] font-score font-semibold text-[#86868b] inline-block">
                     ~{book.pages} págs
                   </span>
                 </div>
@@ -275,35 +266,27 @@ ${book.resumo}
               </p>
             </div>
 
-            {/* Filmes com atmosfera equivalente (2 a 4 filmes com thumbnails visuais via TMDb) */}
-            <div className="p-3.5 rounded-2xl bg-neutral-50/90 border border-neutral-200/80 space-y-2.5">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1.5 text-xs font-bold text-[#1d1d1f]">
-                  <Film className="w-3.5 h-3.5 text-amber-700" />
-                  <span>Filmes</span>
+            {/* Filmes com atmosfera equivalente (Até 3 filmes em UMA SÓ LINHA com thumbnails via TMDb) */}
+            {book.movieComparisons && book.movieComparisons.length > 0 && (
+              <div className="p-3.5 rounded-2xl bg-neutral-50/90 border border-neutral-200/80 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-[#1d1d1f]">
+                    <Film className="w-3.5 h-3.5 text-amber-700" />
+                    <span>Filmes Relacionados</span>
+                  </div>
+                  <span className="text-[10px] text-[#86868b] font-medium">
+                    {Math.min(3, book.movieComparisons.length)} {Math.min(3, book.movieComparisons.length) === 1 ? 'indicação' : 'indicações'}
+                  </span>
                 </div>
-                <span className="text-[10px] text-[#86868b] font-medium">
-                  {book.movieComparisons.length} {book.movieComparisons.length === 1 ? 'indicação' : 'indicações'}
-                </span>
+                
+                {/* Single Row of up to 3 Movie Thumbnails */}
+                <div className="grid grid-cols-3 gap-2.5">
+                  {book.movieComparisons.slice(0, 3).map((movie, i) => (
+                    <MovieThumb key={i} title={movie} />
+                  ))}
+                </div>
               </div>
-              
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                {book.movieComparisons.slice(0, 4).map((movie, i) => (
-                  <MovieThumb key={i} title={movie} />
-                ))}
-              </div>
-            </div>
-
-            {/* Adaptações */}
-            <div className="p-3 rounded-xl bg-neutral-50 border border-neutral-200/70 space-y-1">
-              <div className="flex items-center gap-1.5 text-xs font-bold text-[#1d1d1f]">
-                <Sparkles className="w-3.5 h-3.5 text-purple-700" />
-                <span>Adaptações & Mídia</span>
-              </div>
-              <p className="text-xs text-[#1d1d1f] leading-snug">
-                {book.adaptacoes}
-              </p>
-            </div>
+            )}
 
             {/* Critérios do Veredito — Dashboard Visual Intuitivo */}
             <div className="space-y-2 pt-1">

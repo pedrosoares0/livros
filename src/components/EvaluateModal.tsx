@@ -265,8 +265,7 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                     )}
                   </div>
 
-                  <div className="flex items-center justify-between pt-1">
-                    <span className="text-[11px] text-[#86868b]">Motor Gemini calibrado</span>
+                  <div className="flex items-center justify-end pt-1">
                     <PearlButton
                       type="submit"
                       disabled={!query.trim()}
@@ -296,8 +295,8 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                           onClick={() => handleSelectBook(book)}
                           className="group flex items-center gap-4 p-3 rounded-2xl bg-neutral-50 hover:bg-neutral-100/90 border border-neutral-200/70 hover:border-neutral-300 cursor-pointer transition-all duration-200 active:scale-[0.98] shadow-2xs hover:shadow-xs"
                         >
-                          {/* Generous Cover with Aspect Ratio */}
-                          <div className="w-16 h-24 shrink-0 transition-transform duration-200 group-hover:scale-105">
+                          {/* Generous Large Cover with 2:3 Aspect Ratio */}
+                          <div className="w-20 sm:w-24 shrink-0 transition-transform duration-200 group-hover:scale-105">
                             <BookCover
                               title={book.title || 'Livro'}
                               author={book.author || 'Autor'}

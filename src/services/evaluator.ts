@@ -307,13 +307,17 @@ export function evaluateBook(
     genericidade = 1;
   }
 
-  // 3. Tom sombrio / psicológico (0 = leve, 10 = perturbador)
+  // 3. Tom sombrio / psicológico (0 = leve, 10 = visceralmente sombrio/noir/perturbador)
   let tomSombrio = 5;
   let sombrioMatches = 0;
-  ['morte', 'luto', 'culpa', 'tragédia', 'opressivo', 'guerra', 'pesado', 'terror', 'horror', 'violência', 'psicológico', 'trauma'].forEach(w => {
+  ['morte', 'luto', 'culpa', 'tragédia', 'opressivo', 'guerra', 'pesado', 'terror', 'horror', 'violência', 'psicológico', 'trauma', 'cyberpunk', 'noir', 'distopia', 'submundo', 'crime', 'drogas', 'decadente', 'decadência', 'niilista', 'sombrio', 'chiba', 'hacker'].forEach(w => {
     if (text.includes(w)) sombrioMatches++;
   });
-  tomSombrio = Math.min(10, Math.max(1, 4 + sombrioMatches * 1.5));
+  if (text.includes('cyberpunk') || text.includes('noir') || text.includes('distopia') || text.includes('dark fantasy')) {
+    tomSombrio = Math.min(10, Math.max(7.5, 6.5 + sombrioMatches * 0.8));
+  } else {
+    tomSombrio = Math.min(10, Math.max(1, 4 + sombrioMatches * 1.5));
+  }
   if (text.includes('comédia') || text.includes('romance fofo') || text.includes('leve') || text.includes('humor')) {
     tomSombrio = Math.max(1, tomSombrio - 4);
   }

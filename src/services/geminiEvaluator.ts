@@ -76,7 +76,7 @@ Você DEVE responder ESTRITAMENTE em formato JSON com as seguintes chaves:
   "pages": 250, // número aproximado de páginas da edição brasileira mais comum
   "genres": ["Ficção Científica", "Distopia"],
   "resumo": "2 a 3 linhas focando clima, tema e premissa sem spoilers",
-  "movieComparisons": ["Filme 1", "Filme 2", "Filme 3"], // Forneça de 2 até 4 indicações de filmes do cinema mundial (de qualquer país ou época) que capturem a atmosfera, tom, ritmo ou conflito da obra
+  "movieComparisons": ["Filme 1", "Filme 2", "Filme 3"], // Forneça até 3 indicações de filmes do cinema mundial que capturem a atmosfera, tom, ritmo ou conflito da obra
   "adaptacoes": "Menção curta a adaptações existentes em cinema, série, anime, HQ, ou 'Nenhuma adaptação conhecida'",
   "criteria": {
     "genericidade": 1.0, // 0 = extremamente original, 10 = clichê
@@ -86,7 +86,7 @@ Você DEVE responder ESTRITAMENTE em formato JSON com as seguintes chaves:
     "worldbuilding": 8.5, // 0 a 10
     "ritmo": 7.5, // 0 a 10
     "ritmoDescricao": "Frase curta descrevendo o ritmo (ex: Frenético e visceral, Cadenciado reflexivo, etc.)",
-    "tomSombrio": 8.5, // 0 a 10
+    "tomSombrio": 8.5, // 0 = solar/otimista/leve, 10 = visceralmente sombrio/noir/pesado/distópico
     "impactoEmocional": 8.0 // 0 a 10
   },
   "notaTecnica": 8.8, // 0 a 10

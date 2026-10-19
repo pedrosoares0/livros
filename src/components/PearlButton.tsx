@@ -65,13 +65,14 @@ export const PearlButton: React.FC<PearlButtonProps> = ({
           height: 44px;
         }
         .pearl-button.size-nav-rect {
-          --radius: 16px;
+          --radius: 100px;
         }
         .pearl-button.size-nav-rect .wrap {
           font-size: 13px;
           font-weight: 700;
-          padding: 0 16px;
+          padding: 0 18px;
           height: 42px;
+          border-radius: inherit;
         }
         .pearl-button .wrap p {
           display: flex;
