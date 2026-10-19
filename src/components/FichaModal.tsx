@@ -383,7 +383,11 @@ ${book.resumo}
                                   value={customCoverUrl}
                                   onChange={(e) => setCustomCoverUrl(e.target.value)}
                                   placeholder="https://exemplo.com/capa.jpg"
-                                  className="flex-1 px-2.5 py-1 text-xs bg-white border border-neutral-200/90 rounded-lg text-[#1d1d1f] placeholder-[#86868b] focus:outline-none focus:border-black"
+                                  autoCapitalize="none"
+                                  autoCorrect="off"
+                                  spellCheck={false}
+                                  enterKeyHint="done"
+                                  className="flex-1 px-2.5 py-1 text-[16px] sm:text-xs bg-white border border-neutral-200/90 rounded-lg text-[#1d1d1f] placeholder-[#86868b] focus:outline-none focus:border-black"
                                   autoFocus
                                 />
                                 <button

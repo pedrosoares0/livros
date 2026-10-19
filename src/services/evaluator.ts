@@ -203,7 +203,8 @@ export async function searchBookApi(query: string): Promise<Partial<BookEvaluati
               genres: info.categories || ['Literatura'],
               resumo: info.description || '',
             };
-          });
+          })
+          .sort((a: any, b: any) => (b.coverUrl ? 1 : 0) - (a.coverUrl ? 1 : 0));
 
         const combined = [...localMatches];
         for (const gr of googleResults) {
@@ -220,7 +221,7 @@ export async function searchBookApi(query: string): Promise<Partial<BookEvaluati
     console.warn('Google Books indisponível, tentando OpenLibrary por:', err);
   }
 
-  // 4. Fallback OpenLibrary com filtro estrito de idioma português (language=por)
+  // 4. Fallback OpenLibrary com filtro de idioma e priorização de capas
   try {
     const encoded = encodeURIComponent(query.trim());
     const olRes = await fetch(`https://openlibrary.org/search.json?q=${encoded}&language=por&limit=8`);
@@ -229,7 +230,7 @@ export async function searchBookApi(query: string): Promise<Partial<BookEvaluati
       if (olData.docs && olData.docs.length > 0) {
         const olResults = olData.docs
           .filter((doc: any) => {
-            // Confirmar que possui referência em português
+            // Confirmar que não é exclusivamente em outro idioma estranho
             if (doc.language && Array.isArray(doc.language) && !doc.language.includes('por')) {
               return false;
             }
@@ -248,7 +249,8 @@ export async function searchBookApi(query: string): Promise<Partial<BookEvaluati
               : '',
             genres: doc.subject ? doc.subject.slice(0, 2) : ['Literatura'],
             resumo: '',
-          }));
+          }))
+          .sort((a: any, b: any) => (b.coverUrl ? 1 : 0) - (a.coverUrl ? 1 : 0));
 
         const combined = [...localMatches];
         for (const ol of olResults) {

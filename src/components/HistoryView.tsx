@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { BookEvaluation } from '../types';
-import { Search, Trash2, Clock, CheckCircle2, AlertTriangle, XCircle, ArrowUpDown } from 'lucide-react';
+import { Search, Trash2, Clock, CheckCircle2, AlertTriangle, XCircle, ArrowUpDown, X } from 'lucide-react';
 import { BookCover } from './BookCover';
 import { ScoreBadge } from './ScoreBadge';
 import { PearlButton } from './PearlButton';
@@ -75,18 +75,36 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
   };
 
   return (
-    <div className="w-full space-y-4 px-6 pt-2 pb-24">
+    <div
+      className="w-full space-y-4 px-6 pt-2 pb-24"
+      onTouchMove={() => (document.activeElement as HTMLElement)?.blur()}
+    >
       {/* Search & Sort Controls */}
       <div className="flex flex-col sm:flex-row gap-3 items-center justify-between">
         <div className="relative w-full sm:w-72">
+          <Search className="w-3.5 h-3.5 text-[#86868b] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Buscar no histórico por título ou autor..."
-            className="w-full pl-9 pr-3 py-2 rounded-xl bg-neutral-100 border border-neutral-200/90 text-xs text-[#1d1d1f] placeholder-[#86868b] focus:outline-none focus:border-neutral-400 focus:bg-white transition-all duration-150"
+            autoComplete="off"
+            autoCorrect="off"
+            autoCapitalize="none"
+            spellCheck={false}
+            enterKeyHint="search"
+            className="w-full pl-9 pr-8 py-2 rounded-xl bg-neutral-100 border border-neutral-200/90 text-[16px] sm:text-xs text-[#1d1d1f] placeholder-[#86868b] focus:outline-none focus:border-neutral-400 focus:bg-white transition-all duration-150"
           />
-          <Search className="w-3.5 h-3.5 text-[#86868b] absolute left-3 top-1/2 -translate-y-1/2" />
+          {search.length > 0 && (
+            <button
+              type="button"
+              onClick={() => setSearch('')}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-[#86868b] hover:text-[#1d1d1f] rounded-full transition-colors cursor-pointer"
+              aria-label="Limpar busca"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
         </div>
 
         {/* Sort Options */}

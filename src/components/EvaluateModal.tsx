@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Search, ListPlus, X, BookOpen, ChevronRight, AlertTriangle, Check } from 'lucide-react';
+import { Search, ListPlus, X, BookOpen, ChevronRight, AlertTriangle, Check, Loader2 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { searchBookApi, evaluateBulkList, evaluateBook } from '../services/evaluator';
 import { evaluateWithGemini } from '../services/geminiEvaluator';
@@ -38,9 +38,20 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
   const [query, setQuery] = useState('');
   const [bulkText, setBulkText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
   const [loadingStepIndex, setLoadingStepIndex] = useState(0);
   const [duplicateWarning, setDuplicateWarning] = useState<BookEvaluation | null>(null);
   const [apiSuggestions, setApiSuggestions] = useState<Partial<BookEvaluation>[]>([]);
+
+  const searchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (searchTimerRef.current) {
+        clearTimeout(searchTimerRef.current);
+      }
+    };
+  }, []);
 
   const normalizeText = (text: string) =>
     text
@@ -68,25 +79,41 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
     );
   };
 
-  const handleInputChange = async (val: string) => {
+  const handleInputChange = (val: string) => {
     setQuery(val);
     if (duplicateWarning) setDuplicateWarning(null);
 
-    if (val.trim().length >= 3) {
+    if (searchTimerRef.current) {
+      clearTimeout(searchTimerRef.current);
+    }
+
+    const trimmed = val.trim();
+    if (trimmed.length < 3) {
+      setApiSuggestions([]);
+      setIsSearching(false);
+      return;
+    }
+
+    setIsSearching(true);
+    searchTimerRef.current = setTimeout(async () => {
       try {
-        const results = await searchBookApi(val);
+        const results = await searchBookApi(trimmed);
         setApiSuggestions(results);
       } catch (e) {
-        console.error(e);
+        console.error('Search error:', e);
+      } finally {
+        setIsSearching(false);
       }
-    } else {
-      setApiSuggestions([]);
-    }
+    }, 280);
   };
 
   const handleClearQuery = () => {
+    if (searchTimerRef.current) {
+      clearTimeout(searchTimerRef.current);
+    }
     setQuery('');
     setApiSuggestions([]);
+    setIsSearching(false);
     setDuplicateWarning(null);
   };
 
@@ -102,7 +129,6 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
     }, 700);
 
     try {
-      // 1. Try real Gemini 3.8 Flash evaluation with user taste profile
       let evaluation: BookEvaluation;
       try {
         evaluation = await evaluateWithGemini(title, extraContext);
@@ -118,7 +144,6 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
         });
       }
 
-      // Ensure minimum thinking time so user can see the analysis steps
       await new Promise((resolve) => setTimeout(resolve, 800));
 
       if (evaluation.notaEncaixe >= 8) {
@@ -142,6 +167,9 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
   };
 
   const handleSelectBook = (rawBook: Partial<BookEvaluation>) => {
+    // Dismiss mobile keyboard on selection
+    (document.activeElement as HTMLElement)?.blur();
+
     const existing = findAlreadyEvaluated(rawBook.title || query);
     if (existing) {
       setDuplicateWarning(existing);
@@ -160,6 +188,10 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
   const handleDirectEvaluate = (e: React.FormEvent) => {
     e.preventDefault();
     if (!query.trim()) return;
+
+    // Dismiss mobile keyboard on submit
+    (document.activeElement as HTMLElement)?.blur();
+
     const existing = findAlreadyEvaluated(query.trim());
     if (existing) {
       setDuplicateWarning(existing);
@@ -173,10 +205,11 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
     e.preventDefault();
     if (!bulkText.trim()) return;
 
+    (document.activeElement as HTMLElement)?.blur();
+
     setIsLoading(true);
     setTimeout(() => {
       const results = evaluateBulkList(bulkText);
-      // Filter out any titles already evaluated
       const newOnly = results.filter((b) => !findAlreadyEvaluated(b.title));
       if (newOnly.length === 0 && results.length > 0) {
         const firstDup = findAlreadyEvaluated(results[0].title);
@@ -202,24 +235,27 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
           onClick={() => !isLoading && onClose()}
-          className="absolute inset-0 bg-black/40 backdrop-blur-sm z-10"
+          className="absolute inset-0 bg-black/45 backdrop-blur-sm z-10"
         />
 
-        {/* Modal Window */}
+        {/* Modal Window — iPhone-optimized bottom sheet with max-h-[92dvh] and pb-safe */}
         <motion.div
-          initial={{ y: 24, opacity: 0, scale: 0.98 }}
+          initial={{ y: 32, opacity: 0, scale: 0.98 }}
           animate={{ y: 0, opacity: 1, scale: 1 }}
-          exit={{ y: 20, opacity: 0, scale: 0.98 }}
-          transition={{ type: 'spring', damping: 28, stiffness: 320 }}
-          className="relative w-full max-w-lg max-h-[90vh] bg-white border border-neutral-200/90 rounded-t-3xl sm:rounded-3xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.25)] flex flex-col overflow-hidden text-[#1d1d1f] z-20"
+          exit={{ y: 32, opacity: 0, scale: 0.98 }}
+          transition={{ type: 'spring', damping: 28, stiffness: 340 }}
+          className="relative w-full max-w-lg max-h-[92dvh] sm:max-h-[86vh] bg-white border border-neutral-200/90 rounded-t-3xl sm:rounded-3xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] flex flex-col overflow-hidden text-[#1d1d1f] z-20 pb-safe"
         >
-          {/* Clean Top Action Bar with Close Button */}
-          <div className="flex items-center justify-end px-6 pt-3.5 pb-1 sticky top-0 z-20 bg-white/95 backdrop-blur-md">
+          {/* iOS Handle Indicator on mobile */}
+          <div className="w-10 h-1 bg-neutral-300 rounded-full mx-auto mt-2.5 sm:hidden shrink-0" />
+
+          {/* Minimalist Top Close Bar with Apple HIG touch target */}
+          <div className="flex items-center justify-end px-5 pt-2 pb-1 sticky top-0 z-20 bg-white/95 backdrop-blur-md">
             {!isLoading && (
               <button
                 onClick={onClose}
                 aria-label="Fechar"
-                className="p-1.5 rounded-full hover:bg-neutral-100 text-[#86868b] hover:text-[#1d1d1f] transition-all duration-150 active:scale-90 cursor-pointer"
+                className="p-2 -mr-2 rounded-full hover:bg-neutral-100 active:bg-neutral-200/70 text-[#86868b] hover:text-[#1d1d1f] transition-all cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -228,10 +264,10 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
 
           {/* Mode Switcher Tabs */}
           {!isLoading && (
-            <div className="flex p-1 mx-6 mt-4 rounded-xl bg-neutral-100 border border-neutral-200/70">
+            <div className="flex p-1 mx-5 mt-1 rounded-xl bg-neutral-100 border border-neutral-200/70 shrink-0">
               <button
                 onClick={() => setTab('single')}
-                className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition-all duration-150 flex items-center justify-center gap-2 select-none active:scale-[0.98] cursor-pointer ${
+                className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition-all duration-150 flex items-center justify-center gap-1.5 select-none active:scale-[0.98] cursor-pointer ${
                   tab === 'single'
                     ? 'bg-white text-[#1d1d1f] shadow-xs font-bold'
                     : 'text-[#86868b] hover:text-[#1d1d1f]'
@@ -242,20 +278,20 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
               </button>
               <button
                 onClick={() => setTab('bulk')}
-                className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition-all duration-150 flex items-center justify-center gap-2 select-none active:scale-[0.98] cursor-pointer ${
+                className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition-all duration-150 flex items-center justify-center gap-1.5 select-none active:scale-[0.98] cursor-pointer ${
                   tab === 'bulk'
                     ? 'bg-white text-[#1d1d1f] shadow-xs font-bold'
                     : 'text-[#86868b] hover:text-[#1d1d1f]'
                 }`}
               >
                 <ListPlus className="w-3.5 h-3.5" />
-                <span>Colar Lista em Lote</span>
+                <span>Colar Lista</span>
               </button>
             </div>
           )}
 
           {/* Content Area */}
-          <div className="p-6 overflow-y-auto hide-scrollbar space-y-4">
+          <div className="p-5 overflow-y-auto hide-scrollbar space-y-3.5 flex-1">
             {isLoading ? (
               /* Thoughtful Stepped Evaluation Loading State */
               <div className="py-12 px-4 text-center space-y-5">
@@ -274,7 +310,6 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                   </p>
                 </div>
 
-                {/* Progress Indicators */}
                 <div className="flex justify-center gap-1.5 pt-2">
                   {EVALUATION_STEPS.map((_, i) => (
                     <div
@@ -287,7 +322,7 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                 </div>
               </div>
             ) : tab === 'single' ? (
-              <div className="space-y-4">
+              <div className="space-y-3.5">
                 {/* Duplicate Book Warning Banner */}
                 <AnimatePresence>
                   {duplicateWarning && (
@@ -296,32 +331,32 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: -8, scale: 0.98 }}
                       transition={{ type: 'spring', damping: 25, stiffness: 400 }}
-                      className="p-4 rounded-2xl bg-amber-50/95 border border-amber-200 shadow-sm flex flex-col gap-3"
+                      className="p-3.5 rounded-2xl bg-amber-50/95 border border-amber-200 shadow-sm flex flex-col gap-2.5"
                     >
-                      <div className="flex items-start gap-3">
-                        <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center shrink-0 mt-0.5">
-                          <AlertTriangle className="w-4 h-4 text-amber-800" />
+                      <div className="flex items-start gap-2.5">
+                        <div className="w-7 h-7 rounded-full bg-amber-100 flex items-center justify-center shrink-0 mt-0.5">
+                          <AlertTriangle className="w-3.5 h-3.5 text-amber-800" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-1.5">
-                            <span className="text-[10px] uppercase font-bold tracking-wider text-amber-800 bg-amber-200/60 px-2 py-0.5 rounded-full">
+                            <span className="text-[9px] uppercase font-bold tracking-wider text-amber-800 bg-amber-200/60 px-1.5 py-0.5 rounded-md">
                               Já avaliado
                             </span>
                           </div>
-                          <h4 className="text-sm font-bold text-amber-950 mt-1">
+                          <h4 className="text-xs font-bold text-amber-950 mt-1">
                             Esse livro já foi avaliado
                           </h4>
-                          <p className="text-xs text-amber-900/80 mt-0.5 leading-relaxed">
-                            <strong>"{duplicateWarning.title}"</strong> ({duplicateWarning.author}) já está cadastrado no seu acervo do Veredito com Nota de Encaixe <strong>{Math.floor(duplicateWarning.notaEncaixe)}</strong>.
+                          <p className="text-[11px] text-amber-900/85 mt-0.5 leading-relaxed">
+                            <strong>"{duplicateWarning.title}"</strong> ({duplicateWarning.author}) já está no seu acervo com Nota <strong>{Math.floor(duplicateWarning.notaEncaixe)}</strong>.
                           </p>
                         </div>
                       </div>
 
-                      <div className="flex items-center justify-end gap-2 pt-2 border-t border-amber-200/70">
+                      <div className="flex items-center justify-end gap-2 pt-1 border-t border-amber-200/70">
                         <button
                           type="button"
                           onClick={() => setDuplicateWarning(null)}
-                          className="px-3 py-1.5 text-xs font-semibold text-amber-800 hover:text-amber-950 rounded-lg hover:bg-amber-100 transition-colors cursor-pointer"
+                          className="px-2.5 py-1 text-xs font-semibold text-amber-800 hover:text-amber-950 rounded-lg transition-colors cursor-pointer"
                         >
                           Tentar outro
                         </button>
@@ -335,7 +370,7 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                             }}
                             className="!bg-amber-950 hover:!bg-black !text-white text-xs font-bold"
                           >
-                            Ver Ficha Existente
+                            Ver Ficha
                           </AceternityButton>
                         )}
                       </div>
@@ -343,67 +378,83 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                   )}
                 </AnimatePresence>
 
-                <form onSubmit={handleDirectEvaluate} className="space-y-3">
+                {/* Integrated Search Bar with Inline Action Button (Immune to Keyboard Height) */}
+                <form onSubmit={handleDirectEvaluate} className="space-y-2">
                   <label className="text-xs font-semibold text-[#1d1d1f] block">
                     Digite o título do livro ou ISBN:
                   </label>
 
-                  <div className="relative">
-                    <input
-                      type="text"
-                      value={query}
-                      onChange={(e) => handleInputChange(e.target.value)}
-                      placeholder="Ex: Neuromancer, Duna, 1984, Vidas Secas..."
-                      className="w-full pl-11 pr-10 py-3 rounded-2xl bg-neutral-100/80 focus:bg-white border border-neutral-200/90 focus:border-neutral-400 focus:ring-2 focus:ring-black/5 text-[#1d1d1f] placeholder-[#86868b] text-sm focus:outline-none transition-all duration-150"
-                      autoFocus
-                    />
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#86868b]" />
-                    {query.trim().length > 0 && (
-                      <button
-                        type="button"
-                        onClick={handleClearQuery}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-[#86868b] hover:text-[#1d1d1f] rounded-full hover:bg-neutral-200/60 transition-colors cursor-pointer"
-                      >
-                        <X className="w-3.5 h-3.5" />
-                      </button>
-                    )}
-                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="relative flex-1">
+                      <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#86868b] pointer-events-none" />
+                      <input
+                        type="text"
+                        value={query}
+                        onChange={(e) => handleInputChange(e.target.value)}
+                        placeholder="Ex: Noite na Taverna, Duna..."
+                        className="w-full pl-10 pr-9 py-2.5 rounded-xl bg-neutral-100/90 focus:bg-white border border-neutral-200/90 focus:border-neutral-900 focus:ring-2 focus:ring-black/5 text-[#1d1d1f] placeholder-[#86868b] text-[16px] sm:text-sm focus:outline-none transition-all duration-150"
+                        autoComplete="off"
+                        autoCorrect="off"
+                        autoCapitalize="words"
+                        spellCheck={false}
+                        enterKeyHint="search"
+                      />
 
-                  <div className="flex items-center justify-end pt-1">
+                      {isSearching ? (
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center justify-center">
+                          <Loader2 className="w-4 h-4 text-neutral-600 animate-spin" />
+                        </div>
+                      ) : query.trim().length > 0 ? (
+                        <button
+                          type="button"
+                          onClick={handleClearQuery}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-[#86868b] hover:text-[#1d1d1f] rounded-full hover:bg-neutral-200/60 transition-colors cursor-pointer"
+                          aria-label="Limpar campo"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      ) : null}
+                    </div>
+
                     <AceternityButton
                       type="submit"
                       variant="primary"
                       size="md"
                       disabled={!query.trim()}
+                      className="shrink-0 font-bold px-3.5 py-2.5 text-xs"
                     >
-                      Avaliar livro
+                      Avaliar
                     </AceternityButton>
                   </div>
                 </form>
 
-                {/* Suggestions from Books API with Generous Visual Covers */}
-                {apiSuggestions.length > 0 && (
-                  <div className="space-y-2.5 pt-3 border-t border-neutral-200/60">
+                {/* Suggestions from Books API */}
+                {apiSuggestions.length > 0 ? (
+                  <div className="space-y-2 pt-2 border-t border-neutral-200/60">
                     <div className="flex items-center justify-between">
                       <span className="text-[10px] font-bold uppercase tracking-wider text-[#86868b]">
-                        Edições em Português ({apiSuggestions.length})
+                        Edições Encontradas ({apiSuggestions.length})
                       </span>
                       <span className="text-[10px] text-[#86868b]">
-                        Toque no livro para avaliar
+                        Toque para selecionar
                       </span>
                     </div>
 
-                    <div className="space-y-2.5 max-h-80 overflow-y-auto pr-1">
+                    {/* Touch-optimized scroll area with auto-blur on scroll */}
+                    <div
+                      onTouchMove={() => (document.activeElement as HTMLElement)?.blur()}
+                      className="space-y-2 max-h-72 sm:max-h-80 overflow-y-auto pr-1"
+                    >
                       {apiSuggestions.map((book, idx) => {
                         const isAlready = findAlreadyEvaluated(book.title || '');
                         return (
                           <div
                             key={book.id || idx}
                             onClick={() => handleSelectBook(book)}
-                            className="group flex items-center gap-4 sm:gap-4.5 p-3 sm:p-3.5 rounded-2xl bg-neutral-50 hover:bg-neutral-100/90 border border-neutral-200/70 hover:border-neutral-300 cursor-pointer transition-all duration-200 active:scale-[0.98] shadow-2xs hover:shadow-xs"
+                            className="group flex items-center gap-3 p-2.5 rounded-2xl bg-neutral-50 hover:bg-neutral-100/90 active:bg-neutral-200/60 border border-neutral-200/70 hover:border-neutral-300 cursor-pointer transition-all active:scale-[0.98] shadow-2xs"
                           >
-                            {/* Generous Large Cover with 2:3 Aspect Ratio */}
-                            <div className="w-24 sm:w-28 shrink-0 transition-transform duration-200 group-hover:scale-105">
+                            {/* Generous Cover with 2:3 Aspect Ratio */}
+                            <div className="w-16 sm:w-20 shrink-0">
                               <BookCover
                                 title={book.title || 'Livro'}
                                 author={book.author || 'Autor'}
@@ -412,48 +463,54 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                             </div>
 
                             {/* Descriptive Metadata */}
-                            <div className="flex-1 min-w-0 space-y-1">
-                              <div className="flex items-center gap-2">
-                                <h4 className="text-sm font-bold text-[#1d1d1f] truncate group-hover:text-black leading-snug">
-                                  {book.title}
-                                </h4>
-                              </div>
-                              <p className="text-xs text-[#86868b] truncate">
+                            <div className="flex-1 min-w-0 space-y-0.5">
+                              <h4 className="text-xs sm:text-sm font-bold text-[#1d1d1f] line-clamp-2 leading-snug">
+                                {book.title}
+                              </h4>
+                              <p className="text-[11px] text-[#86868b] truncate">
                                 {book.author}
                               </p>
-                              <div className="flex items-center gap-2 pt-0.5">
+                              <div className="flex items-center gap-1.5 pt-0.5">
                                 {isAlready ? (
-                                  <span className="text-[10px] font-bold text-amber-800 bg-amber-100 border border-amber-200/80 px-2 py-0.5 rounded-md flex items-center gap-1">
-                                    <Check className="w-3 h-3 text-amber-700" />
+                                  <span className="text-[9px] font-bold text-amber-800 bg-amber-100 border border-amber-200/80 px-1.5 py-0.5 rounded-md flex items-center gap-1">
+                                    <Check className="w-2.5 h-2.5 text-amber-700" />
                                     Já avaliado
                                   </span>
                                 ) : book.pages ? (
-                                  <span className="text-[10px] font-medium text-[#6e6e73] bg-neutral-200/60 px-2 py-0.5 rounded-md">
+                                  <span className="text-[9px] font-medium text-[#6e6e73] bg-neutral-200/60 px-1.5 py-0.5 rounded-md">
                                     ~{book.pages} págs
                                   </span>
                                 ) : null}
                                 {book.year && (
-                                  <span className="text-[10px] font-medium text-[#6e6e73]">
+                                  <span className="text-[9px] font-medium text-[#6e6e73]">
                                     {book.year}
                                   </span>
                                 )}
                               </div>
                             </div>
 
-                            {/* Subtle Elegant Action Indicator */}
-                            <div className="shrink-0 p-2 text-[#86868b] group-hover:text-[#1d1d1f] group-hover:translate-x-0.5 transition-all">
-                              <ChevronRight className="w-5 h-5 stroke-[2]" />
+                            <div className="shrink-0 p-1 text-[#86868b] group-hover:text-[#1d1d1f] group-hover:translate-x-0.5 transition-all">
+                              <ChevronRight className="w-4 h-4 stroke-[2]" />
                             </div>
                           </div>
                         );
                       })}
                     </div>
                   </div>
-                )}
+                ) : query.trim().length >= 3 && !isSearching ? (
+                  <div className="p-3 rounded-xl bg-neutral-50 border border-neutral-200/60 text-center space-y-1">
+                    <p className="text-xs font-semibold text-[#1d1d1f]">
+                      Nenhuma edição direta encontrada
+                    </p>
+                    <p className="text-[11px] text-[#86868b]">
+                      Toque no botão <strong>Avaliar</strong> ao lado para consultar a IA diretamente.
+                    </p>
+                  </div>
+                ) : null}
               </div>
             ) : (
-              <form onSubmit={handleBulkSubmit} className="space-y-3.5">
-                <div className="space-y-1">
+              <form onSubmit={handleBulkSubmit} className="space-y-3">
+                <div className="space-y-0.5">
                   <label className="text-xs font-semibold text-[#1d1d1f] block">
                     Cole sua lista (um livro por linha):
                   </label>
@@ -465,9 +522,9 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                 <textarea
                   value={bulkText}
                   onChange={(e) => setBulkText(e.target.value)}
-                  placeholder={`Vidas Secas - Graciliano Ramos&#10;1984 - George Orwell&#10;A Estrada - Cormac McCarthy&#10;Kallocaína - Karin Boye`}
-                  rows={6}
-                  className="w-full p-3.5 rounded-2xl bg-neutral-100/80 focus:bg-white border border-neutral-200/90 focus:border-neutral-400 focus:ring-2 focus:ring-black/5 text-[#1d1d1f] placeholder-[#86868b] text-xs font-mono focus:outline-none transition-all duration-150 resize-none leading-relaxed"
+                  placeholder={"Vidas Secas - Graciliano Ramos\n1984 - George Orwell\nA Estrada - Cormac McCarthy"}
+                  rows={5}
+                  className="w-full p-3 rounded-xl bg-neutral-100/90 focus:bg-white border border-neutral-200/90 focus:border-neutral-900 focus:ring-2 focus:ring-black/5 text-[#1d1d1f] placeholder-[#86868b] text-[16px] sm:text-xs font-mono focus:outline-none transition-all duration-150 resize-none leading-relaxed"
                 />
 
                 <div className="flex justify-end pt-1">
@@ -476,6 +533,7 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                     variant="primary"
                     size="md"
                     disabled={!bulkText.trim()}
+                    className="font-bold text-xs"
                   >
                     Avaliar Lista Completa
                   </AceternityButton>
@@ -488,4 +546,5 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
     </AnimatePresence>
   );
 };
+
 
