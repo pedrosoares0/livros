@@ -1,4 +1,4 @@
-import { BookEvaluation } from '../types';
+import type { BookEvaluation } from '../types/index.ts';
 
 export const INITIAL_BOOKS: BookEvaluation[] = [
   // ==========================================

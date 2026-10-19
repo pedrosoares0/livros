@@ -1,8 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
-import { BookEvaluation } from '../types';
+import type { BookEvaluation } from '../types/index.ts';
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'https://odaawprzdbpzivajzned.supabase.co';
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || 'sb_publishable_ylTo-hmvP4G-LE8T8J6aoA_jFh2p9mg';
+const SUPABASE_URL = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_URL) || 'https://odaawprzdbpzivajzned.supabase.co';
+const SUPABASE_ANON_KEY = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_ANON_KEY) || 'sb_publishable_ylTo-hmvP4G-LE8T8J6aoA_jFh2p9mg';
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
