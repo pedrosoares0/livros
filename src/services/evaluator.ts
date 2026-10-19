@@ -102,9 +102,32 @@ const BRAZILIAN_EDITIONS_CATALOG: Partial<BookEvaluation>[] = [
   },
 ];
 
+const STOPWORDS = new Set([
+  'o', 'a', 'os', 'as', 'um', 'uma', 'uns', 'umas',
+  'de', 'do', 'da', 'dos', 'das', 'em', 'no', 'na', 'nos', 'nas',
+  'por', 'para', 'com', 'sem', 'sob', 'sobre', 'e', 'ou'
+]);
+
+function normalizeSearchText(text: string): string {
+  return (text || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^\w\s]/gi, '')
+    .trim();
+}
+
+function extractSignificantKeywords(query: string): string[] {
+  return normalizeSearchText(query)
+    .split(/\s+/)
+    .filter((w) => w.length >= 2 && !STOPWORDS.has(w));
+}
+
 export async function searchBookApi(query: string): Promise<Partial<BookEvaluation>[]> {
-  const cleanQuery = query.trim().toLowerCase();
+  const cleanQuery = normalizeSearchText(query);
   if (!cleanQuery) return [];
+
+  const keywords = extractSignificantKeywords(query);
 
   // 1. Verificar se a busca é um ISBN (BrasilAPI / CBL)
   const isbnMatch = query.replace(/[-\s]/g, '').match(/^(97[89])?\d{9}[\dX]$/i);
@@ -119,9 +142,9 @@ export async function searchBookApi(query: string): Promise<Partial<BookEvaluati
           title: cblData.title,
           author: cblData.authors ? cblData.authors.join(', ') : 'Autor',
           year: cblData.year,
-          pages: cblData.page_count || 240,
+          pages: cblData.page_count && cblData.page_count > 15 ? cblData.page_count : undefined,
           coverUrl: cblData.cover_url || `https://covers.openlibrary.org/b/isbn/${rawIsbn}-L.jpg`,
-          genres: cblData.subjects || ['Literatura Brasileira'],
+          genres: cblData.subjects || ['Literatura'],
           resumo: cblData.synopsis || '',
         }];
       }
@@ -130,25 +153,27 @@ export async function searchBookApi(query: string): Promise<Partial<BookEvaluati
     }
   }
 
+  const candidates: (Partial<BookEvaluation> & { score: number })[] = [];
+
   // 2. Consulta no catálogo local de livros calibrados e edições brasileiras
   const catalogPool = [...INITIAL_BOOKS, ...BRAZILIAN_EDITIONS_CATALOG];
-  const localMatches: Partial<BookEvaluation>[] = catalogPool
-    .filter(
-      (b) =>
-        b.title?.toLowerCase().includes(cleanQuery) ||
-        b.author?.toLowerCase().includes(cleanQuery)
-    )
-    .sort((a, b) => {
-      // Priorizar correspondência exata de título ou início
-      const aTitle = a.title?.toLowerCase() || '';
-      const bTitle = b.title?.toLowerCase() || '';
-      if (aTitle === cleanQuery) return -1;
-      if (bTitle === cleanQuery) return 1;
-      if (aTitle.startsWith(cleanQuery) && !bTitle.startsWith(cleanQuery)) return -1;
-      if (bTitle.startsWith(cleanQuery) && !aTitle.startsWith(cleanQuery)) return 1;
-      return 0;
-    })
-    .map((b) => ({
+  for (const b of catalogPool) {
+    const titleNorm = normalizeSearchText(b.title || '');
+    const authorNorm = normalizeSearchText(b.author || '');
+
+    const matchesKeyword = keywords.length === 0 || keywords.some((kw) => titleNorm.includes(kw) || authorNorm.includes(kw));
+    if (!matchesKeyword) continue;
+
+    let score = 0;
+    if (titleNorm === cleanQuery) score += 60;
+    else if (titleNorm.startsWith(cleanQuery)) score += 40;
+    else if (titleNorm.includes(cleanQuery)) score += 30;
+
+    const matchedKw = keywords.filter((kw) => titleNorm.includes(kw)).length;
+    score += matchedKw * 10;
+    if (b.coverUrl) score += 25;
+
+    candidates.push({
       id: b.id,
       title: b.title,
       author: b.author,
@@ -157,115 +182,135 @@ export async function searchBookApi(query: string): Promise<Partial<BookEvaluati
       coverUrl: b.coverUrl,
       genres: b.genres,
       resumo: b.resumo,
-    }));
-
-  // Se já temos correspondência exata ou forte local, mantemos no topo
-  if (localMatches.length >= 5) {
-    return localMatches.slice(0, 8);
+      score,
+    });
   }
 
-  // 3. Consulta à Google Books API com restrição rígida de idioma (pt-BR / pt)
+  // 3. Open Library (Motor Primário: acervo literário rico, edições brasileiras e capas fiéis)
   try {
-    const encoded = encodeURIComponent(`${query.trim()}`);
+    const encoded = encodeURIComponent(query.trim());
+    const olRes = await fetch(`https://openlibrary.org/search.json?q=${encoded}&limit=20`);
+    if (olRes.ok) {
+      const olData = await olRes.json();
+      for (const doc of olData.docs || []) {
+        const titleNorm = normalizeSearchText(doc.title);
+        const authorNorm = normalizeSearchText((doc.author_name || []).join(' '));
+
+        // FILTRO ESTRITO DE RELEVÂNCIA: se o título não tiver as palavras da busca, DESCARTA
+        const matchesKeyword = keywords.length === 0 || keywords.some((kw) => titleNorm.includes(kw) || authorNorm.includes(kw));
+        if (!matchesKeyword) continue;
+
+        // Descartar registros exclusivamente em idiomas não ocidentais se explicitamente marcados
+        if (doc.language && Array.isArray(doc.language) && doc.language.length === 1) {
+          const l = doc.language[0];
+          if (['rus', 'jpn', 'chi', 'kor', 'ara', 'heb'].includes(l)) continue;
+        }
+
+        const cover = doc.cover_i
+          ? `https://covers.openlibrary.org/b/id/${doc.cover_i}-L.jpg`
+          : doc.isbn && doc.isbn[0]
+          ? `https://covers.openlibrary.org/b/isbn/${doc.isbn[0]}-L.jpg`
+          : '';
+
+        let score = 0;
+        if (titleNorm === cleanQuery) score += 50;
+        else if (titleNorm.startsWith(cleanQuery)) score += 35;
+        else if (titleNorm.includes(cleanQuery)) score += 25;
+
+        const matchedKw = keywords.filter((kw) => titleNorm.includes(kw)).length;
+        score += matchedKw * 10;
+
+        if (cover) score += 20;
+        if (doc.author_name && doc.author_name.length > 0) score += 5;
+
+        candidates.push({
+          id: `ol-${doc.key || Math.random()}`,
+          title: doc.title,
+          author: doc.author_name ? doc.author_name.join(', ') : 'Autor a verificar',
+          year: doc.first_publish_year,
+          pages: doc.number_of_pages_median && doc.number_of_pages_median > 20 ? doc.number_of_pages_median : undefined,
+          coverUrl: cover,
+          genres: doc.subject ? doc.subject.slice(0, 2) : ['Literatura'],
+          resumo: '',
+          score,
+        });
+      }
+    }
+  } catch (err) {
+    console.warn('OpenLibrary search error:', err);
+  }
+
+  // 4. Google Books (Complementar / Suplementar com checagem rígida de relevância)
+  try {
+    const encoded = encodeURIComponent(query.trim());
     const res = await fetch(
       `https://www.googleapis.com/books/v1/volumes?q=${encoded}&langRestrict=pt&printType=books&maxResults=8`
     );
     if (res.ok) {
       const data = await res.json();
       if (data.items && data.items.length > 0) {
-        const googleResults = data.items
-          .filter((item: any) => {
-            const lang = item.volumeInfo?.language;
-            // Descartar obras explicitamente em idiomas estrangeiros
-            if (lang && !['pt', 'pt-BR', 'pt-PT'].includes(lang)) {
-              return false;
-            }
-            return true;
-          })
-          .map((item: any) => {
-            const info = item.volumeInfo || {};
-            let cover =
-              info.imageLinks?.extraLarge ||
-              info.imageLinks?.large ||
-              info.imageLinks?.medium ||
-              info.imageLinks?.thumbnail ||
-              '';
-            if (cover.startsWith('http://')) {
-              cover = cover.replace('http://', 'https://');
-            }
-            return {
-              id: item.id,
-              title: info.title || query,
-              author: info.authors ? info.authors.join(', ') : 'Autor desconhecido',
-              year: info.publishedDate ? parseInt(info.publishedDate.substring(0, 4)) : undefined,
-              pages: info.pageCount && info.pageCount > 20 ? info.pageCount : 240,
-              coverUrl: cover,
-              genres: info.categories || ['Literatura'],
-              resumo: info.description || '',
-            };
-          })
-          .sort((a: any, b: any) => (b.coverUrl ? 1 : 0) - (a.coverUrl ? 1 : 0));
+        for (const item of data.items) {
+          const info = item.volumeInfo || {};
+          const titleNorm = normalizeSearchText(info.title || '');
+          const authorNorm = normalizeSearchText((info.authors || []).join(' '));
 
-        const combined = [...localMatches];
-        for (const gr of googleResults) {
-          if (!combined.some((c) => c.title?.toLowerCase() === gr.title.toLowerCase())) {
-            combined.push(gr);
+          // FILTRO CRÍTICO: Descarta qualquer livro que não contenha as palavras-chave da busca!
+          const matchesKeyword = keywords.length === 0 || keywords.some((kw) => titleNorm.includes(kw) || authorNorm.includes(kw));
+          if (!matchesKeyword) continue;
+
+          let cover =
+            info.imageLinks?.extraLarge ||
+            info.imageLinks?.large ||
+            info.imageLinks?.medium ||
+            info.imageLinks?.thumbnail ||
+            '';
+          if (cover.startsWith('http://')) {
+            cover = cover.replace('http://', 'https://');
           }
-        }
-        if (combined.length >= 4) {
-          return combined.slice(0, 8);
+
+          let score = 0;
+          if (titleNorm === cleanQuery) score += 45;
+          else if (titleNorm.startsWith(cleanQuery)) score += 30;
+          else if (titleNorm.includes(cleanQuery)) score += 20;
+
+          const matchedKw = keywords.filter((kw) => titleNorm.includes(kw)).length;
+          score += matchedKw * 10;
+          if (cover) score += 20;
+
+          candidates.push({
+            id: `gb-${item.id}`,
+            title: info.title || query,
+            author: info.authors ? info.authors.join(', ') : 'Autor desconhecido',
+            year: info.publishedDate ? parseInt(info.publishedDate.substring(0, 4)) : undefined,
+            pages: info.pageCount && info.pageCount > 15 ? info.pageCount : undefined,
+            coverUrl: cover,
+            genres: info.categories || ['Literatura'],
+            resumo: info.description || '',
+            score,
+          });
         }
       }
     }
   } catch (err) {
-    console.warn('Google Books indisponível, tentando OpenLibrary por:', err);
+    console.warn('Google Books indisponível ou quota excedida:', err);
   }
 
-  // 4. Fallback OpenLibrary com filtro de idioma e priorização de capas
-  try {
-    const encoded = encodeURIComponent(query.trim());
-    const olRes = await fetch(`https://openlibrary.org/search.json?q=${encoded}&language=por&limit=8`);
-    if (olRes.ok) {
-      const olData = await olRes.json();
-      if (olData.docs && olData.docs.length > 0) {
-        const olResults = olData.docs
-          .filter((doc: any) => {
-            // Confirmar que não é exclusivamente em outro idioma estranho
-            if (doc.language && Array.isArray(doc.language) && !doc.language.includes('por')) {
-              return false;
-            }
-            return true;
-          })
-          .map((doc: any, i: number) => ({
-            id: `ol-${doc.key || i}`,
-            title: doc.title,
-            author: doc.author_name ? doc.author_name.join(', ') : 'Autor desconhecido',
-            year: doc.first_publish_year,
-            pages: doc.number_of_pages_median || 240,
-            coverUrl: doc.cover_i
-              ? `https://covers.openlibrary.org/b/id/${doc.cover_i}-L.jpg`
-              : doc.isbn && doc.isbn[0]
-              ? `https://covers.openlibrary.org/b/isbn/${doc.isbn[0]}-L.jpg`
-              : '',
-            genres: doc.subject ? doc.subject.slice(0, 2) : ['Literatura'],
-            resumo: '',
-          }))
-          .sort((a: any, b: any) => (b.coverUrl ? 1 : 0) - (a.coverUrl ? 1 : 0));
+  // Deduplicação inteligente e ordenação por relevância
+  const seen = new Set<string>();
+  const results: Partial<BookEvaluation>[] = [];
 
-        const combined = [...localMatches];
-        for (const ol of olResults) {
-          if (!combined.some((c) => c.title?.toLowerCase() === ol.title.toLowerCase())) {
-            combined.push(ol);
-          }
-        }
-        return combined.slice(0, 8);
-      }
-    }
-  } catch (err) {
-    console.warn('OpenLibrary fallback falhou:', err);
+  candidates.sort((a, b) => b.score - a.score);
+
+  for (const item of candidates) {
+    const key = normalizeSearchText(item.title || '');
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
+
+    const { score, ...cleanBook } = item;
+    results.push(cleanBook);
   }
 
-  return localMatches;
+  return results.slice(0, 8);
 }
 
 // Calibração e avaliação inteligente com base no algoritmo do Veredito
