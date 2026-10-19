@@ -43,7 +43,6 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
   const [duplicateWarning, setDuplicateWarning] = useState<BookEvaluation | null>(null);
   const [evalError, setEvalError] = useState<string | null>(null);
   const [apiSuggestions, setApiSuggestions] = useState<Partial<BookEvaluation>[]>([]);
-  const [bookToConfirm, setBookToConfirm] = useState<Partial<BookEvaluation> | null>(null);
 
   const searchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -117,7 +116,6 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
     setApiSuggestions([]);
     setIsSearching(false);
     setDuplicateWarning(null);
-    setBookToConfirm(null);
   };
 
   const runEvaluationWithProgress = async (
@@ -171,20 +169,13 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
       return;
     }
     setDuplicateWarning(null);
-    setBookToConfirm(rawBook);
-  };
 
-  const handleConfirmEvaluation = () => {
-    if (!bookToConfirm) return;
-    const target = bookToConfirm;
-    setBookToConfirm(null);
-
-    runEvaluationWithProgress(target.title || query.trim() || 'Livro', {
-      author: target.author,
-      description: target.resumo,
-      coverUrl: target.coverUrl,
-      pages: target.pages,
-      genres: target.genres,
+    runEvaluationWithProgress(rawBook.title || query.trim() || 'Livro', {
+      author: rawBook.author,
+      description: rawBook.resumo,
+      coverUrl: rawBook.coverUrl,
+      pages: rawBook.pages,
+      genres: rawBook.genres,
     });
   };
 
@@ -199,11 +190,7 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
         setDuplicateWarning(existing);
         return;
       }
-      setBookToConfirm({
-        title: query.trim(),
-        author: 'Autor a consultar',
-        coverUrl: undefined,
-      });
+      runEvaluationWithProgress(query.trim());
     }
   };
 
@@ -618,97 +605,6 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
               </form>
             )}
           </div>
-
-          {/* Confirmation Modal Alert */}
-          <AnimatePresence>
-            {bookToConfirm && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.16 }}
-                className="absolute inset-0 z-40 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4"
-              >
-                <motion.div
-                  initial={{ scale: 0.92, opacity: 0, y: 14 }}
-                  animate={{ scale: 1, opacity: 1, y: 0 }}
-                  exit={{ scale: 0.94, opacity: 0, y: 10 }}
-                  transition={{ type: 'spring', damping: 25, stiffness: 380 }}
-                  className="w-full max-w-xs sm:max-w-sm bg-white rounded-3xl shadow-2xl border border-neutral-200/90 p-5 space-y-3.5 text-center overflow-hidden"
-                >
-                  <div className="flex items-center justify-between pb-1 border-b border-neutral-100">
-                    <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-neutral-500">
-                      <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-                      <span>Confirmar Avaliação</span>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => setBookToConfirm(null)}
-                      className="p-1 -mr-1 rounded-full text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 transition-colors cursor-pointer"
-                      aria-label="Cancelar"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-
-                  {/* Capa do Livro */}
-                  <div className="w-24 sm:w-28 mx-auto drop-shadow-lg rounded-md overflow-hidden">
-                    <BookCover
-                      title={bookToConfirm.title || 'Livro'}
-                      author={bookToConfirm.author || 'Autor'}
-                      coverUrl={bookToConfirm.coverUrl}
-                    />
-                  </div>
-
-                  {/* Título e Autor */}
-                  <div className="space-y-1">
-                    <h3 className="text-sm sm:text-base font-bold text-[#1d1d1f] leading-snug line-clamp-2 px-1">
-                      {bookToConfirm.title}
-                    </h3>
-                    <p className="text-xs text-[#86868b]">
-                      de <strong className="text-neutral-800 font-semibold">{bookToConfirm.author || 'Autor a verificar'}</strong>
-                    </p>
-
-                    <div className="flex items-center justify-center gap-1.5 pt-0.5 flex-wrap">
-                      {bookToConfirm.year && (
-                        <span className="text-[10px] font-medium text-neutral-600 bg-neutral-100 px-2 py-0.5 rounded-md">
-                          {bookToConfirm.year}
-                        </span>
-                      )}
-                      {bookToConfirm.pages && (
-                        <span className="text-[10px] font-medium text-neutral-600 bg-neutral-100 px-2 py-0.5 rounded-md">
-                          ~{bookToConfirm.pages} págs
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  <p className="text-[11px] text-[#86868b] leading-relaxed px-1">
-                    Deseja avaliar esta obra com o perfil literário do Veredito? A IA calibrará as notas técnica e de encaixe.
-                  </p>
-
-                  {/* Botões de Ação */}
-                  <div className="flex items-center gap-2 pt-1">
-                    <button
-                      type="button"
-                      onClick={() => setBookToConfirm(null)}
-                      className="flex-1 py-2.5 text-xs font-semibold text-neutral-600 hover:text-neutral-900 bg-neutral-100 hover:bg-neutral-200/70 rounded-xl transition-all active:scale-[0.98] cursor-pointer"
-                    >
-                      Cancelar
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleConfirmEvaluation}
-                      className="flex-1 py-2.5 text-xs font-bold text-white bg-[#1d1d1f] hover:bg-black rounded-xl shadow-md transition-all active:scale-[0.98] cursor-pointer flex items-center justify-center gap-1.5"
-                    >
-                      <span>Avaliar Livro</span>
-                      <ChevronRight className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </motion.div>
-              </motion.div>
-            )}
-          </AnimatePresence>
         </motion.div>
       </div>
     </AnimatePresence>
