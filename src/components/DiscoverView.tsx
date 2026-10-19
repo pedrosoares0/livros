@@ -54,7 +54,7 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
         <div className="space-y-3.5 pt-1">
           <div className="flex items-center justify-between">
             <h3 className="text-xs font-bold uppercase tracking-wider text-[#1d1d1f]">
-              Recomendações de Alto Encaixe
+              Recomendações
             </h3>
             <div className="flex items-center gap-2">
               <button
@@ -86,15 +86,18 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
                     notaEncaixe={book.notaEncaixe}
                   />
                 </div>
-                <div className="space-y-1">
-                  <h4 className="text-xs font-bold text-[#1d1d1f] truncate group-hover:text-black">
+                <div className="space-y-0.5 pt-0.5">
+                  <h4 className="text-xs sm:text-[13px] font-bold text-[#1d1d1f] truncate group-hover:text-black leading-snug">
                     {book.title}
                   </h4>
-                  <p className="text-[11px] text-[#86868b] truncate">
-                    {book.author}
-                  </p>
-                  <p className="text-[10px] text-[#86868b] italic line-clamp-1 pt-0.5">
-                    "{book.veredito}"
+                  <p className="text-[11px] text-[#86868b] truncate flex items-center gap-1.5">
+                    <span className="truncate">{book.author}</span>
+                    {book.pages && (
+                      <>
+                        <span className="text-neutral-300 shrink-0">•</span>
+                        <span className="text-[10px] text-[#86868b] font-medium font-score shrink-0">~{book.pages} págs</span>
+                      </>
+                    )}
                   </p>
                 </div>
               </div>
@@ -143,12 +146,9 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
                       </p>
                     </div>
 
-                    {/* Prominent Large Score Badge */}
-                    <div className="shrink-0 flex flex-col items-end">
+                    {/* Prominent Large Round Score Badge */}
+                    <div className="shrink-0 flex items-center justify-center">
                       <ScoreBadge score={book.notaEncaixe} size="lg" />
-                      <span className="text-[9px] font-bold text-[#86868b] uppercase tracking-wider mt-1">
-                        Encaixe
-                      </span>
                     </div>
                   </div>
 

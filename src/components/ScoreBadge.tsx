@@ -7,9 +7,17 @@ interface ScoreBadgeProps {
   label?: string;
 }
 
+/**
+ * Rounds score to the nearest multiple of 0.5 (e.g., 8.0, 8.5, 9.0)
+ */
+export const roundToHalf = (val: number): number => {
+  return Math.round(val * 2) / 2;
+};
+
 export const getScoreTone = (score: number): 'green' | 'yellow' | 'red' => {
-  if (score >= 8) return 'green';
-  if (score >= 5) return 'yellow';
+  const rounded = roundToHalf(score);
+  if (rounded >= 8) return 'green';
+  if (rounded >= 5) return 'yellow';
   return 'red';
 };
 
@@ -19,29 +27,32 @@ export const ScoreBadge: React.FC<ScoreBadgeProps> = ({
   className = '',
   label,
 }) => {
-  const tone = getScoreTone(score);
+  const roundedScore = roundToHalf(score);
+  const formattedScore = roundedScore.toFixed(1);
+  const tone = getScoreTone(roundedScore);
 
+  // Enlarged circular rounded-full badges with tactile presence
   const sizeClasses = {
-    xs: 'px-1.5 py-0.5 text-[10px] rounded-md min-w-[20px]',
-    sm: 'px-2 py-0.5 text-[11px] rounded-md min-w-[24px]',
-    md: 'px-2.5 py-1 text-xs rounded-lg min-w-[28px]',
-    lg: 'px-3 py-1 text-sm rounded-xl min-w-[34px]',
-    xl: 'px-4 py-2 text-2xl rounded-2xl min-w-[56px]',
-    criteria: 'px-2.5 py-0.5 text-xs sm:text-sm font-black rounded-lg min-w-[30px] h-6 sm:h-7 flex items-center justify-center',
+    xs: 'min-w-[26px] h-[26px] px-1 text-[10px] rounded-full',
+    sm: 'min-w-[32px] h-[32px] px-1 text-[11px] font-black rounded-full',
+    md: 'min-w-[38px] h-[38px] px-1.5 text-xs font-black rounded-full',
+    lg: 'min-w-[46px] h-[46px] px-2 text-base font-black rounded-full',
+    xl: 'min-w-[62px] h-[62px] px-2.5 text-2xl font-black rounded-full',
+    criteria: 'min-w-[34px] h-[34px] sm:min-w-[36px] sm:h-[36px] px-1.5 text-xs sm:text-sm font-black rounded-full',
   };
 
   const toneStyles = {
     green: {
       gradient: 'bg-gradient-to-b from-emerald-500 to-emerald-600 text-white border-emerald-400/80',
-      shadow: '0 2px 4px rgba(5, 150, 105, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.45), inset 0 -1.5px 0 rgba(4, 120, 87, 0.6)',
+      shadow: '0 3px 8px -1px rgba(5, 150, 105, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.5), inset 0 -1.5px 0 rgba(4, 120, 87, 0.6)',
     },
     yellow: {
       gradient: 'bg-gradient-to-b from-amber-400 to-amber-500 text-amber-950 border-amber-300',
-      shadow: '0 2px 4px rgba(217, 119, 6, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.6), inset 0 -1.5px 0 rgba(180, 83, 9, 0.5)',
+      shadow: '0 3px 8px -1px rgba(217, 119, 6, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.65), inset 0 -1.5px 0 rgba(180, 83, 9, 0.5)',
     },
     red: {
       gradient: 'bg-gradient-to-b from-rose-500 to-rose-600 text-white border-rose-400/80',
-      shadow: '0 2px 4px rgba(225, 29, 72, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.45), inset 0 -1.5px 0 rgba(190, 18, 60, 0.6)',
+      shadow: '0 3px 8px -1px rgba(225, 29, 72, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.5), inset 0 -1.5px 0 rgba(190, 18, 60, 0.6)',
     },
   };
 
@@ -49,14 +60,15 @@ export const ScoreBadge: React.FC<ScoreBadgeProps> = ({
 
   return (
     <div
-      className={`inline-flex items-center justify-center font-score font-black leading-none border select-none transition-transform active:scale-95 ${sizeClasses[size]} ${styleConfig.gradient} ${className}`}
+      className={`inline-flex items-center justify-center font-score leading-none border select-none transition-transform active:scale-95 shrink-0 ${sizeClasses[size]} ${styleConfig.gradient} ${className}`}
       style={{
         boxShadow: styleConfig.shadow,
-        textShadow: tone === 'yellow' ? 'none' : '0 1px 1px rgba(0,0,0,0.25)',
+        textShadow: tone === 'yellow' ? 'none' : '0 1px 1.5px rgba(0,0,0,0.3)',
       }}
     >
       {label && <span className="text-[9px] font-normal uppercase mr-1 opacity-85">{label}</span>}
-      <span>{score}</span>
+      <span className="tracking-tight">{formattedScore}</span>
     </div>
   );
 };
+
