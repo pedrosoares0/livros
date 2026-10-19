@@ -32,16 +32,16 @@ export const EstanteView: React.FC<EstanteViewProps> = ({
 
   // Helper matching functions for dynamic, intelligent categorization
   const isRejeicao = (b: BookEvaluation) =>
-    b.notaEncaixe < 5 || b.userStatus === 'disliked' || b.vereditoTipo === 'evite';
+    Math.floor(b.notaEncaixe) < 5 || b.userStatus === 'disliked' || b.vereditoTipo === 'evite';
 
   const isObrasPrimas = (b: BookEvaluation) =>
-    !isRejeicao(b) && (b.notaEncaixe >= 9.5 || b.userStatus === 'loved');
+    !isRejeicao(b) && (Math.floor(b.notaEncaixe) >= 10 || b.userStatus === 'loved');
 
   const isRecomendados = (b: BookEvaluation) =>
-    !isRejeicao(b) && !isObrasPrimas(b) && b.notaEncaixe >= 8 && b.notaEncaixe < 9.5;
+    !isRejeicao(b) && !isObrasPrimas(b) && Math.floor(b.notaEncaixe) >= 8;
 
   const isRessalvas = (b: BookEvaluation) =>
-    !isRejeicao(b) && !isObrasPrimas(b) && !isRecomendados(b) && ((b.notaEncaixe >= 5 && b.notaEncaixe < 8) || b.vereditoTipo === 'ressalvas');
+    !isRejeicao(b) && !isObrasPrimas(b) && !isRecomendados(b) && (Math.floor(b.notaEncaixe) >= 5 || b.vereditoTipo === 'ressalvas');
 
   const isSciFi = (b: BookEvaluation) => 
     b.categoryShelf === 'Ficção Científica' || 

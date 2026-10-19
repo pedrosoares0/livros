@@ -374,7 +374,7 @@ export function evaluateBook(
     impactoEmocional * 0.15 +
     Math.min(10, ritmo + 2) * 0.10
   );
-  const notaTecnica = Math.round(Math.min(10, Math.max(1, notaTecnicaRaw)) * 10) / 10;
+  const notaTecnica = Math.floor(Math.min(10, Math.max(1, notaTecnicaRaw)));
 
   // CÁLCULO DA NOTA DE ENCAIXE (Pesos estritos do usuário)
   let fitScore = 5.0;
@@ -419,20 +419,20 @@ export function evaluateBook(
     fitScore = Math.min(fitScore, 4.0);
   }
 
-  const notaEncaixe = Math.round(Math.min(10, Math.max(1, fitScore)) * 10) / 10;
+  const notaEncaixe = Math.floor(Math.min(10, Math.max(1, fitScore)));
 
   // GERAÇÃO DE VEREDITO E COMPARAÇÕES COM FILMES
   let veredito = 'Vale a pena conferir.';
   let vereditoTipo: VereditoTipo = 'leia';
   let justificativaEncaixe = '';
 
-  if (notaEncaixe >= 8.5) {
+  if (notaEncaixe >= 8) {
     vereditoTipo = 'leia';
-    veredito = notaEncaixe >= 9.5 
+    veredito = notaEncaixe >= 9 
       ? 'Leia imediatamente: casamento perfeito com suas obsessões temáticas.' 
       : 'Recomendação certeira: alta carga dramática e peso moral.';
     justificativaEncaixe = 'Sintonia alta: ausência de sentimentalismo barato, presença de conflito humano grave e tom condizente com seu perfil.';
-  } else if (notaEncaixe >= 6.5) {
+  } else if (notaEncaixe >= 6) {
     vereditoTipo = 'ressalvas';
     veredito = 'Vale com ressalvas: bons elementos, mas prepare-se para momentos fora da sua zona de conforto.';
     justificativaEncaixe = 'Possui virtudes objetivas fortes, porém com ritmo ou elementos periféricos que demandam concessão de sua parte.';

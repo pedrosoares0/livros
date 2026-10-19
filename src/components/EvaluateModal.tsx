@@ -88,7 +88,7 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
       // Ensure minimum thinking time so user can see the analysis steps
       await new Promise((resolve) => setTimeout(resolve, 800));
 
-      if (evaluation.notaEncaixe >= 8.5) {
+      if (evaluation.notaEncaixe >= 8) {
         confetti({
           particleCount: 50,
           spread: 60,

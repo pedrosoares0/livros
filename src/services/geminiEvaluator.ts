@@ -79,18 +79,18 @@ Você DEVE responder ESTRITAMENTE em formato JSON com as seguintes chaves:
   "movieComparisons": ["Filme 1", "Filme 2", "Filme 3"], // Forneça até 3 indicações de filmes do cinema mundial que capturem a atmosfera, tom, ritmo ou conflito da obra
   "adaptacoes": "Menção curta a adaptações existentes em cinema, série, anime, HQ, ou 'Nenhuma adaptação conhecida'",
   "criteria": {
-    "genericidade": 1.0, // 0 = extremamente original, 10 = clichê
-    "infantilidade": 1.0, // 0 = adulto/sombrio, 10 = infantil; faixa: 0-2 ideal, 3-5 aceitavel, 6 risco, 7-10 rejeicao
+    "genericidade": 1, // inteiro 0 a 10 (0 = original, 10 = clichê)
+    "infantilidade": 1, // inteiro 0 a 10 (0-2 ideal, 3-5 aceitavel, 6 risco, 7-10 rejeicao)
     "infantilidadeStatus": "ideal", // "ideal" | "aceitavel" | "risco" | "rejeicao"
-    "qualidadeTecnica": 9.0, // 0 a 10
-    "worldbuilding": 8.5, // 0 a 10
-    "ritmo": 7.5, // 0 a 10
+    "qualidadeTecnica": 9, // inteiro 0 a 10
+    "worldbuilding": 8, // inteiro 0 a 10
+    "ritmo": 7, // inteiro 0 a 10
     "ritmoDescricao": "Frase curta descrevendo o ritmo (ex: Frenético e visceral, Cadenciado reflexivo, etc.)",
-    "tomSombrio": 8.5, // 0 = solar/otimista/leve, 10 = visceralmente sombrio/noir/pesado/distópico
-    "impactoEmocional": 8.0 // 0 a 10
+    "tomSombrio": 8, // inteiro 0 a 10
+    "impactoEmocional": 8 // inteiro 0 a 10
   },
-  "notaTecnica": 8.8, // 0 a 10
-  "notaEncaixe": 9.0, // 0 a 10 rigorosamente calibrada com os pesos do perfil
+  "notaTecnica": 8, // inteiro 0 a 10 (sem decimais)
+  "notaEncaixe": 9, // inteiro 0 a 10 (sem decimais, arredondado para menos se fracionado)
   "veredito": "Uma frase final direta, sincera e sem rodeios",
   "vereditoTipo": "leia", // "leia" | "ressalvas" | "evite"
   "justificativaEncaixe": "Análise transparente e direta de 2 linhas explicando por que a obra casa ou conflita com o perfil"
@@ -140,18 +140,18 @@ Você DEVE responder ESTRITAMENTE em formato JSON com as seguintes chaves:
     movieComparisons: Array.isArray(parsed.movieComparisons) ? parsed.movieComparisons.slice(0, 4) : [],
     adaptacoes: parsed.adaptacoes || 'Nenhuma adaptação conhecida',
     criteria: {
-      genericidade: Number(parsed.criteria?.genericidade) || 5,
-      infantilidade: Number(parsed.criteria?.infantilidade) || 3,
+      genericidade: Math.floor(Number(parsed.criteria?.genericidade) || 5),
+      infantilidade: Math.floor(Number(parsed.criteria?.infantilidade) || 3),
       infantilidadeStatus: parsed.criteria?.infantilidadeStatus || 'ideal',
-      qualidadeTecnica: Number(parsed.criteria?.qualidadeTecnica) || 7,
-      worldbuilding: Number(parsed.criteria?.worldbuilding) || 5,
-      ritmo: Number(parsed.criteria?.ritmo) || 6,
+      qualidadeTecnica: Math.floor(Number(parsed.criteria?.qualidadeTecnica) || 7),
+      worldbuilding: Math.floor(Number(parsed.criteria?.worldbuilding) || 5),
+      ritmo: Math.floor(Number(parsed.criteria?.ritmo) || 6),
       ritmoDescricao: parsed.criteria?.ritmoDescricao || 'Ritmo moderado',
-      tomSombrio: Number(parsed.criteria?.tomSombrio) || 5,
-      impactoEmocional: Number(parsed.criteria?.impactoEmocional) || 6,
+      tomSombrio: Math.floor(Number(parsed.criteria?.tomSombrio) || 5),
+      impactoEmocional: Math.floor(Number(parsed.criteria?.impactoEmocional) || 6),
     },
-    notaTecnica: Number(parsed.notaTecnica) || 7,
-    notaEncaixe: Number(parsed.notaEncaixe) || 7,
+    notaTecnica: Math.floor(Number(parsed.notaTecnica) || 7),
+    notaEncaixe: Math.floor(Number(parsed.notaEncaixe) || 7),
     veredito: parsed.veredito || 'Vale a pena conferir com atenção.',
     vereditoTipo: parsed.vereditoTipo || 'ressalvas',
     justificativaEncaixe: parsed.justificativaEncaixe || '',

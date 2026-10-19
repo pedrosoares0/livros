@@ -97,14 +97,14 @@ export const FichaModal: React.FC<FichaModalProps> = ({
   }, []);
 
   // Derived inverted metrics for unified 0-10 intuitive scale (higher = better fit)
-  const originalidade = Math.round((10 - book.criteria.genericidade) * 10) / 10;
+  const originalidade = Math.floor(10 - book.criteria.genericidade);
 
   const copyFichaToClipboard = () => {
     const text = `📋 VEREDITO — Ficha de Avaliação
 📖 Obra: ${book.title} (${book.author})
 📄 Páginas: ~${book.pages} (ed. brasileira)
-⭐ Nota Técnica: ${book.notaTecnica}
-🎯 Nota de Encaixe: ${book.notaEncaixe}
+⭐ Nota Técnica: ${Math.floor(book.notaTecnica)}
+🎯 Nota de Encaixe: ${Math.floor(book.notaEncaixe)}
 💡 Veredito: ${book.veredito}
 
 📝 Resumo:
@@ -113,12 +113,12 @@ ${book.resumo}
 🎬 Filmes: ${book.movieComparisons.slice(0, 3).join(' • ')}
 
 📊 Critérios:
-• Originalidade: ${originalidade}
-• Técnica / Prosa: ${book.criteria.qualidadeTecnica}
-• Worldbuilding: ${book.criteria.worldbuilding}
-• Ritmo: ${book.criteria.ritmo} (${book.criteria.ritmoDescricao})
-• Tom Sombrio: ${book.criteria.tomSombrio}
-• Impacto Emocional: ${book.criteria.impactoEmocional}
+• Originalidade: ${Math.floor(originalidade)}
+• Técnica / Prosa: ${Math.floor(book.criteria.qualidadeTecnica)}
+• Worldbuilding: ${Math.floor(book.criteria.worldbuilding)}
+• Ritmo: ${Math.floor(book.criteria.ritmo)} (${book.criteria.ritmoDescricao})
+• Tom Sombrio: ${Math.floor(book.criteria.tomSombrio)}
+• Impacto Emocional: ${Math.floor(book.criteria.impactoEmocional)}
 
 🎯 Análise: ${book.justificativaEncaixe}`;
 
@@ -466,7 +466,7 @@ ${book.resumo}
                             ? 'bg-gradient-to-b from-amber-300 via-amber-400 to-amber-500'
                             : 'bg-gradient-to-b from-rose-400 via-rose-500 to-rose-600'
                         }`}
-                        style={{ width: `${Math.min(100, Math.max(8, crit.score * 10))}%` }}
+                        style={{ width: `${Math.min(100, Math.max(8, Math.floor(crit.score) * 10))}%` }}
                       >
                         {/* 3D Specular highlight reflection */}
                         <div className="absolute inset-x-0 top-0 h-[45%] bg-gradient-to-b from-white/55 to-transparent rounded-t-full pointer-events-none" />

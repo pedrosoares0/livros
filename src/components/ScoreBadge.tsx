@@ -8,16 +8,18 @@ interface ScoreBadgeProps {
 }
 
 /**
- * Rounds score to the nearest multiple of 0.5 (e.g., 8.0, 8.5, 9.0)
+ * Floor rounds score to integer (removes all decimals, rounding broken scores down e.g., 8.6 -> 8, 10.0 -> 10)
  */
-export const roundToHalf = (val: number): number => {
-  return Math.round(val * 2) / 2;
+export const roundScore = (val: number): number => {
+  return Math.floor(val);
 };
 
+export const roundToHalf = roundScore;
+
 export const getScoreTone = (score: number): 'green' | 'yellow' | 'red' => {
-  const rounded = roundToHalf(score);
-  if (rounded >= 8) return 'green';
-  if (rounded >= 5) return 'yellow';
+  const floored = Math.floor(score);
+  if (floored >= 8) return 'green';
+  if (floored >= 5) return 'yellow';
   return 'red';
 };
 
@@ -27,8 +29,8 @@ export const ScoreBadge: React.FC<ScoreBadgeProps> = ({
   className = '',
   label,
 }) => {
-  const roundedScore = roundToHalf(score);
-  const formattedScore = roundedScore.toFixed(1);
+  const roundedScore = Math.floor(score);
+  const formattedScore = String(roundedScore);
   const tone = getScoreTone(roundedScore);
 
   // Enlarged circular rounded-full badges with tactile presence
@@ -71,4 +73,3 @@ export const ScoreBadge: React.FC<ScoreBadgeProps> = ({
     </div>
   );
 };
-
