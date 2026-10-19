@@ -33,6 +33,8 @@ export const BookShelf: React.FC<BookShelfProps> = ({
     }
   };
 
+  if (!books || books.length === 0) return null;
+
   return (
     <section className="w-full space-y-2 py-3 select-none">
       {/* Category Header Row */}

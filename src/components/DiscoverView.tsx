@@ -49,6 +49,18 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
         </div>
       </div>
 
+      {/* Empty State when database has no evaluations yet */}
+      {books.length === 0 && (
+        <div className="py-10 text-center space-y-2">
+          <p className="text-sm font-semibold text-[#1d1d1f]">
+            Nenhum livro avaliado ainda
+          </p>
+          <p className="text-xs text-[#86868b] max-w-xs mx-auto">
+            Utilize o botão acima para pesquisar e avaliar livros. Suas avaliações e prateleiras são sincronizadas em tempo real com o banco de dados.
+          </p>
+        </div>
+      )}
+
       {/* Obras de Alto Encaixe com Filtro Interativo Maior/Menor Nota */}
       {topMatches.length > 0 && (
         <div className="space-y-3.5 pt-1">

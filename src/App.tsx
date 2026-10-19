@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
 import { BookEvaluation } from './types';
-import { INITIAL_BOOKS } from './data/initialBooks';
 import { DiscoverView } from './components/DiscoverView';
-import { BookShelf } from './components/BookShelf';
 import { EstanteView } from './components/EstanteView';
 import { FichaModal } from './components/FichaModal';
 import { EvaluateModal } from './components/EvaluateModal';
@@ -11,6 +9,9 @@ import { BottomNavBar } from './components/BottomNavBar';
 import { 
   fetchEvaluations, 
   saveEvaluation, 
+  deleteEvaluation,
+  toggleSaveBook,
+  updateBookCoverInDb,
   getLocalEvaluations 
 } from './services/supabase';
 
@@ -29,12 +30,17 @@ export function App() {
     }
   });
 
-  // Load evaluations from Supabase on mount
+  // Load evaluations and saved books from Supabase on mount
   useEffect(() => {
     let isMounted = true;
     fetchEvaluations().then((loaded) => {
       if (isMounted && loaded) {
         setBooks(loaded);
+        const serverSavedIds = new Set(loaded.filter((b) => b.isSaved).map((b) => b.id));
+        setSavedBookIds((prev) => {
+          const merged = new Set([...prev, ...serverSavedIds]);
+          return merged;
+        });
       }
     });
     return () => {
@@ -49,7 +55,7 @@ export function App() {
   };
 
   const handleBulkEvaluated = async (newBooks: BookEvaluation[]) => {
-    setBooks((prev) => [...newBooks, ...prev]);
+    setBooks((prev) => [...newBooks, ...prev.filter((b) => !newBooks.some((n) => n.id === b.id))]);
     setActiveTab('discover');
     if (newBooks.length > 0) {
       setSelectedBook(newBooks[0]);
@@ -59,50 +65,59 @@ export function App() {
     }
   };
 
-  const handleToggleSave = (book: BookEvaluation) => {
+  const handleToggleSave = async (book: BookEvaluation) => {
+    const willBeSaved = !savedBookIds.has(book.id);
+
+    // Optimistic state update
     setSavedBookIds((prev) => {
       const next = new Set(prev);
-      if (next.has(book.id)) {
-        next.delete(book.id);
-      } else {
+      if (willBeSaved) {
         next.add(book.id);
+      } else {
+        next.delete(book.id);
       }
-      try {
-        localStorage.setItem('veredito_saved_books', JSON.stringify([...next]));
-      } catch {}
       return next;
     });
+
+    setBooks((prev) =>
+      prev.map((b) => (b.id === book.id ? { ...b, isSaved: willBeSaved } : b))
+    );
+
+    setSelectedBook((prev) => (prev && prev.id === book.id ? { ...prev, isSaved: willBeSaved } : prev));
+
+    // Persist directly to Supabase
+    await toggleSaveBook(book.id, willBeSaved);
   };
 
-  const handleDeleteBook = (bookId: string) => {
+  const handleDeleteBook = async (bookId: string) => {
+    // Optimistic removal
     setBooks((prev) => prev.filter((b) => b.id !== bookId));
     setSavedBookIds((prev) => {
       const next = new Set(prev);
       next.delete(bookId);
-      try {
-        localStorage.setItem('veredito_saved_books', JSON.stringify([...next]));
-      } catch {}
       return next;
     });
     if (selectedBook?.id === bookId) {
       setSelectedBook(null);
     }
+
+    // Persist deletion to Supabase
+    await deleteEvaluation(bookId);
   };
 
-  const handleUpdateBookCover = (bookId: string, newCoverUrl: string) => {
+  const handleUpdateBookCover = async (bookId: string, newCoverUrl: string) => {
+    // Optimistic update
     setBooks((prev) =>
       prev.map((b) => (b.id === bookId ? { ...b, coverUrl: newCoverUrl } : b))
     );
     setSelectedBook((prev) => (prev && prev.id === bookId ? { ...prev, coverUrl: newCoverUrl } : prev));
+
+    // Persist cover change to Supabase
+    await updateBookCoverInDb(bookId, newCoverUrl);
   };
 
-  // Merge evaluated books with initial favorite catalog for the Estante view
-  const allShelfBooks = [
-    ...books,
-    ...INITIAL_BOOKS.filter(
-      (init) => !books.some((b) => b.id === init.id || b.title.toLowerCase() === init.title.toLowerCase())
-    ),
-  ];
+  // Shelves display only real books synchronized with the Supabase database
+  const allShelfBooks = books;
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-start bg-[#f5f5f7] text-[#1d1d1f] antialiased">

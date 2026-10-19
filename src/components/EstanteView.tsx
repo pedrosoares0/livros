@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { BookOpen } from 'lucide-react';
 import { BookEvaluation } from '../types';
 import { BookShelf } from './BookShelf';
 
@@ -27,20 +28,7 @@ export const EstanteView: React.FC<EstanteViewProps> = ({
 }) => {
   const [selectedFilter, setSelectedFilter] = useState<FilterOption>('all');
 
-  const savedBooks = books.filter((b) => savedBookIds?.has(b.id));
-
-  const filterChips: { id: FilterOption; label: string }[] = [
-    { id: 'all', label: 'Todas as Prateleiras' },
-    ...(savedBooks.length > 0 ? [{ id: 'salvos' as FilterOption, label: `Salvos (${savedBooks.length})` }] : []),
-    { id: 'obras-primas', label: 'Obras-Primas' },
-    { id: 'recomendados', label: 'Recomendados' },
-    { id: 'ressalvas', label: 'Vale com Ressalvas' },
-    { id: 'rejeicao', label: 'Zona de Rejeição' },
-    { id: 'scifi', label: 'Sci-Fi & Existencial' },
-    { id: 'classicos', label: 'Clássicos & Filosofia' },
-    { id: 'darkside', label: 'DarkSide & Sombrios' },
-    { id: 'curtos', label: 'Contos & Obras Curtas' },
-  ];
+  const savedBooks = books.filter((b) => savedBookIds?.has(b.id) || b.isSaved);
 
   // Helper matching functions for dynamic, intelligent categorization
   const isRejeicao = (b: BookEvaluation) =>
@@ -102,6 +90,19 @@ export const EstanteView: React.FC<EstanteViewProps> = ({
   const darkSideBooks = books.filter(isDarkSide);
   const curtosBooks = books.filter(isCurtos);
 
+  const filterChips: { id: FilterOption; label: string }[] = [
+    { id: 'all', label: 'Todas as Prateleiras' },
+    ...(savedBooks.length > 0 ? [{ id: 'salvos' as FilterOption, label: `Salvos (${savedBooks.length})` }] : []),
+    ...(obrasPrimasBooks.length > 0 ? [{ id: 'obras-primas' as FilterOption, label: `Obras-Primas (${obrasPrimasBooks.length})` }] : []),
+    ...(recomendadosBooks.length > 0 ? [{ id: 'recomendados' as FilterOption, label: `Recomendados (${recomendadosBooks.length})` }] : []),
+    ...(ressalvasBooks.length > 0 ? [{ id: 'ressalvas' as FilterOption, label: `Vale com Ressalvas (${ressalvasBooks.length})` }] : []),
+    ...(rejeicaoBooks.length > 0 ? [{ id: 'rejeicao' as FilterOption, label: `Zona de Rejeição (${rejeicaoBooks.length})` }] : []),
+    ...(sciFiBooks.length > 0 ? [{ id: 'scifi' as FilterOption, label: `Sci-Fi & Existencial (${sciFiBooks.length})` }] : []),
+    ...(classicosBooks.length > 0 ? [{ id: 'classicos' as FilterOption, label: `Clássicos & Filosofia (${classicosBooks.length})` }] : []),
+    ...(darkSideBooks.length > 0 ? [{ id: 'darkside' as FilterOption, label: `DarkSide & Sombrios (${darkSideBooks.length})` }] : []),
+    ...(curtosBooks.length > 0 ? [{ id: 'curtos' as FilterOption, label: `Contos & Obras Curtas (${curtosBooks.length})` }] : []),
+  ];
+
   return (
     <div className="space-y-4 pb-12">
       {/* Smart Filter Pills Row */}
@@ -125,6 +126,21 @@ export const EstanteView: React.FC<EstanteViewProps> = ({
           })}
         </div>
       </div>
+
+      {/* Empty State when no books exist in DB */}
+      {books.length === 0 && (
+        <div className="py-20 text-center px-6 space-y-3">
+          <div className="w-12 h-12 mx-auto rounded-2xl bg-neutral-100 flex items-center justify-center text-[#86868b]">
+            <BookOpen className="w-6 h-6 stroke-[1.75]" />
+          </div>
+          <p className="text-sm font-semibold text-[#1d1d1f]">
+            Sua estante está vazia
+          </p>
+          <p className="text-xs text-[#86868b] max-w-xs mx-auto">
+            Avalie ou salve livros no Veredito para que suas prateleiras sejam organizadas automaticamente e sincronizadas com o banco.
+          </p>
+        </div>
+      )}
 
       {/* Dynamic Shelf Presentation */}
       {selectedFilter === 'all' && (

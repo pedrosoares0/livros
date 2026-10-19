@@ -33,6 +33,7 @@ export interface BookEvaluation {
   userStatus?: 'loved' | 'disliked' | 'wishlist' | 'analyzed';
   categoryShelf?: string;
   createdAt?: string;
+  isSaved?: boolean;
 }
 
 export interface UserPreferences {

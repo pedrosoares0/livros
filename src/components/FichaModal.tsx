@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   X, Film, BookOpen, AlertTriangle, CheckCircle2, 
@@ -54,13 +54,26 @@ export const FichaModal: React.FC<FichaModalProps> = ({
     setIsCoverPickerOpen(false);
   };
 
-  const handleDeleteBook = () => {
-    if (window.confirm(`Tem certeza que deseja excluir "${book.title}" do Veredito?`)) {
-      if (onDeleteBook) {
-        onDeleteBook(book.id);
-      }
-      onClose();
+  const [confirmDelete, setConfirmDelete] = useState(false);
+
+  // Auto-reset delete confirmation after 4s
+  useEffect(() => {
+    if (confirmDelete) {
+      const timer = setTimeout(() => setConfirmDelete(false), 4000);
+      return () => clearTimeout(timer);
     }
+  }, [confirmDelete]);
+
+  const handleDeleteBook = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!confirmDelete) {
+      setConfirmDelete(true);
+      return;
+    }
+    if (onDeleteBook) {
+      onDeleteBook(book.id);
+    }
+    onClose();
   };
 
   // Derived inverted metrics for unified 0-10 intuitive scale (higher = better fit)
@@ -206,22 +219,10 @@ ${book.resumo}
 
           {/* Scrollable Content */}
           <div className="overflow-y-auto px-6 py-5 space-y-4 hide-scrollbar">
-            {/* Hero Section: Extra-Large Cover with Ambient Colored Glow + Dual Scores + Title */}
+            {/* Hero Section: Extra-Large Clean Cover + Dual Scores + Title */}
             <div className="flex flex-col sm:flex-row gap-6 items-center sm:items-start">
-              {/* Extra-Large Book Cover with Soft Color-Matched Backlight Glow */}
+              {/* Extra-Large Book Cover */}
               <div className="relative shrink-0 w-48 sm:w-56 flex flex-col items-center">
-                {/* Ambient Soft Glow matching the book cover palette */}
-                {book.coverUrl && (
-                  <div
-                    className="absolute -inset-3 rounded-2xl opacity-45 blur-2xl scale-95 pointer-events-none -z-10 transition-all duration-300"
-                    style={{
-                      backgroundImage: `url(${book.coverUrl})`,
-                      backgroundSize: 'cover',
-                      backgroundPosition: 'center',
-                    }}
-                  />
-                )}
-
                 <div className="w-full">
                   <BookCover
                     title={book.title}
@@ -481,12 +482,16 @@ ${book.resumo}
             {onDeleteBook && (
               <button
                 onClick={handleDeleteBook}
-                title="Excluir livro do Veredito"
+                title={confirmDelete ? "Clique novamente para confirmar a exclusão definitiva" : "Excluir livro do Veredito"}
                 aria-label="Excluir livro"
-                className="py-2.5 px-3 rounded-xl text-xs font-semibold text-rose-600 bg-rose-50 hover:bg-rose-100 border border-rose-200/80 transition-all active:scale-[0.97] flex items-center justify-center gap-1.5 shrink-0 cursor-pointer shadow-2xs"
+                className={`py-2.5 px-3 rounded-xl text-xs font-semibold transition-all active:scale-[0.97] flex items-center justify-center gap-1.5 shrink-0 cursor-pointer shadow-2xs ${
+                  confirmDelete
+                    ? 'text-white bg-rose-600 hover:bg-rose-700 border border-rose-700'
+                    : 'text-rose-600 bg-rose-50 hover:bg-rose-100 border border-rose-200/80'
+                }`}
               >
                 <Trash2 className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Excluir</span>
+                <span>{confirmDelete ? 'Confirmar exclusão?' : 'Excluir'}</span>
               </button>
             )}
           </div>
