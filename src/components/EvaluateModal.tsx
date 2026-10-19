@@ -32,6 +32,8 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
   existingBooks = [],
   onOpenBook,
 }) => {
+  if (!isOpen) return null;
+
   const [tab, setTab] = useState<'single' | 'bulk'>('single');
   const [query, setQuery] = useState('');
   const [bulkText, setBulkText] = useState('');

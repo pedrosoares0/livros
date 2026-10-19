@@ -182,23 +182,31 @@ export function App() {
         </AnimatePresence>
 
         {/* Evaluator Engine Search & Bulk Modal */}
-        <EvaluateModal
-          isOpen={isEvaluateOpen}
-          onClose={() => setIsEvaluateOpen(false)}
-          onBookEvaluated={handleBookEvaluated}
-          onBulkEvaluated={handleBulkEvaluated}
-          existingBooks={books}
-          onOpenBook={(book) => {
-            setIsEvaluateOpen(false);
-            setSelectedBook(book);
-          }}
-        />
+        <AnimatePresence>
+          {isEvaluateOpen && (
+            <EvaluateModal
+              isOpen={isEvaluateOpen}
+              onClose={() => setIsEvaluateOpen(false)}
+              onBookEvaluated={handleBookEvaluated}
+              onBulkEvaluated={handleBulkEvaluated}
+              existingBooks={books}
+              onOpenBook={(book) => {
+                setIsEvaluateOpen(false);
+                setSelectedBook(book);
+              }}
+            />
+          )}
+        </AnimatePresence>
 
         {/* Calibrated Profile & Criteria Modal */}
-        <ProfileModal
-          isOpen={isProfileOpen}
-          onClose={() => setIsProfileOpen(false)}
-        />
+        <AnimatePresence>
+          {isProfileOpen && (
+            <ProfileModal
+              isOpen={isProfileOpen}
+              onClose={() => setIsProfileOpen(false)}
+            />
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );
