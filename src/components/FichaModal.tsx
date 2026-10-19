@@ -39,12 +39,18 @@ export const FichaModal: React.FC<FichaModalProps> = ({
   const [alternativeCovers, setAlternativeCovers] = useState<string[]>([]);
   const [hasFetchedCovers, setHasFetchedCovers] = useState(false);
 
+  const [customCoverUrl, setCustomCoverUrl] = useState('');
+  const [showCustomInput, setShowCustomInput] = useState(false);
+
   const handleOpenCoverPicker = async () => {
     setIsCoverPickerOpen((prev) => !prev);
     if (!hasFetchedCovers) {
       setIsLoadingCovers(true);
+      const cleanBookTitle = book.title.toLowerCase().replace(/[?.,!:";]/g, '').trim();
       const initialMatch = INITIAL_BOOKS.find(
-        (ib) => ib.id === book.id || ib.title.toLowerCase() === book.title.toLowerCase()
+        (ib) =>
+          ib.id === book.id ||
+          ib.title.toLowerCase().replace(/[?.,!:";]/g, '').trim() === cleanBookTitle
       );
       const originalTitle = book.originalTitle || initialMatch?.originalTitle;
       const results = await fetchAlternativeCovers(book.title, book.author, book.coverUrl, originalTitle);
@@ -325,35 +331,81 @@ ${book.resumo}
                         <div className="w-4 h-4 border-2 border-neutral-300 border-t-neutral-800 rounded-full animate-spin" />
                         <span className="text-[11px]">Buscando capas na API...</span>
                       </div>
-                    ) : alternativeCovers.length === 0 ? (
-                      <p className="text-[11px] text-[#86868b] text-center py-3">
-                        Nenhuma capa alternativa encontrada.
-                      </p>
                     ) : (
-                      <div className="grid grid-cols-2 gap-2">
-                        {alternativeCovers.map((coverUrl, idx) => (
-                            <motion.div
-                              key={idx}
-                              whileHover={{ scale: 1.03 }}
-                              whileTap={{ scale: 0.97 }}
-                              onClick={() => handleSelectCover(coverUrl)}
-                              className="group relative cursor-pointer rounded-lg overflow-hidden border-2 border-neutral-200 hover:border-black transition-colors shadow-xs"
+                      <>
+                        {alternativeCovers.length > 0 && (
+                          <div className="grid grid-cols-2 gap-2">
+                            {alternativeCovers.map((coverUrl, idx) => (
+                              <motion.div
+                                key={idx}
+                                whileHover={{ scale: 1.03 }}
+                                whileTap={{ scale: 0.97 }}
+                                onClick={() => handleSelectCover(coverUrl)}
+                                className="group relative cursor-pointer rounded-lg overflow-hidden border-2 border-neutral-200 hover:border-black transition-colors shadow-xs"
+                              >
+                                <img
+                                  src={coverUrl}
+                                  alt={`Opção ${idx + 1}`}
+                                  className="w-full aspect-[2/3] object-cover"
+                                  loading="lazy"
+                                  onError={(e) => {
+                                    (e.target as HTMLElement).parentElement?.classList.add('hidden');
+                                  }}
+                                />
+                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 flex items-center justify-center transition-all">
+                                  <span className="opacity-0 group-hover:opacity-100 px-2 py-0.5 rounded bg-black/80 text-white text-[9px] font-bold">
+                                    Aplicar
+                                  </span>
+                                </div>
+                              </motion.div>
+                            ))}
+                          </div>
+                        )}
+
+                        {/* Custom Image URL Option */}
+                        <div className="pt-2 border-t border-neutral-200/70">
+                          {!showCustomInput ? (
+                            <button
+                              type="button"
+                              onClick={() => setShowCustomInput(true)}
+                              className="w-full py-1 text-center text-[10px] font-semibold text-[#86868b] hover:text-[#1d1d1f] hover:bg-neutral-100/70 rounded-md transition-colors cursor-pointer"
                             >
-                              <img
-                                src={coverUrl}
-                                alt={`Opção ${idx + 1}`}
-                                className="w-full aspect-[2/3] object-cover"
-                                loading="lazy"
-                              />
-                              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 flex items-center justify-center transition-all">
-                                <span className="opacity-0 group-hover:opacity-100 px-2 py-0.5 rounded bg-black/80 text-white text-[9px] font-bold">
-                                  Aplicar
-                                </span>
+                              + Colar link de outra imagem da internet
+                            </button>
+                          ) : (
+                            <div className="space-y-1.5 pt-0.5">
+                              <label className="text-[10px] font-semibold text-[#86868b] block">
+                                Cole o link direto da imagem:
+                              </label>
+                              <div className="flex gap-1.5">
+                                <input
+                                  type="url"
+                                  value={customCoverUrl}
+                                  onChange={(e) => setCustomCoverUrl(e.target.value)}
+                                  placeholder="https://exemplo.com/capa.jpg"
+                                  className="flex-1 px-2.5 py-1 text-xs bg-white border border-neutral-200/90 rounded-lg text-[#1d1d1f] placeholder-[#86868b] focus:outline-none focus:border-black"
+                                  autoFocus
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    if (customCoverUrl.trim()) {
+                                      handleSelectCover(customCoverUrl.trim());
+                                      setCustomCoverUrl('');
+                                      setShowCustomInput(false);
+                                    }
+                                  }}
+                                  disabled={!customCoverUrl.trim()}
+                                  className="px-2.5 py-1 text-[11px] font-bold bg-[#1d1d1f] text-white rounded-lg hover:bg-black disabled:opacity-40 cursor-pointer"
+                                >
+                                  Salvar
+                                </button>
                               </div>
-                            </motion.div>
-                          ))}
+                            </div>
+                          )}
                         </div>
-                      )}
+                      </>
+                    )}
                     </motion.div>
                   )}
                 </AnimatePresence>
