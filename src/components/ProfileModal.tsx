@@ -57,7 +57,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) =
                 <SlidersHorizontal className="w-4 h-4" strokeWidth={2} />
               </div>
               <h2 className="text-base font-bold tracking-tight text-[#1d1d1f]">
-                Calibrador do Protocolo
+                Calibrador do Veredito
               </h2>
             </div>
             <button
