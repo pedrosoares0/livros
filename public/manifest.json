@@ -1,6 +1,6 @@
 {
-  "name": "Veredito — Avaliador Pessoal de Livros",
-  "short_name": "Veredito",
+  "name": "Protocolo — Avaliador Pessoal de Livros",
+  "short_name": "Protocolo",
   "description": "Avaliador pessoal de livros, HQs e coletâneas.",
   "start_url": "/",
   "display": "standalone",

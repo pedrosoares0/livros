@@ -117,7 +117,7 @@ export const FichaModal: React.FC<FichaModalProps> = ({
   const originalidade = Math.floor(10 - book.criteria.genericidade);
 
   const generateFichaText = () => {
-    return `📋 VEREDITO — Ficha de Avaliação
+    return `📋 PROTOCOLO — Ficha de Avaliação
 📖 Obra: ${book.title} (${book.author})
 📄 Páginas: ~${book.pages} (ed. brasileira)
 ⭐ Nota Técnica: ${Math.floor(book.notaTecnica)}
@@ -513,12 +513,12 @@ ${book.resumo}
               </div>
             )}
 
-            {/* Critérios do Veredito — Dashboard Visual Intuitivo */}
+            {/* Critérios do Protocolo — Dashboard Visual Intuitivo */}
             <div className="space-y-2 pt-1">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#86868b]">
                   <Gauge className="w-3.5 h-3.5 text-[#1d1d1f]" />
-                  <span>Critérios do Veredito</span>
+                  <span>Critérios do Protocolo</span>
                 </div>
                 <span className="text-[10px] text-[#86868b] font-score">
                   Telemetria
@@ -606,7 +606,7 @@ ${book.resumo}
                 variant="destructive"
                 size="md"
                 onClick={handleDeleteBook}
-                title={confirmDelete ? "Clique novamente para confirmar a exclusão definitiva" : "Excluir livro do Veredito"}
+                title={confirmDelete ? "Clique novamente para confirmar a exclusão definitiva" : "Excluir livro do Protocolo"}
                 aria-label="Excluir livro"
                 className={`shrink-0 ${confirmDelete ? '!bg-rose-600 !text-white !border-rose-700' : ''}`}
               >

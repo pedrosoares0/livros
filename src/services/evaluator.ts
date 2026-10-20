@@ -383,7 +383,7 @@ export async function searchBookApi(query: string): Promise<Partial<BookEvaluati
   return results.slice(0, 8);
 }
 
-// Calibração e avaliação inteligente com base no algoritmo do Veredito
+// Calibração e avaliação inteligente com base no algoritmo do Protocolo
 export function evaluateBook(
   rawBook: {
     title: string;
@@ -655,7 +655,7 @@ export function evaluateBulkList(rawText: string): BookEvaluation[] {
       title,
       author,
       pages: 250,
-      description: `Avaliação do Veredito para "${title}". Premissa com foco em tensão psicológica, moralidade e identidade estilística.`,
+      description: `Avaliação do Protocolo para "${title}". Premissa com foco em tensão psicológica, moralidade e identidade estilística.`,
     });
   });
 

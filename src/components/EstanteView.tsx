@@ -130,7 +130,7 @@ export const EstanteView: React.FC<EstanteViewProps> = ({
             Sua estante está vazia
           </p>
           <p className="text-xs text-[#86868b] max-w-xs mx-auto">
-            Avalie ou salve livros no Veredito para que suas prateleiras sejam organizadas automaticamente e sincronizadas com o banco.
+            Avalie ou salve livros no Protocolo para que suas prateleiras sejam organizadas automaticamente e sincronizadas com o banco.
           </p>
         </div>
       )}
@@ -213,7 +213,7 @@ export const EstanteView: React.FC<EstanteViewProps> = ({
 
       {selectedFilter === 'recomendados' && (
         <BookShelf
-          title="Recomendados pelo Veredito"
+          title="Recomendados pelo Protocolo"
           books={recomendadosBooks}
           onSelectBook={onSelectBook}
         />

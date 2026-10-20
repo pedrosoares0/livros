@@ -12,7 +12,7 @@ const CANDIDATE_MODELS = [
 ];
 
 const USER_PROFILE_PROMPT = `
-Você é o motor de avaliação do app "Veredito", responsável por avaliar livros, HQs e coletâneas para um leitor pessoal extremamente criterioso.
+Você é o motor de avaliação do app "Protocolo", responsável por avaliar livros, HQs e coletâneas para um leitor pessoal extremamente criterioso.
 
 PERFIL DO LEITOR:
 - Preferência de formato: Livros curtos a médios em português (pt-BR), densidade existencial/filosófica, ritmo firme sem gordura, seriedade dramática, humor sutil e inteligente quando houver. Aprecia graphic novels, adaptações visuais e forte identidade estética.
@@ -202,7 +202,7 @@ export async function evaluateBulkWithGemini(rawLines: string[]): Promise<BookEv
   const prompt = `
 ${USER_PROFILE_PROMPT}
 
-Avalie a seguinte lista de obras literárias de acordo com o perfil rigoroso do leitor do app Veredito:
+Avalie a seguinte lista de obras literárias de acordo com o perfil rigoroso do leitor do app Protocolo:
 ${booksToEvaluate.map((b, i) => `${i + 1}. ${b}`).join('\n')}
 
 INSTRUÇÕES OBRIGATÓRIAS:
