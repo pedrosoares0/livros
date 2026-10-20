@@ -90,7 +90,7 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3.5">
-            {topMatches.slice(0, 6).map((book) => (
+            {topMatches.map((book) => (
               <div
                 key={book.id}
                 onClick={() => onSelectBook(book)}

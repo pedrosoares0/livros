@@ -73,13 +73,6 @@ export const EstanteView: React.FC<EstanteViewProps> = ({
     });
 
   // Calculate shelves dynamically
-  const recentlyEvaluated = books.filter(
-    (b) =>
-      b.userStatus === 'analyzed' ||
-      b.id.startsWith('eval-') ||
-      b.id.startsWith('book-') ||
-      b.id.startsWith('cbl-')
-  );
   const obrasPrimasBooks = books.filter(isObrasPrimas);
   const recomendadosBooks = books.filter(isRecomendados);
   const ressalvasBooks = books.filter(isRessalvas);
@@ -150,15 +143,6 @@ export const EstanteView: React.FC<EstanteViewProps> = ({
             <BookShelf
               title="Salvos"
               books={savedBooks}
-              onSelectBook={onSelectBook}
-            />
-          )}
-
-          {/* Se houver livros avaliados recentemente */}
-          {recentlyEvaluated.length > 0 && (
-            <BookShelf
-              title="Avaliados Recentemente"
-              books={recentlyEvaluated}
               onSelectBook={onSelectBook}
             />
           )}
