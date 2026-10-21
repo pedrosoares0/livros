@@ -2,8 +2,8 @@ import { BookEvaluation, CriteriaScores, VereditoTipo } from '../types';
 
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || 'AQ.Ab8RN6LNzoEEpQlupq2n1dJRY5APsOuFfXmRLp7ESySq8-A3Uw';
 
-// Lista de modelos suportados em ordem de preferência e resiliência
 const CANDIDATE_MODELS = [
+  'gemini-3.8-flash',
   'gemini-3.5-flash',
   'gemini-3.5-flash-lite',
   'gemini-3-flash-preview',
@@ -48,6 +48,7 @@ export interface GeminiEvaluationResponse {
   author: string;
   originalTitle?: string;
   pages: number;
+  year?: number;
   resumo: string;
   movieComparisons: string[];
   adaptacoes: string;
@@ -62,7 +63,14 @@ export interface GeminiEvaluationResponse {
 
 export async function evaluateWithGemini(
   bookTitle: string,
-  extraContext?: { author?: string; description?: string; coverUrl?: string; pages?: number; genres?: string[] }
+  extraContext?: {
+    author?: string;
+    description?: string;
+    coverUrl?: string;
+    pages?: number;
+    year?: number;
+    genres?: string[];
+  }
 ): Promise<BookEvaluation> {
   const prompt = `
 ${USER_PROFILE_PROMPT}
@@ -149,11 +157,15 @@ Você DEVE responder ESTRITAMENTE em formato JSON com a seguinte estrutura:
         `https://covers.openlibrary.org/b/isbn/9780451524935-L.jpg`;
 
       const pages =
-        parsed.pages && parsed.pages > 30
-          ? Math.round(parsed.pages)
-          : extraContext?.pages && extraContext.pages > 30
+        extraContext?.pages && extraContext.pages > 30
           ? extraContext.pages
+          : parsed.pages && parsed.pages > 30
+          ? Math.round(parsed.pages)
           : 300;
+
+      const year =
+        extraContext?.year ||
+        (parsed.year ? Number(parsed.year) : undefined);
 
       return {
         id,
@@ -161,6 +173,7 @@ Você DEVE responder ESTRITAMENTE em formato JSON com a seguinte estrutura:
         author: parsed.author || extraContext?.author || 'Autor não informado',
         originalTitle: parsed.originalTitle || undefined,
         pages,
+        year,
         coverUrl,
         genres: Array.isArray(parsed.genres) && parsed.genres.length > 0 ? parsed.genres : ['Ficção'],
         resumo: parsed.resumo || '',

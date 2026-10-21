@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Search, ListPlus, X, BookOpen, ChevronRight, AlertTriangle, Check, Loader2, Sparkles } from 'lucide-react';
 import confetti from 'canvas-confetti';
-import { searchBookApi, evaluateBulkList, evaluateBook } from '../services/evaluator';
+import { searchBookApi, evaluateBulkList, evaluateBook, isAmazonUrl } from '../services/evaluator';
 import { evaluateWithGemini, evaluateBulkWithGemini } from '../services/geminiEvaluator';
 import { BookEvaluation } from '../types';
 import { BookCover } from './BookCover';
@@ -95,6 +95,7 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
       return;
     }
 
+    const isAmazon = isAmazonUrl(trimmed);
     setIsSearching(true);
     searchTimerRef.current = setTimeout(async () => {
       try {
@@ -105,7 +106,7 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
       } finally {
         setIsSearching(false);
       }
-    }, 280);
+    }, isAmazon ? 50 : 280);
   };
 
   const handleClearQuery = () => {
@@ -120,7 +121,14 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
 
   const runEvaluationWithProgress = async (
     title: string,
-    extraContext?: { author?: string; description?: string; coverUrl?: string; pages?: number; genres?: string[] }
+    extraContext?: {
+      author?: string;
+      description?: string;
+      coverUrl?: string;
+      pages?: number;
+      year?: number;
+      genres?: string[];
+    }
   ) => {
     setEvalError(null);
     setIsLoading(true);
@@ -175,22 +183,49 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
       description: rawBook.resumo,
       coverUrl: rawBook.coverUrl,
       pages: rawBook.pages,
+      year: rawBook.year,
       genres: rawBook.genres,
     });
   };
 
-  const handleSearchSubmit = (e: React.FormEvent) => {
+  const handleSearchSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     (document.activeElement as HTMLElement)?.blur();
 
-    // Se o usuário apertar Enter no teclado e não houver sugestões prontas
-    if (apiSuggestions.length === 0 && query.trim().length >= 3 && !isSearching) {
-      const existing = findAlreadyEvaluated(query.trim());
+    const trimmed = query.trim();
+    if (trimmed.length < 3) return;
+
+    if (apiSuggestions.length > 0) {
+      handleRequestEvaluation(apiSuggestions[0]);
+      return;
+    }
+
+    if (isAmazonUrl(trimmed)) {
+      if (!isSearching) {
+        setIsSearching(true);
+        try {
+          const results = await searchBookApi(trimmed);
+          setApiSuggestions(results);
+          if (results.length > 0) {
+            handleRequestEvaluation(results[0]);
+          }
+        } catch (e) {
+          console.error('Amazon search error:', e);
+        } finally {
+          setIsSearching(false);
+        }
+      }
+      return;
+    }
+
+    // Se o usuário apertar Enter no teclado e não houver sugestões prontas (busca por título comum)
+    if (!isSearching) {
+      const existing = findAlreadyEvaluated(trimmed);
       if (existing) {
         setDuplicateWarning(existing);
         return;
       }
-      runEvaluationWithProgress(query.trim());
+      runEvaluationWithProgress(trimmed);
     }
   };
 
@@ -420,7 +455,7 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                 {/* Integrated Search Bar (No inline Avaliar button, preventing accidental taps) */}
                 <form onSubmit={handleSearchSubmit} className="space-y-1.5">
                   <label className="text-xs font-semibold text-[#1d1d1f] block">
-                    Pesquise por título, autor ou ISBN:
+                    Pesquise por título, autor, ISBN ou cole um link da Amazon:
                   </label>
 
                   <div className="relative w-full">
@@ -429,7 +464,7 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                       type="text"
                       value={query}
                       onChange={(e) => handleInputChange(e.target.value)}
-                      placeholder="Ex: O massacre da família Hope, Duna, 1984..."
+                      placeholder="Ex: Duna, 1984 ou link da Amazon..."
                       className="w-full pl-10 pr-9 py-2.5 rounded-xl bg-neutral-100/90 focus:bg-white border border-neutral-200/90 focus:border-neutral-900 focus:ring-2 focus:ring-black/5 text-[#1d1d1f] placeholder-[#86868b] text-[16px] sm:text-sm focus:outline-none transition-all duration-150"
                       autoComplete="off"
                       autoCorrect="off"
@@ -453,6 +488,13 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                       </button>
                     ) : null}
                   </div>
+
+                  {isSearching && isAmazonUrl(query) && (
+                    <div className="flex items-center gap-1.5 pt-0.5 px-0.5 text-xs text-[#86868b]">
+                      <Loader2 className="w-3 h-3 animate-spin text-neutral-700" />
+                      <span>Reconhecendo livro da Amazon...</span>
+                    </div>
+                  )}
                 </form>
 
                 {/* Suggestions from Books API */}
@@ -460,7 +502,9 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                   <div className="space-y-2 pt-2 border-t border-neutral-200/60">
                     <div className="flex items-center justify-between">
                       <span className="text-[10px] font-bold uppercase tracking-wider text-[#86868b]">
-                        Edições Encontradas ({apiSuggestions.length})
+                        {apiSuggestions[0]?.id?.startsWith('amz-')
+                          ? 'Livro Reconhecido da Amazon'
+                          : `Edições Encontradas (${apiSuggestions.length})`}
                       </span>
                       <span className="text-[10px] text-[#86868b]">
                         Selecione para avaliar
@@ -474,6 +518,7 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                     >
                       {apiSuggestions.map((book, idx) => {
                         const isAlready = findAlreadyEvaluated(book.title || '');
+                        const isFromAmazon = book.id?.startsWith('amz-');
                         return (
                           <div
                             key={book.id || idx}
@@ -503,11 +548,20 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                                     <Check className="w-2.5 h-2.5 text-amber-700" />
                                     Já avaliado
                                   </span>
-                                ) : book.pages ? (
-                                  <span className="text-[9px] font-medium text-[#6e6e73] bg-neutral-200/60 px-1.5 py-0.5 rounded-md">
-                                    ~{book.pages} págs
-                                  </span>
-                                ) : null}
+                                ) : (
+                                  <>
+                                    {isFromAmazon && (
+                                      <span className="text-[9px] font-semibold text-[#1d1d1f] bg-neutral-200/80 px-1.5 py-0.5 rounded-md">
+                                        Amazon
+                                      </span>
+                                    )}
+                                    {book.pages ? (
+                                      <span className="text-[9px] font-medium text-[#6e6e73] bg-neutral-200/60 px-1.5 py-0.5 rounded-md">
+                                        ~{book.pages} págs
+                                      </span>
+                                    ) : null}
+                                  </>
+                                )}
                                 {book.year && (
                                   <span className="text-[9px] font-medium text-[#6e6e73]">
                                     {book.year}

@@ -1,5 +1,8 @@
 import { BookEvaluation, CriteriaScores, VereditoTipo } from '../types';
 import { INITIAL_BOOKS } from '../data/initialBooks';
+import { isAmazonUrl, recognizeAmazonBook } from './amazonRecognizer';
+
+export { isAmazonUrl, recognizeAmazonBook };
 
 // Perfil de palavras-chave do usuário para calibração de encaixe
 const POSITIVE_KEYWORDS = [
@@ -124,6 +127,21 @@ function extractSignificantKeywords(query: string): string[] {
 }
 
 export async function searchBookApi(query: string): Promise<Partial<BookEvaluation>[]> {
+  const trimmed = query.trim();
+  if (!trimmed) return [];
+
+  // 0. Reconhecimento automático se a busca for um link da Amazon
+  if (isAmazonUrl(trimmed)) {
+    try {
+      const amazonResults = await recognizeAmazonBook(trimmed);
+      if (amazonResults.length > 0) {
+        return amazonResults;
+      }
+    } catch (err) {
+      console.warn('Erro ao reconhecer livro da Amazon:', err);
+    }
+  }
+
   const cleanQuery = normalizeSearchText(query);
   if (!cleanQuery) return [];
 
