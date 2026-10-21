@@ -7,12 +7,14 @@ interface BookShelfProps {
   title: string;
   books: BookEvaluation[];
   onSelectBook: (book: BookEvaluation) => void;
+  onTitleClick?: () => void;
 }
 
 export const BookShelf: React.FC<BookShelfProps> = ({
   title,
   books,
   onSelectBook,
+  onTitleClick,
 }) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -39,11 +41,35 @@ export const BookShelf: React.FC<BookShelfProps> = ({
     <section className="w-full space-y-2 py-3 select-none">
       {/* Category Header Row */}
       <div className="flex items-center justify-between px-6">
-        <h3 className="text-base sm:text-lg font-bold tracking-tight text-[#1d1d1f] font-sans">
-          {title}
-        </h3>
+        {onTitleClick ? (
+          <button
+            type="button"
+            onClick={onTitleClick}
+            className="group flex items-center gap-1.5 text-left cursor-pointer select-none active:scale-[0.98] transition-transform py-0.5 -ml-1 pl-1 pr-2 rounded-lg hover:bg-neutral-100/80"
+            title={`Abrir "${title}" como lista`}
+          >
+            <h3 className="text-base sm:text-lg font-bold tracking-tight text-[#1d1d1f] group-hover:text-black transition-colors font-sans flex items-center gap-1">
+              <span>{title}</span>
+              <ChevronRight className="w-4 h-4 text-[#86868b] group-hover:text-[#1d1d1f] group-hover:translate-x-0.5 transition-all shrink-0" />
+            </h3>
+          </button>
+        ) : (
+          <h3 className="text-base sm:text-lg font-bold tracking-tight text-[#1d1d1f] font-sans">
+            {title}
+          </h3>
+        )}
 
         <div className="flex items-center gap-2">
+          {onTitleClick && (
+            <button
+              type="button"
+              onClick={onTitleClick}
+              className="text-[11px] font-semibold text-[#86868b] hover:text-[#1d1d1f] px-2 py-0.5 rounded-full hover:bg-neutral-100 transition-colors cursor-pointer"
+              title={`Ver todos os livros de "${title}" em lista`}
+            >
+              Ver em lista
+            </button>
+          )}
           <span className="text-xs font-medium text-[#86868b]">
             {books.length} {books.length === 1 ? 'livro' : 'livros'}
           </span>

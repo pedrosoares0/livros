@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { BookOpen } from 'lucide-react';
+import { BookOpen, ArrowLeft, ArrowUpDown, LayoutGrid, Rows } from 'lucide-react';
 import { BookEvaluation } from '../types';
 import { BookShelf } from './BookShelf';
+import { BookCover } from './BookCover';
 
 interface EstanteViewProps {
   books: BookEvaluation[];
@@ -21,12 +22,21 @@ type FilterOption =
   | 'darkside' 
   | 'curtos';
 
+interface ShelfDefinition {
+  id: FilterOption;
+  title: string;
+  chipLabel: string;
+  books: BookEvaluation[];
+}
+
 export const EstanteView: React.FC<EstanteViewProps> = ({
   books,
   onSelectBook,
   savedBookIds,
 }) => {
   const [selectedFilter, setSelectedFilter] = useState<FilterOption>('all');
+  const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
+  const [viewMode, setViewMode] = useState<'grid' | 'carousel'>('grid');
 
   const savedBooks = books.filter((b) => savedBookIds?.has(b.id) || b.isSaved);
 
@@ -83,18 +93,31 @@ export const EstanteView: React.FC<EstanteViewProps> = ({
   const darkSideBooks = books.filter(isDarkSide);
   const curtosBooks = books.filter(isCurtos);
 
+  const allShelves: ShelfDefinition[] = [
+    ...(savedBooks.length > 0 ? [{ id: 'salvos' as FilterOption, title: 'Salvos', chipLabel: `Salvos (${savedBooks.length})`, books: savedBooks }] : []),
+    ...(obrasPrimasBooks.length > 0 ? [{ id: 'obras-primas' as FilterOption, title: 'Obras-Primas & Favoritos', chipLabel: `Obras-Primas (${obrasPrimasBooks.length})`, books: obrasPrimasBooks }] : []),
+    ...(recomendadosBooks.length > 0 ? [{ id: 'recomendados' as FilterOption, title: 'Recomendados pelo Veredito', chipLabel: `Recomendados (${recomendadosBooks.length})`, books: recomendadosBooks }] : []),
+    ...(sciFiBooks.length > 0 ? [{ id: 'scifi' as FilterOption, title: 'Ficção Científica & Existencial', chipLabel: `Sci-Fi & Existencial (${sciFiBooks.length})`, books: sciFiBooks }] : []),
+    ...(classicosBooks.length > 0 ? [{ id: 'classicos' as FilterOption, title: 'Clássicos, Filosofia & Drama Humano', chipLabel: `Clássicos & Filosofia (${classicosBooks.length})`, books: classicosBooks }] : []),
+    ...(darkSideBooks.length > 0 ? [{ id: 'darkside' as FilterOption, title: 'Fantasia Sombria, DarkSide & Contos', chipLabel: `DarkSide & Sombrios (${darkSideBooks.length})`, books: darkSideBooks }] : []),
+    ...(curtosBooks.length > 0 ? [{ id: 'curtos' as FilterOption, title: 'Contos & Obras Curtas', chipLabel: `Contos & Obras Curtas (${curtosBooks.length})`, books: curtosBooks }] : []),
+    ...(ressalvasBooks.length > 0 ? [{ id: 'ressalvas' as FilterOption, title: 'Vale com Ressalvas', chipLabel: `Vale com Ressalvas (${ressalvasBooks.length})`, books: ressalvasBooks }] : []),
+    ...(rejeicaoBooks.length > 0 ? [{ id: 'rejeicao' as FilterOption, title: 'Zona de Rejeição & Evite', chipLabel: `Zona de Rejeição (${rejeicaoBooks.length})`, books: rejeicaoBooks }] : []),
+  ];
+
   const filterChips: { id: FilterOption; label: string }[] = [
     { id: 'all', label: 'Todas as Prateleiras' },
-    ...(savedBooks.length > 0 ? [{ id: 'salvos' as FilterOption, label: `Salvos (${savedBooks.length})` }] : []),
-    ...(obrasPrimasBooks.length > 0 ? [{ id: 'obras-primas' as FilterOption, label: `Obras-Primas (${obrasPrimasBooks.length})` }] : []),
-    ...(recomendadosBooks.length > 0 ? [{ id: 'recomendados' as FilterOption, label: `Recomendados (${recomendadosBooks.length})` }] : []),
-    ...(ressalvasBooks.length > 0 ? [{ id: 'ressalvas' as FilterOption, label: `Vale com Ressalvas (${ressalvasBooks.length})` }] : []),
-    ...(rejeicaoBooks.length > 0 ? [{ id: 'rejeicao' as FilterOption, label: `Zona de Rejeição (${rejeicaoBooks.length})` }] : []),
-    ...(sciFiBooks.length > 0 ? [{ id: 'scifi' as FilterOption, label: `Sci-Fi & Existencial (${sciFiBooks.length})` }] : []),
-    ...(classicosBooks.length > 0 ? [{ id: 'classicos' as FilterOption, label: `Clássicos & Filosofia (${classicosBooks.length})` }] : []),
-    ...(darkSideBooks.length > 0 ? [{ id: 'darkside' as FilterOption, label: `DarkSide & Sombrios (${darkSideBooks.length})` }] : []),
-    ...(curtosBooks.length > 0 ? [{ id: 'curtos' as FilterOption, label: `Contos & Obras Curtas (${curtosBooks.length})` }] : []),
+    ...allShelves.map((s) => ({ id: s.id, label: s.chipLabel })),
   ];
+
+  const activeShelf = allShelves.find((s) => s.id === selectedFilter);
+
+  const handleSelectShelf = (id: FilterOption) => {
+    setSelectedFilter(id);
+    if (id !== 'all') {
+      setViewMode('grid');
+    }
+  };
 
   return (
     <div className="space-y-4 pb-12">
@@ -106,7 +129,7 @@ export const EstanteView: React.FC<EstanteViewProps> = ({
             return (
               <button
                 key={chip.id}
-                onClick={() => setSelectedFilter(chip.id)}
+                onClick={() => handleSelectShelf(chip.id)}
                 className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold shrink-0 transition-all duration-150 cursor-pointer active:scale-95 ${
                   isActive
                     ? 'bg-[#1d1d1f] text-white shadow-xs'
@@ -135,136 +158,128 @@ export const EstanteView: React.FC<EstanteViewProps> = ({
         </div>
       )}
 
-      {/* Dynamic Shelf Presentation */}
+      {/* View All Shelves (Horizontal Carousels with Clickable Titles) */}
       {selectedFilter === 'all' && (
         <div className="space-y-4">
-          {/* Prateleira de Livros Salvos pelo Usuário */}
-          {savedBooks.length > 0 && (
+          {allShelves.map((shelf) => (
             <BookShelf
-              title="Salvos"
-              books={savedBooks}
+              key={shelf.id}
+              title={shelf.title}
+              books={shelf.books}
               onSelectBook={onSelectBook}
+              onTitleClick={() => handleSelectShelf(shelf.id)}
             />
-          )}
-
-          {/* Obras-Primas / Favoritos */}
-          <BookShelf
-            title="Obras-Primas & Favoritos"
-            books={obrasPrimasBooks}
-            onSelectBook={onSelectBook}
-          />
-
-          {/* Ficção Científica & Existencial */}
-          <BookShelf
-            title="Ficção Científica & Existencial"
-            books={sciFiBooks}
-            onSelectBook={onSelectBook}
-          />
-
-          {/* Clássicos & Filosofia */}
-          <BookShelf
-            title="Clássicos, Filosofia & Drama Humano"
-            books={classicosBooks}
-            onSelectBook={onSelectBook}
-          />
-
-          {/* Fantasia Sombria & DarkSide */}
-          <BookShelf
-            title="Fantasia Sombria, DarkSide & Contos"
-            books={darkSideBooks}
-            onSelectBook={onSelectBook}
-          />
-
-          {/* Livros com Ressalvas */}
-          {ressalvasBooks.length > 0 && (
-            <BookShelf
-              title="Vale com Ressalvas"
-              books={ressalvasBooks}
-              onSelectBook={onSelectBook}
-            />
-          )}
-
-          {/* Zona de Rejeição / Evite */}
-          {rejeicaoBooks.length > 0 && (
-            <BookShelf
-              title="Zona de Rejeição & Evite"
-              books={rejeicaoBooks}
-              onSelectBook={onSelectBook}
-            />
-          )}
+          ))}
         </div>
       )}
 
-      {selectedFilter === 'salvos' && (
-        <BookShelf
-          title="Salvos"
-          books={savedBooks}
-          onSelectBook={onSelectBook}
-        />
-      )}
+      {/* Single Shelf Opened as List/Grid View (like Início) */}
+      {selectedFilter !== 'all' && activeShelf && (
+        <div className="space-y-4 px-5 sm:px-6 pt-1 pb-24">
+          {/* Shelf Navigation and Controls Header */}
+          <div className="flex items-center justify-between gap-2 flex-wrap">
+            <button
+              onClick={() => setSelectedFilter('all')}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-neutral-200/90 hover:border-neutral-300 text-xs font-semibold text-[#1d1d1f] hover:bg-neutral-50 active:scale-95 transition-all shadow-2xs cursor-pointer select-none"
+            >
+              <ArrowLeft className="w-3.5 h-3.5 text-[#86868b]" />
+              <span>Todas as Prateleiras</span>
+            </button>
 
-      {selectedFilter === 'obras-primas' && (
-        <BookShelf
-          title="Obras-Primas do Leitor"
-          books={obrasPrimasBooks}
-          onSelectBook={onSelectBook}
-        />
-      )}
+            <div className="flex items-center gap-2">
+              {/* View Mode Toggle (Grid vs Shelf Carousel) */}
+              <div className="flex items-center bg-neutral-100 p-0.5 rounded-full border border-neutral-200/60">
+                <button
+                  type="button"
+                  onClick={() => setViewMode('grid')}
+                  className={`p-1.5 rounded-full transition-all cursor-pointer ${
+                    viewMode === 'grid' ? 'bg-white text-[#1d1d1f] shadow-2xs' : 'text-[#86868b] hover:text-[#1d1d1f]'
+                  }`}
+                  title="Ver em grade (lista)"
+                >
+                  <LayoutGrid className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setViewMode('carousel')}
+                  className={`p-1.5 rounded-full transition-all cursor-pointer ${
+                    viewMode === 'carousel' ? 'bg-white text-[#1d1d1f] shadow-2xs' : 'text-[#86868b] hover:text-[#1d1d1f]'
+                  }`}
+                  title="Ver em carrossel"
+                >
+                  <Rows className="w-3.5 h-3.5" />
+                </button>
+              </div>
 
-      {selectedFilter === 'recomendados' && (
-        <BookShelf
-          title="Recomendados pelo Veredito"
-          books={recomendadosBooks}
-          onSelectBook={onSelectBook}
-        />
-      )}
+              {/* Sort Order Toggle */}
+              <button
+                type="button"
+                onClick={() => setSortOrder((prev) => (prev === 'desc' ? 'asc' : 'desc'))}
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white border border-neutral-200/90 hover:border-neutral-300 text-[11px] font-semibold text-[#1d1d1f] hover:bg-neutral-50 active:scale-95 transition-all shadow-2xs cursor-pointer select-none"
+                title="Alternar ordenação da maior para a menor nota ou vice-versa"
+              >
+                <ArrowUpDown className="w-3 h-3 text-[#86868b]" />
+                <span>{sortOrder === 'desc' ? 'Maior Nota' : 'Menor Nota'}</span>
+              </button>
 
-      {selectedFilter === 'ressalvas' && (
-        <BookShelf
-          title="Vale com Ressalvas"
-          books={ressalvasBooks}
-          onSelectBook={onSelectBook}
-        />
-      )}
+              <span className="text-xs font-semibold text-[#86868b]">
+                {activeShelf.books.length} {activeShelf.books.length === 1 ? 'obra' : 'obras'}
+              </span>
+            </div>
+          </div>
 
-      {selectedFilter === 'rejeicao' && (
-        <BookShelf
-          title="Zona de Rejeição"
-          books={rejeicaoBooks}
-          onSelectBook={onSelectBook}
-        />
-      )}
+          <div>
+            <h2 className="text-lg sm:text-xl font-bold tracking-tight text-[#1d1d1f] font-sans">
+              {activeShelf.title}
+            </h2>
+          </div>
 
-      {selectedFilter === 'scifi' && (
-        <BookShelf
-          title="Ficção Científica & Existencial"
-          books={sciFiBooks}
-          onSelectBook={onSelectBook}
-        />
-      )}
-
-      {selectedFilter === 'classicos' && (
-        <BookShelf
-          title="Clássicos, Filosofia & Drama Humano"
-          books={classicosBooks}
-          onSelectBook={onSelectBook}
-        />
-      )}
-
-      {selectedFilter === 'darkside' && (
-        <BookShelf
-          title="Fantasia Sombria & DarkSide"
-          books={darkSideBooks}
-          onSelectBook={onSelectBook}
-        />
-      )}
-
-      {selectedFilter === 'curtos' && (
-        <BookShelf
-          title="Contos & Obras Curtas"
-          books={curtosBooks}
-          onSelectBook={onSelectBook}
-        />
+          {/* Grid presentation matching Início */}
+          {viewMode === 'grid' ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3.5">
+              {[...activeShelf.books]
+                .sort((a, b) => (sortOrder === 'desc' ? b.notaEncaixe - a.notaEncaixe : a.notaEncaixe - b.notaEncaixe))
+                .map((book) => (
+                  <div
+                    key={book.id}
+                    onClick={() => onSelectBook(book)}
+                    className="p-3.5 rounded-2xl bg-white hover:bg-neutral-50/80 border border-white hover:border-white transition-all duration-200 cursor-pointer flex flex-col justify-between group active:scale-[0.98] shadow-xs hover:shadow-sm"
+                  >
+                    <div className="w-full mb-2.5">
+                      <BookCover
+                        title={book.title}
+                        author={book.author}
+                        coverUrl={book.coverUrl}
+                        notaEncaixe={book.notaEncaixe}
+                      />
+                    </div>
+                    <div className="space-y-0.5 pt-0.5">
+                      <h4 className="text-xs sm:text-[13px] font-bold text-[#1d1d1f] truncate group-hover:text-black leading-snug">
+                        {book.title}
+                      </h4>
+                      <p className="text-[11px] text-[#86868b] truncate flex items-center gap-1.5">
+                        <span className="truncate">{book.author}</span>
+                        {book.pages && (
+                          <>
+                            <span className="text-neutral-300 shrink-0">•</span>
+                            <span className="text-[10px] text-[#86868b] font-medium font-score shrink-0">~{book.pages} págs</span>
+                          </>
+                        )}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+            </div>
+          ) : (
+            <div className="-mx-5 sm:-mx-6">
+              <BookShelf
+                title={activeShelf.title}
+                books={activeShelf.books}
+                onSelectBook={onSelectBook}
+              />
+            </div>
+          )}
+        </div>
       )}
     </div>
   );

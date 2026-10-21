@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BookOpen, ArrowUpDown } from 'lucide-react';
+import { BookOpen, ArrowUpDown, Search, X } from 'lucide-react';
 import { BookEvaluation } from '../types';
 import { isUserEvaluation } from '../data/initialBooks';
 import { BookCover } from './BookCover';
@@ -18,17 +18,28 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
   onOpenEvaluate,
 }) => {
   const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Apenas as avaliações reais do usuário (exclui catálogo inicial, que fica na Estante)
   const userEvaluations = books.filter(isUserEvaluation);
 
+  // Filtragem pela busca
+  const cleanQuery = searchQuery.trim().toLowerCase();
+  const filteredEvaluations = userEvaluations.filter((b) => {
+    if (!cleanQuery) return true;
+    const titleMatch = b.title.toLowerCase().includes(cleanQuery);
+    const authorMatch = b.author.toLowerCase().includes(cleanQuery);
+    const genreMatch = b.genres?.some((g) => g.toLowerCase().includes(cleanQuery));
+    return titleMatch || authorMatch || genreMatch;
+  });
+
   // Recomendações: apenas avaliações do usuário com nota de encaixe a partir de 7
-  const topMatches = userEvaluations
+  const topMatches = filteredEvaluations
     .filter((b) => b.notaEncaixe >= 7)
     .sort((a, b) => (sortOrder === 'desc' ? b.notaEncaixe - a.notaEncaixe : a.notaEncaixe - b.notaEncaixe));
 
-  // Últimas avaliações: todas as avaliações do usuário
-  const recentEvaluations = userEvaluations;
+  // Últimas avaliações: todas as avaliações do usuário filtradas
+  const recentEvaluations = filteredEvaluations;
 
   return (
     <div className="w-full space-y-7 px-5 sm:px-6 pt-3 pb-24">
@@ -55,6 +66,35 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
         </div>
       </div>
 
+      {/* Search Bar - Simples, seguindo a UI/UX padrão do sistema, logo acima da section RECOMENDAÇÕES */}
+      {userEvaluations.length > 0 && (
+        <div className="relative w-full -mt-2">
+          <Search className="w-4 h-4 text-[#86868b] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Buscar por título, autor ou gênero..."
+            autoComplete="off"
+            autoCorrect="off"
+            autoCapitalize="none"
+            spellCheck={false}
+            enterKeyHint="search"
+            className="w-full pl-10 pr-9 py-2.5 rounded-2xl bg-neutral-100/90 hover:bg-neutral-100 focus:bg-white border border-neutral-200/80 focus:border-neutral-400 text-xs sm:text-sm text-[#1d1d1f] placeholder-[#86868b] focus:outline-none transition-all duration-150 shadow-2xs"
+          />
+          {searchQuery.length > 0 && (
+            <button
+              type="button"
+              onClick={() => setSearchQuery('')}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-[#86868b] hover:text-[#1d1d1f] rounded-full transition-colors cursor-pointer"
+              aria-label="Limpar busca"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
+        </div>
+      )}
+
       {/* Empty State when user has no evaluations yet */}
       {userEvaluations.length === 0 && (
         <div className="py-10 text-center space-y-2">
@@ -63,6 +103,18 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
           </p>
           <p className="text-xs text-[#86868b] max-w-xs mx-auto">
             Utilize o botão acima para avaliar livros. Suas avaliações aparecerão aqui e seu catálogo completo está organizado na aba Estante.
+          </p>
+        </div>
+      )}
+
+      {/* Empty State when search has no results */}
+      {cleanQuery.length > 0 && filteredEvaluations.length === 0 && (
+        <div className="py-10 text-center space-y-2">
+          <p className="text-sm font-semibold text-[#1d1d1f]">
+            Nenhum livro encontrado
+          </p>
+          <p className="text-xs text-[#86868b] max-w-xs mx-auto">
+            Não encontramos resultados para "{searchQuery}". Tente buscar por outro título, autor ou gênero.
           </p>
         </div>
       )}
