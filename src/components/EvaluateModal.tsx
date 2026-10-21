@@ -18,10 +18,21 @@ interface EvaluateModalProps {
 }
 
 const EVALUATION_STEPS = [
-  'Localizando edição em português e premissa...',
-  'Analisando estrutura, ritmo e temas...',
-  'Consultando o Gemini com o seu perfil...',
+  'Localizando edição e estruturando premissa...',
+  'Analisando ritmo narrativo e worldbuilding...',
+  'Cruzando temas com o seu perfil pessoal de leitura...',
+  'Examinando densidade dramática e dilemas morais...',
   'Calibrando Nota Técnica e Nota de Encaixe...',
+  'Mapeando paralelos no cinema e literatura...',
+  'Sintetizando veredito final e justificativa crítica...',
+];
+
+const ANALYSIS_DIMENSIONS = [
+  'Prosa & Ritmo',
+  'Worldbuilding',
+  'Perfil do Leitor',
+  'Nota de Encaixe',
+  'Veredito Final',
 ];
 
 export const EvaluateModal: React.FC<EvaluateModalProps> = ({
@@ -40,6 +51,11 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [loadingStepIndex, setLoadingStepIndex] = useState(0);
+  const [evaluatingBook, setEvaluatingBook] = useState<{
+    title: string;
+    author?: string;
+    coverUrl?: string;
+  } | null>(null);
   const [duplicateWarning, setDuplicateWarning] = useState<BookEvaluation | null>(null);
   const [evalError, setEvalError] = useState<string | null>(null);
   const [apiSuggestions, setApiSuggestions] = useState<Partial<BookEvaluation>[]>([]);
@@ -131,12 +147,17 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
     }
   ) => {
     setEvalError(null);
+    setEvaluatingBook({
+      title,
+      author: extraContext?.author,
+      coverUrl: extraContext?.coverUrl,
+    });
     setIsLoading(true);
     setLoadingStepIndex(0);
 
     const stepInterval = setInterval(() => {
-      setLoadingStepIndex((prev) => (prev < EVALUATION_STEPS.length - 1 ? prev + 1 : prev));
-    }, 700);
+      setLoadingStepIndex((prev) => prev + 1);
+    }, 1700);
 
     try {
       const evaluation = await evaluateWithGemini(title, extraContext);
@@ -163,6 +184,7 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
       clearInterval(stepInterval);
       setIsLoading(false);
       setLoadingStepIndex(0);
+      setEvaluatingBook(null);
     }
   };
 
@@ -235,15 +257,19 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
 
     (document.activeElement as HTMLElement)?.blur();
     setEvalError(null);
+    const lines = bulkText.split(/[\n;]+/).map((l) => l.trim()).filter((l) => l.length > 2);
+    setEvaluatingBook({
+      title: 'Avaliação em lote',
+      author: `${lines.length} ${lines.length === 1 ? 'livro selecionado' : 'livros na lista'}`,
+    });
     setIsLoading(true);
     setLoadingStepIndex(0);
 
     const stepInterval = setInterval(() => {
-      setLoadingStepIndex((prev) => (prev < EVALUATION_STEPS.length - 1 ? prev + 1 : prev));
-    }, 700);
+      setLoadingStepIndex((prev) => prev + 1);
+    }, 1800);
 
     try {
-      const lines = bulkText.split(/[\n;]+/).map((l) => l.trim()).filter((l) => l.length > 2);
       let results: BookEvaluation[];
       try {
         results = await evaluateBulkWithGemini(lines);
@@ -270,6 +296,7 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
       clearInterval(stepInterval);
       setIsLoading(false);
       setLoadingStepIndex(0);
+      setEvaluatingBook(null);
     }
   };
 
@@ -341,32 +368,116 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
           {/* Content Area */}
           <div className="p-5 overflow-y-auto hide-scrollbar space-y-3.5 flex-1">
             {isLoading ? (
-              /* Thoughtful Stepped Evaluation Loading State */
-              <div className="py-12 px-4 text-center space-y-5">
-                <div className="relative w-14 h-14 mx-auto flex items-center justify-center">
-                  <div className="absolute inset-0 rounded-full border-2 border-neutral-200 animate-ping opacity-30" />
-                  <div className="w-12 h-12 rounded-full border-2 border-neutral-300 border-t-neutral-900 animate-spin" />
-                  <BookOpen className="w-5 h-5 text-neutral-800 absolute" />
+              /* Apple-inspired Dynamic Stepped Evaluation Loading State */
+              <div className="py-7 sm:py-8 px-4 text-center space-y-5">
+                {/* Book Cover with subtle ambient depth halo */}
+                <div className="relative mx-auto flex flex-col items-center">
+                  {/* Soft breathing ambient halo */}
+                  <motion.div
+                    animate={{
+                      scale: [1, 1.08, 1],
+                      opacity: [0.14, 0.28, 0.14],
+                    }}
+                    transition={{
+                      duration: 2.6,
+                      repeat: Infinity,
+                      ease: 'easeInOut',
+                    }}
+                    className="absolute -inset-2 rounded-2xl bg-black blur-md pointer-events-none"
+                  />
+
+                  {evaluatingBook?.coverUrl ? (
+                    <div className="relative w-16 sm:w-18 shadow-xl rounded-lg overflow-hidden border border-black/10 z-10 transition-transform duration-300">
+                      <BookCover
+                        title={evaluatingBook.title}
+                        author={evaluatingBook.author || ''}
+                        coverUrl={evaluatingBook.coverUrl}
+                      />
+                    </div>
+                  ) : (
+                    <div className="relative w-16 h-22 rounded-xl bg-neutral-100 border border-neutral-200/90 flex items-center justify-center shadow-md z-10">
+                      <BookOpen className="w-7 h-7 text-neutral-800" />
+                    </div>
+                  )}
+
+                  {/* Floating live status badge */}
+                  <div className="relative -mt-2 z-20 flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#1d1d1f] text-white shadow-xs border border-white/10 text-[10px] font-medium">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    <span>Avaliando obra</span>
+                  </div>
                 </div>
 
-                <div className="space-y-1.5">
-                  <h3 className="text-sm font-bold text-[#1d1d1f]">
-                    Avaliando com base no seu perfil
+                {/* Book Title & Animated Subtitle Step */}
+                <div className="space-y-1">
+                  <h3 className="text-sm sm:text-base font-bold text-[#1d1d1f] truncate max-w-xs mx-auto">
+                    {evaluatingBook ? evaluatingBook.title : 'Avaliando obra'}
                   </h3>
-                  <p className="text-xs text-[#86868b] font-medium transition-all duration-300">
-                    {EVALUATION_STEPS[loadingStepIndex]}
-                  </p>
+                  {evaluatingBook?.author && (
+                    <p className="text-[11px] text-[#86868b] truncate max-w-xs mx-auto">
+                      {evaluatingBook.author}
+                    </p>
+                  )}
+
+                  {/* Animated Step Description with AnimatePresence */}
+                  <div className="h-7 flex items-center justify-center overflow-hidden pt-0.5">
+                    <AnimatePresence mode="wait">
+                      <motion.p
+                        key={loadingStepIndex}
+                        initial={{ opacity: 0, y: 7 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -7 }}
+                        transition={{ duration: 0.22, ease: 'easeOut' }}
+                        className="text-xs text-neutral-600 font-medium px-2"
+                      >
+                        {loadingStepIndex < EVALUATION_STEPS.length
+                          ? EVALUATION_STEPS[loadingStepIndex]
+                          : 'Sintetizando veredito final e justificativa crítica...'}
+                      </motion.p>
+                    </AnimatePresence>
+                  </div>
                 </div>
 
-                <div className="flex justify-center gap-1.5 pt-2">
-                  {EVALUATION_STEPS.map((_, i) => (
-                    <div
-                      key={i}
-                      className={`h-1 rounded-full transition-all duration-300 ${
-                        i <= loadingStepIndex ? 'w-6 bg-neutral-900' : 'w-2 bg-neutral-200'
-                      }`}
-                    />
-                  ))}
+                {/* Live Analysis Dimension Chips */}
+                <div className="flex flex-wrap items-center justify-center gap-1.5 max-w-xs mx-auto pt-0.5">
+                  {ANALYSIS_DIMENSIONS.map((dim, i) => {
+                    const isCompleted = loadingStepIndex > i;
+                    const isCurrent = loadingStepIndex === i;
+                    return (
+                      <span
+                        key={dim}
+                        className={`text-[10px] px-2 py-0.5 rounded-lg transition-all duration-300 flex items-center gap-1 select-none ${
+                          isCurrent
+                            ? 'bg-[#1d1d1f] text-white font-semibold shadow-xs scale-105'
+                            : isCompleted
+                            ? 'bg-neutral-100 text-neutral-600 border border-neutral-200/60'
+                            : 'bg-neutral-50/80 text-neutral-400 border border-neutral-200/40 opacity-60'
+                        }`}
+                      >
+                        {isCurrent && <Loader2 className="w-2.5 h-2.5 animate-spin" />}
+                        {isCompleted && <Check className="w-2.5 h-2.5 text-neutral-700" />}
+                        {dim}
+                      </span>
+                    );
+                  })}
+                </div>
+
+                {/* Continuous Dynamic Progress Bar with Subtle Shimmer */}
+                <div className="pt-1.5 space-y-1.5">
+                  <div className="w-52 mx-auto h-1 rounded-full bg-neutral-200/70 overflow-hidden relative">
+                    <motion.div
+                      className="h-full bg-[#1d1d1f] rounded-full relative overflow-hidden"
+                      initial={{ width: '15%' }}
+                      animate={{
+                        width: `${Math.min(18 + loadingStepIndex * 13, 94)}%`,
+                      }}
+                      transition={{ duration: 0.6, ease: 'easeOut' }}
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-pulse" />
+                    </motion.div>
+                  </div>
+                  <p className="text-[10px] text-[#86868b] tracking-wider uppercase font-mono">
+                    Calibrando critérios com IA
+                  </p>
                 </div>
               </div>
             ) : tab === 'single' ? (
