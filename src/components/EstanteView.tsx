@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BookOpen, ArrowLeft, ArrowUpDown, LayoutGrid, Rows } from 'lucide-react';
+import { BookOpen, ArrowLeft, ArrowUpDown } from 'lucide-react';
 import { BookEvaluation } from '../types';
 import { BookShelf } from './BookShelf';
 import { BookCover } from './BookCover';
@@ -36,7 +36,6 @@ export const EstanteView: React.FC<EstanteViewProps> = ({
 }) => {
   const [selectedFilter, setSelectedFilter] = useState<FilterOption>('all');
   const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
-  const [viewMode, setViewMode] = useState<'grid' | 'carousel'>('grid');
 
   const savedBooks = books.filter((b) => savedBookIds?.has(b.id) || b.isSaved);
 
@@ -106,7 +105,7 @@ export const EstanteView: React.FC<EstanteViewProps> = ({
   ];
 
   const filterChips: { id: FilterOption; label: string }[] = [
-    { id: 'all', label: 'Todas as Prateleiras' },
+    { id: 'all', label: 'Prateleiras' },
     ...allShelves.map((s) => ({ id: s.id, label: s.chipLabel })),
   ];
 
@@ -114,9 +113,6 @@ export const EstanteView: React.FC<EstanteViewProps> = ({
 
   const handleSelectShelf = (id: FilterOption) => {
     setSelectedFilter(id);
-    if (id !== 'all') {
-      setViewMode('grid');
-    }
   };
 
   return (
@@ -173,53 +169,29 @@ export const EstanteView: React.FC<EstanteViewProps> = ({
         </div>
       )}
 
-      {/* Single Shelf Opened as List/Grid View (like Início) */}
+      {/* Single Shelf Opened as List/Grid View */}
       {selectedFilter !== 'all' && activeShelf && (
         <div className="space-y-4 px-5 sm:px-6 pt-1 pb-24">
           {/* Shelf Navigation and Controls Header */}
-          <div className="flex items-center justify-between gap-2 flex-wrap">
+          <div className="flex items-center justify-between gap-2">
             <button
               onClick={() => setSelectedFilter('all')}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-neutral-200/90 hover:border-neutral-300 text-xs font-semibold text-[#1d1d1f] hover:bg-neutral-50 active:scale-95 transition-all shadow-2xs cursor-pointer select-none"
             >
               <ArrowLeft className="w-3.5 h-3.5 text-[#86868b]" />
-              <span>Todas as Prateleiras</span>
+              <span>Prateleiras</span>
             </button>
 
             <div className="flex items-center gap-2">
-              {/* View Mode Toggle (Grid vs Shelf Carousel) */}
-              <div className="flex items-center bg-neutral-100 p-0.5 rounded-full border border-neutral-200/60">
-                <button
-                  type="button"
-                  onClick={() => setViewMode('grid')}
-                  className={`p-1.5 rounded-full transition-all cursor-pointer ${
-                    viewMode === 'grid' ? 'bg-white text-[#1d1d1f] shadow-2xs' : 'text-[#86868b] hover:text-[#1d1d1f]'
-                  }`}
-                  title="Ver em grade (lista)"
-                >
-                  <LayoutGrid className="w-3.5 h-3.5" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setViewMode('carousel')}
-                  className={`p-1.5 rounded-full transition-all cursor-pointer ${
-                    viewMode === 'carousel' ? 'bg-white text-[#1d1d1f] shadow-2xs' : 'text-[#86868b] hover:text-[#1d1d1f]'
-                  }`}
-                  title="Ver em carrossel"
-                >
-                  <Rows className="w-3.5 h-3.5" />
-                </button>
-              </div>
-
-              {/* Sort Order Toggle */}
+              {/* Sort Order Toggle - apenas setinhas */}
               <button
                 type="button"
                 onClick={() => setSortOrder((prev) => (prev === 'desc' ? 'asc' : 'desc'))}
-                className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white border border-neutral-200/90 hover:border-neutral-300 text-[11px] font-semibold text-[#1d1d1f] hover:bg-neutral-50 active:scale-95 transition-all shadow-2xs cursor-pointer select-none"
-                title="Alternar ordenação da maior para a menor nota ou vice-versa"
+                className="p-1.5 rounded-full bg-white border border-neutral-200/90 hover:border-neutral-300 text-[#1d1d1f] hover:bg-neutral-50 active:scale-95 transition-all shadow-2xs cursor-pointer select-none flex items-center justify-center"
+                title={sortOrder === 'desc' ? 'Maior Nota (clique para Menor Nota)' : 'Menor Nota (clique para Maior Nota)'}
+                aria-label="Alternar ordenação"
               >
-                <ArrowUpDown className="w-3 h-3 text-[#86868b]" />
-                <span>{sortOrder === 'desc' ? 'Maior Nota' : 'Menor Nota'}</span>
+                <ArrowUpDown className="w-3.5 h-3.5 text-[#1d1d1f]" />
               </button>
 
               <span className="text-xs font-semibold text-[#86868b]">
@@ -235,50 +207,40 @@ export const EstanteView: React.FC<EstanteViewProps> = ({
           </div>
 
           {/* Grid presentation matching Início */}
-          {viewMode === 'grid' ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3.5">
-              {[...activeShelf.books]
-                .sort((a, b) => (sortOrder === 'desc' ? b.notaEncaixe - a.notaEncaixe : a.notaEncaixe - b.notaEncaixe))
-                .map((book) => (
-                  <div
-                    key={book.id}
-                    onClick={() => onSelectBook(book)}
-                    className="p-3.5 rounded-2xl bg-white hover:bg-neutral-50/80 border border-white hover:border-white transition-all duration-200 cursor-pointer flex flex-col justify-between group active:scale-[0.98] shadow-xs hover:shadow-sm"
-                  >
-                    <div className="w-full mb-2.5">
-                      <BookCover
-                        title={book.title}
-                        author={book.author}
-                        coverUrl={book.coverUrl}
-                        notaEncaixe={book.notaEncaixe}
-                      />
-                    </div>
-                    <div className="space-y-0.5 pt-0.5">
-                      <h4 className="text-xs sm:text-[13px] font-bold text-[#1d1d1f] truncate group-hover:text-black leading-snug">
-                        {book.title}
-                      </h4>
-                      <p className="text-[11px] text-[#86868b] truncate flex items-center gap-1.5">
-                        <span className="truncate">{book.author}</span>
-                        {book.pages && (
-                          <>
-                            <span className="text-neutral-300 shrink-0">•</span>
-                            <span className="text-[10px] text-[#86868b] font-medium font-score shrink-0">{book.pages} págs</span>
-                          </>
-                        )}
-                      </p>
-                    </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3.5">
+            {[...activeShelf.books]
+              .sort((a, b) => (sortOrder === 'desc' ? b.notaEncaixe - a.notaEncaixe : a.notaEncaixe - b.notaEncaixe))
+              .map((book) => (
+                <div
+                  key={book.id}
+                  onClick={() => onSelectBook(book)}
+                  className="p-3.5 rounded-2xl bg-white hover:bg-neutral-50/80 border border-white hover:border-white transition-all duration-200 cursor-pointer flex flex-col justify-between group active:scale-[0.98] shadow-xs hover:shadow-sm"
+                >
+                  <div className="w-full mb-2.5">
+                    <BookCover
+                      title={book.title}
+                      author={book.author}
+                      coverUrl={book.coverUrl}
+                      notaEncaixe={book.notaEncaixe}
+                    />
                   </div>
-                ))}
-            </div>
-          ) : (
-            <div className="-mx-5 sm:-mx-6">
-              <BookShelf
-                title={activeShelf.title}
-                books={activeShelf.books}
-                onSelectBook={onSelectBook}
-              />
-            </div>
-          )}
+                  <div className="space-y-0.5 pt-0.5">
+                    <h4 className="text-xs sm:text-[13px] font-bold text-[#1d1d1f] truncate group-hover:text-black leading-snug">
+                      {book.title}
+                    </h4>
+                    <p className="text-[11px] text-[#86868b] truncate flex items-center gap-1.5">
+                      <span className="truncate">{book.author}</span>
+                      {book.pages && (
+                        <>
+                          <span className="text-neutral-300 shrink-0">•</span>
+                          <span className="text-[10px] text-[#86868b] font-medium font-score shrink-0">{book.pages} págs</span>
+                        </>
+                      )}
+                    </p>
+                  </div>
+                </div>
+              ))}
+          </div>
         </div>
       )}
     </div>
