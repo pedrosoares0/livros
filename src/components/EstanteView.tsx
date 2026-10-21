@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { BookOpen, ArrowLeft, ArrowUpDown } from 'lucide-react';
 import { BookEvaluation } from '../types';
 import { BookShelf } from './BookShelf';
@@ -27,7 +27,45 @@ interface ShelfDefinition {
   title: string;
   chipLabel: string;
   books: BookEvaluation[];
+  covers?: string[];
 }
+
+// Representantes icônicos e não-repetidos para cada gênero/prateleira
+const PREFERRED_REPRESENTATIVES: Record<string, string[]> = {
+  scifi: [
+    'a-chegada-historia-da-sua-vida',
+    'o-cair-da-noite',
+    'flores-para-algernon',
+    'br-duna',
+  ],
+  classicos: [
+    'noites-brancas',
+    'o-inferno-de-dante',
+    'entre-quatro-paredes',
+    'diario-de-um-homem-superfluo',
+  ],
+  darkside: [
+    'colapso',
+    'o-gato-preto',
+    'a-menina-do-outro-lado',
+    'o-estranho-misterioso',
+  ],
+  curtos: [
+    'de-quanta-terra-precisa-o-homem',
+    'contos-de-beedle-o-bardo',
+    'a-morte-de-ivan-ilitch',
+  ],
+  'obras-primas': [
+    'senhor-das-moscas',
+    'a-revolucao-dos-bichos',
+    '1984',
+    'a-estrada',
+  ],
+  rejeicao: [
+    'patinando-no-amor',
+    'a-cabeca-do-santo',
+  ],
+};
 
 export const EstanteView: React.FC<EstanteViewProps> = ({
   books,
@@ -93,23 +131,71 @@ export const EstanteView: React.FC<EstanteViewProps> = ({
   const curtosBooks = books.filter(isCurtos);
 
   const allShelves: ShelfDefinition[] = [
-    ...(savedBooks.length > 0 ? [{ id: 'salvos' as FilterOption, title: 'Salvos', chipLabel: `Salvos (${savedBooks.length})`, books: savedBooks }] : []),
-    ...(obrasPrimasBooks.length > 0 ? [{ id: 'obras-primas' as FilterOption, title: 'Obras-Primas & Favoritos', chipLabel: `Obras-Primas (${obrasPrimasBooks.length})`, books: obrasPrimasBooks }] : []),
-    ...(recomendadosBooks.length > 0 ? [{ id: 'recomendados' as FilterOption, title: 'Recomendados pelo Veredito', chipLabel: `Recomendados (${recomendadosBooks.length})`, books: recomendadosBooks }] : []),
-    ...(sciFiBooks.length > 0 ? [{ id: 'scifi' as FilterOption, title: 'Ficção Científica & Existencial', chipLabel: `Sci-Fi & Existencial (${sciFiBooks.length})`, books: sciFiBooks }] : []),
-    ...(classicosBooks.length > 0 ? [{ id: 'classicos' as FilterOption, title: 'Clássicos, Filosofia & Drama Humano', chipLabel: `Clássicos & Filosofia (${classicosBooks.length})`, books: classicosBooks }] : []),
-    ...(darkSideBooks.length > 0 ? [{ id: 'darkside' as FilterOption, title: 'Fantasia Sombria, DarkSide & Contos', chipLabel: `DarkSide & Sombrios (${darkSideBooks.length})`, books: darkSideBooks }] : []),
-    ...(curtosBooks.length > 0 ? [{ id: 'curtos' as FilterOption, title: 'Contos & Obras Curtas', chipLabel: `Contos & Obras Curtas (${curtosBooks.length})`, books: curtosBooks }] : []),
-    ...(ressalvasBooks.length > 0 ? [{ id: 'ressalvas' as FilterOption, title: 'Vale com Ressalvas', chipLabel: `Vale com Ressalvas (${ressalvasBooks.length})`, books: ressalvasBooks }] : []),
-    ...(rejeicaoBooks.length > 0 ? [{ id: 'rejeicao' as FilterOption, title: 'Zona de Rejeição & Evite', chipLabel: `Zona de Rejeição (${rejeicaoBooks.length})`, books: rejeicaoBooks }] : []),
+    ...(savedBooks.length > 0 ? [{ id: 'salvos' as FilterOption, title: 'Salvos', chipLabel: 'Salvos', books: savedBooks }] : []),
+    ...(obrasPrimasBooks.length > 0 ? [{ id: 'obras-primas' as FilterOption, title: 'Obras-Primas & Favoritos', chipLabel: 'Obras-Primas', books: obrasPrimasBooks }] : []),
+    ...(sciFiBooks.length > 0 ? [{ id: 'scifi' as FilterOption, title: 'Ficção Científica & Existencial', chipLabel: 'Ficção Científica', books: sciFiBooks }] : []),
+    ...(classicosBooks.length > 0 ? [{ id: 'classicos' as FilterOption, title: 'Clássicos, Filosofia & Drama Humano', chipLabel: 'Clássicos', books: classicosBooks }] : []),
+    ...(darkSideBooks.length > 0 ? [{ id: 'darkside' as FilterOption, title: 'Fantasia Sombria, DarkSide & Contos', chipLabel: 'DarkSide', books: darkSideBooks }] : []),
+    ...(curtosBooks.length > 0 ? [{ id: 'curtos' as FilterOption, title: 'Contos & Obras Curtas', chipLabel: 'Contos Curtos', books: curtosBooks }] : []),
+    ...(recomendadosBooks.length > 0 ? [{ id: 'recomendados' as FilterOption, title: 'Recomendados pelo Veredito', chipLabel: 'Recomendados', books: recomendadosBooks }] : []),
+    ...(ressalvasBooks.length > 0 ? [{ id: 'ressalvas' as FilterOption, title: 'Vale com Ressalvas', chipLabel: 'Ressalvas', books: ressalvasBooks }] : []),
+    ...(rejeicaoBooks.length > 0 ? [{ id: 'rejeicao' as FilterOption, title: 'Zona de Rejeição & Evite', chipLabel: 'Zona de Rejeição', books: rejeicaoBooks }] : []),
   ];
 
-  const filterChips: { id: FilterOption; label: string }[] = [
-    { id: 'all', label: 'Prateleiras' },
-    ...allShelves.map((s) => ({ id: s.id, label: s.chipLabel })),
-  ];
+  // Atribuição de duas capas representativas para cada filtro, sem repetição entre eles
+  const shelvesWithCovers = useMemo(() => {
+    const usedCoverUrls = new Set<string>();
 
-  const activeShelf = allShelves.find((s) => s.id === selectedFilter);
+    return allShelves.map((shelf) => {
+      const selectedCovers: string[] = [];
+      const preferredIds = PREFERRED_REPRESENTATIVES[shelf.id] || [];
+
+      // 1. Tentar representantes icônicos pré-definidos se ainda não foram usados
+      for (const prefId of preferredIds) {
+        if (selectedCovers.length >= 2) break;
+        const book = shelf.books.find(
+          (b) => (b.id === prefId || b.id.includes(prefId)) && b.coverUrl && !usedCoverUrls.has(b.coverUrl)
+        );
+        if (book?.coverUrl) {
+          selectedCovers.push(book.coverUrl);
+          usedCoverUrls.add(book.coverUrl);
+        }
+      }
+
+      // 2. Se ainda faltar capa, buscar livros não utilizados pertencentes a esta prateleira
+      if (selectedCovers.length < 2) {
+        for (const book of shelf.books) {
+          if (selectedCovers.length >= 2) break;
+          if (book.coverUrl && !usedCoverUrls.has(book.coverUrl)) {
+            selectedCovers.push(book.coverUrl);
+            usedCoverUrls.add(book.coverUrl);
+          }
+        }
+      }
+
+      // 3. Fallback seguro: se a prateleira tem poucos livros, pegar livros distintos da própria prateleira
+      if (selectedCovers.length < 2) {
+        for (const book of shelf.books) {
+          if (selectedCovers.length >= 2) break;
+          if (book.coverUrl && !selectedCovers.includes(book.coverUrl)) {
+            selectedCovers.push(book.coverUrl);
+          }
+        }
+      }
+
+      // 4. Se só houver 1 livro cadastrado na prateleira inteira, usar como capa única/dupla
+      if (selectedCovers.length === 1 && shelf.books[0]?.coverUrl) {
+        selectedCovers.push(shelf.books[0].coverUrl);
+      }
+
+      return {
+        ...shelf,
+        covers: selectedCovers,
+      };
+    });
+  }, [allShelves]);
+
+  const activeShelf = shelvesWithCovers.find((s) => s.id === selectedFilter);
 
   const handleSelectShelf = (id: FilterOption) => {
     setSelectedFilter(id);
@@ -117,22 +203,88 @@ export const EstanteView: React.FC<EstanteViewProps> = ({
 
   return (
     <div className="space-y-4 pb-12">
-      {/* Smart Filter Pills Row */}
-      <div className="px-6 pt-1">
+      {/* Smart Filter Pills Row (Estilo Spotify / Apple com capas duplas) */}
+      <div className="px-5 sm:px-6 pt-1 pb-1">
         <div className="flex items-center gap-2 overflow-x-auto py-1 hide-scrollbar select-none">
-          {filterChips.map((chip) => {
-            const isActive = selectedFilter === chip.id;
+          {/* Botão circular de Todas as Prateleiras (menu da imagem) */}
+          <button
+            type="button"
+            onClick={() => handleSelectShelf('all')}
+            className={`h-10 w-10 sm:h-11 sm:w-11 rounded-full flex items-center justify-center shrink-0 transition-all duration-150 cursor-pointer shadow-2xs active:scale-95 ${
+              selectedFilter === 'all'
+                ? 'bg-[#1d1d1f] text-white border border-[#1d1d1f]'
+                : 'bg-white text-[#1d1d1f] hover:bg-neutral-50 border border-neutral-200/90'
+            }`}
+            title="Prateleiras"
+            aria-label="Ver todas as prateleiras"
+          >
+            <div className="flex flex-col gap-[3px] items-start justify-center">
+              <span
+                className={`h-[2px] w-3.5 rounded-full transition-colors ${
+                  selectedFilter === 'all' ? 'bg-white' : 'bg-[#1d1d1f]'
+                }`}
+              />
+              <span
+                className={`h-[2px] w-3.5 rounded-full transition-colors ${
+                  selectedFilter === 'all' ? 'bg-white' : 'bg-[#1d1d1f]'
+                }`}
+              />
+              <span
+                className={`h-[2px] w-2 rounded-full transition-colors ${
+                  selectedFilter === 'all' ? 'bg-white' : 'bg-[#1d1d1f]'
+                }`}
+              />
+            </div>
+          </button>
+
+          {/* Pílulas de gênero com duas capas sobrepostas */}
+          {shelvesWithCovers.map((shelf) => {
+            const isActive = selectedFilter === shelf.id;
+            const [cover1, cover2] = shelf.covers || [];
+
             return (
               <button
-                key={chip.id}
-                onClick={() => handleSelectShelf(chip.id)}
-                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold shrink-0 transition-all duration-150 cursor-pointer active:scale-95 ${
+                key={shelf.id}
+                type="button"
+                onClick={() => handleSelectShelf(isActive ? 'all' : shelf.id)}
+                className={`h-10 sm:h-11 pl-2 pr-4 rounded-full flex items-center gap-2.5 shrink-0 transition-all duration-150 cursor-pointer active:scale-95 shadow-2xs ${
                   isActive
-                    ? 'bg-[#1d1d1f] text-white shadow-xs'
-                    : 'bg-neutral-100/90 text-[#86868b] hover:text-[#1d1d1f] hover:bg-neutral-200/80 border border-neutral-200/60'
+                    ? 'bg-[#1d1d1f] text-white border border-[#1d1d1f]'
+                    : 'bg-white text-[#1d1d1f] hover:bg-neutral-50/90 border border-neutral-200/90'
                 }`}
               >
-                <span>{chip.label}</span>
+                {/* Duas capas sobrepostas */}
+                <div className="flex items-center shrink-0">
+                  {cover1 && (
+                    <div className="w-6.5 h-6.5 sm:w-7 sm:h-7 rounded-[7px] overflow-hidden bg-neutral-200 shadow-2xs shrink-0 flex items-center justify-center">
+                      <img
+                        src={cover1}
+                        alt=""
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                      />
+                    </div>
+                  )}
+                  {cover2 && (
+                    <div
+                      className={`relative -ml-3 sm:-ml-3.5 z-10 w-6.5 h-6.5 sm:w-7 sm:h-7 rounded-[7px] overflow-hidden bg-neutral-200 shadow-xs shrink-0 flex items-center justify-center ${
+                        isActive ? 'ring-1.5 ring-[#1d1d1f]' : 'ring-1.5 ring-white'
+                      }`}
+                    >
+                      <img
+                        src={cover2}
+                        alt=""
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* Título do Gênero/Prateleira */}
+                <span className="text-xs sm:text-[13px] font-semibold tracking-tight whitespace-nowrap">
+                  {shelf.chipLabel}
+                </span>
               </button>
             );
           })}
