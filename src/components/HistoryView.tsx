@@ -234,7 +234,7 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
                 </div>
 
                 <p className="text-xs text-[#86868b] truncate">
-                  {book.author} • <span className="font-score text-[#86868b]">~{book.pages} págs</span>
+                  {book.author} • <span className="font-score text-[#86868b]">{book.pages} págs</span>
                   {book.createdAt && ` • ${formatDate(book.createdAt)}`}
                 </p>
 

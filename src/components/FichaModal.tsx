@@ -119,7 +119,7 @@ export const FichaModal: React.FC<FichaModalProps> = ({
   const generateFichaText = () => {
     return `📋 VEREDITO — Ficha de Avaliação
 📖 Obra: ${book.title} (${book.author})
-📄 Páginas: ~${book.pages} (ed. brasileira)
+📄 Páginas: ${book.pages} (ed. brasileira)
 ⭐ Nota Técnica: ${Math.floor(book.notaTecnica)}
 🎯 Nota de Encaixe: ${Math.floor(book.notaEncaixe)}
 💡 Veredito: ${book.veredito}
@@ -296,7 +296,7 @@ ${book.resumo}
 
                 <div className="mt-2.5 flex items-center gap-2">
                   <span className="px-2.5 py-1 bg-neutral-100 border border-neutral-200/90 rounded-lg text-[10px] font-score font-semibold text-[#86868b] inline-block">
-                    ~{book.pages} págs
+                    {book.pages} págs
                   </span>
 
                   {/* Alterar Capa Action */}

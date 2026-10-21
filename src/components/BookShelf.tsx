@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { BookEvaluation } from '../types';
 import { BookCover } from './BookCover';
 
@@ -17,12 +17,6 @@ export const BookShelf: React.FC<BookShelfProps> = ({
   onTitleClick,
 }) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-
-  const scroll = (direction: 'left' | 'right') => {
-    if (!scrollContainerRef.current) return;
-    const offset = direction === 'left' ? -320 : 320;
-    scrollContainerRef.current.scrollBy({ left: offset, behavior: 'smooth' });
-  };
 
   // Smooth mouse-wheel scrolling translated to horizontal motion without blocking clicks
   const handleWheel = (e: React.WheelEvent) => {
@@ -59,37 +53,9 @@ export const BookShelf: React.FC<BookShelfProps> = ({
           </h3>
         )}
 
-        <div className="flex items-center gap-2">
-          {onTitleClick && (
-            <button
-              type="button"
-              onClick={onTitleClick}
-              className="text-[11px] font-semibold text-[#86868b] hover:text-[#1d1d1f] px-2 py-0.5 rounded-full hover:bg-neutral-100 transition-colors cursor-pointer"
-              title={`Ver todos os livros de "${title}" em lista`}
-            >
-              Ver em lista
-            </button>
-          )}
-          <span className="text-xs font-medium text-[#86868b]">
-            {books.length} {books.length === 1 ? 'livro' : 'livros'}
-          </span>
-          <div className="flex items-center gap-1">
-            <button
-              onClick={() => scroll('left')}
-              aria-label="Rolar para esquerda"
-              className="p-1.5 rounded-full text-[#86868b] hover:text-[#1d1d1f] hover:bg-neutral-200/60 transition-all duration-150 active:scale-95 cursor-pointer"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => scroll('right')}
-              aria-label="Rolar para direita"
-              className="p-1.5 rounded-full text-[#86868b] hover:text-[#1d1d1f] hover:bg-neutral-200/60 transition-all duration-150 active:scale-95 cursor-pointer"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
+        <span className="text-xs font-medium text-[#86868b]">
+          {books.length} {books.length === 1 ? 'livro' : 'livros'}
+        </span>
       </div>
 
       {/* Books Container with Frosted Gray Shelf Bar Physically Overlapping the Books */}

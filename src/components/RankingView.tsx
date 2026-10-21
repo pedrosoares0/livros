@@ -143,7 +143,7 @@ export const RankingView: React.FC<RankingViewProps> = ({ books, onSelectBook })
                     )}
                   </div>
                   <p className="text-xs text-[#86868b] truncate">
-                    {book.author} • <span className="font-score text-[#86868b]">~{book.pages} págs</span>
+                    {book.author} • <span className="font-score text-[#86868b]">{book.pages} págs</span>
                   </p>
                   <p className="text-[11px] text-[#86868b] italic line-clamp-1">
                     "{book.veredito}"

@@ -668,7 +668,7 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                                     )}
                                     {book.pages ? (
                                       <span className="text-[9px] font-medium text-[#6e6e73] bg-neutral-200/60 px-1.5 py-0.5 rounded-md">
-                                        ~{book.pages} págs
+                                        {book.pages} págs
                                       </span>
                                     ) : null}
                                   </>

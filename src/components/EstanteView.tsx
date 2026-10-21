@@ -262,7 +262,7 @@ export const EstanteView: React.FC<EstanteViewProps> = ({
                         {book.pages && (
                           <>
                             <span className="text-neutral-300 shrink-0">•</span>
-                            <span className="text-[10px] text-[#86868b] font-medium font-score shrink-0">~{book.pages} págs</span>
+                            <span className="text-[10px] text-[#86868b] font-medium font-score shrink-0">{book.pages} págs</span>
                           </>
                         )}
                       </p>

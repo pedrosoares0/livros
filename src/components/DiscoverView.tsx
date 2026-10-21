@@ -5,6 +5,7 @@ import { isUserEvaluation } from '../data/initialBooks';
 import { BookCover } from './BookCover';
 import { ScoreBadge } from './ScoreBadge';
 import { PearlButton } from './PearlButton';
+import { BorderBeam } from './BorderBeam';
 
 interface DiscoverViewProps {
   books: BookEvaluation[];
@@ -19,6 +20,13 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
 }) => {
   const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedScoreFilters, setSelectedScoreFilters] = useState<number[]>([]);
+
+  const toggleScoreFilter = (score: number) => {
+    setSelectedScoreFilters((prev) =>
+      prev.includes(score) ? prev.filter((s) => s !== score) : [...prev, score]
+    );
+  };
 
   // Normalização para busca sem acentos e case-insensitive
   const normalize = (text: string) =>
@@ -31,13 +39,17 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
   // Apenas as avaliações reais do usuário (exclui catálogo inicial, que fica na Estante)
   const userEvaluations = books.filter(isUserEvaluation);
 
-  // Busca precisa por título ou autor (sem falsos positivos de gêneros como "sobrenatural" para "sobre")
+  // Busca precisa por título ou autor
   const cleanQuery = searchQuery.trim();
   const normalizedQuery = normalize(cleanQuery);
 
   const searchResults = cleanQuery
     ? books
         .filter((b) => {
+          const score = Math.floor(b.notaEncaixe);
+          if (selectedScoreFilters.length > 0 && !selectedScoreFilters.includes(score)) {
+            return false;
+          }
           const title = normalize(b.title || '');
           const author = normalize(b.author || '');
           const orig = b.originalTitle ? normalize(b.originalTitle) : '';
@@ -46,9 +58,15 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
         .sort((a, b) => (sortOrder === 'desc' ? b.notaEncaixe - a.notaEncaixe : a.notaEncaixe - b.notaEncaixe))
     : [];
 
-  // Recomendações padrão (quando não está pesquisando): apenas avaliações do usuário com nota >= 7
+  // Recomendações padrão (quando não está pesquisando): apenas avaliações do usuário com nota >= 7, ou filtradas pelas notas selecionadas
   const topMatches = userEvaluations
-    .filter((b) => b.notaEncaixe >= 7)
+    .filter((b) => {
+      const score = Math.floor(b.notaEncaixe);
+      if (selectedScoreFilters.length > 0) {
+        return selectedScoreFilters.includes(score);
+      }
+      return b.notaEncaixe >= 7;
+    })
     .sort((a, b) => (sortOrder === 'desc' ? b.notaEncaixe - a.notaEncaixe : a.notaEncaixe - b.notaEncaixe));
 
   // Últimas avaliações: todas as avaliações do usuário
@@ -79,31 +97,43 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
         </div>
       </div>
 
-      {/* Search Bar - Simples, seguindo a UI/UX padrão do sistema, logo acima da section RECOMENDAÇÕES */}
-      <div className="relative w-full -mt-2">
-        <Search className="w-4 h-4 text-[#86868b] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Buscar por título ou autor..."
-          autoComplete="off"
-          autoCorrect="off"
-          autoCapitalize="none"
-          spellCheck={false}
-          enterKeyHint="search"
-          className="w-full pl-10 pr-9 py-2.5 rounded-2xl bg-neutral-100/90 hover:bg-neutral-100 focus:bg-white border border-neutral-200/80 focus:border-neutral-400 text-xs sm:text-sm text-[#1d1d1f] placeholder-[#86868b] focus:outline-none transition-all duration-150 shadow-2xs"
-        />
-        {searchQuery.length > 0 && (
-          <button
-            type="button"
-            onClick={() => setSearchQuery('')}
-            className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-[#86868b] hover:text-[#1d1d1f] rounded-full transition-colors cursor-pointer"
-            aria-label="Limpar busca"
-          >
-            <X className="w-3.5 h-3.5" />
-          </button>
-        )}
+      {/* Search Bar - Branca e Apple style com BorderBeam */}
+      <div className="w-full -mt-2">
+        <BorderBeam
+          size="sm"
+          theme="light"
+          colorVariant="mono"
+          borderRadius={20}
+          duration={3.5}
+          strength={0.8}
+          className="w-full"
+        >
+          <div className="relative w-full rounded-[20px] bg-white border border-neutral-200/90 shadow-[0_2px_12px_rgba(0,0,0,0.04)] flex items-center">
+            <Search className="w-4 h-4 text-[#86868b] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Buscar por título ou autor..."
+              autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="none"
+              spellCheck={false}
+              enterKeyHint="search"
+              className="w-full pl-10 pr-9 py-2.5 rounded-[20px] bg-transparent text-xs sm:text-sm text-[#1d1d1f] placeholder-[#86868b] focus:outline-none"
+            />
+            {searchQuery.length > 0 && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery('')}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-[#86868b] hover:text-[#1d1d1f] rounded-full transition-colors cursor-pointer"
+                aria-label="Limpar busca"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+        </BorderBeam>
       </div>
 
       {/* Empty State when user has no evaluations yet and not searching */}
@@ -125,16 +155,41 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
             <h3 className="text-xs font-bold uppercase tracking-wider text-[#1d1d1f]">
               Resultados da busca
             </h3>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5">
+              {/* Botão de ordenação apenas com ícone das setinhas */}
               <button
+                type="button"
                 onClick={() => setSortOrder((prev) => (prev === 'desc' ? 'asc' : 'desc'))}
-                className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white border border-neutral-200/90 hover:border-neutral-300 text-[11px] font-semibold text-[#1d1d1f] hover:bg-neutral-50 active:scale-95 transition-all shadow-2xs cursor-pointer select-none"
-                title="Alternar ordenação da maior para a menor nota ou vice-versa"
+                className="p-1.5 rounded-full bg-white border border-neutral-200/90 hover:border-neutral-300 text-[#1d1d1f] hover:bg-neutral-50 active:scale-95 transition-all shadow-2xs cursor-pointer select-none flex items-center justify-center"
+                title={sortOrder === 'desc' ? 'Maior Nota (clique para Menor Nota)' : 'Menor Nota (clique para Maior Nota)'}
+                aria-label="Alternar ordenação"
               >
-                <ArrowUpDown className="w-3 h-3 text-[#86868b]" />
-                <span>{sortOrder === 'desc' ? 'Maior Nota' : 'Menor Nota'}</span>
+                <ArrowUpDown className="w-3.5 h-3.5 text-[#1d1d1f]" />
               </button>
-              <span className="text-xs font-semibold text-[#86868b]">
+
+              {/* Filtros multi-seleção de notas 10, 9 e 8 */}
+              <div className="flex items-center gap-1">
+                {[10, 9, 8].map((score) => {
+                  const isSelected = selectedScoreFilters.includes(score);
+                  return (
+                    <button
+                      key={score}
+                      type="button"
+                      onClick={() => toggleScoreFilter(score)}
+                      className={`px-2 py-0.5 rounded-full text-[11px] font-bold transition-all active:scale-95 cursor-pointer select-none border ${
+                        isSelected
+                          ? 'bg-[#1d1d1f] text-white border-[#1d1d1f] shadow-2xs'
+                          : 'bg-white text-[#86868b] hover:text-[#1d1d1f] border-neutral-200/90 hover:border-neutral-300'
+                      }`}
+                      title={`Filtrar nota ${score}`}
+                    >
+                      {score}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <span className="text-xs font-semibold text-[#86868b] ml-1">
                 {searchResults.length} {searchResults.length === 1 ? 'obra' : 'obras'}
               </span>
             </div>
@@ -165,7 +220,7 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
                       {book.pages && (
                         <>
                           <span className="text-neutral-300 shrink-0">•</span>
-                          <span className="text-[10px] text-[#86868b] font-medium font-score shrink-0">~{book.pages} págs</span>
+                          <span className="text-[10px] text-[#86868b] font-medium font-score shrink-0">{book.pages} págs</span>
                         </>
                       )}
                     </p>
@@ -189,23 +244,48 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
       {/* Quando não está pesquisando: Exibe Recomendações e Últimas Avaliações */}
       {!cleanQuery && (
         <>
-          {/* Obras de Alto Encaixe com Filtro Interativo Maior/Menor Nota */}
+          {/* Obras de Alto Encaixe com Filtro Interativo Maior/Menor Nota e Filtros de Notas 10, 9 e 8 */}
           {topMatches.length > 0 && (
             <div className="space-y-3.5 pt-1">
               <div className="flex items-center justify-between">
                 <h3 className="text-xs font-bold uppercase tracking-wider text-[#1d1d1f]">
                   Recomendações
                 </h3>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5">
+                  {/* Botão de ordenação apenas com ícone das setinhas */}
                   <button
+                    type="button"
                     onClick={() => setSortOrder((prev) => (prev === 'desc' ? 'asc' : 'desc'))}
-                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white border border-neutral-200/90 hover:border-neutral-300 text-[11px] font-semibold text-[#1d1d1f] hover:bg-neutral-50 active:scale-95 transition-all shadow-2xs cursor-pointer select-none"
-                    title="Alternar ordenação da maior para a menor nota ou vice-versa"
+                    className="p-1.5 rounded-full bg-white border border-neutral-200/90 hover:border-neutral-300 text-[#1d1d1f] hover:bg-neutral-50 active:scale-95 transition-all shadow-2xs cursor-pointer select-none flex items-center justify-center"
+                    title={sortOrder === 'desc' ? 'Maior Nota (clique para Menor Nota)' : 'Menor Nota (clique para Maior Nota)'}
+                    aria-label="Alternar ordenação"
                   >
-                    <ArrowUpDown className="w-3 h-3 text-[#86868b]" />
-                    <span>{sortOrder === 'desc' ? 'Maior Nota' : 'Menor Nota'}</span>
+                    <ArrowUpDown className="w-3.5 h-3.5 text-[#1d1d1f]" />
                   </button>
-                  <span className="text-xs font-semibold text-[#86868b]">
+
+                  {/* Filtros multi-seleção de notas 10, 9 e 8 */}
+                  <div className="flex items-center gap-1">
+                    {[10, 9, 8].map((score) => {
+                      const isSelected = selectedScoreFilters.includes(score);
+                      return (
+                        <button
+                          key={score}
+                          type="button"
+                          onClick={() => toggleScoreFilter(score)}
+                          className={`px-2 py-0.5 rounded-full text-[11px] font-bold transition-all active:scale-95 cursor-pointer select-none border ${
+                            isSelected
+                              ? 'bg-[#1d1d1f] text-white border-[#1d1d1f] shadow-2xs'
+                              : 'bg-white text-[#86868b] hover:text-[#1d1d1f] border-neutral-200/90 hover:border-neutral-300'
+                          }`}
+                          title={`Filtrar nota ${score}`}
+                        >
+                          {score}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <span className="text-xs font-semibold text-[#86868b] ml-1">
                     {topMatches.length} {topMatches.length === 1 ? 'obra' : 'obras'}
                   </span>
                 </div>
@@ -235,7 +315,7 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
                         {book.pages && (
                           <>
                             <span className="text-neutral-300 shrink-0">•</span>
-                            <span className="text-[10px] text-[#86868b] font-medium font-score shrink-0">~{book.pages} págs</span>
+                            <span className="text-[10px] text-[#86868b] font-medium font-score shrink-0">{book.pages} págs</span>
                           </>
                         )}
                       </p>
@@ -282,7 +362,7 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
                             {book.title}
                           </h4>
                           <p className="text-xs sm:text-sm text-[#86868b] truncate pt-0.5">
-                            {book.author} {book.year ? `• ${book.year}` : ''} {book.pages ? `• ~${book.pages} págs` : ''}
+                            {book.author} {book.year ? `• ${book.year}` : ''} {book.pages ? `• ${book.pages} págs` : ''}
                           </p>
                         </div>
 
