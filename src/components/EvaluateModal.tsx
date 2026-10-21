@@ -178,7 +178,7 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
     } catch (err: any) {
       console.error('Fatal evaluation error:', err);
       setEvalError(
-        'Falha ao obter avaliação da IA do Gemini. Por favor, tente novamente em alguns segundos.'
+        'Falha ao obter avaliação do Veredito. Por favor, tente novamente em alguns segundos.'
       );
     } finally {
       clearInterval(stepInterval);
@@ -291,7 +291,7 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
       onClose();
     } catch (err: any) {
       console.error('Bulk error:', err);
-      setEvalError('Falha ao avaliar a lista com a IA. Tente novamente.');
+      setEvalError('Falha ao avaliar a lista. Tente novamente.');
     } finally {
       clearInterval(stepInterval);
       setIsLoading(false);
@@ -370,24 +370,50 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
             {isLoading ? (
               /* Apple-inspired Dynamic Stepped Evaluation Loading State */
               <div className="py-7 sm:py-8 px-4 text-center space-y-5">
-                {/* Book Cover with subtle ambient depth halo */}
+                {/* Book Cover with chromatic ambient depth glow */}
                 <div className="relative mx-auto flex flex-col items-center">
-                  {/* Soft breathing ambient halo */}
-                  <motion.div
-                    animate={{
-                      scale: [1, 1.08, 1],
-                      opacity: [0.14, 0.28, 0.14],
-                    }}
-                    transition={{
-                      duration: 2.6,
-                      repeat: Infinity,
-                      ease: 'easeInOut',
-                    }}
-                    className="absolute -inset-2 rounded-2xl bg-black blur-md pointer-events-none"
-                  />
+                  {/* Chromatic ambient glow matching book cover color without heavy canvas overhead */}
+                  {evaluatingBook?.coverUrl ? (
+                    <motion.div
+                      animate={{
+                        scale: [1.04, 1.12, 1.04],
+                        opacity: [0.55, 0.8, 0.55],
+                      }}
+                      transition={{
+                        duration: 3,
+                        repeat: Infinity,
+                        ease: 'easeInOut',
+                      }}
+                      className="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none -z-10"
+                      style={{
+                        transform: 'translateY(10px)',
+                        filter: 'blur(22px)',
+                      }}
+                    >
+                      <img
+                        src={evaluatingBook.coverUrl}
+                        alt=""
+                        className="w-full h-full object-cover scale-125"
+                        loading="eager"
+                      />
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      animate={{
+                        scale: [1, 1.08, 1],
+                        opacity: [0.35, 0.55, 0.35],
+                      }}
+                      transition={{
+                        duration: 3,
+                        repeat: Infinity,
+                        ease: 'easeInOut',
+                      }}
+                      className="absolute -inset-3 rounded-2xl bg-gradient-to-tr from-amber-500/25 via-rose-500/20 to-sky-500/25 blur-xl pointer-events-none -z-10"
+                    />
+                  )}
 
                   {evaluatingBook?.coverUrl ? (
-                    <div className="relative w-16 sm:w-18 shadow-xl rounded-lg overflow-hidden border border-black/10 z-10 transition-transform duration-300">
+                    <div className="relative w-28 sm:w-32 shadow-[0_12px_36px_rgba(0,0,0,0.18)] rounded-xl overflow-hidden border border-black/10 z-10 transition-transform duration-300">
                       <BookCover
                         title={evaluatingBook.title}
                         author={evaluatingBook.author || ''}
@@ -395,13 +421,13 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                       />
                     </div>
                   ) : (
-                    <div className="relative w-16 h-22 rounded-xl bg-neutral-100 border border-neutral-200/90 flex items-center justify-center shadow-md z-10">
-                      <BookOpen className="w-7 h-7 text-neutral-800" />
+                    <div className="relative w-28 h-42 sm:w-32 sm:h-48 rounded-xl bg-neutral-100 border border-neutral-200/90 flex items-center justify-center shadow-lg z-10">
+                      <BookOpen className="w-10 h-10 text-neutral-800" />
                     </div>
                   )}
 
                   {/* Floating live status badge */}
-                  <div className="relative -mt-2 z-20 flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#1d1d1f] text-white shadow-xs border border-white/10 text-[10px] font-medium">
+                  <div className="relative -mt-3 z-20 flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#1d1d1f] text-white shadow-md border border-white/10 text-[11px] font-medium">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                     <span>Avaliando obra</span>
                   </div>
@@ -476,7 +502,7 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                     </motion.div>
                   </div>
                   <p className="text-[10px] text-[#86868b] tracking-wider uppercase font-mono">
-                    Calibrando critérios com IA
+                    Calibrando critérios de leitura
                   </p>
                 </div>
               </div>
@@ -719,7 +745,7 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                       Nenhuma edição direta encontrada no acervo
                     </p>
                     <p className="text-[11px] text-[#86868b] max-w-xs mx-auto leading-relaxed">
-                      Deseja consultar a IA diretamente para avaliar <strong>"{query.trim()}"</strong>?
+                      Deseja avaliar <strong>"{query.trim()}"</strong> agora no Veredito?
                     </p>
                     <button
                       type="button"
@@ -732,7 +758,7 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                       className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold rounded-xl bg-[#1d1d1f] text-white hover:bg-black active:scale-95 transition-all shadow-xs cursor-pointer mt-1"
                     >
                       <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-                      <span>Avaliar "{query.trim()}" com a IA</span>
+                      <span>Avaliar "{query.trim()}"</span>
                     </button>
                   </div>
                 ) : null}

@@ -196,7 +196,7 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
               {search ? 'Nenhum resultado para esta busca' : 'Nenhuma avaliação encontrada'}
             </h3>
             <p className="text-xs text-[#86868b] max-w-sm mx-auto">
-              Digite o título de qualquer livro para gerar uma ficha calibrada pelo Gemini.
+              Digite o título de qualquer livro para gerar uma ficha calibrada pelo Veredito.
             </p>
           </div>
           <div className="pt-2 flex justify-center">

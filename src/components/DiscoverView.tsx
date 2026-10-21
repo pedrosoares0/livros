@@ -85,7 +85,7 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
             Avaliador Pessoal
           </h2>
           <p className="text-xs text-[#86868b] leading-relaxed">
-            Analise qualquer livro ou HQ com base no seu perfil de leitura, preferências e aversões calibradas pelo Gemini.
+            Analise qualquer livro ou HQ com base no seu perfil de leitura, preferências e aversões calibradas para você.
           </p>
         </div>
 
