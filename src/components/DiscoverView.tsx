@@ -20,26 +20,39 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
   const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
   const [searchQuery, setSearchQuery] = useState('');
 
+  // Normalização para busca sem acentos e case-insensitive
+  const normalize = (text: string) =>
+    text
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .trim();
+
   // Apenas as avaliações reais do usuário (exclui catálogo inicial, que fica na Estante)
   const userEvaluations = books.filter(isUserEvaluation);
 
-  // Filtragem pela busca
-  const cleanQuery = searchQuery.trim().toLowerCase();
-  const filteredEvaluations = userEvaluations.filter((b) => {
-    if (!cleanQuery) return true;
-    const titleMatch = b.title.toLowerCase().includes(cleanQuery);
-    const authorMatch = b.author.toLowerCase().includes(cleanQuery);
-    const genreMatch = b.genres?.some((g) => g.toLowerCase().includes(cleanQuery));
-    return titleMatch || authorMatch || genreMatch;
-  });
+  // Busca precisa por título ou autor (sem falsos positivos de gêneros como "sobrenatural" para "sobre")
+  const cleanQuery = searchQuery.trim();
+  const normalizedQuery = normalize(cleanQuery);
 
-  // Recomendações: apenas avaliações do usuário com nota de encaixe a partir de 7
-  const topMatches = filteredEvaluations
+  const searchResults = cleanQuery
+    ? books
+        .filter((b) => {
+          const title = normalize(b.title || '');
+          const author = normalize(b.author || '');
+          const orig = b.originalTitle ? normalize(b.originalTitle) : '';
+          return title.includes(normalizedQuery) || author.includes(normalizedQuery) || orig.includes(normalizedQuery);
+        })
+        .sort((a, b) => (sortOrder === 'desc' ? b.notaEncaixe - a.notaEncaixe : a.notaEncaixe - b.notaEncaixe))
+    : [];
+
+  // Recomendações padrão (quando não está pesquisando): apenas avaliações do usuário com nota >= 7
+  const topMatches = userEvaluations
     .filter((b) => b.notaEncaixe >= 7)
     .sort((a, b) => (sortOrder === 'desc' ? b.notaEncaixe - a.notaEncaixe : a.notaEncaixe - b.notaEncaixe));
 
-  // Últimas avaliações: todas as avaliações do usuário filtradas
-  const recentEvaluations = filteredEvaluations;
+  // Últimas avaliações: todas as avaliações do usuário
+  const recentEvaluations = userEvaluations;
 
   return (
     <div className="w-full space-y-7 px-5 sm:px-6 pt-3 pb-24">
@@ -67,36 +80,34 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
       </div>
 
       {/* Search Bar - Simples, seguindo a UI/UX padrão do sistema, logo acima da section RECOMENDAÇÕES */}
-      {userEvaluations.length > 0 && (
-        <div className="relative w-full -mt-2">
-          <Search className="w-4 h-4 text-[#86868b] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Buscar por título, autor ou gênero..."
-            autoComplete="off"
-            autoCorrect="off"
-            autoCapitalize="none"
-            spellCheck={false}
-            enterKeyHint="search"
-            className="w-full pl-10 pr-9 py-2.5 rounded-2xl bg-neutral-100/90 hover:bg-neutral-100 focus:bg-white border border-neutral-200/80 focus:border-neutral-400 text-xs sm:text-sm text-[#1d1d1f] placeholder-[#86868b] focus:outline-none transition-all duration-150 shadow-2xs"
-          />
-          {searchQuery.length > 0 && (
-            <button
-              type="button"
-              onClick={() => setSearchQuery('')}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-[#86868b] hover:text-[#1d1d1f] rounded-full transition-colors cursor-pointer"
-              aria-label="Limpar busca"
-            >
-              <X className="w-3.5 h-3.5" />
-            </button>
-          )}
-        </div>
-      )}
+      <div className="relative w-full -mt-2">
+        <Search className="w-4 h-4 text-[#86868b] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Buscar por título ou autor..."
+          autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="none"
+          spellCheck={false}
+          enterKeyHint="search"
+          className="w-full pl-10 pr-9 py-2.5 rounded-2xl bg-neutral-100/90 hover:bg-neutral-100 focus:bg-white border border-neutral-200/80 focus:border-neutral-400 text-xs sm:text-sm text-[#1d1d1f] placeholder-[#86868b] focus:outline-none transition-all duration-150 shadow-2xs"
+        />
+        {searchQuery.length > 0 && (
+          <button
+            type="button"
+            onClick={() => setSearchQuery('')}
+            className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-[#86868b] hover:text-[#1d1d1f] rounded-full transition-colors cursor-pointer"
+            aria-label="Limpar busca"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
+        )}
+      </div>
 
-      {/* Empty State when user has no evaluations yet */}
-      {userEvaluations.length === 0 && (
+      {/* Empty State when user has no evaluations yet and not searching */}
+      {!cleanQuery && userEvaluations.length === 0 && (
         <div className="py-10 text-center space-y-2">
           <p className="text-sm font-semibold text-[#1d1d1f]">
             Nenhuma avaliação pessoal ainda
@@ -107,24 +118,12 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
         </div>
       )}
 
-      {/* Empty State when search has no results */}
-      {cleanQuery.length > 0 && filteredEvaluations.length === 0 && (
-        <div className="py-10 text-center space-y-2">
-          <p className="text-sm font-semibold text-[#1d1d1f]">
-            Nenhum livro encontrado
-          </p>
-          <p className="text-xs text-[#86868b] max-w-xs mx-auto">
-            Não encontramos resultados para "{searchQuery}". Tente buscar por outro título, autor ou gênero.
-          </p>
-        </div>
-      )}
-
-      {/* Obras de Alto Encaixe com Filtro Interativo Maior/Menor Nota */}
-      {topMatches.length > 0 && (
+      {/* Quando pesquisando: exibe Resultados da Busca com todas as obras correspondentes */}
+      {cleanQuery.length > 0 && (
         <div className="space-y-3.5 pt-1">
           <div className="flex items-center justify-between">
             <h3 className="text-xs font-bold uppercase tracking-wider text-[#1d1d1f]">
-              Recomendações
+              Resultados da busca
             </h3>
             <div className="flex items-center gap-2">
               <button
@@ -136,101 +135,174 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
                 <span>{sortOrder === 'desc' ? 'Maior Nota' : 'Menor Nota'}</span>
               </button>
               <span className="text-xs font-semibold text-[#86868b]">
-                {topMatches.length} {topMatches.length === 1 ? 'obra' : 'obras'}
+                {searchResults.length} {searchResults.length === 1 ? 'obra' : 'obras'}
               </span>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3.5">
-            {topMatches.map((book) => (
-              <div
-                key={book.id}
-                onClick={() => onSelectBook(book)}
-                className="p-3.5 rounded-2xl bg-white hover:bg-neutral-50/80 border border-white hover:border-white transition-all duration-200 cursor-pointer flex flex-col justify-between group active:scale-[0.98] shadow-xs hover:shadow-sm"
-              >
-                <div className="w-full mb-2.5">
-                  <BookCover
-                    title={book.title}
-                    author={book.author}
-                    coverUrl={book.coverUrl}
-                    notaEncaixe={book.notaEncaixe}
-                  />
+          {searchResults.length > 0 ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3.5">
+              {searchResults.map((book) => (
+                <div
+                  key={book.id}
+                  onClick={() => onSelectBook(book)}
+                  className="p-3.5 rounded-2xl bg-white hover:bg-neutral-50/80 border border-white hover:border-white transition-all duration-200 cursor-pointer flex flex-col justify-between group active:scale-[0.98] shadow-xs hover:shadow-sm"
+                >
+                  <div className="w-full mb-2.5">
+                    <BookCover
+                      title={book.title}
+                      author={book.author}
+                      coverUrl={book.coverUrl}
+                      notaEncaixe={book.notaEncaixe}
+                    />
+                  </div>
+                  <div className="space-y-0.5 pt-0.5">
+                    <h4 className="text-xs sm:text-[13px] font-bold text-[#1d1d1f] truncate group-hover:text-black leading-snug">
+                      {book.title}
+                    </h4>
+                    <p className="text-[11px] text-[#86868b] truncate flex items-center gap-1.5">
+                      <span className="truncate">{book.author}</span>
+                      {book.pages && (
+                        <>
+                          <span className="text-neutral-300 shrink-0">•</span>
+                          <span className="text-[10px] text-[#86868b] font-medium font-score shrink-0">~{book.pages} págs</span>
+                        </>
+                      )}
+                    </p>
+                  </div>
                 </div>
-                <div className="space-y-0.5 pt-0.5">
-                  <h4 className="text-xs sm:text-[13px] font-bold text-[#1d1d1f] truncate group-hover:text-black leading-snug">
-                    {book.title}
-                  </h4>
-                  <p className="text-[11px] text-[#86868b] truncate flex items-center gap-1.5">
-                    <span className="truncate">{book.author}</span>
-                    {book.pages && (
-                      <>
-                        <span className="text-neutral-300 shrink-0">•</span>
-                        <span className="text-[10px] text-[#86868b] font-medium font-score shrink-0">~{book.pages} págs</span>
-                      </>
-                    )}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="py-12 text-center space-y-2">
+              <p className="text-sm font-semibold text-[#1d1d1f]">
+                Nenhum livro encontrado
+              </p>
+              <p className="text-xs text-[#86868b] max-w-xs mx-auto">
+                Não encontramos resultados para "{searchQuery}". Tente buscar por outro título ou autor.
+              </p>
+            </div>
+          )}
         </div>
       )}
 
-      {/* Últimas Avaliações — Large Visual Cards com Borda Branca */}
-      {recentEvaluations.length > 0 && (
-        <div className="space-y-3.5 pt-2">
-          <div className="flex items-center justify-between">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-[#86868b]">
-              Últimas Avaliações
-            </h3>
-            <span className="text-[11px] font-medium text-[#86868b]">
-              {recentEvaluations.length} {recentEvaluations.length === 1 ? 'avaliação' : 'avaliações'}
-            </span>
-          </div>
-
-          <div className="space-y-3.5">
-            {recentEvaluations.map((book) => (
-              <div
-                key={book.id}
-                onClick={() => onSelectBook(book)}
-                className="p-4 sm:p-5 rounded-2xl bg-white hover:bg-neutral-50/90 border border-white hover:border-white transition-all duration-200 cursor-pointer flex items-center gap-4 sm:gap-5 group active:scale-[0.99] shadow-xs hover:shadow-sm"
-              >
-                {/* Large Visual Book Cover */}
-                <div className="w-20 sm:w-24 shrink-0 transition-transform duration-200 group-hover:scale-[1.02]">
-                  <BookCover
-                    title={book.title}
-                    author={book.author}
-                    coverUrl={book.coverUrl}
-                  />
-                </div>
-
-                {/* Rich Book Details */}
-                <div className="flex-1 min-w-0 space-y-2">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <h4 className="text-base sm:text-lg font-bold text-[#1d1d1f] truncate group-hover:text-black leading-snug">
-                        {book.title}
-                      </h4>
-                      <p className="text-xs sm:text-sm text-[#86868b] truncate pt-0.5">
-                        {book.author} {book.year ? `• ${book.year}` : ''} {book.pages ? `• ~${book.pages} págs` : ''}
-                      </p>
-                    </div>
-
-                    {/* Prominent Large Round Score Badge */}
-                    <div className="shrink-0 flex items-center justify-center">
-                      <ScoreBadge score={book.notaEncaixe} size="lg" />
-                    </div>
-                  </div>
-
-                  {/* Veredito Quote without any fake badges */}
-                  <p className="text-xs sm:text-sm text-[#515154] italic leading-relaxed line-clamp-2 border-l-2 border-neutral-200 pl-2.5">
-                    "{book.veredito}"
-                  </p>
+      {/* Quando não está pesquisando: Exibe Recomendações e Últimas Avaliações */}
+      {!cleanQuery && (
+        <>
+          {/* Obras de Alto Encaixe com Filtro Interativo Maior/Menor Nota */}
+          {topMatches.length > 0 && (
+            <div className="space-y-3.5 pt-1">
+              <div className="flex items-center justify-between">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-[#1d1d1f]">
+                  Recomendações
+                </h3>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setSortOrder((prev) => (prev === 'desc' ? 'asc' : 'desc'))}
+                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white border border-neutral-200/90 hover:border-neutral-300 text-[11px] font-semibold text-[#1d1d1f] hover:bg-neutral-50 active:scale-95 transition-all shadow-2xs cursor-pointer select-none"
+                    title="Alternar ordenação da maior para a menor nota ou vice-versa"
+                  >
+                    <ArrowUpDown className="w-3 h-3 text-[#86868b]" />
+                    <span>{sortOrder === 'desc' ? 'Maior Nota' : 'Menor Nota'}</span>
+                  </button>
+                  <span className="text-xs font-semibold text-[#86868b]">
+                    {topMatches.length} {topMatches.length === 1 ? 'obra' : 'obras'}
+                  </span>
                 </div>
               </div>
-            ))}
-          </div>
-        </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3.5">
+                {topMatches.map((book) => (
+                  <div
+                    key={book.id}
+                    onClick={() => onSelectBook(book)}
+                    className="p-3.5 rounded-2xl bg-white hover:bg-neutral-50/80 border border-white hover:border-white transition-all duration-200 cursor-pointer flex flex-col justify-between group active:scale-[0.98] shadow-xs hover:shadow-sm"
+                  >
+                    <div className="w-full mb-2.5">
+                      <BookCover
+                        title={book.title}
+                        author={book.author}
+                        coverUrl={book.coverUrl}
+                        notaEncaixe={book.notaEncaixe}
+                      />
+                    </div>
+                    <div className="space-y-0.5 pt-0.5">
+                      <h4 className="text-xs sm:text-[13px] font-bold text-[#1d1d1f] truncate group-hover:text-black leading-snug">
+                        {book.title}
+                      </h4>
+                      <p className="text-[11px] text-[#86868b] truncate flex items-center gap-1.5">
+                        <span className="truncate">{book.author}</span>
+                        {book.pages && (
+                          <>
+                            <span className="text-neutral-300 shrink-0">•</span>
+                            <span className="text-[10px] text-[#86868b] font-medium font-score shrink-0">~{book.pages} págs</span>
+                          </>
+                        )}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Últimas Avaliações — Large Visual Cards com Borda Branca */}
+          {recentEvaluations.length > 0 && (
+            <div className="space-y-3.5 pt-2">
+              <div className="flex items-center justify-between">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-[#86868b]">
+                  Últimas Avaliações
+                </h3>
+                <span className="text-[11px] font-medium text-[#86868b]">
+                  {recentEvaluations.length} {recentEvaluations.length === 1 ? 'avaliação' : 'avaliações'}
+                </span>
+              </div>
+
+              <div className="space-y-3.5">
+                {recentEvaluations.map((book) => (
+                  <div
+                    key={book.id}
+                    onClick={() => onSelectBook(book)}
+                    className="p-4 sm:p-5 rounded-2xl bg-white hover:bg-neutral-50/90 border border-white hover:border-white transition-all duration-200 cursor-pointer flex items-center gap-4 sm:gap-5 group active:scale-[0.99] shadow-xs hover:shadow-sm"
+                  >
+                    {/* Large Visual Book Cover */}
+                    <div className="w-20 sm:w-24 shrink-0 transition-transform duration-200 group-hover:scale-[1.02]">
+                      <BookCover
+                        title={book.title}
+                        author={book.author}
+                        coverUrl={book.coverUrl}
+                      />
+                    </div>
+
+                    {/* Rich Book Details */}
+                    <div className="flex-1 min-w-0 space-y-2">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <h4 className="text-base sm:text-lg font-bold text-[#1d1d1f] truncate group-hover:text-black leading-snug">
+                            {book.title}
+                          </h4>
+                          <p className="text-xs sm:text-sm text-[#86868b] truncate pt-0.5">
+                            {book.author} {book.year ? `• ${book.year}` : ''} {book.pages ? `• ~${book.pages} págs` : ''}
+                          </p>
+                        </div>
+
+                        {/* Prominent Large Round Score Badge */}
+                        <div className="shrink-0 flex items-center justify-center">
+                          <ScoreBadge score={book.notaEncaixe} size="lg" />
+                        </div>
+                      </div>
+
+                      {/* Veredito Quote without any fake badges */}
+                      <p className="text-xs sm:text-sm text-[#515154] italic leading-relaxed line-clamp-2 border-l-2 border-neutral-200 pl-2.5">
+                        "{book.veredito}"
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
