@@ -203,41 +203,9 @@ export const EstanteView: React.FC<EstanteViewProps> = ({
 
   return (
     <div className="space-y-4 pb-12">
-      {/* Smart Filter Pills Row (Estilo Spotify / Apple com capas duplas) */}
-      <div className="px-5 sm:px-6 pt-1 pb-1">
-        <div className="flex items-center gap-2 overflow-x-auto py-1 hide-scrollbar select-none">
-          {/* Botão circular de Todas as Prateleiras (menu da imagem) */}
-          <button
-            type="button"
-            onClick={() => handleSelectShelf('all')}
-            className={`h-10 w-10 sm:h-11 sm:w-11 rounded-full flex items-center justify-center shrink-0 transition-all duration-150 cursor-pointer shadow-2xs active:scale-95 ${
-              selectedFilter === 'all'
-                ? 'bg-[#1d1d1f] text-white border border-[#1d1d1f]'
-                : 'bg-white text-[#1d1d1f] hover:bg-neutral-50 border border-neutral-200/90'
-            }`}
-            title="Prateleiras"
-            aria-label="Ver todas as prateleiras"
-          >
-            <div className="flex flex-col gap-[3px] items-start justify-center">
-              <span
-                className={`h-[2px] w-3.5 rounded-full transition-colors ${
-                  selectedFilter === 'all' ? 'bg-white' : 'bg-[#1d1d1f]'
-                }`}
-              />
-              <span
-                className={`h-[2px] w-3.5 rounded-full transition-colors ${
-                  selectedFilter === 'all' ? 'bg-white' : 'bg-[#1d1d1f]'
-                }`}
-              />
-              <span
-                className={`h-[2px] w-2 rounded-full transition-colors ${
-                  selectedFilter === 'all' ? 'bg-white' : 'bg-[#1d1d1f]'
-                }`}
-              />
-            </div>
-          </button>
-
-          {/* Pílulas de gênero com duas capas sobrepostas */}
+      {/* Smart Filter Pills Row */}
+      <div className="px-5 sm:px-6 pt-1 pb-1.5">
+        <div className="flex items-center gap-2.5 overflow-x-auto py-2 px-1 hide-scrollbar select-none -mx-1">
           {shelvesWithCovers.map((shelf) => {
             const isActive = selectedFilter === shelf.id;
             const [cover1, cover2] = shelf.covers || [];
@@ -247,16 +215,16 @@ export const EstanteView: React.FC<EstanteViewProps> = ({
                 key={shelf.id}
                 type="button"
                 onClick={() => handleSelectShelf(isActive ? 'all' : shelf.id)}
-                className={`h-10 sm:h-11 pl-2 pr-4 rounded-full flex items-center gap-2.5 shrink-0 transition-all duration-150 cursor-pointer active:scale-95 shadow-2xs ${
+                className={`h-11 sm:h-11.5 pl-2 sm:pl-2.5 pr-4.5 sm:pr-5 rounded-full flex items-center gap-2.5 sm:gap-3 shrink-0 transition-all duration-150 cursor-pointer active:scale-95 ${
                   isActive
-                    ? 'bg-[#1d1d1f] text-white border border-[#1d1d1f]'
-                    : 'bg-white text-[#1d1d1f] hover:bg-neutral-50/90 border border-neutral-200/90'
+                    ? 'bg-[#1d1d1f] text-white border border-[#1d1d1f] shadow-[0_4px_14px_rgba(0,0,0,0.2)]'
+                    : 'bg-white text-[#1d1d1f] hover:bg-neutral-50/90 border border-neutral-100/90 shadow-[0_2.5px_10px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_14px_rgba(0,0,0,0.12)]'
                 }`}
               >
-                {/* Duas capas sobrepostas */}
+                {/* Duas capas quadradas sobrepostas com cantos arredondados e borda branca */}
                 <div className="flex items-center shrink-0">
                   {cover1 && (
-                    <div className="w-6.5 h-6.5 sm:w-7 sm:h-7 rounded-[7px] overflow-hidden bg-neutral-200 shadow-2xs shrink-0 flex items-center justify-center">
+                    <div className="w-7.5 h-7.5 sm:w-8 sm:h-8 rounded-[8px] sm:rounded-[9px] overflow-hidden bg-neutral-100 border-[1.5px] sm:border-2 border-white shadow-xs shrink-0 flex items-center justify-center">
                       <img
                         src={cover1}
                         alt=""
@@ -266,11 +234,7 @@ export const EstanteView: React.FC<EstanteViewProps> = ({
                     </div>
                   )}
                   {cover2 && (
-                    <div
-                      className={`relative -ml-3 sm:-ml-3.5 z-10 w-6.5 h-6.5 sm:w-7 sm:h-7 rounded-[7px] overflow-hidden bg-neutral-200 shadow-xs shrink-0 flex items-center justify-center ${
-                        isActive ? 'ring-1.5 ring-[#1d1d1f]' : 'ring-1.5 ring-white'
-                      }`}
-                    >
+                    <div className="relative -ml-3.5 sm:-ml-4 z-10 w-7.5 h-7.5 sm:w-8 sm:h-8 rounded-[8px] sm:rounded-[9px] overflow-hidden bg-neutral-100 border-[1.5px] sm:border-2 border-white shadow-sm shrink-0 flex items-center justify-center">
                       <img
                         src={cover2}
                         alt=""
@@ -282,7 +246,7 @@ export const EstanteView: React.FC<EstanteViewProps> = ({
                 </div>
 
                 {/* Título do Gênero/Prateleira */}
-                <span className="text-xs sm:text-[13px] font-semibold tracking-tight whitespace-nowrap">
+                <span className="text-xs sm:text-[13.5px] font-semibold tracking-tight whitespace-nowrap">
                   {shelf.chipLabel}
                 </span>
               </button>
