@@ -156,7 +156,7 @@ export const DiscoverView: React.FC<DiscoverViewProps> = React.memo(({
 
       {/* Quando pesquisando: exibe Resultados da Busca com todas as obras correspondentes */}
       {cleanQuery.length > 0 && (
-        <div className="space-y-3.5 pt-1">
+        <div className="space-y-4 md:space-y-6 pt-1">
           <div className="flex items-center justify-between">
             <h3 className="text-[11px] md:text-xs font-semibold uppercase tracking-[0.14em] text-[#86868b]">
               Resultados da busca
@@ -202,7 +202,7 @@ export const DiscoverView: React.FC<DiscoverViewProps> = React.memo(({
           </div>
 
           {searchResults.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-5 sm:gap-6 md:gap-7 lg:gap-8">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-7 2xl:grid-cols-8 gap-x-4 sm:gap-x-5 md:gap-x-6 lg:gap-x-6 xl:gap-x-7 gap-y-9 sm:gap-y-10 md:gap-y-12 lg:gap-y-14 xl:gap-y-16">
               {searchResults.map((book) => (
                 <div
                   key={book.id}
@@ -252,7 +252,7 @@ export const DiscoverView: React.FC<DiscoverViewProps> = React.memo(({
         <>
           {/* Obras de Alto Encaixe com Filtro Interativo Maior/Menor Nota e Filtros de Notas 10, 9 e 8 */}
           {topMatches.length > 0 && (
-            <div className="space-y-3.5 pt-1">
+            <div className="space-y-4 md:space-y-6 pt-1">
               <div className="flex items-center justify-between">
                 <h3 className="text-[11px] md:text-xs font-semibold uppercase tracking-[0.14em] text-[#86868b]">
                   Recomendações
@@ -297,7 +297,7 @@ export const DiscoverView: React.FC<DiscoverViewProps> = React.memo(({
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-5 sm:gap-6 md:gap-7 lg:gap-8">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-7 2xl:grid-cols-8 gap-x-4 sm:gap-x-5 md:gap-x-6 lg:gap-x-6 xl:gap-x-7 gap-y-9 sm:gap-y-10 md:gap-y-12 lg:gap-y-14 xl:gap-y-16">
                 {topMatches.map((book) => (
                   <div
                     key={book.id}
@@ -334,7 +334,7 @@ export const DiscoverView: React.FC<DiscoverViewProps> = React.memo(({
 
           {/* Últimas Avaliações — Large Visual Cards com Borda Branca */}
           {recentEvaluations.length > 0 && (
-            <div className="space-y-3.5 pt-2">
+            <div className="space-y-4 md:space-y-6 pt-8 md:pt-14">
               <div className="flex items-center justify-between">
                 <h3 className="text-xs font-bold uppercase tracking-wider text-[#86868b]">
                   Últimas Avaliações
