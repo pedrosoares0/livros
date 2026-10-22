@@ -144,8 +144,9 @@ export function App() {
 
         {/* Desktop Sticky Header Bar (Apple macOS Style) */}
         <header className="hidden md:flex items-center justify-between w-full px-8 lg:px-14 2xl:px-20 py-4.5 border-b border-neutral-100 bg-white/85 backdrop-blur-md sticky top-0 z-30 select-none">
+          {/* Left: Pure Brand Logo (without subtitle) */}
           <div
-            className="flex items-center gap-3.5 cursor-pointer group"
+            className="flex items-center cursor-pointer group"
             onClick={() => setActiveTab('discover')}
           >
             <h1
@@ -154,74 +155,74 @@ export function App() {
             >
               Veredito
             </h1>
-            <span className="hidden lg:inline-block text-[10px] font-semibold tracking-wider text-[#86868b] uppercase border-l border-neutral-300 pl-3.5 py-0.5">
-              Avaliador Pessoal de Livros & HQs
-            </span>
           </div>
 
-          {/* Desktop Navigation Tabs */}
-          <div className="flex items-center bg-neutral-100/90 p-1 rounded-full border border-neutral-200/80 shadow-2xs">
-            <button
-              type="button"
-              onClick={() => setActiveTab('discover')}
-              className={`flex items-center gap-2 px-5 py-2 rounded-full text-xs font-bold transition-all duration-150 cursor-pointer ${
-                activeTab === 'discover'
-                  ? 'bg-white text-[#1d1d1f] shadow-xs'
-                  : 'text-[#86868b] hover:text-[#1d1d1f]'
-              }`}
-            >
-              <svg
-                className={`w-4 h-4 transition-colors ${
-                  activeTab === 'discover' ? 'text-[#000000]' : 'text-[#86868b]'
+          {/* Right Group: Navigation Tabs placed adjacent to Actions */}
+          <div className="flex items-center gap-3.5 lg:gap-4.5">
+            {/* Desktop Navigation Tabs */}
+            <div className="flex items-center bg-neutral-100/90 p-1 rounded-full border border-neutral-200/80 shadow-2xs">
+              <button
+                type="button"
+                onClick={() => setActiveTab('discover')}
+                className={`flex items-center gap-2 px-5 py-2 rounded-full text-xs font-bold transition-all duration-150 cursor-pointer ${
+                  activeTab === 'discover'
+                    ? 'bg-white text-[#1d1d1f] shadow-xs'
+                    : 'text-[#86868b] hover:text-[#1d1d1f]'
                 }`}
-                viewBox="0 0 24 24"
-                fill="currentColor"
               >
-                <path d="M12 2.75a1.25 1.25 0 0 0-.82.31L3.38 9.3a1.5 1.5 0 0 0-.58 1.18V20a1.75 1.75 0 0 0 1.75 1.75h4.2a.75.75 0 0 0 .75-.75v-4.5a1.5 1.5 0 0 1 3 0v4.5a.75.75 0 0 0 .75.75h4.2A1.75 1.75 0 0 0 19.2 20V10.48a1.5 1.5 0 0 0-.58-1.18l-7.8-6.24a1.25 1.25 0 0 0-.82-.31z" />
-              </svg>
-              <span>Início</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab('shelves')}
-              className={`flex items-center gap-2 px-5 py-2 rounded-full text-xs font-bold transition-all duration-150 cursor-pointer ${
-                activeTab === 'shelves'
-                  ? 'bg-white text-[#1d1d1f] shadow-xs'
-                  : 'text-[#86868b] hover:text-[#1d1d1f]'
-              }`}
-            >
-              <svg
-                className={`w-4 h-4 transition-colors ${
-                  activeTab === 'shelves' ? 'text-[#000000]' : 'text-[#86868b]'
+                <svg
+                  className={`w-4 h-4 transition-colors ${
+                    activeTab === 'discover' ? 'text-[#000000]' : 'text-[#86868b]'
+                  }`}
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M12 2.75a1.25 1.25 0 0 0-.82.31L3.38 9.3a1.5 1.5 0 0 0-.58 1.18V20a1.75 1.75 0 0 0 1.75 1.75h4.2a.75.75 0 0 0 .75-.75v-4.5a1.5 1.5 0 0 1 3 0v4.5a.75.75 0 0 0 .75.75h4.2A1.75 1.75 0 0 0 19.2 20V10.48a1.5 1.5 0 0 0-.58-1.18l-7.8-6.24a1.25 1.25 0 0 0-.82-.31z" />
+                </svg>
+                <span>Início</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab('shelves')}
+                className={`flex items-center gap-2 px-5 py-2 rounded-full text-xs font-bold transition-all duration-150 cursor-pointer ${
+                  activeTab === 'shelves'
+                    ? 'bg-white text-[#1d1d1f] shadow-xs'
+                    : 'text-[#86868b] hover:text-[#1d1d1f]'
                 }`}
-                viewBox="0 0 24 24"
-                fill="currentColor"
               >
-                <rect x="3.5" y="4.5" width="4" height="15.5" rx="1.5" />
-                <rect x="9" y="3.5" width="4.2" height="16.5" rx="1.5" />
-                <rect x="10.35" y="6.5" width="1.5" height="3" rx="0.5" fill="white" />
-                <path d="M15.2 5.5a1.5 1.5 0 0 1 1.9-.8l2.6 1.3a1.5 1.5 0 0 1 .7 2l-6.2 12.4a1.5 1.5 0 0 1-2 .7l-2.6-1.3a1.5 1.5 0 0 1-.7-2L15.2 5.5z" />
-              </svg>
-              <span>Estante</span>
-            </button>
-          </div>
+                <svg
+                  className={`w-4 h-4 transition-colors ${
+                    activeTab === 'shelves' ? 'text-[#000000]' : 'text-[#86868b]'
+                  }`}
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <rect x="3.5" y="4.5" width="4" height="15.5" rx="1.5" />
+                  <rect x="9" y="3.5" width="4.2" height="16.5" rx="1.5" />
+                  <rect x="10.35" y="6.5" width="1.5" height="3" rx="0.5" fill="white" />
+                  <path d="M15.2 5.5a1.5 1.5 0 0 1 1.9-.8l2.6 1.3a1.5 1.5 0 0 1 .7 2l-6.2 12.4a1.5 1.5 0 0 1-2 .7l-2.6-1.3a1.5 1.5 0 0 1-.7-2L15.2 5.5z" />
+                </svg>
+                <span>Estante</span>
+              </button>
+            </div>
 
-          {/* Desktop Actions */}
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() => setIsProfileOpen(true)}
-              className="p-2.5 rounded-full border border-neutral-200/80 bg-white hover:bg-neutral-50 text-[#86868b] hover:text-[#1d1d1f] transition-all cursor-pointer shadow-2xs active:scale-95"
-              title="Calibrador de Perfil"
-              aria-label="Calibrador de Perfil"
-            >
-              <SlidersHorizontal className="w-4 h-4" />
-            </button>
-            <PearlButton
-              size="nav-rect"
-              label="Avaliar livro"
-              onClick={() => setIsEvaluateOpen(true)}
-            />
+            {/* Desktop Actions */}
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => setIsProfileOpen(true)}
+                className="p-2.5 rounded-full border border-neutral-200/80 bg-white hover:bg-neutral-50 text-[#86868b] hover:text-[#1d1d1f] transition-all cursor-pointer shadow-2xs active:scale-95"
+                title="Calibrador de Perfil"
+                aria-label="Calibrador de Perfil"
+              >
+                <SlidersHorizontal className="w-4 h-4" />
+              </button>
+              <PearlButton
+                size="nav-rect"
+                label="Avaliar livro"
+                onClick={() => setIsEvaluateOpen(true)}
+              />
+            </div>
           </div>
         </header>
 

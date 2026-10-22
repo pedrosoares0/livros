@@ -311,14 +311,14 @@ export const EstanteView: React.FC<EstanteViewProps> = React.memo(({
               <button
                 type="button"
                 onClick={() => setSortOrder((prev) => (prev === 'desc' ? 'asc' : 'desc'))}
-                className="p-1.5 rounded-full bg-white border border-neutral-200/90 hover:border-neutral-300 text-[#1d1d1f] hover:bg-neutral-50 active:scale-95 transition-all shadow-2xs cursor-pointer select-none flex items-center justify-center"
+                className="w-7 h-7 sm:w-7.5 sm:h-7.5 rounded-full bg-white border border-neutral-200/90 hover:border-neutral-300 text-[#1d1d1f] hover:bg-neutral-50 active:scale-95 transition-all shadow-3xs cursor-pointer select-none flex items-center justify-center shrink-0"
                 title={sortOrder === 'desc' ? 'Maior Nota (clique para Menor Nota)' : 'Menor Nota (clique para Maior Nota)'}
                 aria-label="Alternar ordenação"
               >
                 <ArrowUpDown className="w-3.5 h-3.5 text-[#1d1d1f]" />
               </button>
 
-              <span className="text-xs font-semibold text-[#86868b]">
+              <span className="text-xs font-semibold text-[#86868b] ml-0.5">
                 {activeShelf.books.length} {activeShelf.books.length === 1 ? 'obra' : 'obras'}
               </span>
             </div>

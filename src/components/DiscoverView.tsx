@@ -97,19 +97,25 @@ export const DiscoverView: React.FC<DiscoverViewProps> = React.memo(({
         </div>
       </div>
 
-      {/* Search Bar - Refined Apple style with BorderBeam and comfortable whitespace */}
-      <div className="w-full max-w-xl mx-auto -mt-2 md:mt-2 md:mb-8">
+      {/* Search Bar - Refined tactile Apple style with subtle 3D lighting and soft drop shadow */}
+      <div className="w-full max-w-xl mx-auto -mt-2 md:mt-2 md:mb-8 px-2 sm:px-0">
         <BorderBeam
           size="sm"
           theme="light"
           colorVariant="mono"
-          borderRadius={24}
+          borderRadius={28}
           duration={3.5}
-          strength={0.8}
+          strength={0.65}
           className="w-full"
         >
-          <div className="relative w-full rounded-[24px] bg-white border border-neutral-200/80 shadow-[0_2px_14px_rgba(0,0,0,0.03)] flex items-center transition-shadow hover:shadow-[0_4px_20px_rgba(0,0,0,0.06)]">
-            <Search className="w-4 h-4 text-[#86868b] absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <div
+            className="relative w-full rounded-[28px] bg-gradient-to-b from-white via-[#ffffff] to-[#f8f9fb] border border-neutral-200/90 flex items-center transition-all duration-200 hover:border-neutral-300 focus-within:border-neutral-400"
+            style={{
+              boxShadow:
+                '0 4px 18px -2px rgba(0, 0, 0, 0.07), 0 1px 3px rgba(0, 0, 0, 0.04), inset 0 1px 1px rgba(255, 255, 255, 0.95), inset 0 -1.5px 2px rgba(0, 0, 0, 0.02)',
+            }}
+          >
+            <Search className="w-4 h-4 text-[#86868b] absolute left-4.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
               value={searchQuery}
@@ -120,13 +126,13 @@ export const DiscoverView: React.FC<DiscoverViewProps> = React.memo(({
               autoCapitalize="none"
               spellCheck={false}
               enterKeyHint="search"
-              className="w-full pl-11 pr-10 py-3 rounded-[24px] bg-transparent text-xs sm:text-sm text-[#1d1d1f] placeholder-[#86868b] focus:outline-none"
+              className="w-full pl-11.5 pr-11 py-3 sm:py-3.5 rounded-[28px] bg-transparent text-xs sm:text-[13.5px] text-[#1d1d1f] placeholder-[#86868b] focus:outline-none"
             />
             {searchQuery.length > 0 && (
               <button
                 type="button"
                 onClick={() => setSearchQuery('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-[#86868b] hover:text-[#1d1d1f] rounded-full transition-colors cursor-pointer"
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1.5 text-[#86868b] hover:text-[#1d1d1f] rounded-full transition-colors cursor-pointer"
                 aria-label="Limpar busca"
               >
                 <X className="w-3.5 h-3.5" />
@@ -160,15 +166,15 @@ export const DiscoverView: React.FC<DiscoverViewProps> = React.memo(({
               <button
                 type="button"
                 onClick={() => setSortOrder((prev) => (prev === 'desc' ? 'asc' : 'desc'))}
-                className="p-1.5 rounded-full bg-white border border-neutral-200/90 hover:border-neutral-300 text-[#1d1d1f] hover:bg-neutral-50 active:scale-95 transition-all shadow-2xs cursor-pointer select-none flex items-center justify-center"
+                className="w-7 h-7 sm:w-7.5 sm:h-7.5 rounded-full bg-white border border-neutral-200/90 hover:border-neutral-300 text-[#1d1d1f] hover:bg-neutral-50 active:scale-95 transition-all shadow-3xs cursor-pointer select-none flex items-center justify-center shrink-0"
                 title={sortOrder === 'desc' ? 'Maior Nota (clique para Menor Nota)' : 'Menor Nota (clique para Maior Nota)'}
                 aria-label="Alternar ordenação"
               >
                 <ArrowUpDown className="w-3.5 h-3.5 text-[#1d1d1f]" />
               </button>
 
-              {/* Filtros multi-seleção de notas 10, 9 e 8 */}
-              <div className="flex items-center gap-1">
+              {/* Filtros multi-seleção de notas 10, 9 e 8 (levemente maiores) */}
+              <div className="flex items-center gap-1.5">
                 {[10, 9, 8].map((score) => {
                   const isSelected = selectedScoreFilters.includes(score);
                   return (
@@ -176,10 +182,10 @@ export const DiscoverView: React.FC<DiscoverViewProps> = React.memo(({
                       key={score}
                       type="button"
                       onClick={() => toggleScoreFilter(score)}
-                      className={`px-2 py-0.5 rounded-full text-[11px] font-bold transition-all active:scale-95 cursor-pointer select-none border ${
+                      className={`h-7 sm:h-7.5 px-2.5 sm:px-3 min-w-[30px] rounded-full text-xs font-bold transition-all active:scale-95 cursor-pointer select-none border flex items-center justify-center ${
                         isSelected
-                          ? 'bg-[#1d1d1f] text-white border-[#1d1d1f] shadow-2xs'
-                          : 'bg-white text-[#86868b] hover:text-[#1d1d1f] border-neutral-200/90 hover:border-neutral-300'
+                          ? 'bg-[#1d1d1f] text-white border-[#1d1d1f] shadow-xs'
+                          : 'bg-white text-[#636366] hover:text-[#1d1d1f] border-neutral-200/90 hover:border-neutral-300 shadow-3xs hover:bg-neutral-50'
                       }`}
                       title={`Filtrar nota ${score}`}
                     >
@@ -189,7 +195,7 @@ export const DiscoverView: React.FC<DiscoverViewProps> = React.memo(({
                 })}
               </div>
 
-              <span className="text-xs font-semibold text-[#86868b] ml-1">
+              <span className="text-xs font-semibold text-[#86868b] ml-1.5">
                 {searchResults.length} {searchResults.length === 1 ? 'obra' : 'obras'}
               </span>
             </div>
@@ -256,15 +262,15 @@ export const DiscoverView: React.FC<DiscoverViewProps> = React.memo(({
                   <button
                     type="button"
                     onClick={() => setSortOrder((prev) => (prev === 'desc' ? 'asc' : 'desc'))}
-                    className="p-1.5 rounded-full bg-white border border-neutral-200/90 hover:border-neutral-300 text-[#1d1d1f] hover:bg-neutral-50 active:scale-95 transition-all shadow-2xs cursor-pointer select-none flex items-center justify-center"
+                    className="w-7 h-7 sm:w-7.5 sm:h-7.5 rounded-full bg-white border border-neutral-200/90 hover:border-neutral-300 text-[#1d1d1f] hover:bg-neutral-50 active:scale-95 transition-all shadow-3xs cursor-pointer select-none flex items-center justify-center shrink-0"
                     title={sortOrder === 'desc' ? 'Maior Nota (clique para Menor Nota)' : 'Menor Nota (clique para Maior Nota)'}
                     aria-label="Alternar ordenação"
                   >
                     <ArrowUpDown className="w-3.5 h-3.5 text-[#1d1d1f]" />
                   </button>
 
-                  {/* Filtros multi-seleção de notas 10, 9 e 8 */}
-                  <div className="flex items-center gap-1">
+                  {/* Filtros multi-seleção de notas 10, 9 e 8 (levemente maiores) */}
+                  <div className="flex items-center gap-1.5">
                     {[10, 9, 8].map((score) => {
                       const isSelected = selectedScoreFilters.includes(score);
                       return (
@@ -272,10 +278,10 @@ export const DiscoverView: React.FC<DiscoverViewProps> = React.memo(({
                           key={score}
                           type="button"
                           onClick={() => toggleScoreFilter(score)}
-                          className={`px-2 py-0.5 rounded-full text-[11px] font-bold transition-all active:scale-95 cursor-pointer select-none border ${
+                          className={`h-7 sm:h-7.5 px-2.5 sm:px-3 min-w-[30px] rounded-full text-xs font-bold transition-all active:scale-95 cursor-pointer select-none border flex items-center justify-center ${
                             isSelected
-                              ? 'bg-[#1d1d1f] text-white border-[#1d1d1f] shadow-2xs'
-                              : 'bg-white text-[#86868b] hover:text-[#1d1d1f] border-neutral-200/90 hover:border-neutral-300'
+                              ? 'bg-[#1d1d1f] text-white border-[#1d1d1f] shadow-xs'
+                              : 'bg-white text-[#636366] hover:text-[#1d1d1f] border-neutral-200/90 hover:border-neutral-300 shadow-3xs hover:bg-neutral-50'
                           }`}
                           title={`Filtrar nota ${score}`}
                         >
@@ -285,7 +291,7 @@ export const DiscoverView: React.FC<DiscoverViewProps> = React.memo(({
                     })}
                   </div>
 
-                  <span className="text-xs font-semibold text-[#86868b] ml-1">
+                  <span className="text-xs font-semibold text-[#86868b] ml-1.5">
                     {topMatches.length} {topMatches.length === 1 ? 'obra' : 'obras'}
                   </span>
                 </div>
