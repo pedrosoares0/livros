@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   X, Film, BookOpen, AlertTriangle, CheckCircle2, 
-  XCircle, Copy, Share2, Bookmark, Gauge,
+  XCircle, Share2, Bookmark, Gauge,
   Feather, Compass, Zap, Moon, HeartHandshake,
   Trash2, Image as ImageIcon
 } from 'lucide-react';
@@ -11,6 +11,7 @@ import { BookCover } from './BookCover';
 import { ScoreBadge, getScoreTone } from './ScoreBadge';
 import { MovieThumb } from './MovieThumb';
 import { fetchAlternativeCovers } from '../services/coverSearch';
+import { getCuratedCovers } from '../data/curatedCovers';
 import { INITIAL_BOOKS } from '../data/initialBooks';
 import { AceternityButton } from './AceternityButton';
 import { CopyButton } from './CopyButton';
@@ -40,11 +41,14 @@ export const FichaModal: React.FC<FichaModalProps> = ({
   const [customCoverUrl, setCustomCoverUrl] = useState('');
   const [showCustomInput, setShowCustomInput] = useState(false);
 
+  const handleCoverImageError = (failedUrl: string) => {
+    setAlternativeCovers((prev) => prev.filter((u) => u !== failedUrl));
+  };
+
   const handleOpenCoverPicker = async () => {
     if (!book) return;
     setIsCoverPickerOpen((prev) => !prev);
     if (!hasFetchedCovers) {
-      setIsLoadingCovers(true);
       const cleanBookTitle = book.title.toLowerCase().replace(/[?.,!:";]/g, '').trim();
       const initialMatch = INITIAL_BOOKS.find(
         (ib) =>
@@ -52,9 +56,20 @@ export const FichaModal: React.FC<FichaModalProps> = ({
           ib.title.toLowerCase().replace(/[?.,!:";]/g, '').trim() === cleanBookTitle
       );
       const originalTitle = book.originalTitle || initialMatch?.originalTitle;
-      const results = await fetchAlternativeCovers(book.title, book.author, book.coverUrl, originalTitle);
-      setAlternativeCovers(results);
-      setIsLoadingCovers(false);
+
+      // 1. Instant Curated Covers (0ms - zero waiting)
+      const instantCurated = getCuratedCovers(book.title, book.coverUrl);
+      if (instantCurated.length > 0) {
+        setAlternativeCovers(instantCurated);
+      }
+
+      // If we need more covers, fetch additional ones
+      if (instantCurated.length < 4) {
+        setIsLoadingCovers(instantCurated.length === 0);
+        const results = await fetchAlternativeCovers(book.title, book.author, book.coverUrl, originalTitle);
+        setAlternativeCovers((prev) => Array.from(new Set([...prev, ...results])));
+        setIsLoadingCovers(false);
+      }
       setHasFetchedCovers(true);
     }
   };
@@ -327,7 +342,7 @@ ${book.resumo}
                         </span>
                       </div>
 
-                    {isLoadingCovers ? (
+                    {isLoadingCovers && alternativeCovers.length === 0 ? (
                       <div className="py-5 text-center text-xs text-[#86868b] flex flex-col items-center gap-2">
                         <div className="w-4 h-4 border-2 border-neutral-300 border-t-neutral-800 rounded-full animate-spin" />
                         <span className="text-[11px]">Buscando capas na API...</span>
@@ -342,16 +357,20 @@ ${book.resumo}
                                 whileHover={{ scale: 1.03 }}
                                 whileTap={{ scale: 0.97 }}
                                 onClick={() => handleSelectCover(coverUrl)}
-                                className="group relative cursor-pointer rounded-lg overflow-hidden border-2 border-neutral-200 hover:border-black transition-colors shadow-xs"
+                                className="group relative cursor-pointer rounded-lg overflow-hidden border-2 border-neutral-200 hover:border-black transition-colors shadow-xs bg-neutral-100"
                               >
                                 <img
                                   src={coverUrl}
                                   alt={`Opção ${idx + 1}`}
                                   className="w-full aspect-[2/3] object-cover"
                                   loading="lazy"
-                                  onError={(e) => {
-                                    (e.target as HTMLElement).parentElement?.classList.add('hidden');
+                                  onLoad={(e) => {
+                                    const img = e.currentTarget;
+                                    if (img.naturalWidth <= 1 || img.naturalHeight <= 1) {
+                                      handleCoverImageError(coverUrl);
+                                    }
                                   }}
+                                  onError={() => handleCoverImageError(coverUrl)}
                                 />
                                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 flex items-center justify-center transition-all">
                                   <span className="opacity-0 group-hover:opacity-100 px-2 py-0.5 rounded bg-black/80 text-white text-[9px] font-bold">

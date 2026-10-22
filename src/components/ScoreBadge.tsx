@@ -23,7 +23,7 @@ export const getScoreTone = (score: number): 'green' | 'yellow' | 'red' => {
   return 'red';
 };
 
-export const ScoreBadge: React.FC<ScoreBadgeProps> = ({
+export const ScoreBadge: React.FC<ScoreBadgeProps> = React.memo(({
   score,
   size = 'md',
   className = '',
@@ -72,4 +72,6 @@ export const ScoreBadge: React.FC<ScoreBadgeProps> = ({
       <span className="tracking-tight">{formattedScore}</span>
     </div>
   );
-};
+});
+
+ScoreBadge.displayName = 'ScoreBadge';

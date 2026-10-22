@@ -40,110 +40,117 @@ const normalize = (text: string) =>
     .replace(/\s+/g, ' ')
     .trim();
 
+// In-memory cache for instant cover retrieval on subsequent opens
+const coverMemoryCache = new Map<string, string[]>();
+
 export async function fetchAlternativeCovers(
   title: string,
   author?: string,
   currentCover?: string,
   originalTitle?: string
 ): Promise<string[]> {
-  // 1. Instant Curated Resolution (0ms latency, zero API rate-limiting)
-  const curated = getCuratedCovers(title, currentCover);
-  if (curated && curated.length >= 3) {
-    return curated.slice(0, 6);
-  }
-
-  const covers: string[] = [...curated];
-  const cleanTitle = title.replace(/[?.,!:";]/g, ' ').trim();
   const normTitle = normalize(title);
+  const cacheKey = `${normTitle}|${author ? normalize(author) : ''}`;
 
-  // Multi-pass prioritized queries to ensure 100% catalog coverage
-  const queries: string[] = [];
-
-  // 1. Canonical International Alias
-  if (KNOWN_TITLE_ALIASES[normTitle]) {
-    queries.push(KNOWN_TITLE_ALIASES[normTitle]);
-  }
-
-  // 2. Original / International Title if present
-  if (originalTitle && normalize(originalTitle) !== normTitle) {
-    const cleanOrig = originalTitle.replace(/[?.,!:";]/g, ' ').trim();
-    const lastName = author ? author.split(' ').pop() : '';
-    queries.push(`${cleanOrig} ${lastName}`.trim());
-  }
-
-  // 3. Combined Title + Author Last Name
-  if (author) {
-    const lastName = author.split(' ').pop();
-    queries.push(`${cleanTitle} ${lastName}`);
-  }
-
-  // 4. Cleaned Portuguese Title
-  queries.push(cleanTitle);
-
-  const seenWorkKeys = new Set<string>();
-
-  for (const q of queries) {
-    if (covers.length >= 6) break;
-    try {
-      const res = await fetch(
-        `https://openlibrary.org/search.json?q=${encodeURIComponent(q)}&limit=4`
-      );
-      if (!res.ok) continue;
-      const data = await res.json();
-
-      for (const doc of (data.docs || []).slice(0, 3)) {
-        // Direct search result cover
-        if (doc.cover_i && doc.cover_i > 0) {
-          const url = `https://covers.openlibrary.org/b/id/${doc.cover_i}-L.jpg`;
-          if (!covers.includes(url) && url !== currentCover) {
-            covers.push(url);
-          }
-        }
-
-        // Query specific editions of canonical work
-        if (doc.key && !seenWorkKeys.has(doc.key)) {
-          seenWorkKeys.add(doc.key);
-          try {
-            const edRes = await fetch(
-              `https://openlibrary.org${doc.key}/editions.json?limit=25`
-            );
-            if (edRes.ok) {
-              const edData = await edRes.json();
-              for (const ed of edData.entries || []) {
-                for (const cid of ed.covers || []) {
-                  if (cid > 0) {
-                    const url = `https://covers.openlibrary.org/b/id/${cid}-L.jpg`;
-                    if (!covers.includes(url) && url !== currentCover) {
-                      covers.push(url);
-                    }
-                  }
-                }
-              }
-            }
-          } catch {
-            // Silently continue to next doc
-          }
-        }
-
-        // Try ISBN covers if available
-        if (doc.isbn && Array.isArray(doc.isbn)) {
-          for (const isbn of doc.isbn.slice(0, 3)) {
-            const url = `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg`;
-            if (!covers.includes(url) && url !== currentCover) {
-              covers.push(url);
-            }
-          }
-        }
-
-        if (covers.length >= 6) break;
-      }
-    } catch {
-      // Continue to next fallback query
+  // 1. Instant Memory Cache Check (0ms)
+  const cached = coverMemoryCache.get(cacheKey);
+  if (cached && cached.length > 0) {
+    const filteredCached = cached.filter((c) => c !== currentCover);
+    if (filteredCached.length >= 3) {
+      return filteredCached.slice(0, 8);
     }
   }
 
-  // Filter out current active cover and return up to 6 distinct covers
-  const uniqueCovers = Array.from(new Set(covers)).filter((c) => c !== currentCover);
-  return uniqueCovers.slice(0, 6);
+  // 2. Instant Curated Resolution (0ms)
+  const curated = getCuratedCovers(title, currentCover);
+  const covers: string[] = [...curated];
+
+  // If curated already has plenty of verified high-res covers, return immediately
+  if (curated.length >= 4) {
+    coverMemoryCache.set(cacheKey, curated);
+    return curated.slice(0, 8);
+  }
+
+  // 3. Prepare high-precision search queries
+  const cleanTitle = title.replace(/[?.,!:";]/g, ' ').trim();
+  const querySet = new Set<string>();
+
+  // Canonical International Alias
+  if (KNOWN_TITLE_ALIASES[normTitle]) {
+    querySet.add(KNOWN_TITLE_ALIASES[normTitle]);
+  }
+
+  // Original / International Title
+  if (originalTitle && normalize(originalTitle) !== normTitle) {
+    const cleanOrig = originalTitle.replace(/[?.,!:";]/g, ' ').trim();
+    const lastName = author ? author.split(' ').pop() : '';
+    querySet.add(`${cleanOrig} ${lastName}`.trim());
+  }
+
+  // Author last name + clean title
+  if (author) {
+    const lastName = author.split(' ').pop();
+    querySet.add(`${cleanTitle} ${lastName}`);
+  }
+
+  // Title alone
+  querySet.add(cleanTitle);
+
+  // Take top 2 unique queries to run concurrently
+  const targetQueries = Array.from(querySet).slice(0, 2);
+
+  // 4. Parallel fast fetch from OpenLibrary search.json (no slow editions.json)
+  const fetchPromises = targetQueries.map(async (q) => {
+    try {
+      // Abort controller with strict 2.5s timeout so user never waits
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 2500);
+
+      const res = await fetch(
+        `https://openlibrary.org/search.json?q=${encodeURIComponent(q)}&limit=6&fields=key,cover_i,isbn`,
+        { signal: controller.signal }
+      );
+      clearTimeout(timer);
+
+      if (!res.ok) return [];
+      const data = await res.json();
+      const found: string[] = [];
+
+      for (const doc of (data.docs || []).slice(0, 5)) {
+        // Direct cover ID with default=false to avoid 1x1 blank gifs
+        if (doc.cover_i && doc.cover_i > 0) {
+          found.push(`https://covers.openlibrary.org/b/id/${doc.cover_i}-L.jpg?default=false`);
+        }
+
+        // Fast ISBN covers with default=false
+        if (doc.isbn && Array.isArray(doc.isbn)) {
+          for (const isbn of doc.isbn.slice(0, 2)) {
+            found.push(`https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg?default=false`);
+          }
+        }
+      }
+
+      return found;
+    } catch {
+      return [];
+    }
+  });
+
+  const queryResults = await Promise.allSettled(fetchPromises);
+  for (const res of queryResults) {
+    if (res.status === 'fulfilled' && Array.isArray(res.value)) {
+      covers.push(...res.value);
+    }
+  }
+
+  // Filter unique valid covers, excluding current active cover
+  const uniqueCovers = Array.from(new Set(covers)).filter((c) => Boolean(c) && c !== currentCover);
+
+  // Cache final resolved list for instant reuse
+  if (uniqueCovers.length > 0) {
+    coverMemoryCache.set(cacheKey, uniqueCovers);
+  }
+
+  return uniqueCovers.slice(0, 8);
 }
 

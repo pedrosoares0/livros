@@ -13,7 +13,7 @@ interface DiscoverViewProps {
   onOpenEvaluate: () => void;
 }
 
-export const DiscoverView: React.FC<DiscoverViewProps> = ({
+export const DiscoverView: React.FC<DiscoverViewProps> = React.memo(({
   books,
   onSelectBook,
   onOpenEvaluate,
@@ -386,4 +386,6 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
       )}
     </div>
   );
-};
+});
+
+DiscoverView.displayName = 'DiscoverView';

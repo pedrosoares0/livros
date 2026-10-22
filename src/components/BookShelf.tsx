@@ -10,7 +10,7 @@ interface BookShelfProps {
   onTitleClick?: () => void;
 }
 
-export const BookShelf: React.FC<BookShelfProps> = ({
+export const BookShelf: React.FC<BookShelfProps> = React.memo(({
   title,
   books,
   onSelectBook,
@@ -122,14 +122,15 @@ export const BookShelf: React.FC<BookShelfProps> = ({
           style={{ bottom: '18px' }}
         >
           <div
-            className="w-full h-14 rounded-2xl flex items-center justify-between px-3.5 border shadow-sm"
+            className="w-full h-14 rounded-2xl flex items-center justify-between px-3.5 border shadow-sm will-change-transform"
             style={{
-              background: 'rgba(235, 238, 245, 0.48)',
-              backdropFilter: 'blur(20px) saturate(180%)',
-              WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-              borderColor: 'rgba(255, 255, 255, 0.90)',
+              background: 'rgba(238, 241, 247, 0.82)',
+              backdropFilter: 'blur(6px)',
+              WebkitBackdropFilter: 'blur(6px)',
+              borderColor: 'rgba(255, 255, 255, 0.95)',
               boxShadow:
-                '0 6px 20px -3px rgba(0, 0, 0, 0.05), inset 0 1px 1px rgba(255, 255, 255, 0.95), inset 0 -1px 1px rgba(0, 0, 0, 0.03)',
+                '0 4px 14px -2px rgba(0, 0, 0, 0.04), inset 0 1px 1px rgba(255, 255, 255, 0.95), inset 0 -1px 1px rgba(0, 0, 0, 0.02)',
+              transform: 'translateZ(0)',
             }}
           >
             {/* Left Silver Screw Rivet */}
@@ -149,4 +150,6 @@ export const BookShelf: React.FC<BookShelfProps> = ({
       </div>
     </section>
   );
-};
+});
+
+BookShelf.displayName = 'BookShelf';

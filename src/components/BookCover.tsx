@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ScoreBadge } from './ScoreBadge';
 
 interface BookCoverProps {
@@ -17,14 +17,18 @@ const COVER_PALETTES = [
   { bg: 'from-red-950 via-stone-900 to-black', text: 'text-rose-200', border: 'border-rose-500/30' },
 ];
 
-export const BookCover: React.FC<BookCoverProps> = ({
+export const BookCover: React.FC<BookCoverProps> = React.memo(({
   title,
   author,
   coverUrl,
   notaEncaixe,
   className = '',
 }) => {
-  const [hasError, setHasError] = useState(false);
+  const [failedUrl, setFailedUrl] = useState<string | null>(null);
+  const [loadedUrl, setLoadedUrl] = useState<string | null>(null);
+
+  const hasError = Boolean(coverUrl && failedUrl === coverUrl);
+  const isLoaded = Boolean(coverUrl && loadedUrl === coverUrl);
 
   // Deterministic palette based on title hash for fallback
   const charSum = title.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
@@ -32,7 +36,7 @@ export const BookCover: React.FC<BookCoverProps> = ({
 
   return (
     <div
-      className={`relative rounded-md overflow-hidden shadow-xl select-none transition-all duration-300 group-hover:scale-105 ${className}`}
+      className={`relative rounded-md overflow-hidden shadow-xl select-none transition-all duration-300 group-hover:scale-105 bg-neutral-200/90 ${className}`}
       style={{
         aspectRatio: '2 / 3',
         boxShadow: '0 8px 20px -4px rgba(0, 0, 0, 0.4), inset -2px 0 5px rgba(255, 255, 255, 0.1)',
@@ -41,10 +45,22 @@ export const BookCover: React.FC<BookCoverProps> = ({
       {/* Real Image or Typographic Leather Cover */}
       {!hasError && coverUrl ? (
         <img
+          key={coverUrl}
           src={coverUrl}
           alt={title}
-          onError={() => setHasError(true)}
-          className="w-full h-full object-cover select-none pointer-events-none"
+          onLoad={(e) => {
+            const img = e.currentTarget;
+            // Open Library returns 1x1 pixel gif when cover does not exist
+            if (img.naturalWidth <= 1 || img.naturalHeight <= 1) {
+              setFailedUrl(coverUrl);
+            } else {
+              setLoadedUrl(coverUrl);
+            }
+          }}
+          onError={() => setFailedUrl(coverUrl)}
+          className={`w-full h-full object-cover select-none pointer-events-none transition-opacity duration-200 ${
+            isLoaded ? 'opacity-100' : 'opacity-0'
+          }`}
           loading="lazy"
           decoding="async"
         />
@@ -99,4 +115,6 @@ export const BookCover: React.FC<BookCoverProps> = ({
       )}
     </div>
   );
-};
+});
+
+BookCover.displayName = 'BookCover';

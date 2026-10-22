@@ -67,7 +67,7 @@ const PREFERRED_REPRESENTATIVES: Record<string, string[]> = {
   ],
 };
 
-export const EstanteView: React.FC<EstanteViewProps> = ({
+export const EstanteView: React.FC<EstanteViewProps> = React.memo(({
   books,
   onSelectBook,
   savedBookIds,
@@ -75,72 +75,79 @@ export const EstanteView: React.FC<EstanteViewProps> = ({
   const [selectedFilter, setSelectedFilter] = useState<FilterOption>('all');
   const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
 
-  const savedBooks = books.filter((b) => savedBookIds?.has(b.id) || b.isSaved);
+  // Memoize savedBooks to prevent recalculations
+  const savedBooks = useMemo(
+    () => books.filter((b) => savedBookIds?.has(b.id) || b.isSaved),
+    [books, savedBookIds]
+  );
 
-  // Helper matching functions for dynamic, intelligent categorization
-  const isRejeicao = (b: BookEvaluation) =>
-    Math.floor(b.notaEncaixe) < 5 || b.userStatus === 'disliked' || b.vereditoTipo === 'evite';
+  // Memoize all categorized shelves dynamically
+  const allShelves: ShelfDefinition[] = useMemo(() => {
+    // Helper matching functions for dynamic, intelligent categorization
+    const isRejeicao = (b: BookEvaluation) =>
+      Math.floor(b.notaEncaixe) < 5 || b.userStatus === 'disliked' || b.vereditoTipo === 'evite';
 
-  const isObrasPrimas = (b: BookEvaluation) =>
-    !isRejeicao(b) && (Math.floor(b.notaEncaixe) >= 10 || b.userStatus === 'loved');
+    const isObrasPrimas = (b: BookEvaluation) =>
+      !isRejeicao(b) && (Math.floor(b.notaEncaixe) >= 10 || b.userStatus === 'loved');
 
-  const isRecomendados = (b: BookEvaluation) =>
-    !isRejeicao(b) && !isObrasPrimas(b) && Math.floor(b.notaEncaixe) >= 8;
+    const isRecomendados = (b: BookEvaluation) =>
+      !isRejeicao(b) && !isObrasPrimas(b) && Math.floor(b.notaEncaixe) >= 8;
 
-  const isRessalvas = (b: BookEvaluation) =>
-    !isRejeicao(b) && !isObrasPrimas(b) && !isRecomendados(b) && (Math.floor(b.notaEncaixe) >= 5 || b.vereditoTipo === 'ressalvas');
+    const isRessalvas = (b: BookEvaluation) =>
+      !isRejeicao(b) && !isObrasPrimas(b) && !isRecomendados(b) && (Math.floor(b.notaEncaixe) >= 5 || b.vereditoTipo === 'ressalvas');
 
-  const isSciFi = (b: BookEvaluation) => 
-    b.categoryShelf === 'Ficção Científica' || 
-    b.genres.some((g) => {
-      const gl = g.toLowerCase();
-      return gl.includes('ficção') || gl.includes('sci-fi') || gl.includes('espaço') || gl.includes('distopia') || gl.includes('cyberpunk');
-    });
+    const isSciFi = (b: BookEvaluation) => 
+      b.categoryShelf === 'Ficção Científica' || 
+      b.genres.some((g) => {
+        const gl = g.toLowerCase();
+        return gl.includes('ficção') || gl.includes('sci-fi') || gl.includes('espaço') || gl.includes('distopia') || gl.includes('cyberpunk');
+      });
 
-  const isClassicos = (b: BookEvaluation) =>
-    b.categoryShelf === 'Clássicos & Drama Humano' ||
-    b.genres.some((g) => {
-      const gl = g.toLowerCase();
-      return gl.includes('clássico') || gl.includes('filosofia') || gl.includes('teatro') || gl.includes('moral') || gl.includes('ensaio');
-    });
+    const isClassicos = (b: BookEvaluation) =>
+      b.categoryShelf === 'Clássicos & Drama Humano' ||
+      b.genres.some((g) => {
+        const gl = g.toLowerCase();
+        return gl.includes('clássico') || gl.includes('filosofia') || gl.includes('teatro') || gl.includes('moral') || gl.includes('ensaio');
+      });
 
-  const isDarkSide = (b: BookEvaluation) =>
-    b.categoryShelf === 'Fantasia Sombria & Distopia' ||
-    b.genres.some((g) => {
-      const gl = g.toLowerCase();
-      return gl.includes('darkside') || gl.includes('sombria') || gl.includes('gótico') || gl.includes('horror') || gl.includes('thriller');
-    });
+    const isDarkSide = (b: BookEvaluation) =>
+      b.categoryShelf === 'Fantasia Sombria & Distopia' ||
+      b.genres.some((g) => {
+        const gl = g.toLowerCase();
+        return gl.includes('darkside') || gl.includes('sombria') || gl.includes('gótico') || gl.includes('horror') || gl.includes('thriller');
+      });
 
-  const isCurtos = (b: BookEvaluation) =>
-    b.pages <= 180 ||
-    b.categoryShelf === 'Graphic Novels & Contos' ||
-    b.genres.some((g) => {
-      const gl = g.toLowerCase();
-      return gl.includes('conto') || gl.includes('novela') || gl.includes('graphic');
-    });
+    const isCurtos = (b: BookEvaluation) =>
+      b.pages <= 180 ||
+      b.categoryShelf === 'Graphic Novels & Contos' ||
+      b.genres.some((g) => {
+        const gl = g.toLowerCase();
+        return gl.includes('conto') || gl.includes('novela') || gl.includes('graphic');
+      });
 
-  // Calculate shelves dynamically
-  const obrasPrimasBooks = books.filter(isObrasPrimas);
-  const recomendadosBooks = books.filter(isRecomendados);
-  const ressalvasBooks = books.filter(isRessalvas);
-  const rejeicaoBooks = books.filter(isRejeicao);
+    // Calculate shelf groups
+    const obrasPrimasBooks = books.filter(isObrasPrimas);
+    const recomendadosBooks = books.filter(isRecomendados);
+    const ressalvasBooks = books.filter(isRessalvas);
+    const rejeicaoBooks = books.filter(isRejeicao);
 
-  const sciFiBooks = books.filter(isSciFi);
-  const classicosBooks = books.filter(isClassicos);
-  const darkSideBooks = books.filter(isDarkSide);
-  const curtosBooks = books.filter(isCurtos);
+    const sciFiBooks = books.filter(isSciFi);
+    const classicosBooks = books.filter(isClassicos);
+    const darkSideBooks = books.filter(isDarkSide);
+    const curtosBooks = books.filter(isCurtos);
 
-  const allShelves: ShelfDefinition[] = [
-    ...(savedBooks.length > 0 ? [{ id: 'salvos' as FilterOption, title: 'Salvos', chipLabel: 'Salvos', books: savedBooks }] : []),
-    ...(obrasPrimasBooks.length > 0 ? [{ id: 'obras-primas' as FilterOption, title: 'Obras-Primas & Favoritos', chipLabel: 'Obras-Primas', books: obrasPrimasBooks }] : []),
-    ...(sciFiBooks.length > 0 ? [{ id: 'scifi' as FilterOption, title: 'Ficção Científica & Existencial', chipLabel: 'Ficção Científica', books: sciFiBooks }] : []),
-    ...(classicosBooks.length > 0 ? [{ id: 'classicos' as FilterOption, title: 'Clássicos, Filosofia & Drama Humano', chipLabel: 'Clássicos', books: classicosBooks }] : []),
-    ...(darkSideBooks.length > 0 ? [{ id: 'darkside' as FilterOption, title: 'Fantasia Sombria, DarkSide & Contos', chipLabel: 'DarkSide', books: darkSideBooks }] : []),
-    ...(curtosBooks.length > 0 ? [{ id: 'curtos' as FilterOption, title: 'Contos & Obras Curtas', chipLabel: 'Contos Curtos', books: curtosBooks }] : []),
-    ...(recomendadosBooks.length > 0 ? [{ id: 'recomendados' as FilterOption, title: 'Recomendados pelo Veredito', chipLabel: 'Recomendados', books: recomendadosBooks }] : []),
-    ...(ressalvasBooks.length > 0 ? [{ id: 'ressalvas' as FilterOption, title: 'Vale com Ressalvas', chipLabel: 'Ressalvas', books: ressalvasBooks }] : []),
-    ...(rejeicaoBooks.length > 0 ? [{ id: 'rejeicao' as FilterOption, title: 'Zona de Rejeição & Evite', chipLabel: 'Zona de Rejeição', books: rejeicaoBooks }] : []),
-  ];
+    return [
+      ...(savedBooks.length > 0 ? [{ id: 'salvos' as FilterOption, title: 'Salvos', chipLabel: 'Salvos', books: savedBooks }] : []),
+      ...(obrasPrimasBooks.length > 0 ? [{ id: 'obras-primas' as FilterOption, title: 'Obras-Primas & Favoritos', chipLabel: 'Obras-Primas', books: obrasPrimasBooks }] : []),
+      ...(sciFiBooks.length > 0 ? [{ id: 'scifi' as FilterOption, title: 'Ficção Científica & Existencial', chipLabel: 'Ficção Científica', books: sciFiBooks }] : []),
+      ...(classicosBooks.length > 0 ? [{ id: 'classicos' as FilterOption, title: 'Clássicos, Filosofia & Drama Humano', chipLabel: 'Clássicos', books: classicosBooks }] : []),
+      ...(darkSideBooks.length > 0 ? [{ id: 'darkside' as FilterOption, title: 'Fantasia Sombria, DarkSide & Contos', chipLabel: 'DarkSide', books: darkSideBooks }] : []),
+      ...(curtosBooks.length > 0 ? [{ id: 'curtos' as FilterOption, title: 'Contos & Obras Curtas', chipLabel: 'Contos Curtos', books: curtosBooks }] : []),
+      ...(recomendadosBooks.length > 0 ? [{ id: 'recomendados' as FilterOption, title: 'Recomendados pelo Veredito', chipLabel: 'Recomendados', books: recomendadosBooks }] : []),
+      ...(ressalvasBooks.length > 0 ? [{ id: 'ressalvas' as FilterOption, title: 'Vale com Ressalvas', chipLabel: 'Ressalvas', books: ressalvasBooks }] : []),
+      ...(rejeicaoBooks.length > 0 ? [{ id: 'rejeicao' as FilterOption, title: 'Zona de Rejeição & Evite', chipLabel: 'Zona de Rejeição', books: rejeicaoBooks }] : []),
+    ];
+  }, [books, savedBooks]);
 
   // Atribuição de duas capas representativas para cada filtro, sem repetição entre eles
   const shelvesWithCovers = useMemo(() => {
@@ -362,4 +369,6 @@ export const EstanteView: React.FC<EstanteViewProps> = ({
       )}
     </div>
   );
-};
+});
+
+EstanteView.displayName = 'EstanteView';
