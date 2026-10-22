@@ -1,4 +1,5 @@
 import { BookEvaluation, CriteriaScores, VereditoTipo } from '../types';
+import { buildReadingHistoryBlock } from './ratings';
 
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || 'AQ.Ab8RN6LNzoEEpQlupq2n1dJRY5APsOuFfXmRLp7ESySq8-A3Uw';
 
@@ -72,8 +73,10 @@ export async function evaluateWithGemini(
     genres?: string[];
   }
 ): Promise<BookEvaluation> {
+  const historyBlock = buildReadingHistoryBlock();
   const prompt = `
 ${USER_PROFILE_PROMPT}
+${historyBlock}
 
 Analise rigorosamente a obra: "${bookTitle}" ${extraContext?.author ? `do autor "${extraContext.author}"` : ''}.
 ${extraContext?.description ? `Sinopse/Contexto prévio: ${extraContext.description}` : ''}
@@ -212,8 +215,10 @@ Você DEVE responder ESTRITAMENTE em formato JSON com a seguinte estrutura:
 
 export async function evaluateBulkWithGemini(rawLines: string[]): Promise<BookEvaluation[]> {
   const booksToEvaluate = rawLines.slice(0, 10);
+  const historyBlock = buildReadingHistoryBlock();
   const prompt = `
 ${USER_PROFILE_PROMPT}
+${historyBlock}
 
 Avalie a seguinte lista de obras literárias de acordo com o perfil rigoroso do leitor do app Veredito:
 ${booksToEvaluate.map((b, i) => `${i + 1}. ${b}`).join('\n')}

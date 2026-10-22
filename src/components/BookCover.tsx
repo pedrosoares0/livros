@@ -6,6 +6,7 @@ interface BookCoverProps {
   author: string;
   coverUrl?: string;
   notaEncaixe?: number;
+  userRating?: number;
   className?: string;
 }
 
@@ -22,6 +23,7 @@ export const BookCover: React.FC<BookCoverProps> = React.memo(({
   author,
   coverUrl,
   notaEncaixe,
+  userRating,
   className = '',
 }) => {
   const [failedUrl, setFailedUrl] = useState<string | null>(null);
@@ -127,12 +129,16 @@ export const BookCover: React.FC<BookCoverProps> = React.memo(({
         {/* 4. Delicate overall sheen */}
         <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-white/15 pointer-events-none z-10" />
 
-        {/* Fit Score Badge on Cover */}
-        {notaEncaixe !== undefined && (
+        {/* Fit Score or User Rating Badge on Cover */}
+        {userRating !== undefined ? (
+          <div className="absolute top-1.5 right-1.5 z-20">
+            <ScoreBadge score={userRating} size="sm" isUserRating />
+          </div>
+        ) : notaEncaixe !== undefined ? (
           <div className="absolute top-1.5 right-1.5 z-20">
             <ScoreBadge score={notaEncaixe} size="sm" />
           </div>
-        )}
+        ) : null}
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { BookOpen, ArrowLeft, ArrowUpDown } from 'lucide-react';
-import { BookEvaluation } from '../types';
+import { BookEvaluation, UserRatingsMap } from '../types';
+import { getEffectiveScore } from '../services/ratings';
 import { BookShelf } from './BookShelf';
 import { BookCover } from './BookCover';
 
@@ -8,10 +9,12 @@ interface EstanteViewProps {
   books: BookEvaluation[];
   onSelectBook: (book: BookEvaluation) => void;
   savedBookIds?: Set<string>;
+  userRatings?: UserRatingsMap;
 }
 
 type FilterOption = 
   | 'all' 
+  | 'lidos'
   | 'salvos'
   | 'obras-primas' 
   | 'recomendados' 
@@ -71,6 +74,7 @@ export const EstanteView: React.FC<EstanteViewProps> = React.memo(({
   books,
   onSelectBook,
   savedBookIds,
+  userRatings,
 }) => {
   const [selectedFilter, setSelectedFilter] = useState<FilterOption>('all');
   const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
@@ -83,18 +87,29 @@ export const EstanteView: React.FC<EstanteViewProps> = React.memo(({
 
   // Memoize all categorized shelves dynamically
   const allShelves: ShelfDefinition[] = useMemo(() => {
-    // Helper matching functions for dynamic, intelligent categorization
-    const isRejeicao = (b: BookEvaluation) =>
-      Math.floor(b.notaEncaixe) < 5 || b.userStatus === 'disliked' || b.vereditoTipo === 'evite';
+    // Livros lidos e avaliados pessoalmente pelo leitor
+    const lidosBooks = books.filter((b) => Boolean(userRatings?.[b.id]));
 
-    const isObrasPrimas = (b: BookEvaluation) =>
-      !isRejeicao(b) && (Math.floor(b.notaEncaixe) >= 10 || b.userStatus === 'loved');
+    // Helper matching functions for dynamic, intelligent categorization driven by effective score
+    const isRejeicao = (b: BookEvaluation) => {
+      const eff = getEffectiveScore(b, userRatings);
+      return Math.floor(eff) < 5 || b.userStatus === 'disliked' || b.vereditoTipo === 'evite';
+    };
 
-    const isRecomendados = (b: BookEvaluation) =>
-      !isRejeicao(b) && !isObrasPrimas(b) && Math.floor(b.notaEncaixe) >= 8;
+    const isObrasPrimas = (b: BookEvaluation) => {
+      const eff = getEffectiveScore(b, userRatings);
+      return !isRejeicao(b) && (Math.floor(eff) >= 9 || b.userStatus === 'loved');
+    };
 
-    const isRessalvas = (b: BookEvaluation) =>
-      !isRejeicao(b) && !isObrasPrimas(b) && !isRecomendados(b) && (Math.floor(b.notaEncaixe) >= 5 || b.vereditoTipo === 'ressalvas');
+    const isRecomendados = (b: BookEvaluation) => {
+      const eff = getEffectiveScore(b, userRatings);
+      return !isRejeicao(b) && !isObrasPrimas(b) && Math.floor(eff) >= 8;
+    };
+
+    const isRessalvas = (b: BookEvaluation) => {
+      const eff = getEffectiveScore(b, userRatings);
+      return !isRejeicao(b) && !isObrasPrimas(b) && !isRecomendados(b) && (Math.floor(eff) >= 5 || b.vereditoTipo === 'ressalvas');
+    };
 
     const isSciFi = (b: BookEvaluation) => 
       b.categoryShelf === 'Ficção Científica' || 
@@ -137,6 +152,7 @@ export const EstanteView: React.FC<EstanteViewProps> = React.memo(({
     const curtosBooks = books.filter(isCurtos);
 
     return [
+      ...(lidosBooks.length > 0 ? [{ id: 'lidos' as FilterOption, title: 'Lidos & Avaliados por Você', chipLabel: 'Lidos', books: lidosBooks }] : []),
       ...(savedBooks.length > 0 ? [{ id: 'salvos' as FilterOption, title: 'Salvos', chipLabel: 'Salvos', books: savedBooks }] : []),
       ...(obrasPrimasBooks.length > 0 ? [{ id: 'obras-primas' as FilterOption, title: 'Obras-Primas & Favoritos', chipLabel: 'Obras-Primas', books: obrasPrimasBooks }] : []),
       ...(sciFiBooks.length > 0 ? [{ id: 'scifi' as FilterOption, title: 'Ficção Científica & Existencial', chipLabel: 'Ficção Científica', books: sciFiBooks }] : []),
@@ -147,7 +163,7 @@ export const EstanteView: React.FC<EstanteViewProps> = React.memo(({
       ...(ressalvasBooks.length > 0 ? [{ id: 'ressalvas' as FilterOption, title: 'Vale com Ressalvas', chipLabel: 'Ressalvas', books: ressalvasBooks }] : []),
       ...(rejeicaoBooks.length > 0 ? [{ id: 'rejeicao' as FilterOption, title: 'Zona de Rejeição & Evite', chipLabel: 'Zona de Rejeição', books: rejeicaoBooks }] : []),
     ];
-  }, [books, savedBooks]);
+  }, [books, savedBooks, userRatings]);
 
   // Atribuição de duas capas representativas para cada filtro, sem repetição entre eles
   const shelvesWithCovers = useMemo(() => {
@@ -287,6 +303,7 @@ export const EstanteView: React.FC<EstanteViewProps> = React.memo(({
                 books={shelf.books}
                 onSelectBook={onSelectBook}
                 onTitleClick={() => handleSelectShelf(shelf.id)}
+                userRatings={userRatings}
               />
             </div>
           ))}
@@ -333,7 +350,11 @@ export const EstanteView: React.FC<EstanteViewProps> = React.memo(({
           {/* Grid presentation matching Início */}
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-7 2xl:grid-cols-8 gap-x-4 sm:gap-x-5 md:gap-x-6 lg:gap-x-6 xl:gap-x-7 gap-y-9 sm:gap-y-10 md:gap-y-12 lg:gap-y-14 xl:gap-y-16">
             {[...activeShelf.books]
-              .sort((a, b) => (sortOrder === 'desc' ? b.notaEncaixe - a.notaEncaixe : a.notaEncaixe - b.notaEncaixe))
+              .sort((a, b) => {
+                const scoreA = getEffectiveScore(a, userRatings);
+                const scoreB = getEffectiveScore(b, userRatings);
+                return sortOrder === 'desc' ? scoreB - scoreA : scoreA - scoreB;
+              })
               .map((book) => (
                 <div
                   key={book.id}
@@ -346,6 +367,7 @@ export const EstanteView: React.FC<EstanteViewProps> = React.memo(({
                       author={book.author}
                       coverUrl={book.coverUrl}
                       notaEncaixe={book.notaEncaixe}
+                      userRating={userRatings?.[book.id]?.rating}
                     />
                   </div>
                   <div className="space-y-0.5 px-0.5">

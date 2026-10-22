@@ -41,3 +41,14 @@ export interface UserPreferences {
   preferredTone: string;
   preferredFormat: string;
 }
+
+// Nota pessoal do leitor após terminar a leitura ("Já li")
+export interface UserRating {
+  bookId: string;
+  rating: number; // Inteiro 1 a 10
+  tags: string[]; // Pills da faixa da nota
+  ratedAt: string;
+  updatedAt: string;
+}
+
+export type UserRatingsMap = Record<string, UserRating>;

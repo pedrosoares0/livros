@@ -5,6 +5,7 @@ interface ScoreBadgeProps {
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'criteria';
   className?: string;
   label?: string;
+  isUserRating?: boolean;
 }
 
 /**
@@ -28,6 +29,7 @@ export const ScoreBadge: React.FC<ScoreBadgeProps> = React.memo(({
   size = 'md',
   className = '',
   label,
+  isUserRating = false,
 }) => {
   const roundedScore = Math.floor(score);
   const formattedScore = String(roundedScore);
@@ -56,16 +58,20 @@ export const ScoreBadge: React.FC<ScoreBadgeProps> = React.memo(({
       gradient: 'bg-gradient-to-b from-rose-500 to-rose-600 text-white border-rose-400/80',
       shadow: '0 2px 6px -1px rgba(225, 29, 72, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.5), inset 0 -1px 0 rgba(190, 18, 60, 0.6)',
     },
+    black: {
+      gradient: 'bg-gradient-to-b from-[#2e2e33] to-[#0d0d10] text-white border-neutral-600/80',
+      shadow: '0 2px 7px -1px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.45), inset 0 -1px 0 rgba(0, 0, 0, 0.95)',
+    },
   };
 
-  const styleConfig = toneStyles[tone];
+  const styleConfig = isUserRating ? toneStyles.black : toneStyles[tone];
 
   return (
     <div
       className={`inline-flex items-center justify-center font-score leading-none border select-none transition-transform active:scale-95 shrink-0 ${sizeClasses[size]} ${styleConfig.gradient} ${className}`}
       style={{
         boxShadow: styleConfig.shadow,
-        textShadow: tone === 'yellow' ? 'none' : '0 1px 1.5px rgba(0,0,0,0.3)',
+        textShadow: !isUserRating && tone === 'yellow' ? 'none' : '0 1px 1.5px rgba(0,0,0,0.4)',
       }}
     >
       {label && <span className="text-[9px] font-normal uppercase mr-1 opacity-85">{label}</span>}

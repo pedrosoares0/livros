@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { ChevronRight, ChevronLeft } from 'lucide-react';
-import { BookEvaluation } from '../types';
+import { BookEvaluation, UserRatingsMap } from '../types';
 import { BookCover } from './BookCover';
 
 interface BookShelfProps {
@@ -8,6 +8,7 @@ interface BookShelfProps {
   books: BookEvaluation[];
   onSelectBook: (book: BookEvaluation) => void;
   onTitleClick?: () => void;
+  userRatings?: UserRatingsMap;
 }
 
 export const BookShelf: React.FC<BookShelfProps> = React.memo(({
@@ -15,6 +16,7 @@ export const BookShelf: React.FC<BookShelfProps> = React.memo(({
   books,
   onSelectBook,
   onTitleClick,
+  userRatings,
 }) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -110,6 +112,7 @@ export const BookShelf: React.FC<BookShelfProps> = React.memo(({
                   author={book.author}
                   coverUrl={book.coverUrl}
                   notaEncaixe={book.notaEncaixe}
+                  userRating={userRatings?.[book.id]?.rating}
                 />
               </div>
             </div>

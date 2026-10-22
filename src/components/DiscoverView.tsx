@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { BookOpen, ArrowUpDown, Search, X } from 'lucide-react';
-import { BookEvaluation } from '../types';
+import { BookEvaluation, UserRatingsMap } from '../types';
 import { isUserEvaluation } from '../data/initialBooks';
+import { getEffectiveScore } from '../services/ratings';
 import { BookCover } from './BookCover';
 import { ScoreBadge } from './ScoreBadge';
 import { PearlButton } from './PearlButton';
@@ -11,12 +12,14 @@ interface DiscoverViewProps {
   books: BookEvaluation[];
   onSelectBook: (book: BookEvaluation) => void;
   onOpenEvaluate: () => void;
+  userRatings?: UserRatingsMap;
 }
 
 export const DiscoverView: React.FC<DiscoverViewProps> = React.memo(({
   books,
   onSelectBook,
   onOpenEvaluate,
+  userRatings,
 }) => {
   const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
   const [searchQuery, setSearchQuery] = useState('');
@@ -46,7 +49,7 @@ export const DiscoverView: React.FC<DiscoverViewProps> = React.memo(({
   const searchResults = cleanQuery
     ? books
         .filter((b) => {
-          const score = Math.floor(b.notaEncaixe);
+          const score = Math.floor(getEffectiveScore(b, userRatings));
           if (selectedScoreFilters.length > 0 && !selectedScoreFilters.includes(score)) {
             return false;
           }
@@ -55,19 +58,27 @@ export const DiscoverView: React.FC<DiscoverViewProps> = React.memo(({
           const orig = b.originalTitle ? normalize(b.originalTitle) : '';
           return title.includes(normalizedQuery) || author.includes(normalizedQuery) || orig.includes(normalizedQuery);
         })
-        .sort((a, b) => (sortOrder === 'desc' ? b.notaEncaixe - a.notaEncaixe : a.notaEncaixe - b.notaEncaixe))
+        .sort((a, b) => {
+          const scoreA = getEffectiveScore(a, userRatings);
+          const scoreB = getEffectiveScore(b, userRatings);
+          return sortOrder === 'desc' ? scoreB - scoreA : scoreA - scoreB;
+        })
     : [];
 
-  // Recomendações padrão (quando não está pesquisando): apenas avaliações do usuário com nota >= 7, ou filtradas pelas notas selecionadas
+  // Recomendações padrão (quando não está pesquisando): avaliações do usuário com nota efetiva >= 7, ou filtradas pelas notas selecionadas
   const topMatches = userEvaluations
     .filter((b) => {
-      const score = Math.floor(b.notaEncaixe);
+      const score = Math.floor(getEffectiveScore(b, userRatings));
       if (selectedScoreFilters.length > 0) {
         return selectedScoreFilters.includes(score);
       }
-      return b.notaEncaixe >= 7;
+      return score >= 7;
     })
-    .sort((a, b) => (sortOrder === 'desc' ? b.notaEncaixe - a.notaEncaixe : a.notaEncaixe - b.notaEncaixe));
+    .sort((a, b) => {
+      const scoreA = getEffectiveScore(a, userRatings);
+      const scoreB = getEffectiveScore(b, userRatings);
+      return sortOrder === 'desc' ? scoreB - scoreA : scoreA - scoreB;
+    });
 
   // Últimas avaliações: todas as avaliações do usuário
   const recentEvaluations = userEvaluations;
@@ -215,6 +226,7 @@ export const DiscoverView: React.FC<DiscoverViewProps> = React.memo(({
                       author={book.author}
                       coverUrl={book.coverUrl}
                       notaEncaixe={book.notaEncaixe}
+                      userRating={userRatings?.[book.id]?.rating}
                     />
                   </div>
                   <div className="space-y-0.5 px-0.5">
@@ -310,6 +322,7 @@ export const DiscoverView: React.FC<DiscoverViewProps> = React.memo(({
                         author={book.author}
                         coverUrl={book.coverUrl}
                         notaEncaixe={book.notaEncaixe}
+                        userRating={userRatings?.[book.id]?.rating}
                       />
                     </div>
                     <div className="space-y-0.5 px-0.5">
@@ -357,6 +370,7 @@ export const DiscoverView: React.FC<DiscoverViewProps> = React.memo(({
                         title={book.title}
                         author={book.author}
                         coverUrl={book.coverUrl}
+                        userRating={userRatings?.[book.id]?.rating}
                       />
                     </div>
 
@@ -372,9 +386,13 @@ export const DiscoverView: React.FC<DiscoverViewProps> = React.memo(({
                           </p>
                         </div>
 
-                        {/* Prominent Large Round Score Badge */}
+                        {/* Prominent Large Round Score Badge (Black 3D if rated by user) */}
                         <div className="shrink-0 flex items-center justify-center">
-                          <ScoreBadge score={book.notaEncaixe} size="lg" />
+                          <ScoreBadge
+                            score={getEffectiveScore(book, userRatings)}
+                            size="lg"
+                            isUserRating={Boolean(userRatings?.[book.id])}
+                          />
                         </div>
                       </div>
 

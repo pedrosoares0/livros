@@ -4,9 +4,9 @@ import {
   X, Film, BookOpen, AlertTriangle, CheckCircle2, 
   XCircle, Share2, Bookmark, Gauge,
   Feather, Compass, Zap, Moon, HeartHandshake,
-  Trash2, Image as ImageIcon
+  Trash2, Image as ImageIcon, Check
 } from 'lucide-react';
-import { BookEvaluation } from '../types';
+import { BookEvaluation, UserRating } from '../types';
 import { BookCover } from './BookCover';
 import { ScoreBadge, getScoreTone } from './ScoreBadge';
 import { MovieThumb } from './MovieThumb';
@@ -23,6 +23,8 @@ interface FichaModalProps {
   isSaved?: boolean;
   onDeleteBook?: (bookId: string) => void;
   onUpdateCover?: (bookId: string, newCoverUrl: string) => void;
+  userRating?: UserRating | null;
+  onOpenRateModal?: () => void;
 }
 
 export const FichaModal: React.FC<FichaModalProps> = ({
@@ -32,6 +34,8 @@ export const FichaModal: React.FC<FichaModalProps> = ({
   isSaved = false,
   onDeleteBook,
   onUpdateCover,
+  userRating,
+  onOpenRateModal,
 }) => {
   const [isCoverPickerOpen, setIsCoverPickerOpen] = useState(false);
   const [isLoadingCovers, setIsLoadingCovers] = useState(false);
@@ -137,7 +141,7 @@ export const FichaModal: React.FC<FichaModalProps> = ({
 📖 Obra: ${book.title} (${book.author})
 📄 Páginas: ${book.pages} (ed. brasileira)
 ⭐ Nota Técnica: ${Math.floor(book.notaTecnica)}
-🎯 Nota de Encaixe: ${Math.floor(book.notaEncaixe)}
+🎯 Nota de Encaixe: ${Math.floor(book.notaEncaixe)}${userRating ? `\n👤 Sua Nota: ${userRating.rating}${userRating.tags.length > 0 ? ` (${userRating.tags.join(', ')})` : ''}` : ''}
 💡 Veredito: ${book.veredito}
 
 📝 Resumo:
@@ -307,6 +311,7 @@ ${book.resumo}
                     title={book.title}
                     author={book.author}
                     coverUrl={book.coverUrl}
+                    userRating={userRating?.rating}
                   />
                 </div>
 
@@ -456,31 +461,49 @@ ${book.resumo}
                   {book.author}
                 </p>
 
-                {/* Dual Calibrated 3D Score Cards (No /10, 3D Badges) */}
-                <div className="pt-1 grid grid-cols-2 gap-2.5">
-                  <div className="p-3 rounded-2xl bg-neutral-50/90 border border-neutral-200/80 flex flex-col items-center sm:items-start shadow-xs">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#86868b]">
+                {/* Score Cards (3 Cards if userRating exists, else 2 Cards) */}
+                <div className={`pt-1 grid ${userRating ? 'grid-cols-3' : 'grid-cols-2'} gap-2 sm:gap-2.5`}>
+                  <div className="p-2.5 sm:p-3 rounded-2xl bg-neutral-50/90 border border-neutral-200/80 flex flex-col items-center sm:items-start shadow-xs">
+                    <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-[#86868b] truncate">
                       Nota Técnica
                     </span>
                     <div className="mt-1">
                       <ScoreBadge score={book.notaTecnica} size="lg" />
                     </div>
-                    <span className="text-[9px] text-[#86868b] mt-1 font-medium">
+                    <span className="text-[8px] sm:text-[9px] text-[#86868b] mt-1 font-medium truncate">
                       Qualidade objetiva
                     </span>
                   </div>
 
-                  <div className="p-3 rounded-2xl bg-neutral-50/90 border border-neutral-200/80 flex flex-col items-center sm:items-start shadow-xs">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#86868b]">
+                  <div className="p-2.5 sm:p-3 rounded-2xl bg-neutral-50/90 border border-neutral-200/80 flex flex-col items-center sm:items-start shadow-xs">
+                    <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-[#86868b] truncate">
                       Nota de Encaixe
                     </span>
                     <div className="mt-1">
                       <ScoreBadge score={book.notaEncaixe} size="lg" />
                     </div>
-                    <span className="text-[9px] text-[#86868b] mt-1 font-medium">
+                    <span className="text-[8px] sm:text-[9px] text-[#86868b] mt-1 font-medium truncate">
                       Para o seu perfil
                     </span>
                   </div>
+
+                  {userRating && (
+                    <div
+                      onClick={onOpenRateModal}
+                      className="p-2.5 sm:p-3 rounded-2xl bg-neutral-900 hover:bg-black text-white border border-neutral-800 flex flex-col items-center sm:items-start shadow-xs cursor-pointer transition-all active:scale-95 group/usercard"
+                      title="Clique para editar sua nota"
+                    >
+                      <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-neutral-400 group-hover/usercard:text-white transition-colors truncate">
+                        Sua Nota
+                      </span>
+                      <div className="mt-1">
+                        <ScoreBadge score={userRating.rating} size="lg" isUserRating />
+                      </div>
+                      <span className="text-[8px] sm:text-[9px] text-neutral-400 mt-1 font-medium truncate">
+                        {userRating.tags.length > 0 ? userRating.tags[0] : 'Avaliado por você'}
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -596,23 +619,47 @@ ${book.resumo}
           </div>
 
           {/* Footer Actions — Aceternity Button System */}
-          <div className="p-4 border-t border-black/[0.06] bg-[#ffffff] flex items-center gap-2.5">
+          <div className="p-4 border-t border-black/[0.06] bg-[#ffffff] flex items-center gap-2">
+            {/* Botão "Já li" / "Sua nota · X" */}
+            {onOpenRateModal && (
+              <AceternityButton
+                variant={userRating ? "outline" : "primary"}
+                size="md"
+                onClick={onOpenRateModal}
+                className={`flex-1 ${userRating ? '!bg-neutral-900 hover:!bg-black !text-white !border-neutral-800' : ''}`}
+                title={userRating ? "Editar sua avaliação deste livro" : "Registrar leitura e avaliar este livro"}
+              >
+                {userRating ? (
+                  <>
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                    <span>Sua nota · {userRating.rating}</span>
+                  </>
+                ) : (
+                  <>
+                    <Check className="w-3.5 h-3.5 text-white stroke-[3] shrink-0" />
+                    <span>Já li</span>
+                  </>
+                )}
+              </AceternityButton>
+            )}
+
             {/* Salvar Button (creates/adds to Salvos shelf) */}
             {onSaveToWishlist && (
               <AceternityButton
                 variant={isSaved ? "outline" : "secondary"}
                 size="md"
                 onClick={() => onSaveToWishlist(book)}
-                className={`flex-1 ${isSaved ? '!bg-emerald-50 !text-emerald-800 !border-emerald-300' : ''}`}
+                className={`shrink-0 ${isSaved ? '!bg-emerald-50 !text-emerald-800 !border-emerald-300' : ''}`}
+                title={isSaved ? "Salvo na sua estante" : "Salvar livro"}
               >
                 <Bookmark className={`w-3.5 h-3.5 ${isSaved ? 'fill-emerald-800 text-emerald-800' : ''}`} />
-                <span>{isSaved ? 'Salvo' : 'Salvar'}</span>
+                <span className="hidden sm:inline">{isSaved ? 'Salvo' : 'Salvar'}</span>
               </AceternityButton>
             )}
 
             {/* Copiar Button with Animated Icon Swap */}
             <CopyButton
-              variant="primary"
+              variant="outline"
               size="md"
               text={generateFichaText}
               idleLabel="Copiar"
@@ -631,7 +678,7 @@ ${book.resumo}
                 className={`shrink-0 ${confirmDelete ? '!bg-rose-600 !text-white !border-rose-700' : ''}`}
               >
                 <Trash2 className="w-3.5 h-3.5" />
-                <span>{confirmDelete ? 'Confirmar?' : 'Excluir'}</span>
+                <span className="hidden sm:inline">{confirmDelete ? 'Confirmar?' : 'Excluir'}</span>
               </AceternityButton>
             )}
           </div>

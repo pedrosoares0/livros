@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { AnimatePresence } from 'motion/react';
 import { SlidersHorizontal } from 'lucide-react';
-import { BookEvaluation } from './types';
+import { BookEvaluation, UserRatingsMap, UserRating } from './types';
 import { DiscoverView } from './components/DiscoverView';
 import { EstanteView } from './components/EstanteView';
 import { FichaModal } from './components/FichaModal';
 import { EvaluateModal } from './components/EvaluateModal';
 import { ProfileModal } from './components/ProfileModal';
+import { RateBookModal } from './components/RateBookModal';
 import { BottomNavBar } from './components/BottomNavBar';
 import { PearlButton } from './components/PearlButton';
 import { 
@@ -17,14 +18,22 @@ import {
   updateBookCoverInDb,
   getLocalEvaluations 
 } from './services/supabase';
+import { 
+  fetchRatings, 
+  upsertRating, 
+  deleteRating, 
+  getLocalRatings 
+} from './services/ratings';
 import { prefetchBookCovers } from './services/imagePrefetch';
 
 export function App() {
   const [books, setBooks] = useState<BookEvaluation[]>(() => getLocalEvaluations());
   const [activeTab, setActiveTab] = useState<'discover' | 'shelves'>('discover');
   const [selectedBook, setSelectedBook] = useState<BookEvaluation | null>(null);
+  const [ratingBook, setRatingBook] = useState<BookEvaluation | null>(null);
   const [isEvaluateOpen, setIsEvaluateOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [userRatings, setUserRatings] = useState<UserRatingsMap>(() => getLocalRatings());
   const [savedBookIds, setSavedBookIds] = useState<Set<string>>(() => {
     try {
       const raw = localStorage.getItem('veredito_saved_books');
@@ -34,7 +43,7 @@ export function App() {
     }
   });
 
-  // Load evaluations and saved books from Supabase on mount
+  // Load evaluations, saved books and user ratings from Supabase on mount
   useEffect(() => {
     let isMounted = true;
     fetchEvaluations().then((loaded) => {
@@ -48,6 +57,13 @@ export function App() {
         });
       }
     });
+
+    fetchRatings().then((loadedRatings) => {
+      if (isMounted && loadedRatings) {
+        setUserRatings(loadedRatings);
+      }
+    });
+
     return () => {
       isMounted = false;
     };
@@ -94,6 +110,51 @@ export function App() {
     await toggleSaveBook(book.id, willBeSaved);
   };
 
+  const handleSaveRating = async (book: BookEvaluation, rating: number, tags: string[]) => {
+    const now = new Date().toISOString();
+    const userRating: UserRating = {
+      bookId: book.id,
+      rating,
+      tags,
+      ratedAt: userRatings[book.id]?.ratedAt || now,
+      updatedAt: now,
+    };
+
+    // Optimistic update of ratings
+    setUserRatings((prev) => ({
+      ...prev,
+      [book.id]: userRating,
+    }));
+
+    // Q18: Sai de salvos e passa para a prateleira de lidos
+    if (savedBookIds.has(book.id) || book.isSaved) {
+      setSavedBookIds((prev) => {
+        const next = new Set(prev);
+        next.delete(book.id);
+        return next;
+      });
+      setBooks((prev) =>
+        prev.map((b) => (b.id === book.id ? { ...b, isSaved: false } : b))
+      );
+      if (selectedBook?.id === book.id) {
+        setSelectedBook((prev) => (prev ? { ...prev, isSaved: false } : null));
+      }
+      toggleSaveBook(book.id, false);
+    }
+
+    // Persist rating to Supabase & local cache
+    await upsertRating(userRating);
+  };
+
+  const handleDeleteRating = async (bookId: string) => {
+    setUserRatings((prev) => {
+      const next = { ...prev };
+      delete next[bookId];
+      return next;
+    });
+    await deleteRating(bookId);
+  };
+
   const handleDeleteBook = async (bookId: string) => {
     // Optimistic removal
     setBooks((prev) => prev.filter((b) => b.id !== bookId));
@@ -102,12 +163,21 @@ export function App() {
       next.delete(bookId);
       return next;
     });
+    setUserRatings((prev) => {
+      const next = { ...prev };
+      delete next[bookId];
+      return next;
+    });
     if (selectedBook?.id === bookId) {
       setSelectedBook(null);
+    }
+    if (ratingBook?.id === bookId) {
+      setRatingBook(null);
     }
 
     // Persist deletion to Supabase
     await deleteEvaluation(bookId);
+    await deleteRating(bookId);
   };
 
   const handleUpdateBookCover = async (bookId: string, newCoverUrl: string) => {
@@ -233,6 +303,7 @@ export function App() {
               books={books}
               onSelectBook={setSelectedBook}
               onOpenEvaluate={() => setIsEvaluateOpen(true)}
+              userRatings={userRatings}
             />
           </div>
 
@@ -241,6 +312,7 @@ export function App() {
               books={allShelfBooks}
               onSelectBook={setSelectedBook}
               savedBookIds={savedBookIds}
+              userRatings={userRatings}
             />
           </div>
         </main>
@@ -263,6 +335,23 @@ export function App() {
               isSaved={savedBookIds.has(selectedBook.id)}
               onDeleteBook={handleDeleteBook}
               onUpdateCover={handleUpdateBookCover}
+              userRating={selectedBook ? userRatings[selectedBook.id] : undefined}
+              onOpenRateModal={() => setRatingBook(selectedBook)}
+            />
+          )}
+        </AnimatePresence>
+
+        {/* Rate Book ("Já li") Modal with Adaptive Slider & Exclusive Band Pills */}
+        <AnimatePresence>
+          {ratingBook && (
+            <RateBookModal
+              key={`rate-${ratingBook.id}`}
+              isOpen={Boolean(ratingBook)}
+              book={ratingBook}
+              existingRating={ratingBook ? userRatings[ratingBook.id] : null}
+              onClose={() => setRatingBook(null)}
+              onSaveRating={(rating, tags) => handleSaveRating(ratingBook, rating, tags)}
+              onDeleteRating={() => handleDeleteRating(ratingBook.id)}
             />
           )}
         </AnimatePresence>
