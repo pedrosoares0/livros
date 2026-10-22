@@ -202,10 +202,10 @@ export const EstanteView: React.FC<EstanteViewProps> = ({
   };
 
   return (
-    <div className="space-y-4 pb-12">
+    <div className="space-y-4 pb-12 md:pb-16">
       {/* Smart Filter Pills Row */}
-      <div className="px-5 sm:px-6 pt-1 pb-1.5">
-        <div className="flex items-center gap-2.5 overflow-x-auto py-2 px-1 hide-scrollbar select-none -mx-1">
+      <div className="px-5 sm:px-6 md:px-8 lg:px-12 pt-1 pb-1.5">
+        <div className="flex items-center gap-2.5 overflow-x-auto md:flex-wrap md:overflow-visible py-2 px-1 hide-scrollbar select-none -mx-1">
           {shelvesWithCovers.map((shelf) => {
             const isActive = selectedFilter === shelf.id;
             const [cover1, cover2] = shelf.covers || [];
@@ -287,7 +287,7 @@ export const EstanteView: React.FC<EstanteViewProps> = ({
 
       {/* Single Shelf Opened as List/Grid View */}
       {selectedFilter !== 'all' && activeShelf && (
-        <div className="space-y-4 px-5 sm:px-6 pt-1 pb-24">
+        <div className="space-y-4 px-5 sm:px-6 md:px-8 lg:px-12 pt-1 pb-24 md:pb-16">
           {/* Shelf Navigation and Controls Header */}
           <div className="flex items-center justify-between gap-2">
             <button
@@ -323,14 +323,14 @@ export const EstanteView: React.FC<EstanteViewProps> = ({
           </div>
 
           {/* Grid presentation matching Início */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3.5">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3.5 md:gap-5">
             {[...activeShelf.books]
               .sort((a, b) => (sortOrder === 'desc' ? b.notaEncaixe - a.notaEncaixe : a.notaEncaixe - b.notaEncaixe))
               .map((book) => (
                 <div
                   key={book.id}
                   onClick={() => onSelectBook(book)}
-                  className="p-3.5 rounded-2xl bg-white hover:bg-neutral-50/80 border border-white hover:border-white transition-all duration-200 cursor-pointer flex flex-col justify-between group active:scale-[0.98] shadow-xs hover:shadow-sm"
+                  className="p-3.5 rounded-2xl bg-white hover:bg-neutral-50/80 border border-white hover:border-neutral-200/60 transition-all duration-200 cursor-pointer flex flex-col justify-between group active:scale-[0.98] md:hover:-translate-y-1 md:hover:shadow-md shadow-xs"
                 >
                   <div className="w-full mb-2.5">
                     <BookCover

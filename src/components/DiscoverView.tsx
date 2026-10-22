@@ -73,23 +73,25 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
   const recentEvaluations = userEvaluations;
 
   return (
-    <div className="w-full space-y-7 px-5 sm:px-6 pt-3 pb-24">
+    <div className="w-full space-y-7 px-5 sm:px-6 md:px-8 lg:px-12 pt-3 pb-24 md:pb-16">
       {/* Single Unified Hero Card */}
-      <div className="p-7 text-center rounded-3xl bg-neutral-50/90 border border-neutral-200/80 shadow-xs space-y-4">
-        <div className="w-12 h-12 mx-auto rounded-2xl bg-neutral-100 border border-neutral-200/80 flex items-center justify-center text-[#1d1d1f] shadow-xs">
-          <BookOpen className="w-6 h-6 stroke-[1.75]" />
+      <div className="p-7 md:p-8 lg:p-9 text-center md:text-left rounded-3xl bg-neutral-50/90 border border-neutral-200/80 shadow-xs flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+        <div className="flex flex-col md:flex-row items-center gap-4 md:gap-5">
+          <div className="w-12 h-12 rounded-2xl bg-neutral-100 border border-neutral-200/80 flex items-center justify-center text-[#1d1d1f] shadow-xs shrink-0">
+            <BookOpen className="w-6 h-6 stroke-[1.75]" />
+          </div>
+
+          <div className="space-y-1.5 max-w-sm md:max-w-xl">
+            <h2 className="text-xl md:text-2xl font-bold tracking-tight text-[#1d1d1f]">
+              Avaliador Pessoal
+            </h2>
+            <p className="text-xs md:text-sm text-[#86868b] leading-relaxed">
+              Analise qualquer livro ou HQ com base no seu perfil de leitura, preferências e aversões calibradas para você.
+            </p>
+          </div>
         </div>
 
-        <div className="space-y-1.5 max-w-sm mx-auto">
-          <h2 className="text-xl font-bold tracking-tight text-[#1d1d1f]">
-            Avaliador Pessoal
-          </h2>
-          <p className="text-xs text-[#86868b] leading-relaxed">
-            Analise qualquer livro ou HQ com base no seu perfil de leitura, preferências e aversões calibradas para você.
-          </p>
-        </div>
-
-        <div className="pt-1 flex justify-center">
+        <div className="pt-1 md:pt-0 flex justify-center shrink-0">
           <PearlButton
             label="Avaliar livro"
             onClick={onOpenEvaluate}
@@ -196,12 +198,12 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
           </div>
 
           {searchResults.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3.5">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3.5 md:gap-5">
               {searchResults.map((book) => (
                 <div
                   key={book.id}
                   onClick={() => onSelectBook(book)}
-                  className="p-3.5 rounded-2xl bg-white hover:bg-neutral-50/80 border border-white hover:border-white transition-all duration-200 cursor-pointer flex flex-col justify-between group active:scale-[0.98] shadow-xs hover:shadow-sm"
+                  className="p-3.5 rounded-2xl bg-white hover:bg-neutral-50/80 border border-white hover:border-neutral-200/60 transition-all duration-200 cursor-pointer flex flex-col justify-between group active:scale-[0.98] md:hover:-translate-y-1 md:hover:shadow-md shadow-xs"
                 >
                   <div className="w-full mb-2.5">
                     <BookCover
@@ -291,12 +293,12 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3.5">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3.5 md:gap-5">
                 {topMatches.map((book) => (
                   <div
                     key={book.id}
                     onClick={() => onSelectBook(book)}
-                    className="p-3.5 rounded-2xl bg-white hover:bg-neutral-50/80 border border-white hover:border-white transition-all duration-200 cursor-pointer flex flex-col justify-between group active:scale-[0.98] shadow-xs hover:shadow-sm"
+                    className="p-3.5 rounded-2xl bg-white hover:bg-neutral-50/80 border border-white hover:border-neutral-200/60 transition-all duration-200 cursor-pointer flex flex-col justify-between group active:scale-[0.98] md:hover:-translate-y-1 md:hover:shadow-md shadow-xs"
                   >
                     <div className="w-full mb-2.5">
                       <BookCover
@@ -338,12 +340,12 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
                 </span>
               </div>
 
-              <div className="space-y-3.5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 md:gap-4.5">
                 {recentEvaluations.map((book) => (
                   <div
                     key={book.id}
                     onClick={() => onSelectBook(book)}
-                    className="p-4 sm:p-5 rounded-2xl bg-white hover:bg-neutral-50/90 border border-white hover:border-white transition-all duration-200 cursor-pointer flex items-center gap-4 sm:gap-5 group active:scale-[0.99] shadow-xs hover:shadow-sm"
+                    className="p-4 sm:p-5 rounded-2xl bg-white hover:bg-neutral-50/90 border border-white hover:border-neutral-200/60 transition-all duration-200 cursor-pointer flex items-center gap-4 sm:gap-5 group active:scale-[0.99] md:hover:-translate-y-0.5 md:hover:shadow-md shadow-xs"
                   >
                     {/* Large Visual Book Cover */}
                     <div className="w-20 sm:w-24 shrink-0 transition-transform duration-200 group-hover:scale-[1.02]">

@@ -48,7 +48,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) =
           animate={{ y: 0, opacity: 1, scale: 1 }}
           exit={{ y: 20, opacity: 0, scale: 0.98 }}
           transition={{ type: 'spring', damping: 28, stiffness: 320 }}
-          className="relative w-full max-w-lg max-h-[90vh] bg-[#ffffff] border border-black/[0.08] rounded-t-3xl sm:rounded-3xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.25)] flex flex-col overflow-hidden text-[#1d1d1f] z-20"
+          className="relative w-full max-w-lg md:max-w-2xl lg:max-w-3xl max-h-[90vh] md:max-h-[85vh] bg-[#ffffff] border border-black/[0.08] rounded-t-3xl sm:rounded-3xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.25)] flex flex-col overflow-hidden text-[#1d1d1f] z-20"
         >
           {/* Header */}
           <div className="flex items-center justify-between px-6 pt-5 pb-3 border-b border-black/[0.06] bg-[#ffffff]/90 backdrop-blur-md">

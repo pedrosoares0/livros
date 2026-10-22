@@ -32,8 +32,6 @@ export const FichaModal: React.FC<FichaModalProps> = ({
   onDeleteBook,
   onUpdateCover,
 }) => {
-  if (!book) return null;
-
   const [isCoverPickerOpen, setIsCoverPickerOpen] = useState(false);
   const [isLoadingCovers, setIsLoadingCovers] = useState(false);
   const [alternativeCovers, setAlternativeCovers] = useState<string[]>([]);
@@ -43,6 +41,7 @@ export const FichaModal: React.FC<FichaModalProps> = ({
   const [showCustomInput, setShowCustomInput] = useState(false);
 
   const handleOpenCoverPicker = async () => {
+    if (!book) return;
     setIsCoverPickerOpen((prev) => !prev);
     if (!hasFetchedCovers) {
       setIsLoadingCovers(true);
@@ -63,7 +62,7 @@ export const FichaModal: React.FC<FichaModalProps> = ({
   const [showCoverAlert, setShowCoverAlert] = useState(false);
 
   const handleSelectCover = (newCoverUrl: string) => {
-    if (onUpdateCover) {
+    if (onUpdateCover && book) {
       onUpdateCover(book.id, newCoverUrl);
     }
     setIsCoverPickerOpen(false);
@@ -87,7 +86,7 @@ export const FichaModal: React.FC<FichaModalProps> = ({
       setConfirmDelete(true);
       return;
     }
-    if (onDeleteBook) {
+    if (onDeleteBook && book) {
       onDeleteBook(book.id);
     }
     onClose();
@@ -112,6 +111,8 @@ export const FichaModal: React.FC<FichaModalProps> = ({
       document.body.style.overflow = originalOverflow;
     };
   }, []);
+
+  if (!book) return null;
 
   // Derived inverted metrics for unified 0-10 intuitive scale (higher = better fit)
   const originalidade = Math.floor(10 - book.criteria.genericidade);
@@ -238,7 +239,7 @@ ${book.resumo}
           stiffness: 320,
           mass: 0.85,
         }}
-        className="relative w-full max-w-lg max-h-[92vh] sm:max-h-[88vh] bg-[#ffffff] border border-black/[0.08] rounded-t-3xl sm:rounded-3xl shadow-[0_25px_65px_-15px_rgba(0,0,0,0.25)] flex flex-col overflow-hidden text-[#1d1d1f] z-20 will-change-transform"
+        className="relative w-full max-w-lg md:max-w-3xl lg:max-w-4xl max-h-[92vh] sm:max-h-[88vh] md:max-h-[86vh] bg-[#ffffff] border border-black/[0.08] rounded-t-3xl sm:rounded-3xl shadow-[0_25px_65px_-15px_rgba(0,0,0,0.25)] flex flex-col overflow-hidden text-[#1d1d1f] z-20 will-change-transform"
       >
         {/* Cover Change Success Alert */}
         <AnimatePresence>
@@ -281,7 +282,7 @@ ${book.resumo}
         </div>
 
           {/* Scrollable Content */}
-          <div className="overflow-y-auto px-6 py-5 space-y-4 hide-scrollbar">
+          <div className="overflow-y-auto px-6 md:px-8 py-5 md:py-6 space-y-4 md:space-y-5 hide-scrollbar">
             {/* Hero Section: Extra-Large Clean Cover + Dual Scores + Title */}
             <div className="flex flex-col sm:flex-row gap-6 items-center sm:items-start">
               {/* Extra-Large Book Cover */}
@@ -525,7 +526,7 @@ ${book.resumo}
                 </span>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 md:gap-3">
                 {criteriaList.map((crit, idx) => (
                   <div
                     key={idx}

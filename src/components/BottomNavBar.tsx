@@ -25,7 +25,7 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
 
       <nav
         aria-label="Navegação Principal"
-        className="fixed bottom-5 left-1/2 -translate-x-1/2 z-40 w-[92%] max-w-[420px] pointer-events-auto"
+        className="fixed bottom-5 left-1/2 -translate-x-1/2 z-40 w-[92%] max-w-[420px] pointer-events-auto md:hidden"
       >
         <div
           className="flex items-center justify-between p-2 select-none"

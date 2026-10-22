@@ -43,8 +43,6 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
   existingBooks = [],
   onOpenBook,
 }) => {
-  if (!isOpen) return null;
-
   const [tab, setTab] = useState<'single' | 'bulk'>('single');
   const [query, setQuery] = useState('');
   const [bulkText, setBulkText] = useState('');
@@ -69,6 +67,8 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
       }
     };
   }, []);
+
+  if (!isOpen) return null;
 
   const normalizeText = (text: string) =>
     text
@@ -319,7 +319,7 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
           animate={{ y: 0, opacity: 1, scale: 1 }}
           exit={{ y: 32, opacity: 0, scale: 0.98 }}
           transition={{ type: 'spring', damping: 28, stiffness: 340 }}
-          className="relative w-full max-w-lg max-h-[92dvh] sm:max-h-[86vh] bg-white border border-neutral-200/90 rounded-t-3xl sm:rounded-3xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] flex flex-col overflow-hidden text-[#1d1d1f] z-20 pb-safe"
+          className="relative w-full max-w-lg md:max-w-2xl lg:max-w-3xl max-h-[92dvh] sm:max-h-[86vh] md:max-h-[84vh] bg-white border border-neutral-200/90 rounded-t-3xl sm:rounded-3xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] flex flex-col overflow-hidden text-[#1d1d1f] z-20 pb-safe"
         >
           {/* iOS Handle Indicator on mobile */}
           <div className="w-10 h-1 bg-neutral-300 rounded-full mx-auto mt-2.5 sm:hidden shrink-0" />

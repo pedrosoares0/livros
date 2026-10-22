@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, ChevronLeft } from 'lucide-react';
 import { BookEvaluation } from '../types';
 import { BookCover } from './BookCover';
 
@@ -29,12 +29,21 @@ export const BookShelf: React.FC<BookShelfProps> = ({
     }
   };
 
+  const scrollByAmount = (amount: number) => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({
+        left: amount,
+        behavior: 'smooth',
+      });
+    }
+  };
+
   if (!books || books.length === 0) return null;
 
   return (
     <section className="w-full space-y-2 py-3 select-none">
       {/* Category Header Row */}
-      <div className="flex items-center justify-between px-6">
+      <div className="flex items-center justify-between px-6 md:px-8 lg:px-12">
         {onTitleClick ? (
           <button
             type="button"
@@ -59,12 +68,34 @@ export const BookShelf: React.FC<BookShelfProps> = ({
       </div>
 
       {/* Books Container with Frosted Gray Shelf Bar Physically Overlapping the Books */}
-      <div className="relative w-full overflow-hidden">
+      <div className="relative w-full overflow-hidden group/shelf">
+        {/* Left Scroll Chevron (Desktop Only) */}
+        <button
+          type="button"
+          onClick={() => scrollByAmount(-480)}
+          className="hidden md:flex absolute left-4 top-1/2 -translate-y-8 z-30 w-10 h-10 rounded-full bg-white/95 hover:bg-white text-[#1d1d1f] shadow-md border border-neutral-200/80 items-center justify-center opacity-0 group-hover/shelf:opacity-100 transition-all duration-200 cursor-pointer active:scale-95"
+          aria-label="Rolar estante para esquerda"
+          title="Rolar para esquerda"
+        >
+          <ChevronLeft className="w-5 h-5 text-[#1d1d1f]" />
+        </button>
+
+        {/* Right Scroll Chevron (Desktop Only) */}
+        <button
+          type="button"
+          onClick={() => scrollByAmount(480)}
+          className="hidden md:flex absolute right-4 top-1/2 -translate-y-8 z-30 w-10 h-10 rounded-full bg-white/95 hover:bg-white text-[#1d1d1f] shadow-md border border-neutral-200/80 items-center justify-center opacity-0 group-hover/shelf:opacity-100 transition-all duration-200 cursor-pointer active:scale-95"
+          aria-label="Rolar estante para direita"
+          title="Rolar para direita"
+        >
+          <ChevronRight className="w-5 h-5 text-[#1d1d1f]" />
+        </button>
+
         {/* Horizontal Book Row - Enlarged, Smooth Scrolling */}
         <div
           ref={scrollContainerRef}
           onWheel={handleWheel}
-          className="flex items-end gap-5 overflow-x-auto pt-3 pb-8 px-6 hide-scrollbar scroll-smooth"
+          className="flex items-end gap-5 md:gap-6 overflow-x-auto pt-3 pb-8 px-6 md:px-8 lg:px-12 hide-scrollbar scroll-smooth"
         >
           {books.map((book) => (
             <div
@@ -88,7 +119,7 @@ export const BookShelf: React.FC<BookShelfProps> = ({
 
         {/* Standardized Soft Frosted Gray Acrylic Lip (COVERING THE LOWER PART OF THE BOOKS) */}
         <div
-          className="absolute left-4 right-4 pointer-events-none z-20"
+          className="absolute left-4 md:left-6 lg:left-8 right-4 md:right-6 lg:right-8 pointer-events-none z-20"
           style={{ bottom: '18px' }}
         >
           <div
