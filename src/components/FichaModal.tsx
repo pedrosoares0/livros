@@ -490,16 +490,16 @@ ${book.resumo}
                   {userRating && (
                     <div
                       onClick={onOpenRateModal}
-                      className="p-2.5 sm:p-3 rounded-2xl bg-neutral-900 hover:bg-black text-white border border-neutral-800 flex flex-col items-center sm:items-start shadow-xs cursor-pointer transition-all active:scale-95 group/usercard"
+                      className="p-2.5 sm:p-3 rounded-2xl bg-neutral-50/90 hover:bg-neutral-100/90 border border-neutral-200/80 flex flex-col items-center sm:items-start shadow-xs cursor-pointer transition-all active:scale-95 group/usercard"
                       title="Clique para editar sua nota"
                     >
-                      <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-neutral-400 group-hover/usercard:text-white transition-colors truncate">
+                      <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-[#86868b] truncate">
                         Sua Nota
                       </span>
                       <div className="mt-1">
                         <ScoreBadge score={userRating.rating} size="lg" isUserRating />
                       </div>
-                      <span className="text-[8px] sm:text-[9px] text-neutral-400 mt-1 font-medium truncate">
+                      <span className="text-[8px] sm:text-[9px] text-[#86868b] mt-1 font-medium truncate">
                         {userRating.tags.length > 0 ? userRating.tags[0] : 'Avaliado por você'}
                       </span>
                     </div>
