@@ -73,25 +73,23 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
   const recentEvaluations = userEvaluations;
 
   return (
-    <div className="w-full space-y-7 px-5 sm:px-6 md:px-8 lg:px-12 pt-3 pb-24 md:pb-16">
-      {/* Single Unified Hero Card */}
-      <div className="p-7 md:p-8 lg:p-9 text-center md:text-left rounded-3xl bg-neutral-50/90 border border-neutral-200/80 shadow-xs flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-        <div className="flex flex-col md:flex-row items-center gap-4 md:gap-5">
-          <div className="w-12 h-12 rounded-2xl bg-neutral-100 border border-neutral-200/80 flex items-center justify-center text-[#1d1d1f] shadow-xs shrink-0">
-            <BookOpen className="w-6 h-6 stroke-[1.75]" />
-          </div>
-
-          <div className="space-y-1.5 max-w-sm md:max-w-xl">
-            <h2 className="text-xl md:text-2xl font-bold tracking-tight text-[#1d1d1f]">
-              Avaliador Pessoal
-            </h2>
-            <p className="text-xs md:text-sm text-[#86868b] leading-relaxed">
-              Analise qualquer livro ou HQ com base no seu perfil de leitura, preferências e aversões calibradas para você.
-            </p>
-          </div>
+    <div className="w-full space-y-8 md:space-y-12 pb-24 md:pb-20">
+      {/* Single Unified Hero Card (Mobile only - redundant on PC header) */}
+      <div className="p-7 text-center rounded-3xl bg-neutral-50/90 border border-neutral-200/80 shadow-xs space-y-4 md:hidden">
+        <div className="w-12 h-12 mx-auto rounded-2xl bg-neutral-100 border border-neutral-200/80 flex items-center justify-center text-[#1d1d1f] shadow-xs">
+          <BookOpen className="w-6 h-6 stroke-[1.75]" />
         </div>
 
-        <div className="pt-1 md:pt-0 flex justify-center shrink-0">
+        <div className="space-y-1.5 max-w-sm mx-auto">
+          <h2 className="text-xl font-bold tracking-tight text-[#1d1d1f]">
+            Avaliador Pessoal
+          </h2>
+          <p className="text-xs text-[#86868b] leading-relaxed">
+            Analise qualquer livro ou HQ com base no seu perfil de leitura, preferências e aversões calibradas para você.
+          </p>
+        </div>
+
+        <div className="pt-1 flex justify-center">
           <PearlButton
             label="Avaliar livro"
             onClick={onOpenEvaluate}
@@ -99,19 +97,19 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
         </div>
       </div>
 
-      {/* Search Bar - Branca e Apple style com BorderBeam */}
-      <div className="w-full -mt-2">
+      {/* Search Bar - Refined Apple style with BorderBeam and comfortable whitespace */}
+      <div className="w-full max-w-xl mx-auto -mt-2 md:mt-2 md:mb-8">
         <BorderBeam
           size="sm"
           theme="light"
           colorVariant="mono"
-          borderRadius={20}
+          borderRadius={24}
           duration={3.5}
           strength={0.8}
           className="w-full"
         >
-          <div className="relative w-full rounded-[20px] bg-white border border-neutral-200/90 shadow-[0_2px_12px_rgba(0,0,0,0.04)] flex items-center">
-            <Search className="w-4 h-4 text-[#86868b] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <div className="relative w-full rounded-[24px] bg-white border border-neutral-200/80 shadow-[0_2px_14px_rgba(0,0,0,0.03)] flex items-center transition-shadow hover:shadow-[0_4px_20px_rgba(0,0,0,0.06)]">
+            <Search className="w-4 h-4 text-[#86868b] absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
               value={searchQuery}
@@ -122,13 +120,13 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
               autoCapitalize="none"
               spellCheck={false}
               enterKeyHint="search"
-              className="w-full pl-10 pr-9 py-2.5 rounded-[20px] bg-transparent text-xs sm:text-sm text-[#1d1d1f] placeholder-[#86868b] focus:outline-none"
+              className="w-full pl-11 pr-10 py-3 rounded-[24px] bg-transparent text-xs sm:text-sm text-[#1d1d1f] placeholder-[#86868b] focus:outline-none"
             />
             {searchQuery.length > 0 && (
               <button
                 type="button"
                 onClick={() => setSearchQuery('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-[#86868b] hover:text-[#1d1d1f] rounded-full transition-colors cursor-pointer"
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-[#86868b] hover:text-[#1d1d1f] rounded-full transition-colors cursor-pointer"
                 aria-label="Limpar busca"
               >
                 <X className="w-3.5 h-3.5" />
@@ -154,7 +152,7 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
       {cleanQuery.length > 0 && (
         <div className="space-y-3.5 pt-1">
           <div className="flex items-center justify-between">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-[#1d1d1f]">
+            <h3 className="text-[11px] md:text-xs font-semibold uppercase tracking-[0.14em] text-[#86868b]">
               Resultados da busca
             </h3>
             <div className="flex items-center gap-1.5">
@@ -198,14 +196,14 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
           </div>
 
           {searchResults.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3.5 md:gap-5">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-4 sm:gap-5 md:gap-6 lg:gap-7">
               {searchResults.map((book) => (
                 <div
                   key={book.id}
                   onClick={() => onSelectBook(book)}
-                  className="p-3.5 rounded-2xl bg-white hover:bg-neutral-50/80 border border-white hover:border-neutral-200/60 transition-all duration-200 cursor-pointer flex flex-col justify-between group active:scale-[0.98] md:hover:-translate-y-1 md:hover:shadow-md shadow-xs"
+                  className="p-2.5 sm:p-3 rounded-2xl bg-white hover:bg-neutral-50/70 border border-neutral-100 hover:border-neutral-200/80 transition-all duration-300 cursor-pointer flex flex-col justify-between group active:scale-[0.98] md:hover:-translate-y-1.5 md:hover:shadow-[0_12px_28px_rgba(0,0,0,0.06)] shadow-xs"
                 >
-                  <div className="w-full mb-2.5">
+                  <div className="w-full mb-2.5 overflow-hidden rounded-xl">
                     <BookCover
                       title={book.title}
                       author={book.author}
@@ -213,16 +211,16 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
                       notaEncaixe={book.notaEncaixe}
                     />
                   </div>
-                  <div className="space-y-0.5 pt-0.5">
-                    <h4 className="text-xs sm:text-[13px] font-bold text-[#1d1d1f] truncate group-hover:text-black leading-snug">
+                  <div className="space-y-0.5 px-0.5">
+                    <h4 className="text-xs sm:text-[13px] font-semibold text-[#1d1d1f] truncate group-hover:text-black leading-snug tracking-tight">
                       {book.title}
                     </h4>
-                    <p className="text-[11px] text-[#86868b] truncate flex items-center gap-1.5">
+                    <p className="text-[11px] text-[#86868b] truncate flex items-center gap-1.5 font-normal">
                       <span className="truncate">{book.author}</span>
                       {book.pages && (
                         <>
                           <span className="text-neutral-300 shrink-0">•</span>
-                          <span className="text-[10px] text-[#86868b] font-medium font-score shrink-0">{book.pages} págs</span>
+                          <span className="text-[10px] text-[#86868b] font-score shrink-0">{book.pages} págs</span>
                         </>
                       )}
                     </p>
@@ -250,7 +248,7 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
           {topMatches.length > 0 && (
             <div className="space-y-3.5 pt-1">
               <div className="flex items-center justify-between">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-[#1d1d1f]">
+                <h3 className="text-[11px] md:text-xs font-semibold uppercase tracking-[0.14em] text-[#86868b]">
                   Recomendações
                 </h3>
                 <div className="flex items-center gap-1.5">
@@ -293,14 +291,14 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3.5 md:gap-5">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-4 sm:gap-5 md:gap-6 lg:gap-7">
                 {topMatches.map((book) => (
                   <div
                     key={book.id}
                     onClick={() => onSelectBook(book)}
-                    className="p-3.5 rounded-2xl bg-white hover:bg-neutral-50/80 border border-white hover:border-neutral-200/60 transition-all duration-200 cursor-pointer flex flex-col justify-between group active:scale-[0.98] md:hover:-translate-y-1 md:hover:shadow-md shadow-xs"
+                    className="p-2.5 sm:p-3 rounded-2xl bg-white hover:bg-neutral-50/70 border border-neutral-100 hover:border-neutral-200/80 transition-all duration-300 cursor-pointer flex flex-col justify-between group active:scale-[0.98] md:hover:-translate-y-1.5 md:hover:shadow-[0_12px_28px_rgba(0,0,0,0.06)] shadow-xs"
                   >
-                    <div className="w-full mb-2.5">
+                    <div className="w-full mb-2.5 overflow-hidden rounded-xl">
                       <BookCover
                         title={book.title}
                         author={book.author}
@@ -308,16 +306,16 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
                         notaEncaixe={book.notaEncaixe}
                       />
                     </div>
-                    <div className="space-y-0.5 pt-0.5">
-                      <h4 className="text-xs sm:text-[13px] font-bold text-[#1d1d1f] truncate group-hover:text-black leading-snug">
+                    <div className="space-y-0.5 px-0.5">
+                      <h4 className="text-xs sm:text-[13px] font-semibold text-[#1d1d1f] truncate group-hover:text-black leading-snug tracking-tight">
                         {book.title}
                       </h4>
-                      <p className="text-[11px] text-[#86868b] truncate flex items-center gap-1.5">
+                      <p className="text-[11px] text-[#86868b] truncate flex items-center gap-1.5 font-normal">
                         <span className="truncate">{book.author}</span>
                         {book.pages && (
                           <>
                             <span className="text-neutral-300 shrink-0">•</span>
-                            <span className="text-[10px] text-[#86868b] font-medium font-score shrink-0">{book.pages} págs</span>
+                            <span className="text-[10px] text-[#86868b] font-score shrink-0">{book.pages} págs</span>
                           </>
                         )}
                       </p>

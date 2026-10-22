@@ -270,24 +270,25 @@ export const EstanteView: React.FC<EstanteViewProps> = ({
         </div>
       )}
 
-      {/* View All Shelves (Horizontal Carousels with Clickable Titles) */}
+      {/* View All Shelves (Horizontal Carousels with Clickable Titles) - 2 columns on PC, single column on mobile */}
       {selectedFilter === 'all' && (
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 xl:gap-12 items-start pt-2 md:pt-4">
           {allShelves.map((shelf) => (
-            <BookShelf
-              key={shelf.id}
-              title={shelf.title}
-              books={shelf.books}
-              onSelectBook={onSelectBook}
-              onTitleClick={() => handleSelectShelf(shelf.id)}
-            />
+            <div key={shelf.id} className="min-w-0 w-full overflow-hidden">
+              <BookShelf
+                title={shelf.title}
+                books={shelf.books}
+                onSelectBook={onSelectBook}
+                onTitleClick={() => handleSelectShelf(shelf.id)}
+              />
+            </div>
           ))}
         </div>
       )}
 
       {/* Single Shelf Opened as List/Grid View */}
       {selectedFilter !== 'all' && activeShelf && (
-        <div className="space-y-4 px-5 sm:px-6 md:px-8 lg:px-12 pt-1 pb-24 md:pb-16">
+        <div className="space-y-6 pt-1 pb-24 md:pb-16">
           {/* Shelf Navigation and Controls Header */}
           <div className="flex items-center justify-between gap-2">
             <button
@@ -323,16 +324,16 @@ export const EstanteView: React.FC<EstanteViewProps> = ({
           </div>
 
           {/* Grid presentation matching Início */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3.5 md:gap-5">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-4 sm:gap-5 md:gap-6 lg:gap-7">
             {[...activeShelf.books]
               .sort((a, b) => (sortOrder === 'desc' ? b.notaEncaixe - a.notaEncaixe : a.notaEncaixe - b.notaEncaixe))
               .map((book) => (
                 <div
                   key={book.id}
                   onClick={() => onSelectBook(book)}
-                  className="p-3.5 rounded-2xl bg-white hover:bg-neutral-50/80 border border-white hover:border-neutral-200/60 transition-all duration-200 cursor-pointer flex flex-col justify-between group active:scale-[0.98] md:hover:-translate-y-1 md:hover:shadow-md shadow-xs"
+                  className="p-2.5 sm:p-3 rounded-2xl bg-white hover:bg-neutral-50/70 border border-neutral-100 hover:border-neutral-200/80 transition-all duration-300 cursor-pointer flex flex-col justify-between group active:scale-[0.98] md:hover:-translate-y-1.5 md:hover:shadow-[0_12px_28px_rgba(0,0,0,0.06)] shadow-xs"
                 >
-                  <div className="w-full mb-2.5">
+                  <div className="w-full mb-2.5 overflow-hidden rounded-xl">
                     <BookCover
                       title={book.title}
                       author={book.author}
@@ -340,16 +341,16 @@ export const EstanteView: React.FC<EstanteViewProps> = ({
                       notaEncaixe={book.notaEncaixe}
                     />
                   </div>
-                  <div className="space-y-0.5 pt-0.5">
-                    <h4 className="text-xs sm:text-[13px] font-bold text-[#1d1d1f] truncate group-hover:text-black leading-snug">
+                  <div className="space-y-0.5 px-0.5">
+                    <h4 className="text-xs sm:text-[13px] font-semibold text-[#1d1d1f] truncate group-hover:text-black leading-snug tracking-tight">
                       {book.title}
                     </h4>
-                    <p className="text-[11px] text-[#86868b] truncate flex items-center gap-1.5">
+                    <p className="text-[11px] text-[#86868b] truncate flex items-center gap-1.5 font-normal">
                       <span className="truncate">{book.author}</span>
                       {book.pages && (
                         <>
                           <span className="text-neutral-300 shrink-0">•</span>
-                          <span className="text-[10px] text-[#86868b] font-medium font-score shrink-0">{book.pages} págs</span>
+                          <span className="text-[10px] text-[#86868b] font-score shrink-0">{book.pages} págs</span>
                         </>
                       )}
                     </p>

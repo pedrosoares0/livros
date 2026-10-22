@@ -43,7 +43,7 @@ export const BookShelf: React.FC<BookShelfProps> = ({
   return (
     <section className="w-full space-y-2 py-3 select-none">
       {/* Category Header Row */}
-      <div className="flex items-center justify-between px-6 md:px-8 lg:px-12">
+      <div className="flex items-center justify-between px-3 sm:px-4 md:px-3 lg:px-4">
         {onTitleClick ? (
           <button
             type="button"
@@ -72,40 +72,39 @@ export const BookShelf: React.FC<BookShelfProps> = ({
         {/* Left Scroll Chevron (Desktop Only) */}
         <button
           type="button"
-          onClick={() => scrollByAmount(-480)}
-          className="hidden md:flex absolute left-4 top-1/2 -translate-y-8 z-30 w-10 h-10 rounded-full bg-white/95 hover:bg-white text-[#1d1d1f] shadow-md border border-neutral-200/80 items-center justify-center opacity-0 group-hover/shelf:opacity-100 transition-all duration-200 cursor-pointer active:scale-95"
+          onClick={() => scrollByAmount(-320)}
+          className="hidden md:flex absolute left-1 top-1/2 -translate-y-8 z-30 w-8 h-8 rounded-full bg-white/95 hover:bg-white text-[#1d1d1f] shadow-md border border-neutral-200/80 items-center justify-center opacity-0 group-hover/shelf:opacity-100 transition-all duration-200 cursor-pointer active:scale-95"
           aria-label="Rolar estante para esquerda"
           title="Rolar para esquerda"
         >
-          <ChevronLeft className="w-5 h-5 text-[#1d1d1f]" />
+          <ChevronLeft className="w-4 h-4 text-[#1d1d1f]" />
         </button>
 
         {/* Right Scroll Chevron (Desktop Only) */}
         <button
           type="button"
-          onClick={() => scrollByAmount(480)}
-          className="hidden md:flex absolute right-4 top-1/2 -translate-y-8 z-30 w-10 h-10 rounded-full bg-white/95 hover:bg-white text-[#1d1d1f] shadow-md border border-neutral-200/80 items-center justify-center opacity-0 group-hover/shelf:opacity-100 transition-all duration-200 cursor-pointer active:scale-95"
+          onClick={() => scrollByAmount(320)}
+          className="hidden md:flex absolute right-1 top-1/2 -translate-y-8 z-30 w-8 h-8 rounded-full bg-white/95 hover:bg-white text-[#1d1d1f] shadow-md border border-neutral-200/80 items-center justify-center opacity-0 group-hover/shelf:opacity-100 transition-all duration-200 cursor-pointer active:scale-95"
           aria-label="Rolar estante para direita"
           title="Rolar para direita"
         >
-          <ChevronRight className="w-5 h-5 text-[#1d1d1f]" />
+          <ChevronRight className="w-4 h-4 text-[#1d1d1f]" />
         </button>
 
         {/* Horizontal Book Row - Enlarged, Smooth Scrolling */}
         <div
           ref={scrollContainerRef}
           onWheel={handleWheel}
-          className="flex items-end gap-5 md:gap-6 overflow-x-auto pt-3 pb-8 px-6 md:px-8 lg:px-12 hide-scrollbar scroll-smooth"
+          className="flex items-end gap-4 sm:gap-5 overflow-x-auto pt-2 pb-8 px-3 sm:px-4 md:px-3 lg:px-4 hide-scrollbar scroll-smooth"
         >
           {books.map((book) => (
             <div
               key={book.id}
               onClick={() => onSelectBook(book)}
-              className="group relative flex flex-col items-center shrink-0 cursor-pointer transition-transform duration-200 active:scale-[0.97]"
-              style={{ width: '154px' }}
+              className="group relative flex flex-col items-center shrink-0 cursor-pointer transition-transform duration-200 active:scale-[0.97] w-[142px] sm:w-[154px] lg:w-[138px] xl:w-[146px]"
             >
-              {/* Authentic Book Cover - Enlarged (154px x 231px) */}
-              <div className="w-[154px] h-[231px] transition-transform duration-200 group-hover:-translate-y-1.5">
+              {/* Authentic Book Cover */}
+              <div className="w-[142px] h-[213px] sm:w-[154px] sm:h-[231px] lg:w-[138px] lg:h-[207px] xl:w-[146px] xl:h-[219px] transition-transform duration-200 group-hover:-translate-y-1.5">
                 <BookCover
                   title={book.title}
                   author={book.author}
@@ -119,7 +118,7 @@ export const BookShelf: React.FC<BookShelfProps> = ({
 
         {/* Standardized Soft Frosted Gray Acrylic Lip (COVERING THE LOWER PART OF THE BOOKS) */}
         <div
-          className="absolute left-4 md:left-6 lg:left-8 right-4 md:right-6 lg:right-8 pointer-events-none z-20"
+          className="absolute left-2 sm:left-3 md:left-2 lg:left-3 right-2 sm:right-3 md:right-2 lg:right-3 pointer-events-none z-20"
           style={{ bottom: '18px' }}
         >
           <div

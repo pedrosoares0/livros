@@ -125,9 +125,9 @@ export function App() {
   const allShelfBooks = books;
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-start bg-[#f5f5f7] text-[#1d1d1f] antialiased">
-      {/* Responsive Apple Container (Mobile-first frame on phone, expansive canvas on desktop) */}
-      <div className="w-full max-w-md sm:max-w-xl md:max-w-5xl lg:max-w-6xl xl:max-w-7xl min-h-screen flex flex-col bg-[#ffffff] md:border-x border-neutral-200/80 md:shadow-[0_0_50px_rgba(0,0,0,0.03)] relative pb-24 md:pb-16">
+    <div className="min-h-screen flex flex-col items-center justify-start bg-[#f5f5f7] md:bg-white text-[#1d1d1f] antialiased w-full">
+      {/* Mobile-first frame on phone, seamless edge-to-edge canvas on desktop */}
+      <div className="w-full max-w-md sm:max-w-xl md:max-w-none min-h-screen flex flex-col bg-white border-x border-neutral-200/80 md:border-none shadow-[0_0_40px_rgba(0,0,0,0.04)] md:shadow-none relative pb-24 md:pb-20">
         
         {/* Mobile Header (Untouched for phone) */}
         <header className="px-6 pt-7 pb-2 text-center select-none md:hidden">
@@ -143,7 +143,7 @@ export function App() {
         </header>
 
         {/* Desktop Sticky Header Bar (Apple macOS Style) */}
-        <header className="hidden md:flex items-center justify-between px-8 lg:px-12 py-4 border-b border-neutral-200/70 bg-white/90 backdrop-blur-md sticky top-0 z-30 select-none">
+        <header className="hidden md:flex items-center justify-between w-full px-8 lg:px-14 2xl:px-20 py-4.5 border-b border-neutral-100 bg-white/85 backdrop-blur-md sticky top-0 z-30 select-none">
           <div
             className="flex items-center gap-3.5 cursor-pointer group"
             onClick={() => setActiveTab('discover')}
@@ -226,7 +226,7 @@ export function App() {
         </header>
 
         {/* Main Content Views — Persistent mounted DOM for zero-reload instant tab switching */}
-        <main className="flex-1 py-1">
+        <main className="flex-1 w-full max-w-[1560px] mx-auto px-4 sm:px-6 md:px-10 lg:px-14 2xl:px-20 py-2 md:py-6">
           <div className={activeTab === 'discover' ? 'block' : 'hidden'}>
             <DiscoverView
               books={books}
