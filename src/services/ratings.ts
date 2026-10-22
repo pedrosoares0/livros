@@ -9,7 +9,7 @@ const RATINGS_STORAGE_KEY = 'veredito_user_ratings';
 export type RatingBand = 'low' | 'mid' | 'high';
 
 export const RATING_PILLS: Record<RatingBand, string[]> = {
-  low: ['Ritmo arrastado', 'Nenhum impacto', 'Raso / besta'],
+  low: ['Só é ruim mesmo', 'Ritmo arrastado', 'Nenhum impacto', 'Raso / besta'],
   mid: ['Experiência ok', 'Bom, mas nada demais', 'Ideia boa, ritmo lento'],
   high: ['Me marcou', 'Ritmo impecável', 'Releria'],
 };
@@ -18,6 +18,19 @@ export const getRatingBand = (rating: number): RatingBand => {
   if (rating <= 5) return 'low';
   if (rating <= 7) return 'mid';
   return 'high';
+};
+
+export const getPillsForRating = (rating: number): string[] => {
+  if (rating <= 5) {
+    return ['Só é ruim mesmo', 'Ritmo arrastado', 'Nenhum impacto', 'Raso / besta'];
+  }
+  if (rating <= 7) {
+    return ['Experiência ok', 'Bom, mas nada demais', 'Ideia boa, ritmo lento'];
+  }
+  if (rating === 10) {
+    return ['Perfeito', 'Me marcou', 'Ritmo impecável', 'Releria'];
+  }
+  return ['Me marcou', 'Ritmo impecável', 'Releria'];
 };
 
 /** Nota efetiva: a do leitor quando existe, senão a de encaixe prevista pela IA. */

@@ -2,7 +2,7 @@ import React, { useState, useMemo, ChangeEvent } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Trash2, Check } from 'lucide-react';
 import { BookEvaluation, UserRating } from '../types';
-import { RATING_PILLS, getRatingBand, RatingBand } from '../services/ratings';
+import { getPillsForRating, getRatingBand, RatingBand } from '../services/ratings';
 import { AceternityButton } from './AceternityButton';
 
 interface RateBookModalProps {
@@ -71,7 +71,7 @@ export const RateBookModal: React.FC<RateBookModalProps> = ({
 
   // Current band based on rating (1-5: low, 6-7: mid, 8-10: high)
   const currentBand: RatingBand = useMemo(() => getRatingBand(rating), [rating]);
-  const availablePills = RATING_PILLS[currentBand];
+  const availablePills = useMemo(() => getPillsForRating(rating), [rating]);
 
   const colorSettings = useMemo(() => getColorSettings(rating), [rating]);
   const percentage = ((rating - MIN_RATING) / (MAX_RATING - MIN_RATING)) * 100;
@@ -92,10 +92,14 @@ export const RateBookModal: React.FC<RateBookModalProps> = ({
   const handleSliderChange = (e: ChangeEvent<HTMLInputElement>) => {
     const val = Number(e.target.value);
     const newBand = getRatingBand(val);
+    const nextPills = getPillsForRating(val);
     
     // Clear tags if changing bands (Q11: pills are exclusive to each rating band)
     if (newBand !== currentBand) {
       setSelectedTags([]);
+    } else {
+      // Retém apenas tags compatíveis com o novo valor (ex: "Perfeito" só existe no 10)
+      setSelectedTags((prev) => prev.filter((t) => nextPills.includes(t)));
     }
 
     setRating(val);
