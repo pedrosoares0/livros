@@ -331,16 +331,16 @@ export const EstanteView: React.FC<EstanteViewProps> = React.memo(({
           </div>
 
           {/* Grid presentation matching Início */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-4 sm:gap-5 md:gap-6 lg:gap-7">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-5 sm:gap-6 md:gap-7 lg:gap-8">
             {[...activeShelf.books]
               .sort((a, b) => (sortOrder === 'desc' ? b.notaEncaixe - a.notaEncaixe : a.notaEncaixe - b.notaEncaixe))
               .map((book) => (
                 <div
                   key={book.id}
                   onClick={() => onSelectBook(book)}
-                  className="p-2.5 sm:p-3 rounded-2xl bg-white hover:bg-neutral-50/70 border border-neutral-100 hover:border-neutral-200/80 transition-all duration-300 cursor-pointer flex flex-col justify-between group active:scale-[0.98] md:hover:-translate-y-1.5 md:hover:shadow-[0_12px_28px_rgba(0,0,0,0.06)] shadow-xs"
+                  className="flex flex-col cursor-pointer group active:scale-[0.98] transition-transform duration-200 select-none"
                 >
-                  <div className="w-full mb-2.5 overflow-hidden rounded-xl">
+                  <div className="w-full mb-3 transition-transform duration-200 group-hover:-translate-y-1.5">
                     <BookCover
                       title={book.title}
                       author={book.author}
