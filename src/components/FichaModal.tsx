@@ -628,9 +628,9 @@ ${book.resumo}
           </div>
         </div>
 
-        {/* Footer Actions — Aceternity Button System + Desktop Keyboard Hint */}
-        <div className="p-3.5 sm:p-4 md:px-8 border-t border-black/[0.06] bg-[#ffffff] flex items-center justify-between gap-2.5">
-          <div className="flex items-center gap-2 flex-1 md:flex-initial">
+        {/* Footer Actions — Centered Action Bar */}
+        <div className="p-3.5 sm:p-4 md:px-8 border-t border-black/[0.06] bg-[#ffffff] flex items-center justify-center">
+          <div className="flex items-center justify-center gap-2 flex-wrap sm:flex-nowrap">
             {/* 1. Avaliar Novo Livro — Botão padrão PearlButton (à esquerda) */}
             {onOpenEvaluate && (
               <PearlButton
@@ -653,7 +653,7 @@ ${book.resumo}
               >
                 {userRating ? (
                   <>
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                    <CheckCircle2 className="w-3.5 h-3.5 text-white shrink-0" />
                     <span>Sua nota · {userRating.rating}</span>
                   </>
                 ) : (
@@ -665,17 +665,21 @@ ${book.resumo}
               </AceternityButton>
             )}
 
-            {/* 3. Salvar Button (creates/adds to Salvos shelf) */}
+            {/* 3. Salvar Button — apenas símbolo, tema preto quando ativo */}
             {onSaveToWishlist && (
               <AceternityButton
-                variant={isSaved ? "outline" : "secondary"}
+                variant={isSaved ? "primary" : "secondary"}
                 size="md"
                 onClick={() => onSaveToWishlist(book)}
-                className={`shrink-0 ${isSaved ? '!bg-emerald-50 !text-emerald-800 !border-emerald-300' : ''}`}
+                className={`shrink-0 px-3.5 ${
+                  isSaved
+                    ? '!bg-neutral-900 hover:!bg-black !text-white !border-neutral-800 shadow-sm'
+                    : ''
+                }`}
                 title={isSaved ? "Salvo na sua estante" : "Salvar livro"}
+                aria-label={isSaved ? "Salvo na sua estante" : "Salvar livro"}
               >
-                <Bookmark className={`w-3.5 h-3.5 ${isSaved ? 'fill-emerald-800 text-emerald-800' : ''}`} />
-                <span className="hidden sm:inline">{isSaved ? 'Salvo' : 'Salvar'}</span>
+                <Bookmark className={`w-3.5 h-3.5 ${isSaved ? 'fill-white text-white' : 'text-[#1d1d1f]'}`} />
               </AceternityButton>
             )}
 
