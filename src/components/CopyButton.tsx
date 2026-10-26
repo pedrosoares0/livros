@@ -46,9 +46,11 @@ export interface CopyButtonProps {
   errorIcon?: React.ReactNode;
   idleLabel?: string;
   doneLabel?: string;
+  showLabel?: boolean;
   onCopySuccess?: () => void;
   onCopyError?: (err: Error) => void;
   children?: React.ReactNode;
+  'aria-label'?: string;
 }
 
 export const CopyButton: React.FC<CopyButtonProps> = ({
@@ -61,9 +63,11 @@ export const CopyButton: React.FC<CopyButtonProps> = ({
   errorIcon,
   idleLabel = 'Copiar',
   doneLabel = 'Copiado',
+  showLabel = true,
   onCopySuccess,
   onCopyError,
   children,
+  'aria-label': ariaLabel,
 }) => {
   const [state, setState] = useState<CopyState>('idle');
 
@@ -89,6 +93,7 @@ export const CopyButton: React.FC<CopyButtonProps> = ({
       onClick={handleCopy}
       className={`will-change-transform ${className}`}
       title={state === 'done' ? 'Copiado para a área de transferência!' : 'Copiar'}
+      aria-label={ariaLabel || 'Copiar'}
     >
       <CopyStateIcon
         state={state}
@@ -96,10 +101,12 @@ export const CopyButton: React.FC<CopyButtonProps> = ({
         doneIcon={doneIcon}
         errorIcon={errorIcon}
       />
-      {children ? (
-        children
-      ) : (
-        <span className="font-semibold">{state === 'done' ? doneLabel : idleLabel}</span>
+      {showLabel && (
+        children ? (
+          children
+        ) : (
+          <span className="font-semibold">{state === 'done' ? doneLabel : idleLabel}</span>
+        )
       )}
     </AceternityButton>
   );

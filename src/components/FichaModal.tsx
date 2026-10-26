@@ -631,13 +631,24 @@ ${book.resumo}
         {/* Footer Actions — Aceternity Button System + Desktop Keyboard Hint */}
         <div className="p-3.5 sm:p-4 md:px-8 border-t border-black/[0.06] bg-[#ffffff] flex items-center justify-between gap-2.5">
           <div className="flex items-center gap-2 flex-1 md:flex-initial">
-            {/* Botão "Já li" / "Sua nota · X" */}
+            {/* 1. Avaliar Novo Livro — Botão padrão PearlButton (à esquerda) */}
+            {onOpenEvaluate && (
+              <PearlButton
+                size="nav-rect"
+                label="Avaliar"
+                onClick={onOpenEvaluate}
+                title="Avaliar novo livro no Veredito"
+                className="shrink-0"
+              />
+            )}
+
+            {/* 2. Botão "Já li" / "Sua nota · X" */}
             {onOpenRateModal && (
               <AceternityButton
-                variant={userRating ? "outline" : "primary"}
+                variant={userRating ? "primary" : "secondary"}
                 size="md"
                 onClick={onOpenRateModal}
-                className={`flex-1 sm:flex-initial ${userRating ? '!bg-neutral-900 hover:!bg-black !text-white !border-neutral-800' : ''}`}
+                className={`shrink-0 ${userRating ? '!bg-neutral-900 hover:!bg-black !text-white !border-neutral-800' : ''}`}
                 title={userRating ? "Editar sua avaliação deste livro" : "Registrar leitura e avaliar este livro"}
               >
                 {userRating ? (
@@ -647,14 +658,14 @@ ${book.resumo}
                   </>
                 ) : (
                   <>
-                    <Check className="w-3.5 h-3.5 text-white stroke-[3] shrink-0" />
+                    <Check className="w-3.5 h-3.5 text-[#1d1d1f] stroke-[2.5] shrink-0" />
                     <span>Já li</span>
                   </>
                 )}
               </AceternityButton>
             )}
 
-            {/* Salvar Button (creates/adds to Salvos shelf) */}
+            {/* 3. Salvar Button (creates/adds to Salvos shelf) */}
             {onSaveToWishlist && (
               <AceternityButton
                 variant={isSaved ? "outline" : "secondary"}
@@ -668,28 +679,17 @@ ${book.resumo}
               </AceternityButton>
             )}
 
-            {/* Copiar Button with Animated Icon Swap */}
+            {/* 4. Copiar Button with Animated Icon Swap (apenas símbolo) */}
             <CopyButton
-              variant="outline"
+              variant="secondary"
               size="md"
               text={generateFichaText}
-              idleLabel="Copiar"
-              doneLabel="Copiado!"
-              className="shrink-0"
+              showLabel={false}
+              aria-label="Copiar ficha"
+              className="shrink-0 px-3.5"
             />
 
-            {/* Avaliar Novo Livro — Botão padrão PearlButton */}
-            {onOpenEvaluate && (
-              <PearlButton
-                size="nav-rect"
-                label="Avaliar"
-                onClick={onOpenEvaluate}
-                title="Avaliar novo livro no Veredito"
-                className="shrink-0"
-              />
-            )}
-
-            {/* Excluir Livro */}
+            {/* 5. Excluir Livro */}
             {onDeleteBook && (
               <AceternityButton
                 variant="destructive"
