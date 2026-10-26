@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Search, ListPlus, X, BookOpen, ChevronRight, AlertTriangle, Check, Loader2, Sparkles } from 'lucide-react';
+import { Search, ListPlus, X, BookOpen, ChevronRight, AlertTriangle, Check, Loader2 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { searchBookApi, evaluateBulkList, evaluateBook, isAmazonUrl } from '../services/evaluator';
 import { evaluateWithGemini, evaluateBulkWithGemini } from '../services/geminiEvaluator';
@@ -355,31 +355,16 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
           {/* iOS Handle Indicator on mobile */}
           <div className="w-10 h-1 bg-neutral-300 rounded-full mx-auto mt-2.5 sm:hidden shrink-0" />
 
-          {/* Top Action Bar with Desktop Breadcrumb / Branding */}
-          <div className="flex items-center justify-between px-5 sm:px-6 md:px-8 pt-3 pb-2.5 sticky top-0 z-20 bg-white/95 backdrop-blur-md border-b border-black/[0.04]">
-            <div className="hidden md:flex items-center gap-2 text-xs font-semibold text-[#86868b] min-w-0">
-              <Sparkles className="w-3.5 h-3.5 text-neutral-900 shrink-0" />
-              <span className="text-[#1d1d1f] font-bold shrink-0">Veredito Engine</span>
-              <span className="text-neutral-300">•</span>
-              <span className="text-neutral-600 font-medium truncate">
-                {isLoading
-                  ? 'Análise Crítica em Andamento'
-                  : tab === 'single'
-                  ? 'Pesquisar & Avaliar Obra'
-                  : 'Avaliação em Lote'}
-              </span>
-            </div>
-
+          {/* Minimalist Top Close Bar */}
+          <div className="flex items-center justify-end px-5 sm:px-6 md:px-8 pt-3 pb-1 sticky top-0 z-20 bg-white/95 backdrop-blur-md">
             {!isLoading && (
-              <div className="flex items-center gap-1.5 ml-auto">
-                <button
-                  onClick={onClose}
-                  aria-label="Fechar"
-                  className="p-2 -mr-2 rounded-full hover:bg-neutral-100 active:bg-neutral-200/70 text-[#86868b] hover:text-[#1d1d1f] transition-all cursor-pointer"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
+              <button
+                onClick={onClose}
+                aria-label="Fechar"
+                className="p-2 -mr-2 rounded-full hover:bg-neutral-100 active:bg-neutral-200/70 text-[#86868b] hover:text-[#1d1d1f] transition-all cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
             )}
           </div>
 
@@ -497,8 +482,8 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                   <div className="w-full md:col-span-7 flex flex-col justify-center space-y-4 md:space-y-5 text-center md:text-left md:pl-2 mt-4 md:mt-0">
                     <div className="space-y-1.5">
                       <div className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200/80">
-                        <Sparkles className="w-3 h-3 text-emerald-600 animate-pulse" />
-                        <span>Veredito AI Engine</span>
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                        <span>Análise Crítica</span>
                       </div>
                       <h4 className="text-base md:text-lg font-bold text-[#1d1d1f]">
                         Processando Telemetria da Obra
@@ -659,14 +644,9 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
 
                 {/* Command Palette Styled Search Bar */}
                 <form onSubmit={handleSearchSubmit} className="space-y-1.5">
-                  <div className="flex items-center justify-between">
-                    <label className="text-xs font-semibold text-[#1d1d1f] block">
-                      Pesquise por título, autor, ISBN ou cole um link da Amazon:
-                    </label>
-                    <span className="hidden md:inline text-[10px] text-[#86868b] font-medium">
-                      Pressione <kbd className="px-1 py-0.2 bg-neutral-100 border border-neutral-200/80 rounded font-mono">↵ Enter</kbd> para buscar
-                    </span>
-                  </div>
+                  <label className="text-xs font-semibold text-[#1d1d1f] block">
+                    Pesquise por título, autor, ISBN ou cole um link da Amazon:
+                  </label>
 
                   <div className="relative w-full">
                     <Search className="absolute left-3.5 sm:left-4 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-4.5 sm:h-4.5 text-[#86868b] pointer-events-none" />
@@ -803,7 +783,6 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                                   }}
                                   className="px-3 py-1.5 text-xs font-bold rounded-xl bg-[#1d1d1f] text-white hover:bg-black active:scale-95 transition-all shadow-2xs cursor-pointer flex items-center gap-1.5"
                                 >
-                                  <Sparkles className="w-3 h-3 text-amber-300 shrink-0" />
                                   <span>Avaliar</span>
                                 </button>
                               )}
@@ -819,7 +798,7 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                       Nenhuma edição direta encontrada na busca rápida
                     </p>
                     <p className="text-[11px] sm:text-xs text-[#86868b] max-w-sm mx-auto leading-relaxed">
-                      Deseja que a IA do Veredito consulte a premissa de <strong>"{query.trim()}"</strong> e gere a ficha completa agora?
+                      Deseja avaliar <strong>"{query.trim()}"</strong> agora no Veredito?
                     </p>
                     <button
                       type="button"
@@ -831,51 +810,26 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                       }
                       className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-xl bg-[#1d1d1f] text-white hover:bg-black active:scale-95 transition-all shadow-xs cursor-pointer mt-1"
                     >
-                      <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-                      <span>Avaliar "{query.trim()}" com IA</span>
+                      <span>Avaliar "{query.trim()}"</span>
                     </button>
                   </div>
                 ) : (
-                  /* Initial Empty State on Desktop: Quick Suggestions & Feature Pillars */
-                  <div className="space-y-4 pt-1">
-                    <div className="space-y-2">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-[#86868b] block">
-                        Sugestões Populares para Avaliar
-                      </span>
-                      <div className="flex flex-wrap gap-1.5">
-                        {POPULAR_SUGGESTIONS.map((title) => (
-                          <button
-                            key={title}
-                            type="button"
-                            onClick={() => handleInputChange(title)}
-                            className="px-2.5 py-1 rounded-lg bg-neutral-100 hover:bg-neutral-200/80 border border-neutral-200/80 text-xs font-medium text-neutral-800 transition-colors cursor-pointer active:scale-95 flex items-center gap-1"
-                          >
-                            <span>{title}</span>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* 3 Pillars Explainer on Desktop */}
-                    <div className="hidden md:grid md:grid-cols-3 md:gap-3 pt-2 border-t border-neutral-200/60">
-                      <div className="p-3 rounded-xl bg-neutral-50/90 border border-neutral-200/70 space-y-1">
-                        <span className="text-xs font-bold text-[#1d1d1f] block">🔍 Busca Universal</span>
-                        <p className="text-[11px] text-[#86868b] leading-relaxed">
-                          Pesquise por título, autor, ISBN ou cole qualquer link direto da Amazon.
-                        </p>
-                      </div>
-                      <div className="p-3 rounded-xl bg-neutral-50/90 border border-neutral-200/70 space-y-1">
-                        <span className="text-xs font-bold text-[#1d1d1f] block">⚡ Telemetria por IA</span>
-                        <p className="text-[11px] text-[#86868b] leading-relaxed">
-                          Ritmo narrativo, densidade dramática, qualidade técnica e worldbuilding.
-                        </p>
-                      </div>
-                      <div className="p-3 rounded-xl bg-neutral-50/90 border border-neutral-200/70 space-y-1">
-                        <span className="text-xs font-bold text-[#1d1d1f] block">🎯 Nota de Encaixe</span>
-                        <p className="text-[11px] text-[#86868b] leading-relaxed">
-                          Calibrada às suas preferências pessoais para evitar obras genéricas.
-                        </p>
-                      </div>
+                  /* Initial Empty State on Desktop: Quick Suggestions */
+                  <div className="space-y-2 pt-1">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#86868b] block">
+                      Sugestões Populares para Avaliar
+                    </span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {POPULAR_SUGGESTIONS.map((title) => (
+                        <button
+                          key={title}
+                          type="button"
+                          onClick={() => handleInputChange(title)}
+                          className="px-2.5 py-1 rounded-lg bg-neutral-100 hover:bg-neutral-200/80 border border-neutral-200/80 text-xs font-medium text-neutral-800 transition-colors cursor-pointer active:scale-95 flex items-center gap-1"
+                        >
+                          <span>{title}</span>
+                        </button>
+                      ))}
                     </div>
                   </div>
                 )}
