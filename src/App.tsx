@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { AnimatePresence } from 'motion/react';
+import { AnimatePresence, motion } from 'motion/react';
 import { SlidersHorizontal } from 'lucide-react';
 import { BookEvaluation, UserRatingsMap, UserRating } from './types';
 import { DiscoverView } from './components/DiscoverView';
@@ -230,49 +230,67 @@ export function App() {
           {/* Right Group: Navigation Tabs placed adjacent to Actions */}
           <div className="flex items-center gap-3.5 lg:gap-4.5">
             {/* Desktop Navigation Tabs */}
-            <div className="flex items-center bg-neutral-100/90 p-1 rounded-full border border-neutral-200/80 shadow-2xs">
+            <div className="relative flex items-center bg-neutral-100/90 p-1 rounded-full border border-neutral-200/80 shadow-2xs">
               <button
                 type="button"
                 onClick={() => setActiveTab('discover')}
-                className={`flex items-center gap-2 px-5 py-2 rounded-full text-xs font-bold transition-all duration-150 cursor-pointer ${
-                  activeTab === 'discover'
-                    ? 'bg-white text-[#1d1d1f] shadow-xs'
-                    : 'text-[#86868b] hover:text-[#1d1d1f]'
-                }`}
+                className="relative px-5 py-2 rounded-full text-xs font-bold transition-colors duration-200 cursor-pointer select-none active:scale-[0.97]"
               >
-                <svg
-                  className={`w-4 h-4 transition-colors ${
-                    activeTab === 'discover' ? 'text-[#000000]' : 'text-[#86868b]'
+                {activeTab === 'discover' && (
+                  <motion.div
+                    layoutId="desktop-nav-bubble"
+                    className="absolute inset-0 rounded-full bg-white shadow-xs border border-black/[0.04]"
+                    transition={{ type: 'spring', damping: 26, stiffness: 380, mass: 0.8 }}
+                  />
+                )}
+                <span
+                  className={`relative z-10 flex items-center gap-2 transition-colors duration-200 ${
+                    activeTab === 'discover' ? 'text-[#1d1d1f]' : 'text-[#86868b] hover:text-[#1d1d1f]'
                   }`}
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
                 >
-                  <path d="M12 2.75a1.25 1.25 0 0 0-.82.31L3.38 9.3a1.5 1.5 0 0 0-.58 1.18V20a1.75 1.75 0 0 0 1.75 1.75h4.2a.75.75 0 0 0 .75-.75v-4.5a1.5 1.5 0 0 1 3 0v4.5a.75.75 0 0 0 .75.75h4.2A1.75 1.75 0 0 0 19.2 20V10.48a1.5 1.5 0 0 0-.58-1.18l-7.8-6.24a1.25 1.25 0 0 0-.82-.31z" />
-                </svg>
-                <span>Início</span>
+                  <svg
+                    className={`w-4 h-4 transition-colors duration-200 ${
+                      activeTab === 'discover' ? 'text-[#000000]' : 'text-[#86868b]'
+                    }`}
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path d="M12 2.75a1.25 1.25 0 0 0-.82.31L3.38 9.3a1.5 1.5 0 0 0-.58 1.18V20a1.75 1.75 0 0 0 1.75 1.75h4.2a.75.75 0 0 0 .75-.75v-4.5a1.5 1.5 0 0 1 3 0v4.5a.75.75 0 0 0 .75.75h4.2A1.75 1.75 0 0 0 19.2 20V10.48a1.5 1.5 0 0 0-.58-1.18l-7.8-6.24a1.25 1.25 0 0 0-.82-.31z" />
+                  </svg>
+                  <span>Início</span>
+                </span>
               </button>
               <button
                 type="button"
                 onClick={() => setActiveTab('shelves')}
-                className={`flex items-center gap-2 px-5 py-2 rounded-full text-xs font-bold transition-all duration-150 cursor-pointer ${
-                  activeTab === 'shelves'
-                    ? 'bg-white text-[#1d1d1f] shadow-xs'
-                    : 'text-[#86868b] hover:text-[#1d1d1f]'
-                }`}
+                className="relative px-5 py-2 rounded-full text-xs font-bold transition-colors duration-200 cursor-pointer select-none active:scale-[0.97]"
               >
-                <svg
-                  className={`w-4 h-4 transition-colors ${
-                    activeTab === 'shelves' ? 'text-[#000000]' : 'text-[#86868b]'
+                {activeTab === 'shelves' && (
+                  <motion.div
+                    layoutId="desktop-nav-bubble"
+                    className="absolute inset-0 rounded-full bg-white shadow-xs border border-black/[0.04]"
+                    transition={{ type: 'spring', damping: 26, stiffness: 380, mass: 0.8 }}
+                  />
+                )}
+                <span
+                  className={`relative z-10 flex items-center gap-2 transition-colors duration-200 ${
+                    activeTab === 'shelves' ? 'text-[#1d1d1f]' : 'text-[#86868b] hover:text-[#1d1d1f]'
                   }`}
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
                 >
-                  <rect x="3.5" y="4.5" width="4" height="15.5" rx="1.5" />
-                  <rect x="9" y="3.5" width="4.2" height="16.5" rx="1.5" />
-                  <rect x="10.35" y="6.5" width="1.5" height="3" rx="0.5" fill="white" />
-                  <path d="M15.2 5.5a1.5 1.5 0 0 1 1.9-.8l2.6 1.3a1.5 1.5 0 0 1 .7 2l-6.2 12.4a1.5 1.5 0 0 1-2 .7l-2.6-1.3a1.5 1.5 0 0 1-.7-2L15.2 5.5z" />
-                </svg>
-                <span>Estante</span>
+                  <svg
+                    className={`w-4 h-4 transition-colors duration-200 ${
+                      activeTab === 'shelves' ? 'text-[#000000]' : 'text-[#86868b]'
+                    }`}
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <rect x="3.5" y="4.5" width="4" height="15.5" rx="1.5" />
+                    <rect x="9" y="3.5" width="4.2" height="16.5" rx="1.5" />
+                    <rect x="10.35" y="6.5" width="1.5" height="3" rx="0.5" fill="white" />
+                    <path d="M15.2 5.5a1.5 1.5 0 0 1 1.9-.8l2.6 1.3a1.5 1.5 0 0 1 .7 2l-6.2 12.4a1.5 1.5 0 0 1-2 .7l-2.6-1.3a1.5 1.5 0 0 1-.7-2L15.2 5.5z" />
+                  </svg>
+                  <span>Estante</span>
+                </span>
               </button>
             </div>
 

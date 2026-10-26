@@ -375,9 +375,8 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                 <button
                   onClick={onClose}
                   aria-label="Fechar"
-                  className="p-2 -mr-2 rounded-full hover:bg-neutral-100 active:bg-neutral-200/70 text-[#86868b] hover:text-[#1d1d1f] transition-all cursor-pointer flex items-center gap-1.5"
+                  className="p-2 -mr-2 rounded-full hover:bg-neutral-100 active:bg-neutral-200/70 text-[#86868b] hover:text-[#1d1d1f] transition-all cursor-pointer"
                 >
-                  <span className="hidden md:inline-flex items-center px-1.5 py-0.5 bg-neutral-100 border border-neutral-200/90 rounded text-[10px] font-mono text-neutral-500 shadow-2xs">Esc</span>
                   <X className="w-5 h-5" />
                 </button>
               </div>

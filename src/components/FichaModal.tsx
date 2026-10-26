@@ -276,16 +276,9 @@ ${book.resumo}
           )}
         </AnimatePresence>
 
-        {/* Top Header Bar with Desktop Breadcrumb */}
-        <div className="flex items-center justify-between px-5 sm:px-6 md:px-8 pt-3 pb-2.5 bg-[#ffffff]/95 backdrop-blur-lg sticky top-0 z-20 border-b border-black/[0.04]">
-          <div className="hidden md:flex items-center gap-2 text-xs font-semibold text-[#86868b] min-w-0">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
-            <span className="text-[#1d1d1f] font-bold shrink-0">Ficha Técnica & Veredito</span>
-            <span className="text-neutral-300">•</span>
-            <span className="truncate max-w-[280px] lg:max-w-[420px] text-neutral-600 font-medium">{book.title}</span>
-          </div>
-
-          <div className="flex items-center gap-1.5 ml-auto">
+        {/* Minimalist Top Action Bar */}
+        <div className="flex items-center justify-end px-6 pt-3.5 pb-2 bg-[#ffffff]/90 backdrop-blur-lg sticky top-0 z-20">
+          <div className="flex items-center gap-1.5">
             <motion.button
               whileHover={{ scale: 1.08 }}
               whileTap={{ scale: 0.92 }}
@@ -300,7 +293,7 @@ ${book.resumo}
               whileTap={{ scale: 0.92 }}
               onClick={onClose}
               aria-label="Fechar"
-              className="p-2 rounded-full hover:bg-neutral-100 text-[#86868b] hover:text-[#1d1d1f] transition-colors cursor-pointer flex items-center gap-1"
+              className="p-2 rounded-full hover:bg-neutral-100 text-[#86868b] hover:text-[#1d1d1f] transition-colors cursor-pointer"
             >
               <X className="w-5 h-5" />
             </motion.button>
@@ -446,33 +439,6 @@ ${book.resumo}
                   </motion.div>
                 )}
               </AnimatePresence>
-
-              {/* Desktop Metadata Snapshot Box */}
-              <div className="hidden md:flex w-full max-w-[260px] p-3 rounded-2xl bg-neutral-50/90 border border-neutral-200/80 flex-col gap-2">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#86868b]">
-                  Status no Acervo
-                </span>
-                <div className="flex items-center justify-between text-xs font-semibold">
-                  <span className="text-[#1d1d1f] flex items-center gap-1.5">
-                    {userRating ? (
-                      <>
-                        <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
-                        <span>Lido · Nota {userRating.rating}</span>
-                      </>
-                    ) : isSaved ? (
-                      <>
-                        <span className="w-2 h-2 rounded-full bg-blue-500 shrink-0" />
-                        <span>Salvo na Estante</span>
-                      </>
-                    ) : (
-                      <>
-                        <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0" />
-                        <span>Recomendado pelo Veredito</span>
-                      </>
-                    )}
-                  </span>
-                </div>
-              </div>
             </div>
 
             {/* Right Column (Title, Scoreboard, Veredito, Premissa, Filmes, Critérios) */}
@@ -723,12 +689,6 @@ ${book.resumo}
                 <span className="hidden sm:inline">{confirmDelete ? 'Confirmar?' : 'Excluir'}</span>
               </AceternityButton>
             )}
-          </div>
-
-          {/* Desktop Keyboard ESC Hint */}
-          <div className="hidden md:flex items-center gap-1.5 text-xs text-neutral-400 font-medium select-none">
-            <kbd className="px-1.5 py-0.5 bg-neutral-100 border border-neutral-200/90 rounded text-[10px] font-mono text-neutral-500 shadow-2xs">Esc</kbd>
-            <span>para fechar</span>
           </div>
         </div>
       </motion.div>
