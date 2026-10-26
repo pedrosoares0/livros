@@ -258,7 +258,7 @@ ${book.resumo}
           stiffness: 320,
           mass: 0.85,
         }}
-        className="relative w-full max-w-lg md:max-w-3xl lg:max-w-4xl max-h-[92vh] sm:max-h-[88vh] md:max-h-[86vh] bg-[#ffffff] border border-black/[0.08] rounded-t-3xl sm:rounded-3xl shadow-[0_25px_65px_-15px_rgba(0,0,0,0.25)] flex flex-col overflow-hidden text-[#1d1d1f] z-20 will-change-transform"
+        className="relative w-full max-w-lg md:max-w-4xl lg:max-w-5xl xl:max-w-[1100px] max-h-[92vh] sm:max-h-[88vh] md:max-h-[88vh] bg-[#ffffff] border border-black/[0.08] rounded-t-3xl sm:rounded-3xl shadow-[0_25px_65px_-15px_rgba(0,0,0,0.25)] flex flex-col overflow-hidden text-[#1d1d1f] z-20 will-change-transform"
       >
         {/* Cover Change Success Alert */}
         <AnimatePresence>
@@ -276,9 +276,16 @@ ${book.resumo}
           )}
         </AnimatePresence>
 
-        {/* Minimalist Top Action Bar */}
-        <div className="flex items-center justify-end px-6 pt-3.5 pb-2 bg-[#ffffff]/90 backdrop-blur-lg sticky top-0 z-20">
-          <div className="flex items-center gap-1.5">
+        {/* Top Header Bar with Desktop Breadcrumb */}
+        <div className="flex items-center justify-between px-5 sm:px-6 md:px-8 pt-3 pb-2.5 bg-[#ffffff]/95 backdrop-blur-lg sticky top-0 z-20 border-b border-black/[0.04]">
+          <div className="hidden md:flex items-center gap-2 text-xs font-semibold text-[#86868b] min-w-0">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
+            <span className="text-[#1d1d1f] font-bold shrink-0">Ficha Técnica & Veredito</span>
+            <span className="text-neutral-300">•</span>
+            <span className="truncate max-w-[280px] lg:max-w-[420px] text-neutral-600 font-medium">{book.title}</span>
+          </div>
+
+          <div className="flex items-center gap-1.5 ml-auto">
             <motion.button
               whileHover={{ scale: 1.08 }}
               whileTap={{ scale: 0.92 }}
@@ -293,59 +300,60 @@ ${book.resumo}
               whileTap={{ scale: 0.92 }}
               onClick={onClose}
               aria-label="Fechar"
-              className="p-2 rounded-full hover:bg-neutral-100 text-[#86868b] hover:text-[#1d1d1f] transition-colors cursor-pointer"
+              className="p-2 rounded-full hover:bg-neutral-100 text-[#86868b] hover:text-[#1d1d1f] transition-colors cursor-pointer flex items-center gap-1"
             >
               <X className="w-5 h-5" />
             </motion.button>
           </div>
         </div>
 
-          {/* Scrollable Content */}
-          <div className="overflow-y-auto px-6 md:px-8 py-5 md:py-6 space-y-4 md:space-y-5 hide-scrollbar">
-            {/* Hero Section: Extra-Large Clean Cover + Dual Scores + Title */}
-            <div className="flex flex-col sm:flex-row gap-6 items-center sm:items-start">
-              {/* Extra-Large Book Cover */}
-              <div className="relative shrink-0 w-48 sm:w-56 flex flex-col items-center">
-                <div className="w-full">
-                  <BookCover
-                    title={book.title}
-                    author={book.author}
-                    coverUrl={book.coverUrl}
-                    userRating={userRating?.rating}
-                  />
-                </div>
+        {/* Scrollable Content: 12-Column Editorial Grid on Desktop, Single Column on Mobile */}
+        <div className="overflow-y-auto px-5 sm:px-6 md:px-8 py-4 sm:py-5 md:py-6 hide-scrollbar flex-1">
+          <div className="flex flex-col md:grid md:grid-cols-12 md:gap-8 items-start">
+            
+            {/* Left Column (Desktop Hero: Cover, Edition Tools & Metadata) */}
+            <div className="w-full md:col-span-4 lg:col-span-4 flex flex-col items-center md:items-start space-y-3.5 md:sticky md:top-0">
+              {/* Extra-Large Clean Cover */}
+              <div className="w-48 sm:w-56 md:w-full max-w-[260px] mx-auto md:mx-0">
+                <BookCover
+                  title={book.title}
+                  author={book.author}
+                  coverUrl={book.coverUrl}
+                  userRating={userRating?.rating}
+                />
+              </div>
 
-                <div className="mt-2.5 flex items-center gap-2">
-                  <span className="px-2.5 py-1 bg-neutral-100 border border-neutral-200/90 rounded-lg text-[10px] font-score font-semibold text-[#86868b] inline-block">
-                    {book.pages} págs
-                  </span>
+              {/* Cover Controls */}
+              <div className="w-full max-w-[260px] flex items-center justify-between gap-2 mx-auto md:mx-0">
+                <span className="px-2.5 py-1 bg-neutral-100 border border-neutral-200/90 rounded-lg text-[10px] font-score font-semibold text-[#86868b] inline-block">
+                  {book.pages} págs
+                </span>
 
-                  {/* Alterar Capa Action */}
-                  <button
-                    onClick={handleOpenCoverPicker}
-                    className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-neutral-100 hover:bg-neutral-200/80 border border-neutral-200/90 text-[10px] font-semibold text-[#1d1d1f] transition-all cursor-pointer active:scale-95 shadow-2xs"
-                    title="Buscar e selecionar capa alternativa"
+                <button
+                  onClick={handleOpenCoverPicker}
+                  className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1 rounded-lg bg-neutral-100 hover:bg-neutral-200/80 border border-neutral-200/90 text-[10px] font-semibold text-[#1d1d1f] transition-all cursor-pointer active:scale-95 shadow-2xs"
+                  title="Buscar e selecionar capa alternativa"
+                >
+                  <ImageIcon className="w-3.5 h-3.5 text-[#86868b]" />
+                  <span>{isCoverPickerOpen ? 'Fechar capas' : 'Alterar capa'}</span>
+                </button>
+              </div>
+
+              {/* Alternative Covers Selector Drawer with AnimatePresence */}
+              <AnimatePresence>
+                {isCoverPickerOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.22, ease: [0.32, 0.72, 0, 1] }}
+                    className="w-full max-w-[260px] mx-auto md:mx-0 p-3 rounded-2xl bg-neutral-50/95 border border-neutral-200/90 space-y-2 shadow-xs overflow-hidden"
                   >
-                    <ImageIcon className="w-3 h-3 text-[#86868b]" />
-                    <span>{isCoverPickerOpen ? 'Fechar capas' : 'Alterar capa'}</span>
-                  </button>
-                </div>
-
-                {/* Alternative Covers Selector Drawer with AnimatePresence */}
-                <AnimatePresence>
-                  {isCoverPickerOpen && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
-                      exit={{ opacity: 0, height: 0 }}
-                      transition={{ duration: 0.22, ease: [0.32, 0.72, 0, 1] }}
-                      className="w-full mt-3 p-3 rounded-2xl bg-neutral-50/95 border border-neutral-200/90 space-y-2 shadow-xs overflow-hidden"
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-[#1d1d1f]">
-                          Edições Disponíveis
-                        </span>
-                      </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-[#1d1d1f]">
+                        Edições Disponíveis
+                      </span>
+                    </div>
 
                     {isLoadingCovers && alternativeCovers.length === 0 ? (
                       <div className="py-5 text-center text-xs text-[#86868b] flex flex-col items-center gap-2">
@@ -355,7 +363,7 @@ ${book.resumo}
                     ) : (
                       <>
                         {alternativeCovers.length > 0 && (
-                          <div className="grid grid-cols-2 gap-2">
+                          <div className="grid grid-cols-2 gap-2 max-h-56 overflow-y-auto pr-0.5">
                             {alternativeCovers.map((coverUrl, idx) => (
                               <motion.div
                                 key={idx}
@@ -435,198 +443,232 @@ ${book.resumo}
                         </div>
                       </>
                     )}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
-              <div className="flex-1 text-center sm:text-left space-y-2 min-w-0">
+              {/* Desktop Metadata Snapshot Box */}
+              <div className="hidden md:flex w-full max-w-[260px] p-3 rounded-2xl bg-neutral-50/90 border border-neutral-200/80 flex-col gap-2">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#86868b]">
+                  Status no Acervo
+                </span>
+                <div className="flex items-center justify-between text-xs font-semibold">
+                  <span className="text-[#1d1d1f] flex items-center gap-1.5">
+                    {userRating ? (
+                      <>
+                        <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
+                        <span>Lido · Nota {userRating.rating}</span>
+                      </>
+                    ) : isSaved ? (
+                      <>
+                        <span className="w-2 h-2 rounded-full bg-blue-500 shrink-0" />
+                        <span>Salvo na Estante</span>
+                      </>
+                    ) : (
+                      <>
+                        <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0" />
+                        <span>Recomendado pelo Veredito</span>
+                      </>
+                    )}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column (Title, Scoreboard, Veredito, Premissa, Filmes, Critérios) */}
+            <div className="w-full md:col-span-8 lg:col-span-8 space-y-4 md:space-y-5 min-w-0 mt-5 md:mt-0">
+              
+              {/* Header: Tags, Title, Author */}
+              <div className="space-y-1.5 text-center sm:text-left">
                 <div className="flex flex-wrap items-center justify-center sm:justify-start gap-1.5">
-                  {book.genres.slice(0, 2).map((g, i) => (
+                  {book.genres.map((g, i) => (
                     <span key={i} className="px-2.5 py-0.5 rounded-full text-[10px] font-medium bg-neutral-100 border border-neutral-200/80 text-[#86868b]">
                       {g}
                     </span>
                   ))}
                   {book.year && (
-                    <span className="text-[10px] text-[#86868b] font-score">
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] text-[#86868b] bg-neutral-100 border border-neutral-200/80 font-score font-semibold">
                       {book.year}
                     </span>
                   )}
                 </div>
 
-                <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-[#1d1d1f] leading-tight">
+                <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight text-[#1d1d1f] leading-tight">
                   {book.title}
                 </h2>
-                <p className="text-sm font-medium text-[#86868b]">
+                <p className="text-sm md:text-base font-semibold text-[#86868b]">
                   {book.author}
                 </p>
+              </div>
 
-                {/* Score Cards (3 Cards if userRating exists, else 2 Cards) */}
-                <div className={`pt-1 grid ${userRating ? 'grid-cols-3' : 'grid-cols-2'} gap-2 sm:gap-2.5`}>
-                  <div className="p-2.5 sm:p-3 rounded-2xl bg-neutral-50/90 border border-neutral-200/80 flex flex-col items-center sm:items-start shadow-xs">
-                    <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-[#86868b] truncate">
-                      Nota Técnica
-                    </span>
-                    <div className="mt-1">
-                      <ScoreBadge score={book.notaTecnica} size="lg" />
-                    </div>
-                    <span className="text-[8px] sm:text-[9px] text-[#86868b] mt-1 font-medium truncate">
-                      Qualidade objetiva
-                    </span>
+              {/* Scoreboard: Apple-grade Metrics Deck */}
+              <div className={`grid ${userRating ? 'grid-cols-3' : 'grid-cols-2'} gap-2 sm:gap-3`}>
+                <div className="p-3 md:p-3.5 rounded-2xl bg-neutral-50/90 border border-neutral-200/80 flex flex-col items-center sm:items-start shadow-xs hover:border-neutral-300 transition-all">
+                  <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-[#86868b] truncate">
+                    Nota Técnica
+                  </span>
+                  <div className="my-1.5">
+                    <ScoreBadge score={book.notaTecnica} size="lg" />
                   </div>
-
-                  <div className="p-2.5 sm:p-3 rounded-2xl bg-neutral-50/90 border border-neutral-200/80 flex flex-col items-center sm:items-start shadow-xs">
-                    <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-[#86868b] truncate">
-                      Nota de Encaixe
-                    </span>
-                    <div className="mt-1">
-                      <ScoreBadge score={book.notaEncaixe} size="lg" />
-                    </div>
-                    <span className="text-[8px] sm:text-[9px] text-[#86868b] mt-1 font-medium truncate">
-                      Para o seu perfil
-                    </span>
-                  </div>
-
-                  {userRating && (
-                    <div
-                      onClick={onOpenRateModal}
-                      className="p-2.5 sm:p-3 rounded-2xl bg-neutral-50/90 hover:bg-neutral-100/90 border border-neutral-200/80 flex flex-col items-center sm:items-start shadow-xs cursor-pointer transition-all active:scale-95 group/usercard"
-                      title="Clique para editar sua nota"
-                    >
-                      <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-[#86868b] truncate">
-                        Sua Nota
-                      </span>
-                      <div className="mt-1">
-                        <ScoreBadge score={userRating.rating} size="lg" isUserRating />
-                      </div>
-                      <span className="text-[8px] sm:text-[9px] text-[#86868b] mt-1 font-medium truncate">
-                        {userRating.tags.length > 0 ? userRating.tags[0] : 'Avaliado por você'}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Veredito Direto */}
-            <div className="p-3.5 rounded-2xl bg-neutral-50 border border-neutral-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 shadow-xs">
-              <div className="space-y-0.5">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#86868b] block">
-                  Veredito
-                </span>
-                <p className="text-sm font-semibold text-[#1d1d1f] italic leading-snug">
-                  "{book.veredito}"
-                </p>
-              </div>
-              <div className="shrink-0 self-start sm:self-center">
-                {getVereditoBadge()}
-              </div>
-            </div>
-
-            {/* Premissa & Clima */}
-            <div className="space-y-1">
-              <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#86868b]">
-                <BookOpen className="w-3.5 h-3.5 text-[#1d1d1f]" />
-                <span>Premissa & Clima</span>
-              </div>
-              <p className="text-xs sm:text-sm text-[#1d1d1f] leading-relaxed bg-neutral-50 p-3 rounded-xl border border-neutral-200/70">
-                {book.resumo}
-              </p>
-            </div>
-
-            {/* Filmes com atmosfera equivalente (Até 3 filmes em UMA SÓ LINHA com thumbnails via TMDb) */}
-            {book.movieComparisons && book.movieComparisons.length > 0 && (
-              <div className="p-3.5 rounded-2xl bg-neutral-50/90 border border-neutral-200/80 space-y-2">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-1.5 text-xs font-bold text-[#1d1d1f]">
-                    <Film className="w-3.5 h-3.5 text-amber-700" />
-                    <span>Filmes Relacionados</span>
-                  </div>
-                  <span className="text-[10px] text-[#86868b] font-medium">
-                    {Math.min(3, book.movieComparisons.length)} {Math.min(3, book.movieComparisons.length) === 1 ? 'indicação' : 'indicações'}
+                  <span className="text-[8px] sm:text-[9.5px] text-[#86868b] font-medium truncate leading-tight">
+                    Qualidade objetiva
                   </span>
                 </div>
-                
-                {/* Single Row of up to 3 Movie Thumbnails */}
-                <div className="grid grid-cols-3 gap-2.5">
-                  {book.movieComparisons.slice(0, 3).map((movie, i) => (
-                    <MovieThumb key={i} title={movie} />
+
+                <div className="p-3 md:p-3.5 rounded-2xl bg-neutral-50/90 border border-neutral-200/80 flex flex-col items-center sm:items-start shadow-xs hover:border-neutral-300 transition-all">
+                  <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-[#86868b] truncate">
+                    Nota de Encaixe
+                  </span>
+                  <div className="my-1.5">
+                    <ScoreBadge score={book.notaEncaixe} size="lg" />
+                  </div>
+                  <span className="text-[8px] sm:text-[9.5px] text-[#86868b] font-medium truncate leading-tight">
+                    Para o seu perfil
+                  </span>
+                </div>
+
+                {userRating && (
+                  <div
+                    onClick={onOpenRateModal}
+                    className="p-3 md:p-3.5 rounded-2xl bg-neutral-50/90 hover:bg-neutral-100/90 border border-neutral-200/80 flex flex-col items-center sm:items-start shadow-xs cursor-pointer transition-all active:scale-95 group/usercard"
+                    title="Clique para editar sua nota"
+                  >
+                    <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-[#86868b] truncate">
+                      Sua Nota
+                    </span>
+                    <div className="my-1.5">
+                      <ScoreBadge score={userRating.rating} size="lg" isUserRating />
+                    </div>
+                    <span className="text-[8px] sm:text-[9.5px] text-[#86868b] font-medium truncate leading-tight">
+                      {userRating.tags.length > 0 ? userRating.tags[0] : 'Avaliado por você'}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {/* Veredito Direto Banner */}
+              <div className="p-3.5 md:p-4 rounded-2xl bg-gradient-to-br from-neutral-50 to-neutral-100/70 border border-neutral-200/90 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+                <div className="space-y-1 flex-1 min-w-0">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#86868b] block">
+                    Veredito Crítico
+                  </span>
+                  <p className="text-sm md:text-[15px] font-semibold text-[#1d1d1f] italic leading-snug">
+                    "{book.veredito}"
+                  </p>
+                </div>
+                <div className="shrink-0 self-start sm:self-center">
+                  {getVereditoBadge()}
+                </div>
+              </div>
+
+              {/* Premissa & Clima */}
+              <div className="space-y-1.5">
+                <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#86868b]">
+                  <BookOpen className="w-3.5 h-3.5 text-[#1d1d1f]" />
+                  <span>Premissa & Clima</span>
+                </div>
+                <p className="text-xs sm:text-sm text-[#1d1d1f] leading-relaxed bg-neutral-50 p-3.5 rounded-xl border border-neutral-200/70">
+                  {book.resumo}
+                </p>
+              </div>
+
+              {/* Filmes com atmosfera equivalente */}
+              {book.movieComparisons && book.movieComparisons.length > 0 && (
+                <div className="p-3.5 md:p-4 rounded-2xl bg-neutral-50/90 border border-neutral-200/80 space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-[#1d1d1f]">
+                      <Film className="w-3.5 h-3.5 text-amber-700" />
+                      <span>Filmes com Atmosfera Equivalente</span>
+                    </div>
+                    <span className="text-[10px] text-[#86868b] font-medium">
+                      {Math.min(3, book.movieComparisons.length)} {Math.min(3, book.movieComparisons.length) === 1 ? 'indicação' : 'indicações'}
+                    </span>
+                  </div>
+                  
+                  {/* Single Row of up to 3 Movie Thumbnails */}
+                  <div className="grid grid-cols-3 gap-2.5 md:gap-3">
+                    {book.movieComparisons.slice(0, 3).map((movie, i) => (
+                      <MovieThumb key={i} title={movie} />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Critérios do Veredito — Telemetria Detalhada */}
+              <div className="space-y-2.5 pt-1">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#86868b]">
+                    <Gauge className="w-3.5 h-3.5 text-[#1d1d1f]" />
+                    <span>Critérios do Veredito</span>
+                  </div>
+                  <span className="text-[10px] text-[#86868b] font-score font-semibold">
+                    Telemetria Detalhada
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 md:gap-3">
+                  {criteriaList.map((crit, idx) => (
+                    <div
+                      key={idx}
+                      className="p-3.5 rounded-xl bg-neutral-50 hover:bg-neutral-100/70 border border-neutral-200/70 transition-all space-y-2.5 shadow-2xs hover:border-neutral-300"
+                    >
+                      <div className="flex items-center justify-between gap-1.5">
+                        <div className="flex items-center gap-2 min-w-0">
+                          {crit.icon}
+                          <span className="text-sm sm:text-[14px] font-bold text-[#1d1d1f] tracking-tight truncate">
+                            {crit.label}
+                          </span>
+                        </div>
+                        <ScoreBadge score={crit.score} size="criteria" />
+                      </div>
+
+                      {/* 3D Tactile Progress Track */}
+                      <div className="w-full h-3 rounded-full overflow-hidden bg-neutral-200/90 shadow-[inset_0_1.5px_2.5px_rgba(0,0,0,0.18),0_1px_1px_rgba(255,255,255,0.8)] border border-neutral-300/40 p-[1.5px]">
+                        <div
+                          className={`h-full rounded-full transition-all duration-300 relative overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.22),inset_0_1px_1px_rgba(255,255,255,0.7),inset_0_-1px_1px_rgba(0,0,0,0.25)] ${
+                            crit.tone === 'green'
+                              ? 'bg-gradient-to-b from-emerald-400 via-emerald-500 to-emerald-600'
+                              : crit.tone === 'yellow'
+                              ? 'bg-gradient-to-b from-amber-300 via-amber-400 to-amber-500'
+                              : 'bg-gradient-to-b from-rose-400 via-rose-500 to-rose-600'
+                          }`}
+                          style={{ width: `${Math.min(100, Math.max(8, Math.floor(crit.score) * 10))}%` }}
+                        >
+                          {/* 3D Specular highlight reflection */}
+                          <div className="absolute inset-x-0 top-0 h-[45%] bg-gradient-to-b from-white/55 to-transparent rounded-t-full pointer-events-none" />
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between text-[11px]">
+                        <span className={`font-bold ${
+                          crit.tone === 'green'
+                            ? 'text-emerald-700'
+                            : crit.tone === 'yellow'
+                            ? 'text-amber-800'
+                            : 'text-rose-700'
+                        }`}>
+                          {crit.tag}
+                        </span>
+                      </div>
+                    </div>
                   ))}
                 </div>
               </div>
-            )}
 
-            {/* Critérios do Veredito — Dashboard Visual Intuitivo */}
-            <div className="space-y-2 pt-1">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#86868b]">
-                  <Gauge className="w-3.5 h-3.5 text-[#1d1d1f]" />
-                  <span>Critérios do Veredito</span>
-                </div>
-                <span className="text-[10px] text-[#86868b] font-score">
-                  Telemetria
-                </span>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 md:gap-3">
-                {criteriaList.map((crit, idx) => (
-                  <div
-                    key={idx}
-                    className="p-3.5 rounded-xl bg-neutral-50 hover:bg-neutral-100/70 border border-neutral-200/70 transition-all space-y-2.5"
-                  >
-                    <div className="flex items-center justify-between gap-1.5">
-                      <div className="flex items-center gap-2 min-w-0">
-                        {crit.icon}
-                        <span className="text-sm sm:text-[15px] font-bold text-[#1d1d1f] tracking-tight truncate">
-                          {crit.label}
-                        </span>
-                      </div>
-                      <ScoreBadge score={crit.score} size="criteria" />
-                    </div>
-
-                    {/* 3D Tactile Progress Track */}
-                    <div className="w-full h-3 rounded-full overflow-hidden bg-neutral-200/90 shadow-[inset_0_1.5px_2.5px_rgba(0,0,0,0.18),0_1px_1px_rgba(255,255,255,0.8)] border border-neutral-300/40 p-[1.5px]">
-                      <div
-                        className={`h-full rounded-full transition-all duration-300 relative overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.22),inset_0_1px_1px_rgba(255,255,255,0.7),inset_0_-1px_1px_rgba(0,0,0,0.25)] ${
-                          crit.tone === 'green'
-                            ? 'bg-gradient-to-b from-emerald-400 via-emerald-500 to-emerald-600'
-                            : crit.tone === 'yellow'
-                            ? 'bg-gradient-to-b from-amber-300 via-amber-400 to-amber-500'
-                            : 'bg-gradient-to-b from-rose-400 via-rose-500 to-rose-600'
-                        }`}
-                        style={{ width: `${Math.min(100, Math.max(8, Math.floor(crit.score) * 10))}%` }}
-                      >
-                        {/* 3D Specular highlight reflection */}
-                        <div className="absolute inset-x-0 top-0 h-[45%] bg-gradient-to-b from-white/55 to-transparent rounded-t-full pointer-events-none" />
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between text-[11px]">
-                      <span className={`font-bold ${
-                        crit.tone === 'green'
-                          ? 'text-emerald-700'
-                          : crit.tone === 'yellow'
-                          ? 'text-amber-800'
-                          : 'text-rose-700'
-                      }`}>
-                        {crit.tag}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
             </div>
           </div>
+        </div>
 
-          {/* Footer Actions — Aceternity Button System */}
-          <div className="p-4 border-t border-black/[0.06] bg-[#ffffff] flex items-center gap-2">
+        {/* Footer Actions — Aceternity Button System + Desktop Keyboard Hint */}
+        <div className="p-3.5 sm:p-4 md:px-8 border-t border-black/[0.06] bg-[#ffffff] flex items-center justify-between gap-2.5">
+          <div className="flex items-center gap-2 flex-1 md:flex-initial">
             {/* Botão "Já li" / "Sua nota · X" */}
             {onOpenRateModal && (
               <AceternityButton
                 variant={userRating ? "outline" : "primary"}
                 size="md"
                 onClick={onOpenRateModal}
-                className={`flex-1 ${userRating ? '!bg-neutral-900 hover:!bg-black !text-white !border-neutral-800' : ''}`}
+                className={`flex-1 sm:flex-initial ${userRating ? '!bg-neutral-900 hover:!bg-black !text-white !border-neutral-800' : ''}`}
                 title={userRating ? "Editar sua avaliação deste livro" : "Registrar leitura e avaliar este livro"}
               >
                 {userRating ? (
@@ -682,7 +724,14 @@ ${book.resumo}
               </AceternityButton>
             )}
           </div>
-        </motion.div>
-      </div>
-    );
+
+          {/* Desktop Keyboard ESC Hint */}
+          <div className="hidden md:flex items-center gap-1.5 text-xs text-neutral-400 font-medium select-none">
+            <kbd className="px-1.5 py-0.5 bg-neutral-100 border border-neutral-200/90 rounded text-[10px] font-mono text-neutral-500 shadow-2xs">Esc</kbd>
+            <span>para fechar</span>
+          </div>
+        </div>
+      </motion.div>
+    </div>
+  );
 };
