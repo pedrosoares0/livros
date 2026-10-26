@@ -642,25 +642,20 @@ ${book.resumo}
               />
             )}
 
-            {/* 2. Botão "Já li" / "Sua nota · X" */}
+            {/* 2. Botão "Já li" — apenas ícone */}
             {onOpenRateModal && (
               <AceternityButton
                 variant={userRating ? "primary" : "secondary"}
                 size="md"
                 onClick={onOpenRateModal}
-                className={`shrink-0 ${userRating ? '!bg-neutral-900 hover:!bg-black !text-white !border-neutral-800' : ''}`}
-                title={userRating ? "Editar sua avaliação deste livro" : "Registrar leitura e avaliar este livro"}
+                className={`shrink-0 px-3.5 ${userRating ? '!bg-neutral-900 hover:!bg-black !text-white !border-neutral-800 shadow-sm' : ''}`}
+                title={userRating ? `Lido · Sua nota: ${userRating.rating} (clique para editar)` : "Registrar leitura e avaliar este livro"}
+                aria-label={userRating ? `Lido · Sua nota: ${userRating.rating}` : "Já li"}
               >
                 {userRating ? (
-                  <>
-                    <CheckCircle2 className="w-3.5 h-3.5 text-white shrink-0" />
-                    <span>Sua nota · {userRating.rating}</span>
-                  </>
+                  <CheckCircle2 className="w-3.5 h-3.5 text-white shrink-0" />
                 ) : (
-                  <>
-                    <Check className="w-3.5 h-3.5 text-[#1d1d1f] stroke-[2.5] shrink-0" />
-                    <span>Já li</span>
-                  </>
+                  <Check className="w-3.5 h-3.5 text-[#1d1d1f] stroke-[2.5] shrink-0" />
                 )}
               </AceternityButton>
             )}
@@ -693,18 +688,17 @@ ${book.resumo}
               className="shrink-0 px-3.5"
             />
 
-            {/* 5. Excluir Livro */}
+            {/* 5. Excluir Livro — apenas ícone */}
             {onDeleteBook && (
               <AceternityButton
                 variant="destructive"
                 size="md"
                 onClick={handleDeleteBook}
                 title={confirmDelete ? "Clique novamente para confirmar a exclusão definitiva" : "Excluir livro do Veredito"}
-                aria-label="Excluir livro"
-                className={`shrink-0 ${confirmDelete ? '!bg-rose-600 !text-white !border-rose-700' : ''}`}
+                aria-label={confirmDelete ? "Confirmar exclusão definitiva" : "Excluir livro"}
+                className={`shrink-0 px-3.5 ${confirmDelete ? '!bg-rose-600 !text-white !border-rose-700' : ''}`}
               >
                 <Trash2 className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">{confirmDelete ? 'Confirmar?' : 'Excluir'}</span>
               </AceternityButton>
             )}
           </div>
