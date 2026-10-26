@@ -355,6 +355,10 @@ export function App() {
               onUpdateCover={handleUpdateBookCover}
               userRating={selectedBook ? userRatings[selectedBook.id] : undefined}
               onOpenRateModal={() => setRatingBook(selectedBook)}
+              onOpenEvaluate={() => {
+                setSelectedBook(null);
+                setIsEvaluateOpen(true);
+              }}
             />
           )}
         </AnimatePresence>

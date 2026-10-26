@@ -508,18 +508,18 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                             key={dim}
                             className={`p-2.5 rounded-xl border transition-all text-left flex flex-col justify-between ${
                               isCurrent
-                                ? 'bg-neutral-900 text-white border-neutral-900 shadow-sm scale-[1.02]'
+                                ? 'bg-black text-white border-black shadow-sm scale-[1.02]'
                                 : isCompleted
-                                ? 'bg-emerald-50/70 border-emerald-200/80 text-emerald-950'
+                                ? 'bg-[#1d1d1f] text-white border-neutral-800 shadow-2xs'
                                 : 'bg-neutral-50/70 border-neutral-200/50 text-neutral-400 opacity-60'
                             }`}
                           >
                             <div className="flex items-center justify-between text-[10px] font-bold">
                               <span className="truncate">{dim}</span>
-                              {isCurrent && <Loader2 className="w-3 h-3 animate-spin shrink-0 text-white" />}
-                              {isCompleted && <Check className="w-3 h-3 shrink-0 text-emerald-600 stroke-[3]" />}
+                              {isCurrent && <Loader2 className="w-3 h-3 animate-spin shrink-0 text-neutral-300" />}
+                              {isCompleted && <Check className="w-3 h-3 shrink-0 text-white stroke-[3]" />}
                             </div>
-                            <span className="text-[9px] font-medium mt-1">
+                            <span className={`text-[9px] font-medium mt-1 ${isCurrent ? 'text-neutral-300' : isCompleted ? 'text-neutral-400' : 'text-neutral-400'}`}>
                               {isCurrent ? 'Calibrando...' : isCompleted ? 'Calibrado ✓' : 'Aguardando'}
                             </span>
                           </div>

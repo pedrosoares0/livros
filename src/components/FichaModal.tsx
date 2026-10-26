@@ -15,6 +15,7 @@ import { getCuratedCovers } from '../data/curatedCovers';
 import { INITIAL_BOOKS } from '../data/initialBooks';
 import { AceternityButton } from './AceternityButton';
 import { CopyButton } from './CopyButton';
+import { PearlButton } from './PearlButton';
 
 interface FichaModalProps {
   book: BookEvaluation | null;
@@ -25,6 +26,7 @@ interface FichaModalProps {
   onUpdateCover?: (bookId: string, newCoverUrl: string) => void;
   userRating?: UserRating | null;
   onOpenRateModal?: () => void;
+  onOpenEvaluate?: () => void;
 }
 
 export const FichaModal: React.FC<FichaModalProps> = ({
@@ -36,6 +38,7 @@ export const FichaModal: React.FC<FichaModalProps> = ({
   onUpdateCover,
   userRating,
   onOpenRateModal,
+  onOpenEvaluate,
 }) => {
   const [isCoverPickerOpen, setIsCoverPickerOpen] = useState(false);
   const [isLoadingCovers, setIsLoadingCovers] = useState(false);
@@ -674,6 +677,17 @@ ${book.resumo}
               doneLabel="Copiado!"
               className="shrink-0"
             />
+
+            {/* Avaliar Novo Livro — Botão padrão PearlButton */}
+            {onOpenEvaluate && (
+              <PearlButton
+                size="nav-rect"
+                label="Avaliar"
+                onClick={onOpenEvaluate}
+                title="Avaliar novo livro no Veredito"
+                className="shrink-0"
+              />
+            )}
 
             {/* Excluir Livro */}
             {onDeleteBook && (
