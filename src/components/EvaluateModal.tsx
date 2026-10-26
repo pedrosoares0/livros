@@ -458,12 +458,6 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                           </div>
                         )}
                       </div>
-
-                      {/* Live telemetry badge */}
-                      <div className="relative -mt-3 z-20 flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#1d1d1f] text-white shadow-lg border border-white/10 text-[11px] font-medium">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                        <span>Análise em tempo real</span>
-                      </div>
                     </div>
 
                     <div className="space-y-1 max-w-xs">
@@ -481,10 +475,6 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                   {/* Right Column: Step Ticker, Telemetry Dimensions Cards, Progress Bar */}
                   <div className="w-full md:col-span-7 flex flex-col justify-center space-y-4 md:space-y-5 text-center md:text-left md:pl-2 mt-4 md:mt-0">
                     <div className="space-y-1.5">
-                      <div className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200/80">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                        <span>Análise Crítica</span>
-                      </div>
                       <h4 className="text-base md:text-lg font-bold text-[#1d1d1f]">
                         Processando Telemetria da Obra
                       </h4>
