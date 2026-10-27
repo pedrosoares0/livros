@@ -1,6 +1,7 @@
 import { BookEvaluation, CriteriaScores, VereditoTipo } from '../types';
 import { INITIAL_BOOKS } from '../data/initialBooks';
 import { isAmazonUrl, recognizeAmazonBook } from './amazonRecognizer';
+import { searchPopularBooksWithGemini } from './geminiEvaluator';
 
 export { isAmazonUrl, recognizeAmazonBook };
 
@@ -192,9 +193,31 @@ export async function searchBookApi(query: string): Promise<Partial<BookEvaluati
     }
   }
 
+  // 2. Catálogo curado em memória para clássicos brasileiros instantâneos (0ms)
+  const matchedCurated = BRAZILIAN_EDITIONS_CATALOG.filter((b) => {
+    const t = normalizeSearchText(b.title || '');
+    return t === cleanQuery || (cleanQuery.length >= 4 && t.includes(cleanQuery));
+  });
+  if (matchedCurated.length > 0) {
+    const exact = matchedCurated.find((b) => normalizeSearchText(b.title || '') === cleanQuery);
+    if (exact) {
+      return [exact, ...matchedCurated.filter((b) => b !== exact)];
+    }
+  }
+
+  // 3. Motor Comercial Inteligente com Gemini (Equivalente à Amazon Brasil / Principais Livrarias)
+  try {
+    const geminiPopularBooks = await searchPopularBooksWithGemini(trimmed);
+    if (geminiPopularBooks && geminiPopularBooks.length > 0) {
+      return geminiPopularBooks;
+    }
+  } catch (geminiErr) {
+    console.warn('[searchBookApi] Fallback para Open Library após erro do Gemini:', geminiErr);
+  }
+
   const candidates: (Partial<BookEvaluation> & { score: number })[] = [];
 
-  // 2. Open Library como Motor Primário com suporte a edições em português
+  // 4. Fallback Open Library (apenas se Gemini não responder)
   try {
     const encoded = encodeURIComponent(query.trim());
     const fields = [

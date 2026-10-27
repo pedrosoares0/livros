@@ -1,5 +1,6 @@
 import { BookEvaluation, CriteriaScores, VereditoTipo } from '../types';
 import { buildReadingHistoryBlock } from './ratings';
+import { getCuratedCovers } from '../data/curatedCovers';
 
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || 'AQ.Ab8RN6LNzoEEpQlupq2n1dJRY5APsOuFfXmRLp7ESySq8-A3Uw';
 
@@ -329,4 +330,155 @@ Retorne ESTRITAMENTE um array JSON de objetos:
 
   throw lastError || new Error('Não foi possível avaliar a lista com o Gemini.');
 }
+
+/**
+ * Converte ISBN-13 para ISBN-10 (ou ASIN oficial da Amazon) para checagem na CDN
+ */
+function isbn13to10(isbn13?: string | null): string | null {
+  if (!isbn13) return null;
+  const clean = isbn13.replace(/[^0-9]/g, '');
+  if (clean.length !== 13 || !clean.startsWith('978')) return null;
+  const core = clean.slice(3, 12);
+  let sum = 0;
+  for (let i = 0; i < 9; i++) {
+    sum += parseInt(core[i], 10) * (10 - i);
+  }
+  const rem = 11 - (sum % 11);
+  const checkDigit = rem === 10 ? 'X' : rem === 11 ? '0' : String(rem);
+  return core + checkDigit;
+}
+
+/**
+ * Verifica rapidamente se a CDN oficial da Amazon possui capa real (JPEG > 2KB)
+ */
+async function checkAmazonCdnCover(asin: string | null): Promise<string | null> {
+  if (!asin) return null;
+  const cdnUrl = `https://images-na.ssl-images-amazon.com/images/P/${asin}.01.LZZZZZZZ.jpg`;
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 1400);
+    const res = await fetch(cdnUrl, { signal: controller.signal });
+    clearTimeout(timeout);
+    const type = res.headers.get('content-type') || '';
+    const len = Number(res.headers.get('content-length')) || 0;
+    if (res.ok && type.includes('image/jpeg') && len > 2000) {
+      return cdnUrl;
+    }
+  } catch {}
+  return null;
+}
+
+// Cache em memória para buscas instantâneas (0ms)
+const searchMemoryCache = new Map<string, Partial<BookEvaluation>[]>();
+
+/**
+ * Busca inteligente ultra-rápida de livros e edições populares no catálogo brasileiro (equivalente à Amazon Brasil)
+ */
+export async function searchPopularBooksWithGemini(query: string): Promise<Partial<BookEvaluation>[]> {
+  const clean = query.trim();
+  if (!clean || clean.length < 2) return [];
+
+  const cacheKey = clean.toLowerCase();
+  if (searchMemoryCache.has(cacheKey)) {
+    return searchMemoryCache.get(cacheKey)!;
+  }
+
+  // Modelos ultra-rápidos (latência < 2s)
+  const SEARCH_MODELS = [
+    'gemini-3.1-flash-lite',
+    'gemini-flash-lite-latest',
+    'gemini-3.5-flash-lite',
+  ];
+
+  const prompt = `Busca rápida de livros para catálogo brasileiro: "${clean}".
+Retorne no máximo 3 ou 4 obras/edições mais populares comercializadas no Brasil (como na Amazon Brasil e principais livrarias).
+Responda ESTRITAMENTE em formato JSON (array de objetos compactos):
+[
+  {
+    "title": "Título em português",
+    "author": "Nome do Autor",
+    "publisher": "Editora (ex: Antofágica, Companhia das Letras, Planeta)",
+    "year": 2024,
+    "pages": 500,
+    "isbn13": "9788542225341"
+  }
+]`;
+
+  for (const model of SEARCH_MODELS) {
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
+      const payload = {
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: {
+          responseMimeType: 'application/json',
+          temperature: 0.1,
+          maxOutputTokens: 800,
+        },
+      };
+
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 7500);
+
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        signal: controller.signal,
+      });
+      clearTimeout(timeout);
+
+      if (!res.ok) continue;
+
+      const json = await res.json();
+      const rawText = json.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (!rawText) continue;
+
+      const rawItems: any[] = JSON.parse(rawText);
+      if (!Array.isArray(rawItems) || rawItems.length === 0) continue;
+
+      const results: Partial<BookEvaluation>[] = rawItems.slice(0, 4).map((item, idx) => {
+        let coverUrl = '';
+
+        // 1. Capa Curada Imediata (0ms)
+        const curated = getCuratedCovers(item.title);
+        if (curated && curated.length > 0) {
+          coverUrl = curated[0];
+        }
+
+        // 2. Capa Oficial Amazon via ISBN10/ASIN imediata
+        const isbn10 = isbn13to10(item.isbn13);
+        if (!coverUrl && isbn10) {
+          coverUrl = `https://images-na.ssl-images-amazon.com/images/P/${isbn10}.01.LZZZZZZZ.jpg`;
+        }
+
+        // 3. Fallback Open Library via ISBN13
+        if (!coverUrl && item.isbn13) {
+          coverUrl = `https://covers.openlibrary.org/b/isbn/${item.isbn13}-L.jpg`;
+        }
+
+        return {
+          id: `gem-search-${idx}-${Date.now()}`,
+          title: item.title || clean,
+          author: item.author || 'Autor a verificar',
+          publisher: item.publisher || undefined,
+          year: item.year ? Number(item.year) : undefined,
+          pages: item.pages && Number(item.pages) > 20 ? Math.round(Number(item.pages)) : undefined,
+          coverUrl: coverUrl || '',
+          genres: ['Literatura'],
+          resumo: '',
+        };
+      });
+
+      if (results.length > 0) {
+        searchMemoryCache.set(cacheKey, results);
+        return results;
+      }
+    } catch (err) {
+      console.warn(`[searchPopularBooksWithGemini] Modelo ${model} falhou:`, err);
+    }
+  }
+
+  return [];
+}
+
 

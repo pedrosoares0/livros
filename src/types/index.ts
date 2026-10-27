@@ -19,6 +19,7 @@ export interface BookEvaluation {
   originalTitle?: string;
   year?: number;
   pages: number; // Páginas aproximadas edição pt-BR (sempre presente)
+  publisher?: string; // Nome da editora (ex: Antofágica, Companhia das Letras, Aleph)
   coverUrl: string;
   resumo: string; // 2 a 3 linhas, sem spoilers, foco em clima, tema e premissa
   movieComparisons: string[]; // 1 ou 2 filmes para vibe

@@ -153,7 +153,7 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
       } finally {
         setIsSearching(false);
       }
-    }, isAmazon ? 50 : 280);
+    }, isAmazon ? 50 : 380);
   };
 
   const handleClearQuery = () => {
@@ -684,6 +684,8 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                       <span className="text-[10px] font-bold uppercase tracking-wider text-[#86868b]">
                         {apiSuggestions[0]?.id?.startsWith('amz-')
                           ? 'Livro Reconhecido da Amazon'
+                          : apiSuggestions[0]?.id?.startsWith('gem-search-')
+                          ? `Edições em Destaque no Brasil (${apiSuggestions.length})`
                           : `Edições Encontradas (${apiSuggestions.length})`}
                       </span>
                       <span className="text-[10px] text-[#86868b]">
@@ -733,6 +735,11 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                                     {isFromAmazon && (
                                       <span className="text-[9px] font-semibold text-[#1d1d1f] bg-neutral-200/80 px-1.5 py-0.5 rounded-md">
                                         Amazon
+                                      </span>
+                                    )}
+                                    {book.publisher && (
+                                      <span className="text-[9px] font-semibold text-neutral-800 bg-neutral-200/80 px-1.5 py-0.5 rounded-md">
+                                        {book.publisher}
                                       </span>
                                     )}
                                     {book.pages ? (

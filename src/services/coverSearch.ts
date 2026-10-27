@@ -29,6 +29,10 @@ const KNOWN_TITLE_ALIASES: Record<string, string> = {
   'as fontes do paraiso': 'The Fountains of Paradise Arthur C Clarke',
   'neuromancer': 'Neuromancer William Gibson',
   'duna': 'Dune Frank Herbert',
+  'quarta asa': 'Fourth Wing Rebecca Yarros',
+  'a quarta asa': 'Fourth Wing Rebecca Yarros',
+  'o alienista': 'O Alienista Machado de Assis',
+  'o nariz': 'The Nose Nikolai Gogol',
 };
 
 const normalize = (text: string) =>
