@@ -228,21 +228,21 @@ export const CURATED_COVERS: Record<string, string[]> = {
     'https://images-na.ssl-images-amazon.com/images/P/8594318723.01.LZZZZZZZ.jpg',
   ],
   'quarta asa': [
+    'https://images-na.ssl-images-amazon.com/images/P/8542225856.01.LZZZZZZZ.jpg',
     'https://images-na.ssl-images-amazon.com/images/P/1649374046.01.LZZZZZZZ.jpg',
-    'https://images-na.ssl-images-amazon.com/images/P/1649374178.01.LZZZZZZZ.jpg',
   ],
   'a quarta asa': [
+    'https://images-na.ssl-images-amazon.com/images/P/8542225856.01.LZZZZZZZ.jpg',
     'https://images-na.ssl-images-amazon.com/images/P/1649374046.01.LZZZZZZZ.jpg',
-    'https://images-na.ssl-images-amazon.com/images/P/1649374178.01.LZZZZZZZ.jpg',
   ],
   'fourth wing': [
+    'https://images-na.ssl-images-amazon.com/images/P/8542225856.01.LZZZZZZZ.jpg',
     'https://images-na.ssl-images-amazon.com/images/P/1649374046.01.LZZZZZZZ.jpg',
-    'https://images-na.ssl-images-amazon.com/images/P/1649374178.01.LZZZZZZZ.jpg',
   ],
   'o alienista': [
-    'https://images-na.ssl-images-amazon.com/images/P/8582850182.01.LZZZZZZZ.jpg',
-    'https://images-na.ssl-images-amazon.com/images/P/8537803626.01.LZZZZZZZ.jpg',
-    'https://images-na.ssl-images-amazon.com/images/P/8594318049.01.LZZZZZZZ.jpg',
+    'https://images-na.ssl-images-amazon.com/images/P/6580210087.01.LZZZZZZZ.jpg',
+    'https://images-na.ssl-images-amazon.com/images/P/856356093X.01.LZZZZZZZ.jpg',
+    'https://images-na.ssl-images-amazon.com/images/P/6550970377.01.LZZZZZZZ.jpg',
   ],
 };
 

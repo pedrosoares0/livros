@@ -439,21 +439,23 @@ Responda ESTRITAMENTE em formato JSON (array de objetos compactos):
       const results: Partial<BookEvaluation>[] = rawItems.slice(0, 4).map((item, idx) => {
         let coverUrl = '';
 
-        // 1. Capa Curada Imediata (0ms)
+        // 1. Resolução inteligente de capa curada por editora
         const curated = getCuratedCovers(item.title);
         if (curated && curated.length > 0) {
-          coverUrl = curated[0];
-        }
-
-        // 2. Capa Oficial Amazon via ISBN10/ASIN imediata
-        const isbn10 = isbn13to10(item.isbn13);
-        if (!coverUrl && isbn10) {
-          coverUrl = `https://images-na.ssl-images-amazon.com/images/P/${isbn10}.01.LZZZZZZZ.jpg`;
-        }
-
-        // 3. Fallback Open Library via ISBN13
-        if (!coverUrl && item.isbn13) {
-          coverUrl = `https://covers.openlibrary.org/b/isbn/${item.isbn13}-L.jpg`;
+          const pub = (item.publisher || '').toLowerCase();
+          if (pub.includes('antofagica') || pub.includes('antofágica')) {
+            coverUrl = curated[0] || '';
+          } else if (pub.includes('penguin') || pub.includes('companhia')) {
+            coverUrl = curated[1] || curated[0] || '';
+          } else if (pub.includes('principis')) {
+            coverUrl = curated[2] || curated[0] || '';
+          } else if (pub.includes('34')) {
+            coverUrl = curated[1] || curated[0] || '';
+          } else if (pub.includes('planeta') || pub.includes('minotauro')) {
+            coverUrl = curated[0] || '';
+          } else {
+            coverUrl = curated[idx % curated.length] || '';
+          }
         }
 
         return {
