@@ -7,28 +7,29 @@ const GEMINI_API_KEY =
   import.meta.env.VITE_GEMINI_API_KEY ||
   'AQ.Ab8RN6LNzoEEpQlupq2n1dJRY5APsOuFfXmRLp7ESySq8-A3Uw';
 
+/**
+ * Avaliação crítica: SOMENTE modelos Gemini Flash completos com raciocínio (thinking) ativo.
+ * Nenhum modelo `flash-lite` ou `thinkingBudget: 0` entra na avaliação, preservando 100% da
+ * profundidade analítica, fidelidade bibliográfica e calibragem com o histórico do leitor.
+ * O ganho de velocidade vem exclusivamente do paralelismo e do corte imediato de 503/stalls.
+ */
 const EVAL_INITIAL_MODELS: RaceModel[] = [
   {
     model: 'gemini-3-flash-preview',
     tier: 'preferred',
-    generationConfig: { thinkingConfig: { thinkingLevel: 'low' } },
+    generationConfig: { thinkingConfig: { thinkingLevel: 'medium' } },
   },
-  { model: 'gemini-3.1-flash-lite', tier: 'fast' },
+  {
+    model: 'gemini-3.8-flash',
+    tier: 'preferred',
+  },
 ];
 
 const EVAL_BACKUP_MODELS: RaceModel[] = [
-  { model: 'gemini-flash-lite-latest', tier: 'fast' },
-  { model: 'gemini-3.5-flash-lite', tier: 'fast' },
-  {
-    model: 'gemini-3.1-flash-lite-preview',
-    tier: 'fast',
-    generationConfig: { thinkingConfig: { thinkingBudget: 0 } },
-  },
-  {
-    model: 'gemini-3.5-flash',
-    tier: 'preferred',
-    generationConfig: { thinkingConfig: { thinkingBudget: 0 } },
-  },
+  { model: 'gemini-3-flash-preview', tier: 'preferred' },
+  { model: 'gemini-3.6-flash', tier: 'preferred' },
+  { model: 'gemini-3.5-flash', tier: 'preferred' },
+  { model: 'gemini-flash-latest', tier: 'preferred' },
 ];
 
 const EVAL_GENERATION_CONFIG = {
@@ -86,6 +87,99 @@ export interface GeminiEvaluationResponse {
   genres: string[];
 }
 
+export interface EvaluationExtraContext {
+  sourceId?: string;
+  author?: string;
+  publisher?: string;
+  description?: string;
+  coverUrl?: string;
+  pages?: number;
+  year?: number;
+  genres?: string[];
+}
+
+interface VerifiedCatalogFacts {
+  author?: string;
+  publisher?: string;
+  pages?: number;
+  year?: number;
+  description?: string;
+  coverUrl?: string;
+}
+
+function isCatalogVerifiedSource(sourceId?: string): boolean {
+  if (!sourceId) return false;
+  return (
+    sourceId.startsWith('cbl-') ||
+    sourceId.startsWith('amz-cbl-') ||
+    sourceId.startsWith('ol-') ||
+    sourceId.startsWith('gb-')
+  );
+}
+
+/**
+ * Consulta rápida (máx. 800ms) ao catálogo público do Google Books em português
+ * para ancorar páginas reais, ano, autor e sinopse oficial quando o usuário digita
+ * direto ou vem de sugestão sintética sem metadados verificados.
+ */
+async function fetchVerifiedCatalogFacts(
+  bookTitle: string,
+  authorHint?: string
+): Promise<VerifiedCatalogFacts | null> {
+  try {
+    const q = authorHint && authorHint !== 'Autor a consultar' && authorHint !== 'Autor a verificar'
+      ? `intitle:${bookTitle} inauthor:${authorHint}`
+      : `intitle:${bookTitle}`;
+    const res = await fetch(
+      `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(q)}&langRestrict=pt&maxResults=3`,
+      { signal: AbortSignal.timeout(800) }
+    );
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (!Array.isArray(data?.items) || data.items.length === 0) return null;
+
+    const normTarget = bookTitle
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .trim();
+
+    for (const item of data.items) {
+      const info = item?.volumeInfo;
+      if (!info?.title) continue;
+      const normTitle = String(info.title)
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .trim();
+      if (!normTitle.includes(normTarget) && !normTarget.includes(normTitle)) continue;
+
+      let coverUrl: string | undefined =
+        info.imageLinks?.large ||
+        info.imageLinks?.medium ||
+        info.imageLinks?.thumbnail ||
+        undefined;
+      if (coverUrl?.startsWith('http://')) {
+        coverUrl = coverUrl.replace('http://', 'https://');
+      }
+
+      const parsedYear = info.publishedDate ? parseInt(String(info.publishedDate).slice(0, 4), 10) : NaN;
+
+      return {
+        author: Array.isArray(info.authors) && info.authors.length > 0 ? info.authors.join(', ') : undefined,
+        publisher: info.publisher || undefined,
+        pages: info.pageCount && info.pageCount > 30 ? Number(info.pageCount) : undefined,
+        year: Number.isFinite(parsedYear) ? parsedYear : undefined,
+        description: typeof info.description === 'string' ? info.description.slice(0, 900) : undefined,
+        coverUrl,
+      };
+    }
+  } catch {
+    // Silencioso: se exceder 800ms ou falhar, segue direto sem bloquear a avaliação
+  }
+  return null;
+}
+
 function parseEvaluationJson(rawText: string): GeminiEvaluationResponse {
   const parsed = parseJsonLoose<GeminiEvaluationResponse | GeminiEvaluationResponse[]>(rawText);
   const obj = Array.isArray(parsed) ? parsed[0] : parsed;
@@ -109,31 +203,65 @@ function parseBulkJson(rawText: string): GeminiEvaluationResponse[] {
 
 export async function evaluateWithGemini(
   bookTitle: string,
-  extraContext?: {
-    author?: string;
-    description?: string;
-    coverUrl?: string;
-    pages?: number;
-    year?: number;
-    genres?: string[];
-  }
+  extraContext?: EvaluationExtraContext
 ): Promise<BookEvaluation> {
   const historyBlock = buildReadingHistoryBlock();
+  const hasVerifiedCatalogInput = isCatalogVerifiedSource(extraContext?.sourceId);
+
+  // Ancoragem factual rápida caso faltem sinopse ou páginas de catálogo oficial
+  const catalogFacts =
+    hasVerifiedCatalogInput && extraContext?.description && extraContext?.pages
+      ? null
+      : await fetchVerifiedCatalogFacts(bookTitle, extraContext?.author);
+
+  const verifiedAuthor =
+    (extraContext?.author &&
+    extraContext.author !== 'Autor a consultar' &&
+    extraContext.author !== 'Autor a verificar'
+      ? extraContext.author
+      : undefined) || catalogFacts?.author;
+
+  const verifiedPages = hasVerifiedCatalogInput
+    ? extraContext?.pages
+    : catalogFacts?.pages;
+
+  const editionPagesHint = !hasVerifiedCatalogInput ? extraContext?.pages : undefined;
+  const verifiedPublisher = extraContext?.publisher || catalogFacts?.publisher;
+  const verifiedYear = extraContext?.year || catalogFacts?.year;
+  const verifiedDescription = extraContext?.description || catalogFacts?.description;
+
+  const metadataLines: string[] = [];
+  if (verifiedPublisher) metadataLines.push(`- Editora: ${verifiedPublisher}`);
+  if (verifiedYear) metadataLines.push(`- Ano da edição: ${verifiedYear}`);
+  if (verifiedPages && verifiedPages > 30) {
+    metadataLines.push(`- Páginas registradas em catálogo editorial: ${verifiedPages}`);
+  } else if (editionPagesHint && editionPagesHint > 30) {
+    metadataLines.push(
+      `- Estimativa preliminar de páginas (confirme e corrija se imprecisa): ${editionPagesHint}`
+    );
+  }
+  if (extraContext?.genres && extraContext.genres.length > 0) {
+    metadataLines.push(`- Gêneros catalogados: ${extraContext.genres.join(', ')}`);
+  }
+  if (verifiedDescription) {
+    metadataLines.push(`- Sinopse/Contexto editorial oficial: ${verifiedDescription}`);
+  }
+
   const prompt = `
 ${USER_PROFILE_PROMPT}
 ${historyBlock}
 
-Analise rigorosamente a obra: "${bookTitle}" ${extraContext?.author ? `do autor "${extraContext.author}"` : ''}.
-${extraContext?.description ? `Sinopse/Contexto prévio: ${extraContext.description}` : ''}
-
+Analise rigorosamente a obra: "${bookTitle}"${verifiedAuthor ? ` do autor "${verifiedAuthor}"` : ''}.
+${metadataLines.length > 0 ? `\nMETADADOS EDITORIAIS DE APOIO:\n${metadataLines.join('\n')}\n` : ''}
 INSTRUÇÕES OBRIGATÓRIAS DE CONTEÚDO E FIDELIDADE:
-1. PÁGINAS REAIS: Forneça a quantidade REAL aproximada de páginas da edição brasileira mais conhecida ou da obra original (Exemplo: Ritmo da Guerra ~1280; Guerra e Paz ~1200; Duna ~680; Flores para Algernon ~280). NUNCA invente 200 ou 240 se a obra for notoriamente mais extensa ou mais curta.
-2. FILMES RELACIONADOS CONEXOS: Indique de 2 a 3 filmes ou séries cujo tom, temática, atmosfera, escala ou dilemas éticos REALMENTE tenham paralelo com a obra. NUNCA indique comédias ou obras desconexas.
-3. CRITÉRIOS REAIS (0 a 10 inteiros):
+1. PÁGINAS REAIS: Forneça a quantidade REAL aproximada de páginas da edição brasileira mais conhecida ou da edição informada acima (Exemplo: Ritmo da Guerra ~1280; Guerra e Paz ~1200; Duna ~680; Flores para Algernon ~280; O Deserto dos Tártaros ~224). NUNCA invente 200 ou 240 genéricos se a obra for notoriamente mais extensa ou mais curta.
+2. VERACIDADE CRÍTICA E CALIBRAGEM FIEL: Avalie a obra pelo que ela REALMENTE é na literatura (estrutura narrativa real, cadência real de acontecimentos, peso filosófico/humano real), cruzando com rigor contra as obras amadas, rejeitadas e o histórico real do leitor. Nunca infle a Nota de Encaixe por prestígio acadêmico se o ritmo ou o tom colidirem com o perfil.
+3. FILMES RELACIONADOS CONEXOS: Indique de 2 a 3 filmes ou séries cujo tom, temática, atmosfera, escala ou dilemas éticos REALMENTE tenham paralelo com a obra. NUNCA indique comédias ou obras desconexas.
+4. CRITÉRIOS REAIS (0 a 10 inteiros):
    - genericidade: 0 = hiper autoral/original, 10 = clichê comercial previsível
    - infantilidade: 0-2 adulto/pesado, 3-5 aceitável/geral, 6 risco juvenil, 7-10 infantil ("infantilidadeStatus": "ideal" | "aceitavel" | "risco" | "rejeicao")
    - qualidadeTecnica, worldbuilding, ritmo, tomSombrio, impactoEmocional: 0 a 10
-4. NOTAS INTEIRAS: "notaTecnica" e "notaEncaixe" devem ser NÚMEROS INTEIROS (0 a 10), arredondados para baixo. "vereditoTipo": "leia" | "ressalvas" | "evite".
+5. NOTAS INTEIRAS: "notaTecnica" e "notaEncaixe" devem ser NÚMEROS INTEIROS (0 a 10), arredondados para baixo. "vereditoTipo": "leia" | "ressalvas" | "evite".
 
 Responda ESTRITAMENTE em JSON válido com estas exatas chaves:
 {
@@ -171,11 +299,10 @@ Responda ESTRITAMENTE em JSON válido com estas exatas chaves:
     backups: EVAL_BACKUP_MODELS,
     parse: parseEvaluationJson,
     baseGenerationConfig: EVAL_GENERATION_CONFIG,
-    preferWindowMs: 5000,
-    hedgeAfterMs: 2600,
-    perRequestTimeoutMs: 11000,
-    overallTimeoutMs: 13500,
-    label: 'Gemini',
+    hedgeAfterMs: 4500,
+    perRequestTimeoutMs: 16000,
+    overallTimeoutMs: 22000,
+    label: 'Gemini Avaliação',
   });
 
   const id = `eval-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
@@ -183,22 +310,26 @@ Responda ESTRITAMENTE em JSON válido com estas exatas chaves:
   const coverUrl =
     extraContext?.coverUrl ||
     curated?.[0] ||
+    catalogFacts?.coverUrl ||
     `https://covers.openlibrary.org/b/isbn/9780451524935-L.jpg`;
 
   const pages =
-    extraContext?.pages && extraContext.pages > 30
-      ? extraContext.pages
+    verifiedPages && verifiedPages > 30
+      ? Math.round(verifiedPages)
       : parsed.pages && parsed.pages > 30
       ? Math.round(parsed.pages)
+      : editionPagesHint && editionPagesHint > 30
+      ? Math.round(editionPagesHint)
       : 300;
 
-  const year = extraContext?.year || (parsed.year ? Number(parsed.year) : undefined);
+  const year = verifiedYear || (parsed.year ? Number(parsed.year) : undefined);
 
   return {
     id,
     title: parsed.title || bookTitle,
-    author: parsed.author || extraContext?.author || 'Autor não informado',
+    author: parsed.author || verifiedAuthor || 'Autor não informado',
     originalTitle: parsed.originalTitle || undefined,
+    publisher: verifiedPublisher,
     pages,
     year,
     coverUrl,
@@ -237,13 +368,14 @@ export async function evaluateBulkWithGemini(rawLines: string[]): Promise<BookEv
 ${USER_PROFILE_PROMPT}
 ${historyBlock}
 
-Avalie a seguinte lista de obras literárias de acordo com o perfil rigoroso do leitor do app Veredito:
+Avalie rigorosamente a seguinte lista de obras literárias de acordo com o perfil e o histórico real do leitor do app Veredito:
 ${booksToEvaluate.map((b, i) => `${i + 1}. ${b}`).join('\n')}
 
 INSTRUÇÕES OBRIGATÓRIAS:
-1. PÁGINAS REAIS: informe a quantidade real aproximada de páginas de cada obra.
-2. FILMES CONEXOS: indique filmes cujos temas e atmosfera realmente dialoguem com a obra.
-3. NOTAS INTEIRAS: notas inteiras (0 a 10) arredondadas para menos.
+1. PÁGINAS REAIS: informe a quantidade real aproximada de páginas de cada obra na edição brasileira mais conhecida.
+2. VERACIDADE CRÍTICA: avalie cada obra fielmente quanto a ritmo, densidade dramática e encaixe real com o perfil.
+3. FILMES CONEXOS: indique filmes cujos temas e atmosfera realmente dialoguem com a obra.
+4. NOTAS INTEIRAS: notas inteiras (0 a 10) arredondadas para menos.
 
 Retorne ESTRITAMENTE um array JSON de objetos válidos:
 [
@@ -283,10 +415,9 @@ Retorne ESTRITAMENTE um array JSON de objetos válidos:
     backups: EVAL_BACKUP_MODELS,
     parse: parseBulkJson,
     baseGenerationConfig: EVAL_GENERATION_CONFIG,
-    preferWindowMs: 12000,
-    hedgeAfterMs: 8000,
+    hedgeAfterMs: 7000,
     perRequestTimeoutMs: 28000,
-    overallTimeoutMs: 32000,
+    overallTimeoutMs: 35000,
     label: 'Gemini Lote',
   });
 
@@ -342,6 +473,7 @@ const SEARCH_BACKUP_MODELS: RaceModel[] = [
 
 /**
  * Busca inteligente ultra-rápida de livros e edições populares no catálogo brasileiro
+ * (apenas para autocompletar sugestões — a avaliação crítica em si usa sempre modelos completos)
  */
 export async function searchPopularBooksWithGemini(
   query: string,

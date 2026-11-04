@@ -10,14 +10,16 @@ const AMAZON_INITIAL_MODELS: RaceModel[] = [
   {
     model: 'gemini-3-flash-preview',
     tier: 'preferred',
-    generationConfig: { thinkingConfig: { thinkingLevel: 'minimal' } },
+    generationConfig: { thinkingConfig: { thinkingLevel: 'medium' } },
   },
-  { model: 'gemini-3.1-flash-lite', tier: 'fast' },
+  { model: 'gemini-3.8-flash', tier: 'preferred' },
 ];
 
 const AMAZON_BACKUP_MODELS: RaceModel[] = [
-  { model: 'gemini-flash-lite-latest', tier: 'fast' },
-  { model: 'gemini-3.5-flash-lite', tier: 'fast' },
+  { model: 'gemini-3.6-flash', tier: 'preferred' },
+  { model: 'gemini-3.5-flash', tier: 'preferred' },
+  { model: 'gemini-flash-latest', tier: 'preferred' },
+  { model: 'gemini-3.1-flash-lite', tier: 'fast' },
 ];
 
 /**
@@ -203,10 +205,10 @@ Responda ESTRITAMENTE em formato JSON:
         responseMimeType: 'application/json',
         temperature: 0.1,
       },
-      preferWindowMs: 2800,
-      hedgeAfterMs: 1800,
-      perRequestTimeoutMs: 4500,
-      overallTimeoutMs: 5500,
+      preferWindowMs: 7000,
+      hedgeAfterMs: 3000,
+      perRequestTimeoutMs: 9000,
+      overallTimeoutMs: 11000,
       signal,
       label: 'Amazon Gemini',
     });

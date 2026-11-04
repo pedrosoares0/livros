@@ -42,8 +42,8 @@ const EVALUATION_STAGES = [
   },
 ];
 
-// Cadência calibrada para avaliações rápidas (~3,5s a ~5,5s)
-const STEP_INTERVAL_MS = 950;
+// Cadência calibrada para raciocínio completo (~6,5s a ~8,5s)
+const STEP_INTERVAL_MS = 1450;
 const FINISH_HOLD_MS = 260;
 
 const POPULAR_SUGGESTIONS = [
@@ -195,7 +195,9 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
   const runEvaluationWithProgress = async (
     title: string,
     extraContext?: {
+      sourceId?: string;
       author?: string;
+      publisher?: string;
       description?: string;
       coverUrl?: string;
       pages?: number;
@@ -269,7 +271,9 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
     setDuplicateWarning(null);
 
     runEvaluationWithProgress(rawBook.title || query.trim() || 'Livro', {
+      sourceId: rawBook.id,
       author: rawBook.author,
+      publisher: rawBook.publisher,
       description: rawBook.resumo,
       coverUrl: rawBook.coverUrl,
       pages: rawBook.pages,

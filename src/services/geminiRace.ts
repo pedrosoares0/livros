@@ -1,16 +1,15 @@
 /**
- * Motor de chamadas em corrida (hedged requests) para a API do Gemini.
+ * Motor de chamadas paralelas com hedge progressivo para a API do Gemini.
  *
- * Mantém as avaliações consistentemente na faixa de ~3,5s a ~5,5s mesmo quando
- * algum modelo específico sofre pico de carga (HTTP 503 ou latência > 15s):
- *  1. Dispara em paralelo o modelo preferido (maior qualidade, thinking baixo)
- *     e um modelo rápido (flash-lite, ~2s estável).
- *  2. Se o modelo preferido responder dentro de `preferWindowMs`, vence na hora
- *     e cancela os demais.
- *  3. Se o modelo rápido responder primeiro, aguarda até `preferWindowMs` pelo
- *     preferido — ou vence imediatamente se os preferidos já tiverem falhado.
- *  4. Qualquer falha ou atraso além de `hedgeAfterMs` aciona modelos de reserva.
- *  5. Assim que há vencedor, todas as conexões pendentes são abortadas.
+ * Reduz a latência eliminando filas sequenciais de HTTP 503 e conexões travadas
+ * SEM sacrificar raciocínio (thinking) nem rebaixar avaliações para modelos lite:
+ *  1. Dispara imediatamente os modelos principais de raciocínio completo (`tier: 'preferred'`).
+ *  2. Se qualquer instância retornar erro (ex: pico 503) ou ultrapassar `hedgeAfterMs`,
+ *     aciona automaticamente o próximo modelo de raciocínio completo na reserva.
+ *  3. Modelos rápidos (`tier: 'fast'`, usados apenas em buscas de autocompletar ou
+ *     contingência extrema) jamais atropelam um modelo `preferred` dentro de `preferWindowMs`.
+ *  4. Assim que o primeiro modelo qualificado responde com JSON válido, todas as demais
+ *     conexões em andamento são abortadas na hora.
  */
 
 export interface RaceModel {
@@ -49,10 +48,10 @@ export function raceGemini<T>(opts: RaceOptions<T>): Promise<RaceResult<T>> {
     initial,
     parse,
     baseGenerationConfig = {},
-    preferWindowMs = 5000,
-    hedgeAfterMs = 2600,
-    perRequestTimeoutMs = 11000,
-    overallTimeoutMs = 13500,
+    preferWindowMs = 8000,
+    hedgeAfterMs = 4500,
+    perRequestTimeoutMs = 16000,
+    overallTimeoutMs = 22000,
     signal,
     label = 'Gemini',
   } = opts;
@@ -108,6 +107,18 @@ export function raceGemini<T>(opts: RaceOptions<T>): Promise<RaceResult<T>> {
     const launchNextBackup = () => {
       const next = backups.shift();
       if (next) launch(next);
+    };
+
+    const scheduleHedge = () => {
+      if (hedgeAfterMs <= 0) return;
+      timers.push(
+        setTimeout(() => {
+          if (!settled && !heldFast && backups.length > 0) {
+            launchNextBackup();
+            scheduleHedge();
+          }
+        }, hedgeAfterMs)
+      );
     };
 
     const launch = (m: RaceModel) => {
@@ -189,11 +200,7 @@ export function raceGemini<T>(opts: RaceOptions<T>): Promise<RaceResult<T>> {
       );
     }
 
-    timers.push(
-      setTimeout(() => {
-        if (!settled && !heldFast) launchNextBackup();
-      }, hedgeAfterMs)
-    );
+    scheduleHedge();
 
     timers.push(
       setTimeout(() => {
