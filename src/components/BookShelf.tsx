@@ -20,17 +20,6 @@ export const BookShelf: React.FC<BookShelfProps> = React.memo(({
 }) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  // Smooth mouse-wheel scrolling translated to horizontal motion without blocking clicks
-  const handleWheel = (e: React.WheelEvent) => {
-    if (!scrollContainerRef.current) return;
-    if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
-      scrollContainerRef.current.scrollBy({
-        left: e.deltaY * 1.2,
-        behavior: 'smooth',
-      });
-    }
-  };
-
   const scrollByAmount = (amount: number) => {
     if (scrollContainerRef.current) {
       scrollContainerRef.current.scrollBy({
@@ -43,7 +32,7 @@ export const BookShelf: React.FC<BookShelfProps> = React.memo(({
   if (!books || books.length === 0) return null;
 
   return (
-    <section className="w-full space-y-2 py-3 select-none">
+    <section className="w-full space-y-2 py-3 select-none" style={{ contain: 'layout style' }}>
       {/* Category Header Row */}
       <div className="flex items-center justify-between px-3 sm:px-4 md:px-3 lg:px-4">
         {onTitleClick ? (
@@ -96,8 +85,7 @@ export const BookShelf: React.FC<BookShelfProps> = React.memo(({
         {/* Horizontal Book Row - Enlarged, Smooth Scrolling */}
         <div
           ref={scrollContainerRef}
-          onWheel={handleWheel}
-          className="flex items-end gap-4 sm:gap-5 overflow-x-auto pt-2 pb-8 px-3 sm:px-4 md:px-3 lg:px-4 hide-scrollbar scroll-smooth"
+          className="flex items-end gap-4 sm:gap-5 overflow-x-auto pt-2 pb-8 px-3 sm:px-4 md:px-3 lg:px-4 hide-scrollbar"
         >
           {books.map((book) => (
             <div

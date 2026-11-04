@@ -1,3 +1,5 @@
+import { markCoverLoaded } from '../components/BookCover';
+
 /**
  * Non-blocking, gentle image prefetching service
  * Prefetches covers in small batches when browser is idle to avoid
@@ -6,23 +8,26 @@
 
 const prefetchedUrls = new Set<string>();
 
-export function prefetchBookCovers(coverUrls: (string | undefined)[]) {
+export function prefetchBookCovers(coverUrls: (string | undefined)[], immediate = false) {
   if (typeof window === 'undefined') return;
 
-  // Filter valid, un-prefetched URLs and limit to priority batch
   const queue = coverUrls
     .filter((url): url is string => Boolean(url && !prefetchedUrls.has(url)))
-    .slice(0, 16);
+    .slice(0, 20);
 
   if (queue.length === 0) return;
 
   const processBatch = () => {
-    // Process at most 2 images per idle frame
-    const batch = queue.splice(0, 2);
+    const batch = queue.splice(0, 3);
     for (const url of batch) {
       prefetchedUrls.add(url);
       const img = new Image();
       img.decoding = 'async';
+      img.onload = () => {
+        if (img.naturalWidth > 1 && img.naturalHeight > 1) {
+          markCoverLoaded(url);
+        }
+      };
       img.src = url;
     }
 
@@ -30,17 +35,21 @@ export function prefetchBookCovers(coverUrls: (string | undefined)[]) {
       if ('requestIdleCallback' in window) {
         (window as any).requestIdleCallback(processBatch, { timeout: 1000 });
       } else {
-        setTimeout(processBatch, 250);
+        setTimeout(processBatch, 200);
       }
     }
   };
 
-  // Give visible viewport images at least 800ms of exclusive network bandwidth
+  if (immediate) {
+    processBatch();
+    return;
+  }
+
   setTimeout(() => {
     if ('requestIdleCallback' in window) {
       (window as any).requestIdleCallback(processBatch, { timeout: 1500 });
     } else {
-      setTimeout(processBatch, 300);
+      setTimeout(processBatch, 250);
     }
-  }, 800);
+  }, 600);
 }

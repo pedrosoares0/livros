@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { BookOpen, ArrowUpDown, Search, X } from 'lucide-react';
 import { BookEvaluation, UserRatingsMap } from '../types';
 import { isUserEvaluation } from '../data/initialBooks';
@@ -13,13 +13,22 @@ interface DiscoverViewProps {
   onSelectBook: (book: BookEvaluation) => void;
   onOpenEvaluate: () => void;
   userRatings?: UserRatingsMap;
+  isActive?: boolean;
 }
+
+const normalize = (text: string) =>
+  text
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim();
 
 export const DiscoverView: React.FC<DiscoverViewProps> = React.memo(({
   books,
   onSelectBook,
   onOpenEvaluate,
   userRatings,
+  isActive = true,
 }) => {
   const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
   const [searchQuery, setSearchQuery] = useState('');
@@ -31,56 +40,60 @@ export const DiscoverView: React.FC<DiscoverViewProps> = React.memo(({
     );
   };
 
-  // Normalização para busca sem acentos e case-insensitive
-  const normalize = (text: string) =>
-    text
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .trim();
+  // Precomputa normalização de texto apenas quando a lista muda
+  const indexedBooks = useMemo(
+    () =>
+      books.map((book) => ({
+        book,
+        searchBlob: `${normalize(book.title || '')}\n${normalize(book.author || '')}\n${
+          book.originalTitle ? normalize(book.originalTitle) : ''
+        }`,
+      })),
+    [books]
+  );
 
   // Apenas as avaliações reais do usuário (exclui catálogo inicial, que fica na Estante)
-  const userEvaluations = books.filter(isUserEvaluation);
+  const userEvaluations = useMemo(() => books.filter(isUserEvaluation), [books]);
 
-  // Busca precisa por título ou autor
   const cleanQuery = searchQuery.trim();
-  const normalizedQuery = normalize(cleanQuery);
+  const normalizedQuery = useMemo(() => (cleanQuery ? normalize(cleanQuery) : ''), [cleanQuery]);
 
-  const searchResults = cleanQuery
-    ? books
+  const searchResults = useMemo(() => {
+    if (!normalizedQuery) return [];
+    return indexedBooks
+      .filter(({ book, searchBlob }) => {
+        const score = Math.floor(getEffectiveScore(book, userRatings));
+        if (selectedScoreFilters.length > 0 && !selectedScoreFilters.includes(score)) {
+          return false;
+        }
+        return searchBlob.includes(normalizedQuery);
+      })
+      .map(({ book }) => book)
+      .sort((a, b) => {
+        const scoreA = getEffectiveScore(a, userRatings);
+        const scoreB = getEffectiveScore(b, userRatings);
+        return sortOrder === 'desc' ? scoreB - scoreA : scoreA - scoreB;
+      });
+  }, [indexedBooks, normalizedQuery, selectedScoreFilters, sortOrder, userRatings]);
+
+  const topMatches = useMemo(
+    () =>
+      userEvaluations
         .filter((b) => {
           const score = Math.floor(getEffectiveScore(b, userRatings));
-          if (selectedScoreFilters.length > 0 && !selectedScoreFilters.includes(score)) {
-            return false;
+          if (selectedScoreFilters.length > 0) {
+            return selectedScoreFilters.includes(score);
           }
-          const title = normalize(b.title || '');
-          const author = normalize(b.author || '');
-          const orig = b.originalTitle ? normalize(b.originalTitle) : '';
-          return title.includes(normalizedQuery) || author.includes(normalizedQuery) || orig.includes(normalizedQuery);
+          return score >= 7;
         })
         .sort((a, b) => {
           const scoreA = getEffectiveScore(a, userRatings);
           const scoreB = getEffectiveScore(b, userRatings);
           return sortOrder === 'desc' ? scoreB - scoreA : scoreA - scoreB;
-        })
-    : [];
+        }),
+    [userEvaluations, selectedScoreFilters, sortOrder, userRatings]
+  );
 
-  // Recomendações padrão (quando não está pesquisando): avaliações do usuário com nota efetiva >= 7, ou filtradas pelas notas selecionadas
-  const topMatches = userEvaluations
-    .filter((b) => {
-      const score = Math.floor(getEffectiveScore(b, userRatings));
-      if (selectedScoreFilters.length > 0) {
-        return selectedScoreFilters.includes(score);
-      }
-      return score >= 7;
-    })
-    .sort((a, b) => {
-      const scoreA = getEffectiveScore(a, userRatings);
-      const scoreB = getEffectiveScore(b, userRatings);
-      return sortOrder === 'desc' ? scoreB - scoreA : scoreA - scoreB;
-    });
-
-  // Últimas avaliações: todas as avaliações do usuário
   const recentEvaluations = userEvaluations;
 
   return (
@@ -117,6 +130,7 @@ export const DiscoverView: React.FC<DiscoverViewProps> = React.memo(({
           borderRadius={28}
           duration={3.5}
           strength={0.65}
+          active={isActive}
           className="w-full"
         >
           <div

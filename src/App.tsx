@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { SlidersHorizontal } from 'lucide-react';
 import { BookEvaluation, UserRatingsMap, UserRating } from './types';
@@ -10,19 +10,19 @@ import { ProfileModal } from './components/ProfileModal';
 import { RateBookModal } from './components/RateBookModal';
 import { BottomNavBar } from './components/BottomNavBar';
 import { PearlButton } from './components/PearlButton';
-import { 
-  fetchEvaluations, 
-  saveEvaluation, 
+import {
+  fetchEvaluations,
+  saveEvaluation,
   deleteEvaluation,
   toggleSaveBook,
   updateBookCoverInDb,
-  getLocalEvaluations 
+  getLocalEvaluations,
 } from './services/supabase';
-import { 
-  fetchRatings, 
-  upsertRating, 
-  deleteRating, 
-  getLocalRatings 
+import {
+  fetchRatings,
+  upsertRating,
+  deleteRating,
+  getLocalRatings,
 } from './services/ratings';
 import { prefetchBookCovers } from './services/imagePrefetch';
 
@@ -69,22 +69,20 @@ export function App() {
     };
   }, []);
 
-  const handleBookEvaluated = async (newBook: BookEvaluation) => {
+  const handleBookEvaluated = useCallback(async (newBook: BookEvaluation) => {
     setBooks((prev) => [newBook, ...prev.filter((b) => b.id !== newBook.id)]);
     setSelectedBook(newBook);
     await saveEvaluation(newBook);
-  };
+  }, []);
 
-  const handleBulkEvaluated = async (newBooks: BookEvaluation[]) => {
+  const handleBulkEvaluated = useCallback(async (newBooks: BookEvaluation[]) => {
     setBooks((prev) => [...newBooks, ...prev.filter((b) => !newBooks.some((n) => n.id === b.id))]);
     setActiveTab('discover');
     if (newBooks.length > 0) {
       setSelectedBook(newBooks[0]);
     }
-    for (const b of newBooks) {
-      await saveEvaluation(b);
-    }
-  };
+    await Promise.all(newBooks.map((b) => saveEvaluation(b)));
+  }, []);
 
   const handleToggleSave = async (book: BookEvaluation) => {
     const willBeSaved = !savedBookIds.has(book.id);
@@ -176,8 +174,7 @@ export function App() {
     }
 
     // Persist deletion to Supabase
-    await deleteEvaluation(bookId);
-    await deleteRating(bookId);
+    await Promise.all([deleteEvaluation(bookId), deleteRating(bookId)]);
   };
 
   const handleUpdateBookCover = async (bookId: string, newCoverUrl: string) => {
@@ -191,8 +188,29 @@ export function App() {
     await updateBookCoverInDb(bookId, newCoverUrl);
   };
 
+  // Callbacks estáveis: preservam o React.memo das views (evita re-render de todas as capas)
+  const openEvaluate = useCallback(() => setIsEvaluateOpen(true), []);
+  const closeEvaluate = useCallback(() => setIsEvaluateOpen(false), []);
+  const closeFicha = useCallback(() => setSelectedBook(null), []);
+  const closeRating = useCallback(() => setRatingBook(null), []);
+  const closeProfile = useCallback(() => setIsProfileOpen(false), []);
+  const openBookFromEvaluate = useCallback((book: BookEvaluation) => {
+    setIsEvaluateOpen(false);
+    setSelectedBook(book);
+  }, []);
+  const openEvaluateFromFicha = useCallback(() => {
+    setSelectedBook(null);
+    setIsEvaluateOpen(true);
+  }, []);
+
   // Shelves display only real books synchronized with the Supabase database
   const allShelfBooks = books;
+  const isDiscoverActive =
+    activeTab === 'discover' &&
+    !selectedBook &&
+    !isEvaluateOpen &&
+    !ratingBook &&
+    !isProfileOpen;
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-start bg-[#f5f5f7] md:bg-white text-[#1d1d1f] antialiased w-full">
@@ -308,7 +326,7 @@ export function App() {
               <PearlButton
                 size="nav-rect"
                 label="Avaliar livro"
-                onClick={() => setIsEvaluateOpen(true)}
+                onClick={openEvaluate}
               />
             </div>
           </div>
@@ -320,8 +338,9 @@ export function App() {
             <DiscoverView
               books={books}
               onSelectBook={setSelectedBook}
-              onOpenEvaluate={() => setIsEvaluateOpen(true)}
+              onOpenEvaluate={openEvaluate}
               userRatings={userRatings}
+              isActive={isDiscoverActive}
             />
           </div>
 
@@ -339,7 +358,7 @@ export function App() {
         <BottomNavBar
           activeTab={activeTab}
           onSelectTab={setActiveTab}
-          onOpenEvaluate={() => setIsEvaluateOpen(true)}
+          onOpenEvaluate={openEvaluate}
         />
 
         {/* Ficha Veredito Modal */}
@@ -348,17 +367,14 @@ export function App() {
             <FichaModal
               key={selectedBook.id}
               book={selectedBook}
-              onClose={() => setSelectedBook(null)}
+              onClose={closeFicha}
               onSaveToWishlist={handleToggleSave}
               isSaved={savedBookIds.has(selectedBook.id)}
               onDeleteBook={handleDeleteBook}
               onUpdateCover={handleUpdateBookCover}
               userRating={selectedBook ? userRatings[selectedBook.id] : undefined}
               onOpenRateModal={() => setRatingBook(selectedBook)}
-              onOpenEvaluate={() => {
-                setSelectedBook(null);
-                setIsEvaluateOpen(true);
-              }}
+              onOpenEvaluate={openEvaluateFromFicha}
             />
           )}
         </AnimatePresence>
@@ -371,7 +387,7 @@ export function App() {
               isOpen={Boolean(ratingBook)}
               book={ratingBook}
               existingRating={ratingBook ? userRatings[ratingBook.id] : null}
-              onClose={() => setRatingBook(null)}
+              onClose={closeRating}
               onSaveRating={(rating, tags) => handleSaveRating(ratingBook, rating, tags)}
               onDeleteRating={() => handleDeleteRating(ratingBook.id)}
             />
@@ -383,14 +399,11 @@ export function App() {
           {isEvaluateOpen && (
             <EvaluateModal
               isOpen={isEvaluateOpen}
-              onClose={() => setIsEvaluateOpen(false)}
+              onClose={closeEvaluate}
               onBookEvaluated={handleBookEvaluated}
               onBulkEvaluated={handleBulkEvaluated}
               existingBooks={books}
-              onOpenBook={(book) => {
-                setIsEvaluateOpen(false);
-                setSelectedBook(book);
-              }}
+              onOpenBook={openBookFromEvaluate}
             />
           )}
         </AnimatePresence>
@@ -400,7 +413,7 @@ export function App() {
           {isProfileOpen && (
             <ProfileModal
               isOpen={isProfileOpen}
-              onClose={() => setIsProfileOpen(false)}
+              onClose={closeProfile}
             />
           )}
         </AnimatePresence>

@@ -1,4 +1,4 @@
-import { supabase, getLocalEvaluations } from './supabase';
+import { supabase, getLocalEvaluations, getEvaluationsCacheVersion } from './supabase';
 import type { BookEvaluation, UserRating, UserRatingsMap } from '../types';
 
 const RATINGS_STORAGE_KEY = 'veredito_user_ratings';
@@ -57,23 +57,41 @@ const mapRatingToRow = (r: UserRating) => ({
 });
 
 // ---------------------------------------------------------------------------
-// Cache local (leitura síncrona: usado na UI e no prompt da IA sem latência)
+// Cache em memória + flush assíncrono em localStorage (0ms na main thread)
 // ---------------------------------------------------------------------------
+let memoryRatings: UserRatingsMap | null = null;
+let ratingsVersion = 0;
+let ratingsFlushTimer: ReturnType<typeof setTimeout> | null = null;
+
 export const getLocalRatings = (): UserRatingsMap => {
+  if (memoryRatings !== null) {
+    return memoryRatings;
+  }
   try {
+    if (typeof localStorage === 'undefined') return {};
     const raw = localStorage.getItem(RATINGS_STORAGE_KEY);
-    return raw ? JSON.parse(raw) : {};
+    memoryRatings = raw ? JSON.parse(raw) : {};
+    return memoryRatings!;
   } catch {
+    memoryRatings = {};
     return {};
   }
 };
 
 const saveLocalRatings = (map: UserRatingsMap) => {
-  try {
-    localStorage.setItem(RATINGS_STORAGE_KEY, JSON.stringify(map));
-  } catch (e) {
-    console.error('Error writing local ratings:', e);
-  }
+  memoryRatings = map;
+  ratingsVersion++;
+  if (typeof window === 'undefined') return;
+  if (ratingsFlushTimer) clearTimeout(ratingsFlushTimer);
+  ratingsFlushTimer = setTimeout(() => {
+    ratingsFlushTimer = null;
+    if (!memoryRatings) return;
+    try {
+      localStorage.setItem(RATINGS_STORAGE_KEY, JSON.stringify(memoryRatings));
+    } catch (e) {
+      console.error('Error writing local ratings:', e);
+    }
+  }, 0);
 };
 
 // ---------------------------------------------------------------------------
@@ -129,10 +147,11 @@ export const upsertRating = async (rating: UserRating): Promise<void> => {
 };
 
 export const deleteRating = async (bookId: string): Promise<void> => {
-  const map = getLocalRatings();
-  if (map[bookId]) {
-    delete map[bookId];
-    saveLocalRatings(map);
+  const current = getLocalRatings();
+  if (current[bookId]) {
+    const next = { ...current };
+    delete next[bookId];
+    saveLocalRatings(next);
   }
   try {
     const { error } = await supabase.from('user_ratings').delete().eq('book_id', bookId);
@@ -143,26 +162,32 @@ export const deleteRating = async (bookId: string): Promise<void> => {
 };
 
 // ---------------------------------------------------------------------------
-// Histórico real de leitura para o prompt da IA
+// Histórico real de leitura para o prompt da IA (memoizado por versão)
 // ---------------------------------------------------------------------------
 const MAX_RECENT = 20;
 const MAX_DIVERGENT = 10;
 
-/**
- * Bloco compacto (uma linha por obra) com as notas reais do leitor.
- * Lido do cache local: zero requisições extras antes de chamar o Gemini.
- * Seleciona as 20 leituras mais recentes + as 10 com maior divergência entre
- * a previsão da IA e a nota real, para manter o prompt curto e informativo.
- */
+let cachedHistoryKey = '';
+let cachedHistoryValue = '';
+
 export const buildReadingHistoryBlock = (): string => {
   const ratings = Object.values(getLocalRatings());
   if (ratings.length === 0) return '';
+
+  const cacheKey = `${ratingsVersion}:${getEvaluationsCacheVersion()}`;
+  if (cacheKey === cachedHistoryKey) {
+    return cachedHistoryValue;
+  }
 
   const booksById = new Map(getLocalEvaluations().map((b) => [b.id, b]));
   const entries = ratings
     .map((r) => ({ r, book: booksById.get(r.bookId) }))
     .filter((e): e is { r: UserRating; book: BookEvaluation } => Boolean(e.book));
-  if (entries.length === 0) return '';
+  if (entries.length === 0) {
+    cachedHistoryKey = cacheKey;
+    cachedHistoryValue = '';
+    return '';
+  }
 
   const byRecent = [...entries].sort(
     (a, b) => new Date(b.r.updatedAt).getTime() - new Date(a.r.updatedAt).getTime()
@@ -181,16 +206,23 @@ export const buildReadingHistoryBlock = (): string => {
   const lines = [...selected, ...divergent].map(({ r, book }) => {
     const predicted = Math.floor(book.notaEncaixe);
     const delta = r.rating - predicted;
-    const drift = delta === 0 ? 'previsão correta' : delta < 0 ? `IA superestimou em ${-delta}` : `IA subestimou em ${delta}`;
+    const drift =
+      delta === 0
+        ? 'previsão correta'
+        : delta < 0
+        ? `IA superestimou em ${-delta}`
+        : `IA subestimou em ${delta}`;
     const genres = book.genres.slice(0, 2).join(', ');
     const tags = r.tags.length > 0 ? ` | ${r.tags.join(', ')}` : '';
     return `  * ${book.title} (${book.author}) [${genres}] — previsto ${predicted} → leitor ${r.rating} (${drift})${tags}`;
   });
 
-  return `
+  cachedHistoryKey = cacheKey;
+  cachedHistoryValue = `
 HISTÓRICO REAL DE LEITURA (notas que o próprio leitor deu APÓS terminar cada obra, com seus comentários rápidos):
 ${lines.join('\n')}
 - PRIORIDADE: este histórico é o sinal MAIS FORTE do gosto do leitor. Em qualquer conflito com o perfil acima, o histórico prevalece.
 - CALIBRAÇÃO: use as divergências "previsto → leitor" para corrigir sua Nota de Encaixe. Se você superestimou obras com certas características (ritmo, tom, gênero, extensão, estilo do autor), penalize obras semelhantes; se subestimou, valorize-as. Os comentários indicam o motivo.
 `;
+  return cachedHistoryValue;
 };

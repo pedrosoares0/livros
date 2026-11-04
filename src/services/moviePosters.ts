@@ -9,13 +9,17 @@ const CACHE_STORAGE_KEY = 'veredito_tmdb_posters_cache';
 
 // In-memory cache for ultra-fast synchronous lookup
 const posterMemoryCache: Record<string, string> = {};
+const inflightRequests = new Map<string, Promise<string | null>>();
+let posterFlushTimer: ReturnType<typeof setTimeout> | null = null;
 
 // Load cache from localStorage
 try {
-  const stored = localStorage.getItem(CACHE_STORAGE_KEY);
-  if (stored) {
-    const parsed = JSON.parse(stored);
-    Object.assign(posterMemoryCache, parsed);
+  if (typeof localStorage !== 'undefined') {
+    const stored = localStorage.getItem(CACHE_STORAGE_KEY);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      Object.assign(posterMemoryCache, parsed);
+    }
   }
 } catch {
   // Ignore localStorage issues
@@ -23,11 +27,16 @@ try {
 
 const saveToCache = (key: string, url: string) => {
   posterMemoryCache[key] = url;
-  try {
-    localStorage.setItem(CACHE_STORAGE_KEY, JSON.stringify(posterMemoryCache));
-  } catch {
-    // Ignore storage quota
-  }
+  if (typeof window === 'undefined') return;
+  if (posterFlushTimer) clearTimeout(posterFlushTimer);
+  posterFlushTimer = setTimeout(() => {
+    posterFlushTimer = null;
+    try {
+      localStorage.setItem(CACHE_STORAGE_KEY, JSON.stringify(posterMemoryCache));
+    } catch {
+      // Ignore storage quota
+    }
+  }, 0);
 };
 
 // Curated high-res fallbacks for cinema classics and Brazilian cinema
@@ -59,7 +68,7 @@ const CURATED_POSTERS: Record<string, string> = {
 export const normalizeMovieTitle = (title: string): string => {
   return title
     .toLowerCase()
-    .replace(/\s*\(.*?\)\s*/g, '') // remove "(1963)" or "(Memento)"
+    .replace(/\s*\(.*?\)\s*/g, '')
     .replace(/[:\-—]/g, ' ')
     .trim();
 };
@@ -81,83 +90,75 @@ export function getMoviePosterUrl(movieTitle: string): string | null {
   return null;
 }
 
-/**
- * Asynchronous fetch from TMDb API strictly following priority:
- * 1. Request with language=pt-BR, append_to_response=images, include_image_language=pt,en,null
- * 2. Priority:
- *    - 1º: Poster with iso_639_1 === "pt"
- *    - 2º: Fallback to iso_639_1 === "en"
- *    - 3º: Fallback to iso_639_1 === null / neutral
- *    - 4º: Fallback to movie.poster_path
- */
 export async function fetchMoviePoster(movieTitle: string): Promise<string | null> {
   if (!movieTitle) return null;
   const cleanTitle = normalizeMovieTitle(movieTitle);
 
-  // Check cache first
   const cached = getMoviePosterUrl(cleanTitle);
   if (cached) return cached;
 
-  try {
-    // Step 1: Search movie on TMDb
-    const searchUrl = `${TMDB_BASE_URL}/search/movie?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(
-      cleanTitle
-    )}&language=pt-BR`;
-    const searchRes = await fetch(searchUrl);
-    if (!searchRes.ok) throw new Error(`Search failed: ${searchRes.status}`);
+  const existing = inflightRequests.get(cleanTitle);
+  if (existing) return existing;
 
-    const searchData = await searchRes.json();
-    const movie = searchData.results?.[0];
-    if (!movie || !movie.id) {
-      // Fallback: check curated dictionary
-      for (const [cKey, url] of Object.entries(CURATED_POSTERS)) {
-        if (cleanTitle.includes(cKey) || cKey.includes(cleanTitle)) {
-          saveToCache(cleanTitle, url);
-          return url;
+  const requestPromise = (async (): Promise<string | null> => {
+    try {
+      const searchUrl = `${TMDB_BASE_URL}/search/movie?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(
+        cleanTitle
+      )}&language=pt-BR`;
+      const searchRes = await fetch(searchUrl, { signal: AbortSignal.timeout(3500) });
+      if (!searchRes.ok) throw new Error(`Search failed: ${searchRes.status}`);
+
+      const searchData = await searchRes.json();
+      const movie = searchData.results?.[0];
+      if (!movie || !movie.id) {
+        for (const [cKey, url] of Object.entries(CURATED_POSTERS)) {
+          if (cleanTitle.includes(cKey) || cKey.includes(cleanTitle)) {
+            saveToCache(cleanTitle, url);
+            return url;
+          }
         }
+        return null;
       }
-      return null;
+
+      const detailsUrl = `${TMDB_BASE_URL}/movie/${movie.id}?api_key=${TMDB_API_KEY}&language=pt-BR&append_to_response=images&include_image_language=pt,en,null`;
+      const detailsRes = await fetch(detailsUrl, { signal: AbortSignal.timeout(3500) });
+      if (!detailsRes.ok) throw new Error(`Details failed: ${detailsRes.status}`);
+
+      const detailsData = await detailsRes.json();
+      const posters: Array<{ file_path: string; iso_639_1: string | null }> =
+        detailsData.images?.posters || [];
+
+      const ptPoster = posters.find((p) => p.iso_639_1 === 'pt');
+      const enPoster = posters.find((p) => p.iso_639_1 === 'en');
+      const nullPoster = posters.find((p) => p.iso_639_1 === null || !p.iso_639_1);
+
+      const chosen =
+        ptPoster ||
+        enPoster ||
+        nullPoster ||
+        (detailsData.poster_path ? { file_path: detailsData.poster_path } : null);
+
+      if (chosen && chosen.file_path) {
+        const fullUrl = `${TMDB_IMAGE_BASE}${chosen.file_path}`;
+        saveToCache(cleanTitle, fullUrl);
+        return fullUrl;
+      }
+    } catch (err) {
+      console.warn(`TMDb lookup notice for "${cleanTitle}":`, err);
     }
 
-    // Step 2: Fetch movie images with append_to_response=images & include_image_language=pt,en,null
-    const detailsUrl = `${TMDB_BASE_URL}/movie/${movie.id}?api_key=${TMDB_API_KEY}&language=pt-BR&append_to_response=images&include_image_language=pt,en,null`;
-    const detailsRes = await fetch(detailsUrl);
-    if (!detailsRes.ok) throw new Error(`Details failed: ${detailsRes.status}`);
-
-    const detailsData = await detailsRes.json();
-    const posters: Array<{ file_path: string; iso_639_1: string | null }> =
-      detailsData.images?.posters || [];
-
-    // Prioridade da imagem:
-    // 1º: Pôster com iso_639_1 === "pt"
-    const ptPoster = posters.find((p) => p.iso_639_1 === 'pt');
-    // 2º: Fallback para inglês (iso_639_1 === "en")
-    const enPoster = posters.find((p) => p.iso_639_1 === 'en');
-    // 3º: Fallback para pôster sem idioma de texto (iso_639_1 === null)
-    const nullPoster = posters.find((p) => p.iso_639_1 === null || !p.iso_639_1);
-
-    const chosen =
-      ptPoster ||
-      enPoster ||
-      nullPoster ||
-      (detailsData.poster_path ? { file_path: detailsData.poster_path } : null);
-
-    if (chosen && chosen.file_path) {
-      const fullUrl = `${TMDB_IMAGE_BASE}${chosen.file_path}`;
-      saveToCache(cleanTitle, fullUrl);
-      return fullUrl;
+    for (const [cKey, url] of Object.entries(CURATED_POSTERS)) {
+      if (cleanTitle.includes(cKey) || cKey.includes(cleanTitle)) {
+        saveToCache(cleanTitle, url);
+        return url;
+      }
     }
-  } catch (err) {
-    console.warn(`TMDb lookup notice for "${cleanTitle}":`, err);
-  }
 
-  // Fallback to curated dictionary if network error
-  for (const [cKey, url] of Object.entries(CURATED_POSTERS)) {
-    if (cleanTitle.includes(cKey) || cKey.includes(cleanTitle)) {
-      saveToCache(cleanTitle, url);
-      return url;
-    }
-  }
+    return null;
+  })().finally(() => {
+    inflightRequests.delete(cleanTitle);
+  });
 
-  return null;
+  inflightRequests.set(cleanTitle, requestPromise);
+  return requestPromise;
 }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { ScoreBadge } from './ScoreBadge';
 
 interface BookCoverProps {
@@ -18,6 +18,19 @@ const COVER_PALETTES = [
   { bg: 'from-red-950 via-stone-900 to-black', text: 'text-rose-200', border: 'border-rose-500/30' },
 ];
 
+// Cache em memória de URLs já validadas: elimina cascata de re-renders (opacity 0 -> 100) ao montar ou trocar abas
+const loadedCoverUrls = new Set<string>();
+const failedCoverUrls = new Set<string>();
+
+export function markCoverLoaded(url: string) {
+  if (!url) return;
+  if (loadedCoverUrls.size > 600) {
+    const first = loadedCoverUrls.values().next().value;
+    if (first) loadedCoverUrls.delete(first);
+  }
+  loadedCoverUrls.add(url);
+}
+
 export const BookCover: React.FC<BookCoverProps> = React.memo(({
   title,
   author,
@@ -26,45 +39,75 @@ export const BookCover: React.FC<BookCoverProps> = React.memo(({
   userRating,
   className = '',
 }) => {
-  const [failedUrl, setFailedUrl] = useState<string | null>(null);
-  const [loadedUrl, setLoadedUrl] = useState<string | null>(null);
+  const [failedUrl, setFailedUrl] = useState<string | null>(() =>
+    coverUrl && failedCoverUrls.has(coverUrl) ? coverUrl : null
+  );
+  const [loadedUrl, setLoadedUrl] = useState<string | null>(() =>
+    coverUrl && loadedCoverUrls.has(coverUrl) ? coverUrl : null
+  );
 
-  const hasError = Boolean(coverUrl && failedUrl === coverUrl);
-  const isLoaded = Boolean(coverUrl && loadedUrl === coverUrl);
+  const hasError = Boolean(coverUrl && (failedUrl === coverUrl || failedCoverUrls.has(coverUrl)));
+  const isLoaded = Boolean(coverUrl && (loadedUrl === coverUrl || loadedCoverUrls.has(coverUrl)));
 
-  // Deterministic palette based on title hash for fallback
-  const charSum = title.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  // Se o navegador já tem a imagem decodificada em cache HTTP, marca síncronamente na montagem
+  const handleImgRef = useCallback(
+    (img: HTMLImageElement | null) => {
+      if (!img || !coverUrl) return;
+      if (img.complete && img.naturalWidth > 0) {
+        if (img.naturalWidth <= 1 || img.naturalHeight <= 1) {
+          failedCoverUrls.add(coverUrl);
+          if (failedUrl !== coverUrl) setFailedUrl(coverUrl);
+        } else {
+          markCoverLoaded(coverUrl);
+          if (!loadedCoverUrls.has(coverUrl) || loadedUrl !== coverUrl) {
+            setLoadedUrl(coverUrl);
+          }
+        }
+      }
+    },
+    [coverUrl, failedUrl, loadedUrl]
+  );
+
+  let charSum = 0;
+  for (let i = 0; i < title.length; i++) {
+    charSum += title.charCodeAt(i);
+  }
   const palette = COVER_PALETTES[charSum % COVER_PALETTES.length];
 
   return (
     <div
-      className={`relative rounded-[3px] select-none transition-all duration-300 bg-neutral-100 ${className}`}
+      className={`relative rounded-[3px] select-none bg-neutral-100 ${className}`}
       style={{
         aspectRatio: '2 / 3',
-        // Directional drop shadow falling distinctly to the right and bottom, matching reference image
+        contain: 'layout style',
         boxShadow:
           '2px 4px 10px -1px rgba(0, 0, 0, 0.20), 7px 14px 28px -2px rgba(0, 0, 0, 0.22), 12px 24px 38px -4px rgba(0, 0, 0, 0.14)',
       }}
     >
       {/* Outer hardcover clip wrapper to maintain crisp 3px corners without clipping outer shadow */}
-      <div className="relative w-full h-full rounded-[3px] overflow-hidden">
+      <div className="relative w-full h-full rounded-[3px] overflow-hidden" style={{ contain: 'paint' }}>
         {/* Real Image or Typographic Leather Cover */}
         {!hasError && coverUrl ? (
           <img
+            ref={handleImgRef}
             key={coverUrl}
             src={coverUrl}
             alt={title}
             onLoad={(e) => {
               const img = e.currentTarget;
-              // Open Library returns 1x1 pixel gif when cover does not exist
               if (img.naturalWidth <= 1 || img.naturalHeight <= 1) {
+                failedCoverUrls.add(coverUrl);
                 setFailedUrl(coverUrl);
               } else {
+                markCoverLoaded(coverUrl);
                 setLoadedUrl(coverUrl);
               }
             }}
-            onError={() => setFailedUrl(coverUrl)}
-            className={`w-full h-full object-cover select-none pointer-events-none transition-opacity duration-200 ${
+            onError={() => {
+              failedCoverUrls.add(coverUrl);
+              setFailedUrl(coverUrl);
+            }}
+            className={`w-full h-full object-cover select-none pointer-events-none transition-opacity duration-150 ${
               isLoaded ? 'opacity-100' : 'opacity-0'
             }`}
             loading="lazy"

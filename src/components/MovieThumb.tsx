@@ -7,7 +7,7 @@ interface MovieThumbProps {
   className?: string;
 }
 
-export const MovieThumb: React.FC<MovieThumbProps> = ({ title, className = '' }) => {
+export const MovieThumb: React.FC<MovieThumbProps> = React.memo(({ title, className = '' }) => {
   const [imageError, setImageError] = useState(false);
   const [posterUrl, setPosterUrl] = useState<string | null>(() => getMoviePosterUrl(title));
   const [isLoading, setIsLoading] = useState(() => !getMoviePosterUrl(title));
@@ -51,7 +51,7 @@ export const MovieThumb: React.FC<MovieThumbProps> = ({ title, className = '' })
         ) : isLoading ? (
           /* Subtle Apple Shimmer Skeleton */
           <div className="w-full h-full bg-neutral-800 animate-pulse flex flex-col items-center justify-center p-2 text-center">
-            <Film className="w-4 h-4 text-neutral-600 animate-bounce mb-1" />
+            <Film className="w-4 h-4 text-neutral-600 mb-1" />
             <span className="text-[9px] text-neutral-500 font-medium line-clamp-1 px-1">
               {title}
             </span>
@@ -77,4 +77,6 @@ export const MovieThumb: React.FC<MovieThumbProps> = ({ title, className = '' })
       </div>
     </div>
   );
-};
+});
+
+MovieThumb.displayName = 'MovieThumb';

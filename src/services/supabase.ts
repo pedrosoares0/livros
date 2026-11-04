@@ -1,13 +1,38 @@
 import { createClient } from '@supabase/supabase-js';
 import type { BookEvaluation } from '../types/index.ts';
 
-const SUPABASE_URL = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_URL) || 'https://odaawprzdbpzivajzned.supabase.co';
-const SUPABASE_ANON_KEY = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_ANON_KEY) || 'sb_publishable_ylTo-hmvP4G-LE8T8J6aoA_jFh2p9mg';
+const SUPABASE_URL =
+  (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_URL) ||
+  'https://odaawprzdbpzivajzned.supabase.co';
+const SUPABASE_ANON_KEY =
+  (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_ANON_KEY) ||
+  'sb_publishable_ylTo-hmvP4G-LE8T8J6aoA_jFh2p9mg';
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const LOCAL_STORAGE_KEY = 'protocolo_evaluations_cache';
 const SAVED_BOOKS_STORAGE_KEY = 'veredito_saved_books';
+
+// Cache em memória: evita JSON.parse / JSON.stringify síncronos bloqueando animações de UI
+let memoryEvaluations: BookEvaluation[] | null = null;
+let evaluationsVersion = 0;
+let flushTimer: ReturnType<typeof setTimeout> | null = null;
+
+export const getEvaluationsCacheVersion = () => evaluationsVersion;
+
+const scheduleEvaluationsFlush = () => {
+  if (typeof window === 'undefined') return;
+  if (flushTimer) clearTimeout(flushTimer);
+  flushTimer = setTimeout(() => {
+    flushTimer = null;
+    if (!memoryEvaluations) return;
+    try {
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(memoryEvaluations));
+    } catch (e) {
+      console.error('Error writing local evaluations:', e);
+    }
+  }, 0);
+};
 
 // Map database row to BookEvaluation
 export const mapRowToEvaluation = (row: any): BookEvaluation => ({
@@ -71,24 +96,27 @@ export const mapEvaluationToRow = (b: BookEvaluation) => ({
   created_at: b.createdAt || new Date().toISOString(),
 });
 
-// Local cache helpers for resilient offline-first UX
+// Local cache helpers for resilient offline-first UX (O(1) memory hit after initial read)
 export const getLocalEvaluations = (): BookEvaluation[] => {
+  if (memoryEvaluations !== null) {
+    return memoryEvaluations;
+  }
   try {
+    if (typeof localStorage === 'undefined') return [];
     const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
-    if (!raw) return [];
-    return JSON.parse(raw);
+    memoryEvaluations = raw ? JSON.parse(raw) : [];
+    return memoryEvaluations!;
   } catch (e) {
     console.error('Error reading local evaluations:', e);
+    memoryEvaluations = [];
     return [];
   }
 };
 
 export const saveLocalEvaluations = (books: BookEvaluation[]) => {
-  try {
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(books));
-  } catch (e) {
-    console.error('Error writing local evaluations:', e);
-  }
+  memoryEvaluations = books;
+  evaluationsVersion++;
+  scheduleEvaluationsFlush();
 };
 
 // Fetch evaluations from Supabase (with fallback to local storage)
@@ -119,15 +147,14 @@ export const fetchEvaluations = async (): Promise<BookEvaluation[]> => {
 
 // Save single evaluation to Supabase and local cache
 export const saveEvaluation = async (evaluation: BookEvaluation): Promise<BookEvaluation> => {
-  // Update local cache first for instant optimistic response
   const localList = getLocalEvaluations();
   const existingIdx = localList.findIndex((b) => b.id === evaluation.id);
-  const updatedList = existingIdx >= 0
-    ? localList.map((b) => (b.id === evaluation.id ? evaluation : b))
-    : [evaluation, ...localList];
+  const updatedList =
+    existingIdx >= 0
+      ? localList.map((b) => (b.id === evaluation.id ? evaluation : b))
+      : [evaluation, ...localList];
   saveLocalEvaluations(updatedList);
 
-  // Sync to Supabase
   try {
     const row = mapEvaluationToRow(evaluation);
     const { data, error } = await supabase
@@ -148,40 +175,50 @@ export const saveEvaluation = async (evaluation: BookEvaluation): Promise<BookEv
   return evaluation;
 };
 
-// Toggle saved state in Supabase and local cache
+// Toggle saved state in Supabase and local cache (sem round-trip extra de SELECT quando já está em memória)
 export const toggleSaveBook = async (bookId: string, isSaved: boolean): Promise<boolean> => {
-  // 1. Update in local cache
   const localList = getLocalEvaluations();
+  const cachedBook = localList.find((b) => b.id === bookId);
   const updatedList = localList.map((b) => (b.id === bookId ? { ...b, isSaved } : b));
   saveLocalEvaluations(updatedList);
 
-  // 2. Update localStorage saved set
-  try {
-    const raw = localStorage.getItem(SAVED_BOOKS_STORAGE_KEY);
-    const set = new Set(raw ? JSON.parse(raw) : []);
-    if (isSaved) {
-      set.add(bookId);
-    } else {
-      set.delete(bookId);
+  setTimeout(() => {
+    try {
+      const raw = localStorage.getItem(SAVED_BOOKS_STORAGE_KEY);
+      const set = new Set(raw ? JSON.parse(raw) : []);
+      if (isSaved) {
+        set.add(bookId);
+      } else {
+        set.delete(bookId);
+      }
+      localStorage.setItem(SAVED_BOOKS_STORAGE_KEY, JSON.stringify([...set]));
+    } catch (e) {
+      console.error('Error writing saved books storage:', e);
     }
-    localStorage.setItem(SAVED_BOOKS_STORAGE_KEY, JSON.stringify([...set]));
-  } catch (e) {
-    console.error('Error writing saved books storage:', e);
-  }
+  }, 0);
 
-  // 3. Update in Supabase
   try {
-    const { data } = await supabase
-      .from('evaluations')
-      .select('criteria')
-      .eq('id', bookId)
-      .single();
+    let baseCriteria: Record<string, any> = cachedBook?.criteria ? { ...cachedBook.criteria } : {};
+    if (!cachedBook) {
+      const { data } = await supabase
+        .from('evaluations')
+        .select('criteria')
+        .eq('id', bookId)
+        .single();
+      baseCriteria = data?.criteria || {};
+    } else {
+      if (cachedBook.originalTitle) baseCriteria.originalTitle = cachedBook.originalTitle;
+      if (cachedBook.categoryShelf) baseCriteria.categoryShelf = cachedBook.categoryShelf;
+    }
 
-    const currentCriteria = data?.criteria || {};
     const updatedCriteria = {
-      ...currentCriteria,
+      ...baseCriteria,
       isSaved,
-      userStatus: isSaved ? 'wishlist' : (currentCriteria.userStatus === 'wishlist' ? undefined : currentCriteria.userStatus),
+      userStatus: isSaved
+        ? 'wishlist'
+        : baseCriteria.userStatus === 'wishlist'
+        ? undefined
+        : baseCriteria.userStatus,
     };
 
     const { error } = await supabase
@@ -202,12 +239,10 @@ export const toggleSaveBook = async (bookId: string, isSaved: boolean): Promise<
 
 // Update book cover in Supabase and local cache
 export const updateBookCoverInDb = async (bookId: string, newCoverUrl: string): Promise<boolean> => {
-  // 1. Update in local cache
   const localList = getLocalEvaluations();
   const updatedList = localList.map((b) => (b.id === bookId ? { ...b, coverUrl: newCoverUrl } : b));
   saveLocalEvaluations(updatedList);
 
-  // 2. Update in Supabase
   try {
     const { error } = await supabase
       .from('evaluations')
@@ -227,23 +262,22 @@ export const updateBookCoverInDb = async (bookId: string, newCoverUrl: string): 
 
 // Delete evaluation from Supabase and local cache
 export const deleteEvaluation = async (id: string): Promise<boolean> => {
-  // 1. Remove from local cache
   const localList = getLocalEvaluations().filter((b) => b.id !== id);
   saveLocalEvaluations(localList);
 
-  // 2. Remove from saved books in localStorage
-  try {
-    const raw = localStorage.getItem(SAVED_BOOKS_STORAGE_KEY);
-    if (raw) {
-      const set = new Set(JSON.parse(raw));
-      set.delete(id);
-      localStorage.setItem(SAVED_BOOKS_STORAGE_KEY, JSON.stringify([...set]));
+  setTimeout(() => {
+    try {
+      const raw = localStorage.getItem(SAVED_BOOKS_STORAGE_KEY);
+      if (raw) {
+        const set = new Set(JSON.parse(raw));
+        set.delete(id);
+        localStorage.setItem(SAVED_BOOKS_STORAGE_KEY, JSON.stringify([...set]));
+      }
+    } catch (e) {
+      console.error('Error removing from saved books storage:', e);
     }
-  } catch (e) {
-    console.error('Error removing from saved books storage:', e);
-  }
+  }, 0);
 
-  // 3. Delete from Supabase
   try {
     const { error } = await supabase
       .from('evaluations')

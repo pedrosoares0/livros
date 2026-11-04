@@ -1,16 +1,23 @@
 import { BookEvaluation } from '../types';
 import { getCuratedCovers } from '../data/curatedCovers';
+import { raceGemini, parseJsonLoose, RaceModel } from './geminiRace';
 
 const GEMINI_API_KEY =
   import.meta.env.VITE_GEMINI_API_KEY ||
   'AQ.Ab8RN6LNzoEEpQlupq2n1dJRY5APsOuFfXmRLp7ESySq8-A3Uw';
 
-const CANDIDATE_MODELS = [
-  'gemini-3.5-flash',
-  'gemini-3.8-flash',
-  'gemini-3.5-flash-lite',
-  'gemini-3-flash-preview',
-  'gemini-flash-latest',
+const AMAZON_INITIAL_MODELS: RaceModel[] = [
+  {
+    model: 'gemini-3-flash-preview',
+    tier: 'preferred',
+    generationConfig: { thinkingConfig: { thinkingLevel: 'minimal' } },
+  },
+  { model: 'gemini-3.1-flash-lite', tier: 'fast' },
+];
+
+const AMAZON_BACKUP_MODELS: RaceModel[] = [
+  { model: 'gemini-flash-lite-latest', tier: 'fast' },
+  { model: 'gemini-3.5-flash-lite', tier: 'fast' },
 ];
 
 /**
@@ -92,7 +99,7 @@ async function checkAmazonCover(asin: string | null): Promise<string | null> {
   if (!asin) return null;
   const cdnUrl = `https://images-na.ssl-images-amazon.com/images/P/${asin}.01.LZZZZZZZ.jpg`;
   try {
-    const res = await fetch(cdnUrl);
+    const res = await fetch(cdnUrl, { signal: AbortSignal.timeout(1800) });
     const type = res.headers.get('content-type') || '';
     const len = Number(res.headers.get('content-length')) || 0;
     // Amazon retorna 1x1 gif (43 bytes) quando não há imagem; imagem real é JPEG > 2000 bytes
@@ -109,7 +116,9 @@ async function checkAmazonCover(asin: string | null): Promise<string | null> {
 async function fetchCblBook(isbn13: string | null): Promise<Partial<BookEvaluation> & { publisher?: string } | null> {
   if (!isbn13) return null;
   try {
-    const cblRes = await fetch(`https://brasilapi.com.br/api/isbn/v1/${isbn13}`);
+    const cblRes = await fetch(`https://brasilapi.com.br/api/isbn/v1/${isbn13}`, {
+      signal: AbortSignal.timeout(2200),
+    });
     if (cblRes.ok) {
       const cbl = await cblRes.json();
       if (cbl && cbl.title) {
@@ -136,7 +145,8 @@ async function fetchCblBook(isbn13: string | null): Promise<Partial<BookEvaluati
 async function resolveAmazonWithGemini(
   url: string,
   parsed: ParsedAmazonInfo,
-  publisherHint?: string
+  publisherHint?: string,
+  signal?: AbortSignal
 ): Promise<{
   title: string;
   author: string;
@@ -178,55 +188,45 @@ Responda ESTRITAMENTE em formato JSON:
   "resumo": "Sinopse concisa em 2 linhas"
 }`;
 
-  for (const model of CANDIDATE_MODELS) {
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 3800);
+  try {
+    const { value: parsedJson } = await raceGemini<any>({
+      apiKey: GEMINI_API_KEY,
+      prompt,
+      initial: AMAZON_INITIAL_MODELS,
+      backups: AMAZON_BACKUP_MODELS,
+      parse: (rawText) => {
+        const j = parseJsonLoose<any>(rawText);
+        if (!j || !j.title || !j.author) throw new Error('Resposta incompleta.');
+        return j;
+      },
+      baseGenerationConfig: {
+        responseMimeType: 'application/json',
+        temperature: 0.1,
+      },
+      preferWindowMs: 2800,
+      hedgeAfterMs: 1800,
+      perRequestTimeoutMs: 4500,
+      overallTimeoutMs: 5500,
+      signal,
+      label: 'Amazon Gemini',
+    });
 
-      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
-      const res = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        signal: controller.signal,
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: {
-            responseMimeType: 'application/json',
-            temperature: 0.1,
-          },
-        }),
-      });
-
-      clearTimeout(timeoutId);
-
-      if (!res.ok) continue;
-
-      const data = await res.json();
-      const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (!rawText) continue;
-
-      const parsedJson = JSON.parse(rawText);
-      if (parsedJson && parsedJson.title && parsedJson.author) {
-        return {
-          title: parsedJson.title.trim(),
-          author: parsedJson.author.trim(),
-          publisher: parsedJson.publisher?.trim() || publisherHint,
-          originalTitle: parsedJson.originalTitle?.trim() || undefined,
-          pages: Number(parsedJson.pages) || 300,
-          year: Number(parsedJson.year) || undefined,
-          genres:
-            Array.isArray(parsedJson.genres) && parsedJson.genres.length > 0
-              ? parsedJson.genres
-              : ['Literatura'],
-          resumo: parsedJson.resumo?.trim() || '',
-        };
-      }
-    } catch {
-      // Próximo modelo candidato
-    }
+    return {
+      title: parsedJson.title.trim(),
+      author: parsedJson.author.trim(),
+      publisher: parsedJson.publisher?.trim() || publisherHint,
+      originalTitle: parsedJson.originalTitle?.trim() || undefined,
+      pages: Number(parsedJson.pages) || 300,
+      year: Number(parsedJson.year) || undefined,
+      genres:
+        Array.isArray(parsedJson.genres) && parsedJson.genres.length > 0
+          ? parsedJson.genres
+          : ['Literatura'],
+      resumo: parsedJson.resumo?.trim() || '',
+    };
+  } catch {
+    return null;
   }
-
-  return null;
 }
 
 /**
@@ -237,11 +237,18 @@ async function findBestCoverFallback(
   author: string,
   isbn13: string | null
 ): Promise<string> {
-  // 1. OpenLibrary com ISBN-13
+  // 1. Catálogo curado interno (0ms)
+  const curated = getCuratedCovers(title);
+  if (curated && curated.length > 0) {
+    return curated[0];
+  }
+
+  // 2. OpenLibrary com ISBN-13
   if (isbn13) {
     try {
       const res = await fetch(
-        `https://openlibrary.org/search.json?isbn=${isbn13}&fields=cover_i,title&limit=1`
+        `https://openlibrary.org/search.json?isbn=${isbn13}&fields=cover_i,title&limit=1`,
+        { signal: AbortSignal.timeout(2200) }
       );
       if (res.ok) {
         const d = await res.json();
@@ -252,11 +259,12 @@ async function findBestCoverFallback(
     } catch {}
   }
 
-  // 2. OpenLibrary por Título + Autor
+  // 3. OpenLibrary por Título + Autor
   try {
     const q = encodeURIComponent(`${title} ${author}`.trim());
     const res = await fetch(
-      `https://openlibrary.org/search.json?q=${q}&fields=cover_i,title&limit=3`
+      `https://openlibrary.org/search.json?q=${q}&fields=cover_i,title&limit=3`,
+      { signal: AbortSignal.timeout(2200) }
     );
     if (res.ok) {
       const d = await res.json();
@@ -267,12 +275,6 @@ async function findBestCoverFallback(
       }
     }
   } catch {}
-
-  // 3. Catálogo curado interno como último recurso
-  const curated = getCuratedCovers(title);
-  if (curated && curated.length > 0) {
-    return curated[0];
-  }
 
   // 4. Fallback padrão via ISBN
   if (isbn13) {
@@ -286,7 +288,10 @@ async function findBestCoverFallback(
  * Reconhece e extrai os dados completos da edição específica de um livro da Amazon
  * Executa checagem de capa da Amazon, consulta CBL e Gemini em paralelo para máxima velocidade.
  */
-export async function recognizeAmazonBook(url: string): Promise<Partial<BookEvaluation>[]> {
+export async function recognizeAmazonBook(
+  url: string,
+  signal?: AbortSignal
+): Promise<Partial<BookEvaluation>[]> {
   const parsed = parseAmazonUrl(url);
 
   // Executa em paralelo:
@@ -296,7 +301,7 @@ export async function recognizeAmazonBook(url: string): Promise<Partial<BookEval
   const [amazonCover, cblBook, geminiResolved] = await Promise.all([
     checkAmazonCover(parsed.asin),
     fetchCblBook(parsed.isbn13),
-    resolveAmazonWithGemini(url, parsed),
+    resolveAmazonWithGemini(url, parsed, undefined, signal),
   ]);
 
   const title = geminiResolved?.title || cblBook?.title || parsed.slug || 'Livro da Amazon';

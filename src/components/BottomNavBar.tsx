@@ -8,25 +8,16 @@ interface BottomNavBarProps {
   onOpenEvaluate: () => void;
 }
 
-export const BottomNavBar: React.FC<BottomNavBarProps> = ({
+export const BottomNavBar: React.FC<BottomNavBarProps> = React.memo(({
   activeTab,
   onSelectTab,
   onOpenEvaluate,
 }) => {
   return (
-    <>
-      {/* Liquid Glass Filter Definition */}
-      <svg className="fixed w-0 h-0 pointer-events-none opacity-0" aria-hidden="true">
-        <filter id="lg-filter">
-          <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="3" result="noise" />
-          <feDisplacementMap in="SourceGraphic" in2="noise" scale="5" xChannelSelector="R" yChannelSelector="G" />
-        </filter>
-      </svg>
-
-      <nav
-        aria-label="Navegação Principal"
-        className="fixed bottom-5 left-1/2 -translate-x-1/2 z-40 w-[92%] max-w-[420px] pointer-events-auto md:hidden"
-      >
+    <nav
+      aria-label="Navegação Principal"
+      className="fixed bottom-5 left-1/2 -translate-x-1/2 z-40 w-[92%] max-w-[420px] pointer-events-auto md:hidden"
+    >
         <div
           className="flex items-center justify-between p-2 select-none"
           style={{
@@ -119,6 +110,7 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
         </button>
       </div>
     </nav>
-  </>
   );
-};
+});
+
+BottomNavBar.displayName = 'BottomNavBar';

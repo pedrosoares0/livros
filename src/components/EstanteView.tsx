@@ -220,6 +220,15 @@ export const EstanteView: React.FC<EstanteViewProps> = React.memo(({
 
   const activeShelf = shelvesWithCovers.find((s) => s.id === selectedFilter);
 
+  const sortedActiveBooks = useMemo(() => {
+    if (!activeShelf) return [];
+    return [...activeShelf.books].sort((a, b) => {
+      const scoreA = getEffectiveScore(a, userRatings);
+      const scoreB = getEffectiveScore(b, userRatings);
+      return sortOrder === 'desc' ? scoreB - scoreA : scoreA - scoreB;
+    });
+  }, [activeShelf, sortOrder, userRatings]);
+
   const handleSelectShelf = (id: FilterOption) => {
     setSelectedFilter(id);
   };
@@ -349,13 +358,7 @@ export const EstanteView: React.FC<EstanteViewProps> = React.memo(({
 
           {/* Grid presentation matching Início */}
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-7 2xl:grid-cols-8 gap-x-4 sm:gap-x-5 md:gap-x-6 lg:gap-x-6 xl:gap-x-7 gap-y-9 sm:gap-y-10 md:gap-y-12 lg:gap-y-14 xl:gap-y-16">
-            {[...activeShelf.books]
-              .sort((a, b) => {
-                const scoreA = getEffectiveScore(a, userRatings);
-                const scoreB = getEffectiveScore(b, userRatings);
-                return sortOrder === 'desc' ? scoreB - scoreA : scoreA - scoreB;
-              })
-              .map((book) => (
+            {sortedActiveBooks.map((book) => (
                 <div
                   key={book.id}
                   onClick={() => onSelectBook(book)}

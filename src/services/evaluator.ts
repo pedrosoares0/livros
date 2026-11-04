@@ -127,14 +127,14 @@ function extractSignificantKeywords(query: string): string[] {
     .filter((w) => w.length >= 2 && !STOPWORDS.has(w));
 }
 
-export async function searchBookApi(query: string): Promise<Partial<BookEvaluation>[]> {
+export async function searchBookApi(query: string, signal?: AbortSignal): Promise<Partial<BookEvaluation>[]> {
   const trimmed = query.trim();
   if (!trimmed) return [];
 
   // 0. Reconhecimento automático se a busca for um link da Amazon
   if (isAmazonUrl(trimmed)) {
     try {
-      const amazonResults = await recognizeAmazonBook(trimmed);
+      const amazonResults = await recognizeAmazonBook(trimmed, signal);
       if (amazonResults.length > 0) {
         return amazonResults;
       }
@@ -207,7 +207,7 @@ export async function searchBookApi(query: string): Promise<Partial<BookEvaluati
 
   // 3. Motor Comercial Inteligente com Gemini (Equivalente à Amazon Brasil / Principais Livrarias)
   try {
-    const geminiPopularBooks = await searchPopularBooksWithGemini(trimmed);
+    const geminiPopularBooks = await searchPopularBooksWithGemini(trimmed, signal);
     if (geminiPopularBooks && geminiPopularBooks.length > 0) {
       return geminiPopularBooks;
     }
@@ -241,7 +241,7 @@ export async function searchBookApi(query: string): Promise<Partial<BookEvaluati
     ].join(',');
 
     const olRes = await fetch(
-      `https://openlibrary.org/search.json?q=${encoded}&fields=${fields}&limit=15`
+      `https://openlibrary.org/search.json?q=${encoded}&fields=${fields}&limit=15`, { signal: signal || AbortSignal.timeout(4500) }
     );
 
     if (olRes.ok) {
