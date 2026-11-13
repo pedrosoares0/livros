@@ -660,7 +660,7 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
               {/* Command Palette Styled Search Bar */}
               <form onSubmit={handleSearchSubmit} className="space-y-1.5">
                 <label className="text-xs font-semibold text-[#1d1d1f] block">
-                  Pesquise por título, autor, ISBN ou cole um link da Amazon:
+                  Cole o link do livro na Amazon:
                 </label>
 
                 <div className="relative w-full">
@@ -669,11 +669,11 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                     type="text"
                     value={query}
                     onChange={(e) => handleInputChange(e.target.value)}
-                    placeholder="Ex: Duna, Neuromancer ou cole link da Amazon..."
+                    placeholder="Cole aqui o link da Amazon..."
                     className="w-full pl-10 sm:pl-11 pr-10 py-2.5 sm:py-3 rounded-2xl bg-neutral-100/90 focus:bg-white border border-neutral-200/90 focus:border-neutral-900 focus:ring-2 focus:ring-black/5 text-[#1d1d1f] placeholder-[#86868b] text-[16px] sm:text-sm md:text-base focus:outline-none transition-colors duration-150 shadow-2xs"
                     autoComplete="off"
                     autoCorrect="off"
-                    autoCapitalize="words"
+                    autoCapitalize="none"
                     spellCheck={false}
                     enterKeyHint="search"
                   />
