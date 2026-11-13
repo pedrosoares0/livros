@@ -49,297 +49,82 @@ const FINISH_HOLD_MS = 260;
 // Rotação automática de 4 sugestões inéditas a cada 6 horas
 const SUGGESTIONS_ROTATION_MS = 6 * 60 * 60 * 1000;
 const SUGGESTIONS_STORAGE_KEY = 'veredito_modal_suggestions_v1';
+const CHARACTERS_STORAGE_KEY = 'veredito_modal_characters_v1';
 
-const POPULAR_SUGGESTIONS_POOL: Partial<BookEvaluation>[] = [
-  {
-    id: 'br-duna',
-    title: 'Duna',
-    author: 'Frank Herbert',
-    publisher: 'Aleph',
-    year: 1965,
-    pages: 680,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/857657313X.01.LZZZZZZZ.jpg',
-    genres: ['Ficção Científica', 'Space Opera', 'Distopia'],
-    resumo:
-      'Em Arrakis, o planeta desértico governado por vermes colossais e cobiçado pela Especiaria, o jovem Paul Atreides enfrenta a traição do Império e assume seu destino trágico como messias e líder guerreiro dos Fremen.',
-  },
-  {
-    id: 'br-neuromancer',
-    title: 'Neuromancer',
-    author: 'William Gibson',
-    publisher: 'Aleph',
-    year: 1984,
-    pages: 320,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8576573008.01.LZZZZZZZ.jpg',
-    genres: ['Cyberpunk', 'Ficção Científica'],
-    resumo:
-      'Case, um hacker decadente de Chiba City com o sistema nervoso queimado por trair seus chefes, recebe uma última chance de redenção em troca de invadir uma poderosa inteligência artificial corporativa.',
-  },
-  {
-    id: 'br-fundacao',
-    title: 'Fundação',
-    author: 'Isaac Asimov',
-    publisher: 'Aleph',
-    year: 1951,
-    pages: 240,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8576570661.01.LZZZZZZZ.jpg',
-    genres: ['Ficção Científica', 'Clássico'],
-    resumo:
-      'O matemático Hari Seldon prevê a queda inevitável do Império Galáctico e 30.000 anos de barbárie. Para encurtar essa era das trevas, ele cria a Fundação nas bordas da galáxia.',
-  },
-  {
-    id: 'br-fahrenheit-451',
-    title: 'Fahrenheit 451',
-    author: 'Ray Bradbury',
-    publisher: 'Globo Livros',
-    year: 1953,
-    pages: 216,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8525052248.01.LZZZZZZZ.jpg',
-    genres: ['Distopia', 'Ficção Científica'],
-    resumo:
-      'Guy Montag é um bombeiro encarregado de queimar livros numa sociedade totalitária onde pensar é proibido e as pessoas vivem entorpecidas por telas de parede.',
-  },
-  {
-    id: 'br-tres-corpos',
-    title: 'O Problema dos Três Corpos',
-    author: 'Cixin Liu',
-    publisher: 'Suma',
-    year: 2008,
-    pages: 320,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8556510213.01.LZZZZZZZ.jpg',
-    genres: ['Ficção Científica', 'Hard Sci-Fi'],
-    resumo:
-      'Durante a Revolução Cultural Chinesa, um projeto militar secreto envia sinais ao espaço e estabelece contato com uma civilização alienígena à beira do colapso que planeja invadir a Terra.',
-  },
-  {
-    id: 'br-cem-anos-solidao',
-    title: 'Cem Anos de Solidão',
-    author: 'Gabriel García Márquez',
-    publisher: 'Record',
-    year: 1967,
-    pages: 448,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8501012076.01.LZZZZZZZ.jpg',
-    genres: ['Clássico', 'Realismo Mágico', 'Drama Familiar'],
-    resumo:
-      'A saga multigeracional da família Buendía na mítica cidade de Macondo, marcada por paixões obsessivas, guerras civis, presságios trágicos e uma solidão inescapável.',
-  },
-  {
-    id: 'br-o-processo',
-    title: 'O Processo',
-    author: 'Franz Kafka',
-    publisher: 'Companhia das Letras',
-    year: 1925,
-    pages: 264,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8535907432.01.LZZZZZZZ.jpg',
-    genres: ['Clássico', 'Absurdo Existencial'],
-    resumo:
-      'Josef K. é detido numa manhã qualquer sem saber que crime cometeu. Um tribunal invisível e labiríntico o consome aos poucos em um pesadelo burocrático e opressivo.',
-  },
-  {
-    id: 'br-admiravel-mundo-novo',
-    title: 'Admirável Mundo Novo',
-    author: 'Aldous Huxley',
-    publisher: 'Biblioteca Azul',
-    year: 1932,
-    pages: 312,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8525056006.01.LZZZZZZZ.jpg',
-    genres: ['Distopia', 'Ficção Científica', 'Clássico'],
-    resumo:
-      'Num futuro onde seres humanos são gerados em laboratório, divididos em castas biológicas e mantidos felizes pela droga Soma, um homem criado fora do sistema questiona o preço da servidão voluntária.',
-  },
-  {
-    id: 'br-androides-sonham',
-    title: 'Androides Sonham com Ovelhas Elétricas?',
-    author: 'Philip K. Dick',
-    publisher: 'Aleph',
-    year: 1968,
-    pages: 288,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8576571609.01.LZZZZZZZ.jpg',
-    genres: ['Cyberpunk', 'Ficção Científica', 'Noir'],
-    resumo:
-      'Em uma Terra devastada pela poeira radioativa, o caçador de recompensas Rick Deckard precisa aposentar seis androides Nexus-6 fugitivos, quase indistinguíveis dos próprios humanos.',
-  },
-  {
-    id: 'br-fim-da-infancia',
-    title: 'O Fim da Infância',
-    author: 'Arthur C. Clarke',
-    publisher: 'Aleph',
-    year: 1953,
-    pages: 304,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8576570548.01.LZZZZZZZ.jpg',
-    genres: ['Ficção Científica', 'Filosófico'],
-    resumo:
-      'Naves colossais pairam sobre as metrópoles da Terra. Os Senhores Supremos extinguem a guerra e a pobreza, mas o verdadeiro propósito de sua tutela pacífica guarda um destino melancólico para a humanidade.',
-  },
-  {
-    id: 'br-crime-e-castigo',
-    title: 'Crime e Castigo',
-    author: 'Fiódor Dostoiévski',
-    publisher: 'Editora 34',
-    year: 1866,
-    pages: 592,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8573266465.01.LZZZZZZZ.jpg',
-    genres: ['Clássico Russo', 'Drama Psicológico', 'Filosofia Moral'],
-    resumo:
-      'Em São Petersburgo, o ex-estudante Raskólnikov assassina uma velha agiota acreditando estar acima da moral comum, mas mergulha em uma febre psicológica implacável de culpa, paranoia e redenção.',
-  },
-  {
-    id: 'br-a-metamorfose',
-    title: 'A Metamorfose',
-    author: 'Franz Kafka',
-    publisher: 'Companhia das Letras',
-    year: 1915,
-    pages: 96,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8535900977.01.LZZZZZZZ.jpg',
-    genres: ['Clássico', 'Fábula Sombria', 'Drama Psicológico'],
-    resumo:
-      'Gregor Samsa desperta certa manhã transformado em um inseto monstruoso. Confinado no quarto, assiste à deterioração do afeto da própria família à medida que deixa de ser o provedor da casa.',
-  },
-  {
-    id: 'br-frankenstein',
-    title: 'Frankenstein',
-    author: 'Mary Shelley',
-    publisher: 'DarkSide',
-    year: 1818,
-    pages: 304,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8594540183.01.LZZZZZZZ.jpg',
-    genres: ['Clássico Gótico', 'Ficção Científica', 'Tragédia Moral'],
-    resumo:
-      'Obcecado em vencer a morte, o jovem cientista Victor Frankenstein dá vida a uma criatura consciente, mas a abandona horrorizado, desencadeando um ciclo trágico de rejeição e vingança.',
-  },
-  {
-    id: 'br-materia-escura',
-    title: 'Matéria Escura',
-    author: 'Blake Crouch',
-    publisher: 'Intrínseca',
-    year: 2016,
-    pages: 352,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8551001507.01.LZZZZZZZ.jpg',
-    genres: ['Ficção Científica', 'Thriller'],
-    resumo:
-      'Jason Dessen é sequestrado e acorda em uma realidade alternativa onde nunca se casou e se tornou um físico genial que construiu uma caixa capaz de atravessar o multiverso.',
-  },
-  {
-    id: 'br-recursao',
-    title: 'Recursão',
-    author: 'Blake Crouch',
-    publisher: 'Intrínseca',
-    year: 2019,
-    pages: 336,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8551005375.01.LZZZZZZZ.jpg',
-    genres: ['Ficção Científica', 'Thriller Tecnológico'],
-    resumo:
-      'Uma misteriosa síndrome espalha memórias completas de vidas que nunca aconteceram, enquanto uma neurocientista e um detetive descobrem uma tecnologia capaz de reescrever o próprio tempo.',
-  },
-  {
-    id: 'br-devoradores-estrelas',
-    title: 'Devoradores de Estrelas',
-    author: 'Andy Weir',
-    publisher: 'Suma',
-    year: 2021,
-    pages: 480,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/6555602244.01.LZZZZZZZ.jpg',
-    genres: ['Ficção Científica', 'Hard Sci-Fi', 'Sobrevivência'],
-    resumo:
-      'Ryland Grace é o único sobrevivente em uma missão interestelar desesperada para salvar a Terra da extinção solar — mas acorda do coma sem lembrar o próprio nome ou o que precisa fazer.',
-  },
-  {
-    id: 'br-perdido-em-marte',
-    title: 'Perdido em Marte',
-    author: 'Andy Weir',
-    publisher: 'Arqueiro',
-    year: 2011,
-    pages: 368,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8580413001.01.LZZZZZZZ.jpg',
-    genres: ['Ficção Científica', 'Sobrevivência'],
-    resumo:
-      'Dado como morto após uma tempestade de areia devastadora, o astronauta Mark Watney fica sozinho em Marte e precisa usar engenharia, botânica e sangue-frio para sobreviver.',
-  },
-  {
-    id: 'br-ensaio-cegueira',
-    title: 'Ensaio Sobre a Cegueira',
-    author: 'José Saramago',
-    publisher: 'Companhia das Letras',
-    year: 1995,
-    pages: 312,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8535933921.01.LZZZZZZZ.jpg',
-    genres: ['Distopia', 'Alegoria Moral', 'Drama Humano'],
-    resumo:
-      'Uma epidemia fulminante de cegueira branca se espalha por uma cidade. Isolados em quarentena brutal, os infectados testemunham a rápida dissolução da dignidade e da civilização.',
-  },
-  {
-    id: 'br-dom-casmurro',
-    title: 'Dom Casmurro',
-    author: 'Machado de Assis',
-    publisher: 'Penguin-Companhia',
-    year: 1899,
-    pages: 208,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8563560859.01.LZZZZZZZ.jpg',
-    genres: ['Clássico Brasileiro', 'Drama Psicológico'],
-    resumo:
-      'Bento Santiago narra, na velhice e sob o peso de um ciúme corrosivo, sua história de amor com Capitu e sua suspeita obsessiva de traição com seu melhor amigo Escobar.',
-  },
-  {
-    id: 'br-memorias-postumas',
-    title: 'Memórias Póstumas de Brás Cubas',
-    author: 'Machado de Assis',
-    publisher: 'Penguin-Companhia',
-    year: 1881,
-    pages: 192,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8563560832.01.LZZZZZZZ.jpg',
-    genres: ['Clássico Brasileiro', 'Sátira Filosófica'],
-    resumo:
-      'Um defunto autor decide narrar sua vida de privilégios, vaidades e frustrações do além-túmulo, dissecando a sociedade com ironia demolidora e zero hipocrisia.',
-  },
-  {
-    id: 'br-medico-e-monstro',
-    title: 'O Médico e o Monstro',
-    author: 'Robert Louis Stevenson',
-    publisher: 'DarkSide',
-    year: 1886,
-    pages: 192,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8594540329.01.LZZZZZZZ.jpg',
-    genres: ['Clássico Gótico', 'Horror Psicológico'],
-    resumo:
-      'Em Londres, o advogado Utterson investiga a sinistra ligação entre seu respeitável amigo Dr. Henry Jekyll e o cruel Edward Hyde, revelando a dualidade sombria da natureza humana.',
-  },
-  {
-    id: 'br-2001-odisseia',
-    title: '2001: Uma Odisseia no Espaço',
-    author: 'Arthur C. Clarke',
-    publisher: 'Aleph',
-    year: 1968,
-    pages: 336,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8576571552.01.LZZZZZZZ.jpg',
-    genres: ['Ficção Científica', 'Clássico'],
-    resumo:
-      'Após a descoberta de um enigmático monolito negro enterrado na Lua, a nave Discovery parte rumo a Saturno sob o controle da superinteligência HAL 9000.',
-  },
-  {
-    id: 'br-ubik',
-    title: 'Ubik',
-    author: 'Philip K. Dick',
-    publisher: 'Aleph',
-    year: 1969,
-    pages: 272,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8576574349.01.LZZZZZZZ.jpg',
-    genres: ['Ficção Científica', 'Psicológico'],
-    resumo:
-      'Após uma emboscada na Lua, Joe Chip e sua equipe percebem que a própria realidade ao redor está regredindo no tempo, e a única salvação parece ser um misterioso spray chamado Ubik.',
-  },
-  {
-    id: 'br-mao-esquerda-escuridao',
-    title: 'A Mão Esquerda da Escuridão',
-    author: 'Ursula K. Le Guin',
-    publisher: 'Aleph',
-    year: 1969,
-    pages: 312,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8576574365.01.LZZZZZZZ.jpg',
-    genres: ['Ficção Científica', 'Antropológico'],
-    resumo:
-      'Enviado ao planeta glacial Gethen para convencer seus habitantes a integrar uma aliança interplanetária, o emissário Genly Ai enfrenta intrigas políticas e uma cultura sem gênero fixo.',
-  },
-];
+import { POPULAR_SUGGESTIONS_POOL } from '../data/suggestionBooks';
+import {
+  CHARACTER_POOL,
+  DEFAULT_CHARACTER_IDS,
+  getCharacterBooks,
+  buildEvaluatedTitleSet,
+  type CharacterReading,
+} from '../data/characterReadings';
+
+function getOrRotateCharacters(): CharacterReading[] {
+  const poolById = new Map(CHARACTER_POOL.map((c) => [c.id, c]));
+  const now = Date.now();
+  let prevIds: string[] = [];
+
+  try {
+    const raw = localStorage.getItem(CHARACTERS_STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw) as { ids?: string[]; timestamp?: number };
+      if (Array.isArray(parsed.ids) && typeof parsed.timestamp === 'number') {
+        prevIds = parsed.ids;
+        const isExpired = now - parsed.timestamp >= SUGGESTIONS_ROTATION_MS;
+        if (!isExpired) {
+          const validSaved = parsed.ids
+            .map((id) => poolById.get(id))
+            .filter((c): c is CharacterReading => Boolean(c));
+          if (validSaved.length === 4) {
+            return validSaved;
+          }
+        }
+      }
+    } else {
+      // Primeira janela de 6h: inicia com os 4 personagens padrão
+      const initialChars = DEFAULT_CHARACTER_IDS.map((id) => poolById.get(id)).filter(
+        (c): c is CharacterReading => Boolean(c)
+      );
+      if (initialChars.length === 4) {
+        localStorage.setItem(
+          CHARACTERS_STORAGE_KEY,
+          JSON.stringify({
+            ids: initialChars.map((c) => c.id),
+            timestamp: now,
+          })
+        );
+        return initialChars;
+      }
+    }
+  } catch {
+    // ignore storage errors
+  }
+
+  const prevSet = new Set(prevIds);
+  const candidates = CHARACTER_POOL.filter((c) => !prevSet.has(c.id));
+  const source = candidates.length >= 4 ? candidates : [...CHARACTER_POOL];
+  const shuffled = [...source];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  const selected = shuffled.slice(0, 4);
+
+  try {
+    localStorage.setItem(
+      CHARACTERS_STORAGE_KEY,
+      JSON.stringify({
+        ids: selected.map((c) => c.id),
+        timestamp: now,
+      })
+    );
+  } catch {
+    // ignore storage errors
+  }
+
+  return selected;
+}
 
 function normalizeForMatch(text: string): string {
   return (text || '')
@@ -458,6 +243,10 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
   const [popularSuggestions, setPopularSuggestions] = useState<Partial<BookEvaluation>[]>(() =>
     getOrRotateSuggestions(existingBooks)
   );
+  const [characterSuggestions, setCharacterSuggestions] = useState<CharacterReading[]>(() =>
+    getOrRotateCharacters()
+  );
+  const [selectedCharacterId, setSelectedCharacterId] = useState<string | null>(null);
 
   const searchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const searchAbortRef = useRef<AbortController | null>(null);
@@ -465,17 +254,30 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
 
   useEffect(() => {
     const current = getOrRotateSuggestions(existingBooks);
+    const currentChars = getOrRotateCharacters();
+    const evalSet = buildEvaluatedTitleSet(existingBooks);
     setPopularSuggestions(current);
+    setCharacterSuggestions(currentChars);
+
+    const charCoverUrls = currentChars.flatMap((c) =>
+      getCharacterBooks(c, evalSet, 4).map((b) => b.coverUrl)
+    );
     prefetchBookCovers(
-      current.map((s) => s.coverUrl),
+      [...current.map((s) => s.coverUrl), ...charCoverUrls],
       true
     );
 
     const rotationCheck = setInterval(() => {
       const updated = getOrRotateSuggestions(existingBooks);
+      const updatedChars = getOrRotateCharacters();
+      const updatedEvalSet = buildEvaluatedTitleSet(existingBooks);
       setPopularSuggestions(updated);
+      setCharacterSuggestions(updatedChars);
+      const nextCharCovers = updatedChars.flatMap((c) =>
+        getCharacterBooks(c, updatedEvalSet, 4).map((b) => b.coverUrl)
+      );
       prefetchBookCovers(
-        updated.map((s) => s.coverUrl),
+        [...updated.map((s) => s.coverUrl), ...nextCharCovers],
         true
       );
     }, 60_000);
@@ -1231,36 +1033,193 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                   </button>
                 </div>
               ) : (
-                /* Initial Empty State: Visual Book Suggestions with Covers */
-                <div className="space-y-2.5 pt-1.5">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#86868b] block">
-                    Sugestões Populares para Avaliar
-                  </span>
-                  <div className="grid grid-cols-4 gap-3 sm:gap-4 pt-0.5">
-                    {popularSuggestions.map((book) => (
-                      <div
-                        key={book.id || book.title}
-                        onClick={() => handleRequestEvaluation(book)}
-                        className="flex flex-col cursor-pointer group active:scale-[0.97] transition-transform duration-200 select-none"
-                      >
-                        <div className="w-full mb-2 transition-transform duration-200 group-hover:-translate-y-1">
-                          <BookCover
-                            title={book.title || 'Livro'}
-                            author={book.author || ''}
-                            coverUrl={book.coverUrl}
-                          />
+                /* Initial Empty State: Visual Book Suggestions + Character-Driven Recommendations */
+                <div className="space-y-4 pt-1.5">
+                  {/* Row 1: Popular Book Suggestions */}
+                  <div className="space-y-2.5">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#86868b] block">
+                      Sugestões Populares para Avaliar
+                    </span>
+                    <div className="grid grid-cols-4 gap-3 sm:gap-4 pt-0.5">
+                      {popularSuggestions.map((book) => (
+                        <div
+                          key={book.id || book.title}
+                          onClick={() => handleRequestEvaluation(book)}
+                          className="flex flex-col cursor-pointer group active:scale-[0.97] transition-transform duration-200 select-none"
+                        >
+                          <div className="w-full mb-2 transition-transform duration-200 group-hover:-translate-y-1">
+                            <BookCover
+                              title={book.title || 'Livro'}
+                              author={book.author || ''}
+                              coverUrl={book.coverUrl}
+                            />
+                          </div>
+                          <div className="space-y-0.5 px-0.5">
+                            <h4 className="text-[11px] sm:text-xs font-semibold text-[#1d1d1f] truncate group-hover:text-black leading-snug tracking-tight">
+                              {book.title}
+                            </h4>
+                            <p className="text-[10px] text-[#86868b] truncate font-normal">
+                              {book.author}
+                            </p>
+                          </div>
                         </div>
-                        <div className="space-y-0.5 px-0.5">
-                          <h4 className="text-[11px] sm:text-xs font-semibold text-[#1d1d1f] truncate group-hover:text-black leading-snug tracking-tight">
-                            {book.title}
-                          </h4>
-                          <p className="text-[10px] text-[#86868b] truncate font-normal">
-                            {book.author}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
+
+                  {/* Row 2: Books by Favorite Characters (4 rotating characters every 6h) */}
+                  {(() => {
+                    const evaluatedSet = buildEvaluatedTitleSet(existingBooks);
+                    const activeCharacter =
+                      characterSuggestions.find((c) => c.id === selectedCharacterId) || null;
+                    const activeCharacterBooks = activeCharacter
+                      ? getCharacterBooks(activeCharacter, evaluatedSet, 4)
+                      : [];
+
+                    return (
+                      <div className="space-y-2.5 pt-2.5 border-t border-neutral-200/70">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-[#86868b] block">
+                            Livros de Acordo com Personagens
+                          </span>
+                          <span className="text-[10px] text-[#86868b]">
+                            Toque para ver 4 obras
+                          </span>
+                        </div>
+
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5">
+                          {characterSuggestions.map((char) => {
+                            const isSelected = activeCharacter?.id === char.id;
+                            const previewBooks = getCharacterBooks(char, evaluatedSet, 2);
+                            const [cover1, cover2] = previewBooks.map((b) => b.coverUrl);
+
+                            return (
+                              <button
+                                key={char.id}
+                                type="button"
+                                onClick={() =>
+                                  setSelectedCharacterId((prev) =>
+                                    prev === char.id ? null : char.id
+                                  )
+                                }
+                                className={`p-2 sm:p-2.5 rounded-2xl flex items-center gap-2.5 text-left transition-all duration-150 cursor-pointer select-none active:scale-[0.98] border ${
+                                  isSelected
+                                    ? 'bg-[#1d1d1f] text-white border-[#1d1d1f] shadow-[0_6px_18px_rgba(0,0,0,0.16)]'
+                                    : 'bg-neutral-50/90 hover:bg-neutral-100/90 text-[#1d1d1f] border-neutral-200/80 hover:border-neutral-300 shadow-2xs'
+                                }`}
+                              >
+                                {/* Mini par de capas reais sobrepostas */}
+                                <div className="flex items-center shrink-0">
+                                  {cover1 && (
+                                    <div className="w-6.5 h-9 sm:w-7 sm:h-10 rounded-[5px] overflow-hidden bg-neutral-200 border border-white shadow-2xs shrink-0">
+                                      <img
+                                        src={cover1}
+                                        alt=""
+                                        className="w-full h-full object-cover"
+                                        loading="lazy"
+                                      />
+                                    </div>
+                                  )}
+                                  {cover2 && (
+                                    <div className="relative -ml-3 z-10 w-6.5 h-9 sm:w-7 sm:h-10 rounded-[5px] overflow-hidden bg-neutral-200 border border-white shadow-xs shrink-0">
+                                      <img
+                                        src={cover2}
+                                        alt=""
+                                        className="w-full h-full object-cover"
+                                        loading="lazy"
+                                      />
+                                    </div>
+                                  )}
+                                </div>
+
+                                <div className="min-w-0 flex-1">
+                                  <h4
+                                    className={`text-xs font-bold truncate leading-tight tracking-tight ${
+                                      isSelected ? 'text-white' : 'text-[#1d1d1f]'
+                                    }`}
+                                  >
+                                    {char.name}
+                                  </h4>
+                                  <p
+                                    className={`text-[10px] truncate mt-0.5 ${
+                                      isSelected ? 'text-neutral-300' : 'text-[#86868b]'
+                                    }`}
+                                  >
+                                    {char.source}
+                                  </p>
+                                </div>
+                              </button>
+                            );
+                          })}
+                        </div>
+
+                        {/* Inline 4-Book Shelf for Selected Character */}
+                        <AnimatePresence mode="wait" initial={false}>
+                          {activeCharacter && activeCharacterBooks.length > 0 && (
+                            <motion.div
+                              key={activeCharacter.id}
+                              initial={{ opacity: 0, y: 6 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0, y: -4 }}
+                              transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+                              className="p-3 sm:p-3.5 rounded-2xl bg-neutral-50 border border-neutral-200/80 space-y-2.5"
+                            >
+                              <div className="flex items-start justify-between gap-2">
+                                <div className="min-w-0">
+                                  <div className="flex items-center gap-1.5 flex-wrap">
+                                    <span className="text-xs font-bold text-[#1d1d1f]">
+                                      {activeCharacter.name}
+                                    </span>
+                                    <span className="text-[10px] text-[#86868b]">
+                                      • {activeCharacter.source}
+                                    </span>
+                                  </div>
+                                  <p className="text-[11px] text-[#6e6e73] leading-snug mt-0.5">
+                                    {activeCharacter.thread}
+                                  </p>
+                                </div>
+
+                                <button
+                                  type="button"
+                                  onClick={() => setSelectedCharacterId(null)}
+                                  aria-label="Fechar seleção de personagem"
+                                  className="p-1 rounded-full text-[#86868b] hover:text-[#1d1d1f] hover:bg-neutral-200/70 transition-colors cursor-pointer shrink-0"
+                                >
+                                  <X className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+
+                              <div className="grid grid-cols-4 gap-3 sm:gap-4 pt-0.5">
+                                {activeCharacterBooks.map((book) => (
+                                  <div
+                                    key={`${activeCharacter.id}-${book.id || book.title}`}
+                                    onClick={() => handleRequestEvaluation(book)}
+                                    className="flex flex-col cursor-pointer group active:scale-[0.97] transition-transform duration-200 select-none"
+                                  >
+                                    <div className="w-full mb-2 transition-transform duration-200 group-hover:-translate-y-1">
+                                      <BookCover
+                                        title={book.title || 'Livro'}
+                                        author={book.author || ''}
+                                        coverUrl={book.coverUrl}
+                                      />
+                                    </div>
+                                    <div className="space-y-0.5 px-0.5">
+                                      <h4 className="text-[11px] sm:text-xs font-semibold text-[#1d1d1f] truncate group-hover:text-black leading-snug tracking-tight">
+                                        {book.title}
+                                      </h4>
+                                      <p className="text-[10px] text-[#86868b] truncate font-normal">
+                                        {book.author}
+                                      </p>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
+                    );
+                  })()}
                 </div>
               )}
             </div>
