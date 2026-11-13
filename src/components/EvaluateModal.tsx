@@ -1090,10 +1090,12 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                             animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
                             exit={{ opacity: 0, y: -4, scale: 0.985, filter: 'blur(2px)' }}
                             transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
-                            className="grid grid-cols-4 gap-3 sm:gap-4 pt-0.5"
+                            className="grid grid-cols-4 gap-3 sm:gap-4 pt-1"
                           >
                             {characterSuggestions.map((char) => {
+                              const hasSelection = Boolean(activeCharacter);
                               const isSelected = activeCharacter?.id === char.id;
+                              const isDimmed = hasSelection && !isSelected;
 
                               return (
                                 <button
@@ -1104,38 +1106,75 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                                       prev === char.id ? null : char.id
                                     )
                                   }
-                                  className="flex flex-col text-left cursor-pointer group active:scale-[0.97] transition-transform duration-200 select-none"
+                                  className="relative flex flex-col text-left cursor-pointer group active:scale-[0.97] transition-all duration-300 ease-out select-none"
                                 >
-                                  <div
-                                    className={`relative w-full aspect-[2/3] rounded-lg overflow-hidden mb-2 bg-neutral-100 transition-all duration-200 ${
-                                      isSelected
-                                        ? 'ring-2 ring-[#1d1d1f] ring-offset-2 ring-offset-white shadow-[0_10px_24px_rgba(0,0,0,0.2)] -translate-y-0.5'
-                                        : 'border border-black/[0.08] shadow-[0_4px_12px_rgba(0,0,0,0.08)] group-hover:-translate-y-1'
-                                    }`}
-                                  >
-                                    {char.imageUrl ? (
-                                      <img
-                                        src={char.imageUrl}
-                                        alt={char.name}
-                                        className="w-full h-full object-cover object-top"
-                                        loading="eager"
-                                        decoding="async"
-                                        referrerPolicy="no-referrer"
-                                      />
-                                    ) : (
-                                      <div className="w-full h-full flex items-center justify-center bg-neutral-200 text-[#1d1d1f] font-bold text-sm">
-                                        {char.name.slice(0, 2).toUpperCase()}
+                                  <div className="relative w-full mb-2">
+                                    {/* Ambient Color Glow behind the selected character portrait */}
+                                    {isSelected && char.imageUrl && (
+                                      <div
+                                        aria-hidden="true"
+                                        className="absolute -inset-1 rounded-xl overflow-hidden pointer-events-none -z-10 opacity-65"
+                                        style={{
+                                          transform: 'translate3d(0, 6px, 0) scale(1.03)',
+                                          filter: 'blur(14px) saturate(1.4)',
+                                        }}
+                                      >
+                                        <img
+                                          src={char.imageUrl}
+                                          alt=""
+                                          className="w-full h-full object-cover object-top"
+                                          loading="eager"
+                                          decoding="async"
+                                          referrerPolicy="no-referrer"
+                                        />
                                       </div>
                                     )}
-                                    <div className="absolute inset-0 rounded-lg ring-1 ring-inset ring-black/[0.06] pointer-events-none" />
+
+                                    <div
+                                      className={`relative w-full aspect-[2/3] rounded-xl overflow-hidden bg-neutral-100 transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                                        isSelected
+                                          ? '-translate-y-1.5 scale-[1.03] shadow-[0_14px_28px_-6px_rgba(0,0,0,0.32),0_4px_10px_-2px_rgba(0,0,0,0.14)] ring-1 ring-black/10'
+                                          : isDimmed
+                                          ? 'opacity-45 saturate-[0.55] scale-[0.96] border border-black/[0.06] shadow-2xs group-hover:opacity-85 group-hover:saturate-100 group-hover:scale-[0.99]'
+                                          : 'border border-black/[0.08] shadow-[0_4px_12px_rgba(0,0,0,0.08)] group-hover:-translate-y-1'
+                                      }`}
+                                    >
+                                      {char.imageUrl ? (
+                                        <img
+                                          src={char.imageUrl}
+                                          alt={char.name}
+                                          className={`w-full h-full object-cover object-top transition-transform duration-500 ease-out ${
+                                            isSelected ? 'scale-[1.04]' : 'group-hover:scale-[1.02]'
+                                          }`}
+                                          loading="eager"
+                                          decoding="async"
+                                          referrerPolicy="no-referrer"
+                                        />
+                                      ) : (
+                                        <div className="w-full h-full flex items-center justify-center bg-neutral-200 text-[#1d1d1f] font-bold text-sm">
+                                          {char.name.slice(0, 2).toUpperCase()}
+                                        </div>
+                                      )}
+                                      <div
+                                        className={`absolute inset-0 rounded-xl pointer-events-none transition-opacity duration-300 ${
+                                          isSelected
+                                            ? 'ring-1 ring-inset ring-white/35 bg-gradient-to-t from-black/20 via-transparent to-white/10'
+                                            : 'ring-1 ring-inset ring-black/[0.06]'
+                                        }`}
+                                      />
+                                    </div>
                                   </div>
 
-                                  <div className="space-y-0.5 px-0.5 w-full">
+                                  <div
+                                    className={`space-y-0.5 px-0.5 w-full transition-opacity duration-300 ${
+                                      isDimmed ? 'opacity-45 group-hover:opacity-85' : 'opacity-100'
+                                    }`}
+                                  >
                                     <h4
-                                      className={`text-[11px] sm:text-xs font-semibold truncate leading-snug tracking-tight ${
+                                      className={`text-[11px] sm:text-xs truncate leading-snug tracking-tight transition-colors ${
                                         isSelected
-                                          ? 'text-black font-bold'
-                                          : 'text-[#1d1d1f] group-hover:text-black'
+                                          ? 'text-[#1d1d1f] font-bold'
+                                          : 'text-[#1d1d1f] font-semibold group-hover:text-black'
                                       }`}
                                     >
                                       {char.name}
@@ -1143,6 +1182,21 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                                     <p className="text-[10px] text-[#86868b] truncate font-normal">
                                       {char.source}
                                     </p>
+                                  </div>
+
+                                  {/* Shared spring indicator pill below the active character */}
+                                  <div className="h-2.5 w-full flex items-center justify-start px-0.5 mt-0.5">
+                                    {isSelected && (
+                                      <motion.div
+                                        layoutId="active-character-indicator"
+                                        transition={{
+                                          type: 'spring',
+                                          stiffness: 420,
+                                          damping: 32,
+                                        }}
+                                        className="w-5 h-[2.5px] rounded-full bg-[#1d1d1f]"
+                                      />
+                                    )}
                                   </div>
                                 </button>
                               );
