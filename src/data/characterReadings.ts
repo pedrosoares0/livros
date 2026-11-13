@@ -1306,7 +1306,7 @@ export const CHARACTER_POOL: CharacterReading[] = [
     id: 'juiz-holden',
     name: 'Juiz Holden',
     source: 'Meridiano de Sangue',
-    imageUrl: 'https://i.pinimg.com/1200x/97/5b/72/975b72c94f627bf539fd7632ffe6b3b1.jpg',
+    imageUrl: 'https://i.pinimg.com/736x/73/c0/34/73c0346bbca2b0b8ac161732e17a359f.jpg',
     thread: 'A encarnação erudita e sorridente da violência como lei natural do mundo.',
     bookIds: [
       'br-coracao-trevas',
