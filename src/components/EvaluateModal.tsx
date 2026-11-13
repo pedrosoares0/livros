@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Search, ListPlus, X, BookOpen, AlertTriangle, Check, Loader2 } from 'lucide-react';
+import { Search, ListPlus, X, BookOpen, AlertTriangle, Check, Loader2, RefreshCw } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { searchBookApi, evaluateBulkList, isAmazonUrl } from '../services/evaluator';
 import { evaluateWithGemini, evaluateBulkWithGemini } from '../services/geminiEvaluator';
@@ -46,9 +46,7 @@ const EVALUATION_STAGES = [
 const STEP_INTERVAL_MS = 1450;
 const FINISH_HOLD_MS = 260;
 
-// Rotação automática de 4 sugestões inéditas a cada 6 horas (livros) e a cada 1 hora (personagens)
-const SUGGESTIONS_ROTATION_MS = 6 * 60 * 60 * 1000;
-const CHARACTERS_ROTATION_MS = 1 * 60 * 60 * 1000;
+// Persistência das 4 sugestões e 4 personagens ativos (troca sob demanda pelo botão)
 const SUGGESTIONS_STORAGE_KEY = 'veredito_modal_suggestions_v2';
 const CHARACTERS_STORAGE_KEY = 'veredito_modal_characters_v6';
 
@@ -66,7 +64,10 @@ interface CharacterRotationState {
   booksByCharId: Record<string, string[]>;
 }
 
-function getOrRotateCharacters(existingBooks: BookEvaluation[] = []): CharacterRotationState {
+function getOrRotateCharacters(
+  existingBooks: BookEvaluation[] = [],
+  forceRotate = false
+): CharacterRotationState {
   const evaluatedSet = buildEvaluatedTitleSet(existingBooks);
   const visualPool = CHARACTER_POOL.filter((c) => Boolean(c.imageUrl));
   const activePool = visualPool.length >= 4 ? visualPool : CHARACTER_POOL;
@@ -86,10 +87,9 @@ function getOrRotateCharacters(existingBooks: BookEvaluation[] = []): CharacterR
       if (parsed.booksByCharId && typeof parsed.booksByCharId === 'object') {
         prevBooksByCharId = parsed.booksByCharId;
       }
-      if (Array.isArray(parsed.ids) && typeof parsed.timestamp === 'number') {
+      if (Array.isArray(parsed.ids)) {
         prevIds = parsed.ids;
-        const isExpired = now - parsed.timestamp >= CHARACTERS_ROTATION_MS;
-        if (!isExpired) {
+        if (!forceRotate) {
           const validSaved = parsed.ids
             .map((id) => poolById.get(id))
             .filter((c): c is CharacterReading => Boolean(c));
@@ -174,7 +174,10 @@ function pickRandomFour(
   return shuffled.slice(0, 4);
 }
 
-function getOrRotateSuggestions(existingBooks: BookEvaluation[]): Partial<BookEvaluation>[] {
+function getOrRotateSuggestions(
+  existingBooks: BookEvaluation[],
+  forceRotate = false
+): Partial<BookEvaluation>[] {
   const evaluatedTitles = buildEvaluatedTitleSet(existingBooks);
   const availablePool = POPULAR_SUGGESTIONS_POOL.filter(
     (b) => !evaluatedTitles.has(normalizeForMatch(b.title || ''))
@@ -189,10 +192,9 @@ function getOrRotateSuggestions(existingBooks: BookEvaluation[]): Partial<BookEv
     const raw = localStorage.getItem(SUGGESTIONS_STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw) as { ids?: string[]; timestamp?: number };
-      if (Array.isArray(parsed.ids) && typeof parsed.timestamp === 'number') {
+      if (Array.isArray(parsed.ids)) {
         prevIds = parsed.ids;
-        const isExpired = now - parsed.timestamp >= SUGGESTIONS_ROTATION_MS;
-        if (!isExpired) {
+        if (!forceRotate) {
           const validSaved = parsed.ids
             .map((id) => poolById.get(id))
             .filter((b): b is Partial<BookEvaluation> => Boolean(b));
@@ -211,7 +213,7 @@ function getOrRotateSuggestions(existingBooks: BookEvaluation[]): Partial<BookEv
               SUGGESTIONS_STORAGE_KEY,
               JSON.stringify({
                 ids: combined.map((b) => b.id),
-                timestamp: parsed.timestamp,
+                timestamp: parsed.timestamp || now,
               })
             );
             return combined;
@@ -223,7 +225,7 @@ function getOrRotateSuggestions(existingBooks: BookEvaluation[]): Partial<BookEv
     // fallback silencioso caso localStorage esteja indisponível
   }
 
-  // Sorteia 4 novos livros inéditos (excluindo os 4 da janela anterior de 6h)
+  // Sorteia 4 novos livros inéditos (excluindo os 4 anteriores)
   const selected = pickRandomFour(poolToUse, new Set(prevIds));
   try {
     localStorage.setItem(
@@ -270,6 +272,8 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
     getOrRotateCharacters(existingBooks)
   );
   const [selectedCharacterId, setSelectedCharacterId] = useState<string | null>(null);
+  const [suggestionsSpinCount, setSuggestionsSpinCount] = useState(0);
+  const [charactersSpinCount, setCharactersSpinCount] = useState(0);
 
   const searchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const searchAbortRef = useRef<AbortController | null>(null);
@@ -291,31 +295,40 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
       [...current.map((s) => s.coverUrl), ...charPortraitUrls, ...charCoverUrls],
       true
     );
-
-    const rotationCheck = setInterval(() => {
-      const updated = getOrRotateSuggestions(existingBooks);
-      const updatedCharRot = getOrRotateCharacters(existingBooks);
-      const updatedEvalSet = buildEvaluatedTitleSet(existingBooks);
-      setPopularSuggestions(updated);
-      setCharacterRotation(updatedCharRot);
-      const nextCharCovers = updatedCharRot.characters.flatMap((c) =>
-        getCharacterBooks(c, updatedEvalSet, 4, updatedCharRot.booksByCharId[c.id]).map(
-          (b) => b.coverUrl
-        )
-      );
-      const nextPortraits = updatedCharRot.characters.map((c) => c.imageUrl);
-      prefetchBookCovers(
-        [...updated.map((s) => s.coverUrl), ...nextPortraits, ...nextCharCovers],
-        true
-      );
-    }, 60_000);
+    // Pré-aquece em background mais capas e retratos do pool para troca instantânea ao clicar
+    prefetchBookCovers(
+      [
+        ...POPULAR_SUGGESTIONS_POOL.map((b) => b.coverUrl),
+        ...CHARACTER_POOL.map((c) => c.imageUrl),
+      ],
+      false
+    );
 
     return () => {
-      clearInterval(rotationCheck);
       if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
       searchAbortRef.current?.abort();
     };
   }, [existingBooks]);
+
+  const handleSwapSuggestions = () => {
+    setSuggestionsSpinCount((prev) => prev + 1);
+    const next = getOrRotateSuggestions(existingBooks, true);
+    setPopularSuggestions(next);
+    prefetchBookCovers(next.map((s) => s.coverUrl), true);
+  };
+
+  const handleSwapCharacters = () => {
+    setCharactersSpinCount((prev) => prev + 1);
+    setSelectedCharacterId(null);
+    const nextCharRot = getOrRotateCharacters(existingBooks, true);
+    const evalSet = buildEvaluatedTitleSet(existingBooks);
+    setCharacterRotation(nextCharRot);
+    const charCoverUrls = nextCharRot.characters.flatMap((c) =>
+      getCharacterBooks(c, evalSet, 4, nextCharRot.booksByCharId[c.id]).map((b) => b.coverUrl)
+    );
+    const charPortraitUrls = nextCharRot.characters.map((c) => c.imageUrl);
+    prefetchBookCovers([...charPortraitUrls, ...charCoverUrls], true);
+  };
 
   // Keyboard Escape listener for seamless dismissal on PC
   useEffect(() => {
@@ -1071,35 +1084,59 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                 <div className="space-y-4 pt-1.5">
                   {/* Row 1: Popular Book Suggestions */}
                   <div className="space-y-2.5">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#86868b] block">
-                      Sugestões Populares para Avaliar
-                    </span>
-                    <div className="grid grid-cols-4 gap-3 sm:gap-4 pt-0.5">
-                      {popularSuggestions.map((book) => (
-                        <button
-                          key={book.id || book.title}
-                          type="button"
-                          onClick={() => handleRequestEvaluation(book)}
-                          className="flex flex-col text-left cursor-pointer group active:scale-[0.97] transition-transform duration-200 select-none w-full"
-                        >
-                          <div className="w-full mb-2 transition-transform duration-200 group-hover:-translate-y-1">
-                            <BookCover
-                              title={book.title || 'Livro'}
-                              author={book.author || ''}
-                              coverUrl={book.coverUrl}
-                            />
-                          </div>
-                          <div className="space-y-0.5 px-0.5 w-full">
-                            <h4 className="text-[11px] sm:text-xs font-semibold text-[#1d1d1f] truncate group-hover:text-black leading-snug tracking-tight">
-                              {book.title}
-                            </h4>
-                            <p className="text-[10px] text-[#86868b] truncate font-normal">
-                              {book.author}
-                            </p>
-                          </div>
-                        </button>
-                      ))}
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-[#86868b]">
+                        Sugestões Populares para Avaliar
+                      </span>
+                      <button
+                        type="button"
+                        onClick={handleSwapSuggestions}
+                        aria-label="Trocar sugestões de livros"
+                        title="Trocar sugestões"
+                        className="p-1 -mr-1 rounded-full text-[#86868b] hover:text-[#1d1d1f] hover:bg-neutral-100 active:bg-neutral-200/70 active:scale-90 transition-all cursor-pointer"
+                      >
+                        <RefreshCw
+                          className="w-3.5 h-3.5 transition-transform duration-300 ease-out"
+                          style={{ transform: `rotate(${suggestionsSpinCount * 180}deg)` }}
+                        />
+                      </button>
                     </div>
+
+                    <AnimatePresence mode="wait" initial={false}>
+                      <motion.div
+                        key={popularSuggestions.map((b) => b.id || b.title).join('|')}
+                        initial={{ opacity: 0, y: 4, scale: 0.985, filter: 'blur(2px)' }}
+                        animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
+                        exit={{ opacity: 0, y: -4, scale: 0.985, filter: 'blur(2px)' }}
+                        transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+                        className="grid grid-cols-4 gap-3 sm:gap-4 pt-0.5"
+                      >
+                        {popularSuggestions.map((book) => (
+                          <button
+                            key={book.id || book.title}
+                            type="button"
+                            onClick={() => handleRequestEvaluation(book)}
+                            className="flex flex-col text-left cursor-pointer group active:scale-[0.97] transition-transform duration-200 select-none w-full"
+                          >
+                            <div className="w-full mb-2 transition-transform duration-200 group-hover:-translate-y-1">
+                              <BookCover
+                                title={book.title || 'Livro'}
+                                author={book.author || ''}
+                                coverUrl={book.coverUrl}
+                              />
+                            </div>
+                            <div className="space-y-0.5 px-0.5 w-full">
+                              <h4 className="text-[11px] sm:text-xs font-semibold text-[#1d1d1f] truncate group-hover:text-black leading-snug tracking-tight">
+                                {book.title}
+                              </h4>
+                              <p className="text-[10px] text-[#86868b] truncate font-normal">
+                                {book.author}
+                              </p>
+                            </div>
+                          </button>
+                        ))}
+                      </motion.div>
+                    </AnimatePresence>
                   </div>
 
                   {/* Row 2: Books by Favorite Characters (4 character covers + rotating book sets) */}
@@ -1119,67 +1156,90 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
 
                     return (
                       <div className="space-y-2.5 pt-2.5 border-t border-neutral-200/70">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-[#86868b] block">
-                          Livros de Acordo com Personagens
-                        </span>
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-[#86868b]">
+                            Livros de Acordo com Personagens
+                          </span>
+                          <button
+                            type="button"
+                            onClick={handleSwapCharacters}
+                            aria-label="Trocar personagens"
+                            title="Trocar personagens"
+                            className="p-1 -mr-1 rounded-full text-[#86868b] hover:text-[#1d1d1f] hover:bg-neutral-100 active:bg-neutral-200/70 active:scale-90 transition-all cursor-pointer"
+                          >
+                            <RefreshCw
+                              className="w-3.5 h-3.5 transition-transform duration-300 ease-out"
+                              style={{ transform: `rotate(${charactersSpinCount * 180}deg)` }}
+                            />
+                          </button>
+                        </div>
 
-                        <div className="grid grid-cols-4 gap-3 sm:gap-4 pt-0.5">
-                          {characterSuggestions.map((char) => {
-                            const isSelected = activeCharacter?.id === char.id;
+                        <AnimatePresence mode="wait" initial={false}>
+                          <motion.div
+                            key={characterSuggestions.map((c) => c.id).join('|')}
+                            initial={{ opacity: 0, y: 4, scale: 0.985, filter: 'blur(2px)' }}
+                            animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
+                            exit={{ opacity: 0, y: -4, scale: 0.985, filter: 'blur(2px)' }}
+                            transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+                            className="grid grid-cols-4 gap-3 sm:gap-4 pt-0.5"
+                          >
+                            {characterSuggestions.map((char) => {
+                              const isSelected = activeCharacter?.id === char.id;
 
-                            return (
-                              <button
-                                key={char.id}
-                                type="button"
-                                onClick={() =>
-                                  setSelectedCharacterId((prev) =>
-                                    prev === char.id ? null : char.id
-                                  )
-                                }
-                                className="flex flex-col text-left cursor-pointer group active:scale-[0.97] transition-transform duration-200 select-none"
-                              >
-                                <div
-                                  className={`relative w-full aspect-[2/3] rounded-lg overflow-hidden mb-2 bg-neutral-100 transition-all duration-200 ${
-                                    isSelected
-                                      ? 'ring-2 ring-[#1d1d1f] ring-offset-2 ring-offset-white shadow-[0_10px_24px_rgba(0,0,0,0.2)] -translate-y-0.5'
-                                      : 'border border-black/[0.08] shadow-[0_4px_12px_rgba(0,0,0,0.08)] group-hover:-translate-y-1'
-                                  }`}
+                              return (
+                                <button
+                                  key={char.id}
+                                  type="button"
+                                  onClick={() =>
+                                    setSelectedCharacterId((prev) =>
+                                      prev === char.id ? null : char.id
+                                    )
+                                  }
+                                  className="flex flex-col text-left cursor-pointer group active:scale-[0.97] transition-transform duration-200 select-none"
                                 >
-                                  {char.imageUrl ? (
-                                    <img
-                                      src={char.imageUrl}
-                                      alt={char.name}
-                                      className="w-full h-full object-cover object-top"
-                                      loading="eager"
-                                      decoding="async"
-                                      referrerPolicy="no-referrer"
-                                    />
-                                  ) : (
-                                    <div className="w-full h-full flex items-center justify-center bg-neutral-200 text-[#1d1d1f] font-bold text-sm">
-                                      {char.name.slice(0, 2).toUpperCase()}
-                                    </div>
-                                  )}
-                                  <div className="absolute inset-0 rounded-lg ring-1 ring-inset ring-black/[0.06] pointer-events-none" />
-                                </div>
-
-                                <div className="space-y-0.5 px-0.5 w-full">
-                                  <h4
-                                    className={`text-[11px] sm:text-xs font-semibold truncate leading-snug tracking-tight ${
+                                  <div
+                                    className={`relative w-full aspect-[2/3] rounded-lg overflow-hidden mb-2 bg-neutral-100 transition-all duration-200 ${
                                       isSelected
-                                        ? 'text-black font-bold'
-                                        : 'text-[#1d1d1f] group-hover:text-black'
+                                        ? 'ring-2 ring-[#1d1d1f] ring-offset-2 ring-offset-white shadow-[0_10px_24px_rgba(0,0,0,0.2)] -translate-y-0.5'
+                                        : 'border border-black/[0.08] shadow-[0_4px_12px_rgba(0,0,0,0.08)] group-hover:-translate-y-1'
                                     }`}
                                   >
-                                    {char.name}
-                                  </h4>
-                                  <p className="text-[10px] text-[#86868b] truncate font-normal">
-                                    {char.source}
-                                  </p>
-                                </div>
-                              </button>
-                            );
-                          })}
-                        </div>
+                                    {char.imageUrl ? (
+                                      <img
+                                        src={char.imageUrl}
+                                        alt={char.name}
+                                        className="w-full h-full object-cover object-top"
+                                        loading="eager"
+                                        decoding="async"
+                                        referrerPolicy="no-referrer"
+                                      />
+                                    ) : (
+                                      <div className="w-full h-full flex items-center justify-center bg-neutral-200 text-[#1d1d1f] font-bold text-sm">
+                                        {char.name.slice(0, 2).toUpperCase()}
+                                      </div>
+                                    )}
+                                    <div className="absolute inset-0 rounded-lg ring-1 ring-inset ring-black/[0.06] pointer-events-none" />
+                                  </div>
+
+                                  <div className="space-y-0.5 px-0.5 w-full">
+                                    <h4
+                                      className={`text-[11px] sm:text-xs font-semibold truncate leading-snug tracking-tight ${
+                                        isSelected
+                                          ? 'text-black font-bold'
+                                          : 'text-[#1d1d1f] group-hover:text-black'
+                                      }`}
+                                    >
+                                      {char.name}
+                                    </h4>
+                                    <p className="text-[10px] text-[#86868b] truncate font-normal">
+                                      {char.source}
+                                    </p>
+                                  </div>
+                                </button>
+                              );
+                            })}
+                          </motion.div>
+                        </AnimatePresence>
 
                         {/* Inline 4-Book Shelf for Selected Character */}
                         <AnimatePresence mode="wait" initial={false}>
