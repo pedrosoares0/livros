@@ -46,15 +46,55 @@ const EVALUATION_STAGES = [
 const STEP_INTERVAL_MS = 1450;
 const FINISH_HOLD_MS = 260;
 
-const POPULAR_SUGGESTIONS = [
-  'Duna',
-  'Neuromancer',
-  'O Problema dos Três Corpos',
-  'Fundação',
-  '1984',
-  'Fahrenheit 451',
-  'Solaris',
-  'Cem Anos de Solidão',
+const POPULAR_SUGGESTIONS: Partial<BookEvaluation>[] = [
+  {
+    id: 'br-duna',
+    title: 'Duna',
+    author: 'Frank Herbert',
+    publisher: 'Aleph',
+    year: 1965,
+    pages: 680,
+    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/857657313X.01.LZZZZZZZ.jpg',
+    genres: ['Ficção Científica', 'Space Opera', 'Distopia'],
+    resumo:
+      'Em Arrakis, o planeta desértico governado por vermes colossais e cobiçado pela Especiaria, o jovem Paul Atreides enfrenta a traição do Império e assume seu destino trágico como messias e líder guerreiro dos Fremen.',
+  },
+  {
+    id: 'br-neuromancer',
+    title: 'Neuromancer',
+    author: 'William Gibson',
+    publisher: 'Aleph',
+    year: 1984,
+    pages: 320,
+    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8576573008.01.LZZZZZZZ.jpg',
+    genres: ['Cyberpunk', 'Ficção Científica'],
+    resumo:
+      'Case, um hacker decadente de Chiba City com o sistema nervoso queimado por trair seus chefes, recebe uma última chance de redenção em troca de invadir uma poderosa inteligência artificial corporativa.',
+  },
+  {
+    id: 'br-fundacao',
+    title: 'Fundação',
+    author: 'Isaac Asimov',
+    publisher: 'Aleph',
+    year: 1951,
+    pages: 240,
+    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8576570661.01.LZZZZZZZ.jpg',
+    genres: ['Ficção Científica', 'Clássico'],
+    resumo:
+      'O matemático Hari Seldon prevê a queda inevitável do Império Galáctico e 30.000 anos de barbárie. Para encurtar essa era das trevas, ele cria a Fundação nas bordas da galáxia.',
+  },
+  {
+    id: 'br-fahrenheit-451',
+    title: 'Fahrenheit 451',
+    author: 'Ray Bradbury',
+    publisher: 'Globo Livros',
+    year: 1953,
+    pages: 216,
+    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8525052248.01.LZZZZZZZ.jpg',
+    genres: ['Distopia', 'Ficção Científica'],
+    resumo:
+      'Guy Montag é um bombeiro encarregado de queimar livros numa sociedade totalitária onde pensar é proibido e as pessoas vivem entorpecidas por telas de parede.',
+  },
 ];
 
 export const EvaluateModal: React.FC<EvaluateModalProps> = ({
@@ -86,6 +126,10 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
   const searchSeqRef = useRef(0);
 
   useEffect(() => {
+    prefetchBookCovers(
+      POPULAR_SUGGESTIONS.map((s) => s.coverUrl),
+      true
+    );
     return () => {
       if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
       searchAbortRef.current?.abort();
@@ -836,21 +880,34 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                   </button>
                 </div>
               ) : (
-                /* Initial Empty State on Desktop: Quick Suggestions */
-                <div className="space-y-2 pt-1">
+                /* Initial Empty State: Visual Book Suggestions with Covers */
+                <div className="space-y-2.5 pt-1.5">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-[#86868b] block">
                     Sugestões Populares para Avaliar
                   </span>
-                  <div className="flex flex-wrap gap-1.5">
-                    {POPULAR_SUGGESTIONS.map((title) => (
-                      <button
-                        key={title}
-                        type="button"
-                        onClick={() => handleInputChange(title)}
-                        className="px-2.5 py-1 rounded-lg bg-neutral-100 hover:bg-neutral-200/80 border border-neutral-200/80 text-xs font-medium text-neutral-800 transition-colors cursor-pointer active:scale-95 flex items-center gap-1"
+                  <div className="grid grid-cols-4 gap-3 sm:gap-4 pt-0.5">
+                    {POPULAR_SUGGESTIONS.map((book) => (
+                      <div
+                        key={book.id || book.title}
+                        onClick={() => handleRequestEvaluation(book)}
+                        className="flex flex-col cursor-pointer group active:scale-[0.97] transition-transform duration-200 select-none"
                       >
-                        <span>{title}</span>
-                      </button>
+                        <div className="w-full mb-2 transition-transform duration-200 group-hover:-translate-y-1">
+                          <BookCover
+                            title={book.title || 'Livro'}
+                            author={book.author || ''}
+                            coverUrl={book.coverUrl}
+                          />
+                        </div>
+                        <div className="space-y-0.5 px-0.5">
+                          <h4 className="text-[11px] sm:text-xs font-semibold text-[#1d1d1f] truncate group-hover:text-black leading-snug tracking-tight">
+                            {book.title}
+                          </h4>
+                          <p className="text-[10px] text-[#86868b] truncate font-normal">
+                            {book.author}
+                          </p>
+                        </div>
+                      </div>
                     ))}
                   </div>
                 </div>
