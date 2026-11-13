@@ -50,7 +50,7 @@ const FINISH_HOLD_MS = 260;
 const SUGGESTIONS_ROTATION_MS = 6 * 60 * 60 * 1000;
 const CHARACTERS_ROTATION_MS = 1 * 60 * 60 * 1000;
 const SUGGESTIONS_STORAGE_KEY = 'veredito_modal_suggestions_v2';
-const CHARACTERS_STORAGE_KEY = 'veredito_modal_characters_v5';
+const CHARACTERS_STORAGE_KEY = 'veredito_modal_characters_v6';
 
 import { POPULAR_SUGGESTIONS_POOL } from '../data/suggestionBooks';
 import {
