@@ -14,7 +14,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) =
     'Seven', 'De Olhos Bem Fechados', 'After Hours', 'Planeta dos Macacos',
     'Interestelar', 'Goodfellas', 'Manchester à Beira-Mar', 'Klaus',
     'Nada de Novo no Front', 'Bastardos Inglórios', 'Blade Runner 2049',
-    'Aftersun', 'O Poderoso Chefão', 'Clube da Luta'
+    'Aftersun', 'O Poderoso Chefão', 'Clube da Luta', 'Whiplash', 'Princesa Mononoke'
   ];
 
   const topSeries = [
@@ -25,12 +25,12 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) =
 
   const favoriteCharacters = [
     'Viktor (Arcane)', 'Ekko (Arcane)', 'Ultron', 'Thanos', 'Tony Stark',
-    'Visão (Marvel)', 'Loki', 'Bruce Wayne', 'O Coringa', 'Sherlock Holmes',
-    'Cooper, Dra. Brand & Murph (Interestelar)', 'Anakin Skywalker',
-    'Harry Potter, Sirius Black & Snape', 'Abby & Ellie (TLOU Jogo)',
+    'Visão (Marvel)', 'Rocket (Marvel)', 'Magneto (Marvel)', 'Loki', 'Bruce Wayne', 'O Coringa',
+    'Sherlock Holmes', 'Cooper, Dra. Brand & Murph (Interestelar)', 'Anakin Skywalker',
+    'Harry Potter, Sirius Black & Snape', 'Joel, Abby & Ellie (TLOU)',
     'Carmy & Richie (The Bear)', 'K (Blade Runner 2049)', 'César (Planeta dos Macacos)',
     'Michael Corleone', 'Juiz Holden', 'Katniss Everdeen', 'Sebastian (La La Land)',
-    'Tai Lung', 'Jack (Senhor das Moscas)', 'Vegeta', 'Logan'
+    'Tai Lung', 'Jack (Senhor das Moscas)', 'Vegeta', 'Logan', 'Princesa Mononoke'
   ];
 
   return (
