@@ -10,6 +10,7 @@ import { ProfileModal } from './components/ProfileModal';
 import { RateBookModal } from './components/RateBookModal';
 import { BottomNavBar } from './components/BottomNavBar';
 import { PearlButton } from './components/PearlButton';
+import { VereditoGlassIntro } from './components/ui/liquid-glass-logo-reveal';
 import {
   fetchEvaluations,
   saveEvaluation,
@@ -214,6 +215,9 @@ export function App() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-start bg-[#f5f5f7] md:bg-white text-[#1d1d1f] antialiased w-full">
+      {/* Liquid Glass Logo Intro on Site Entry & Page Reload */}
+      <VereditoGlassIntro />
+
       {/* Mobile-first frame on phone, seamless edge-to-edge canvas on desktop */}
       <div className="w-full max-w-md sm:max-w-xl md:max-w-none min-h-screen flex flex-col bg-white border-x border-neutral-200/80 md:border-none shadow-[0_0_40px_rgba(0,0,0,0.04)] md:shadow-none relative pb-24 md:pb-20">
         
