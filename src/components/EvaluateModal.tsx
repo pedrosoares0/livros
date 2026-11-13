@@ -46,7 +46,11 @@ const EVALUATION_STAGES = [
 const STEP_INTERVAL_MS = 1450;
 const FINISH_HOLD_MS = 260;
 
-const POPULAR_SUGGESTIONS: Partial<BookEvaluation>[] = [
+// Rotação automática de 4 sugestões inéditas a cada 6 horas
+const SUGGESTIONS_ROTATION_MS = 6 * 60 * 60 * 1000;
+const SUGGESTIONS_STORAGE_KEY = 'veredito_modal_suggestions_v1';
+
+const POPULAR_SUGGESTIONS_POOL: Partial<BookEvaluation>[] = [
   {
     id: 'br-duna',
     title: 'Duna',
@@ -95,7 +99,338 @@ const POPULAR_SUGGESTIONS: Partial<BookEvaluation>[] = [
     resumo:
       'Guy Montag é um bombeiro encarregado de queimar livros numa sociedade totalitária onde pensar é proibido e as pessoas vivem entorpecidas por telas de parede.',
   },
+  {
+    id: 'br-tres-corpos',
+    title: 'O Problema dos Três Corpos',
+    author: 'Cixin Liu',
+    publisher: 'Suma',
+    year: 2008,
+    pages: 320,
+    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8556510213.01.LZZZZZZZ.jpg',
+    genres: ['Ficção Científica', 'Hard Sci-Fi'],
+    resumo:
+      'Durante a Revolução Cultural Chinesa, um projeto militar secreto envia sinais ao espaço e estabelece contato com uma civilização alienígena à beira do colapso que planeja invadir a Terra.',
+  },
+  {
+    id: 'br-cem-anos-solidao',
+    title: 'Cem Anos de Solidão',
+    author: 'Gabriel García Márquez',
+    publisher: 'Record',
+    year: 1967,
+    pages: 448,
+    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8501012076.01.LZZZZZZZ.jpg',
+    genres: ['Clássico', 'Realismo Mágico', 'Drama Familiar'],
+    resumo:
+      'A saga multigeracional da família Buendía na mítica cidade de Macondo, marcada por paixões obsessivas, guerras civis, presságios trágicos e uma solidão inescapável.',
+  },
+  {
+    id: 'br-o-processo',
+    title: 'O Processo',
+    author: 'Franz Kafka',
+    publisher: 'Companhia das Letras',
+    year: 1925,
+    pages: 264,
+    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8535907432.01.LZZZZZZZ.jpg',
+    genres: ['Clássico', 'Absurdo Existencial'],
+    resumo:
+      'Josef K. é detido numa manhã qualquer sem saber que crime cometeu. Um tribunal invisível e labiríntico o consome aos poucos em um pesadelo burocrático e opressivo.',
+  },
+  {
+    id: 'br-admiravel-mundo-novo',
+    title: 'Admirável Mundo Novo',
+    author: 'Aldous Huxley',
+    publisher: 'Biblioteca Azul',
+    year: 1932,
+    pages: 312,
+    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8525056006.01.LZZZZZZZ.jpg',
+    genres: ['Distopia', 'Ficção Científica', 'Clássico'],
+    resumo:
+      'Num futuro onde seres humanos são gerados em laboratório, divididos em castas biológicas e mantidos felizes pela droga Soma, um homem criado fora do sistema questiona o preço da servidão voluntária.',
+  },
+  {
+    id: 'br-androides-sonham',
+    title: 'Androides Sonham com Ovelhas Elétricas?',
+    author: 'Philip K. Dick',
+    publisher: 'Aleph',
+    year: 1968,
+    pages: 288,
+    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8576571609.01.LZZZZZZZ.jpg',
+    genres: ['Cyberpunk', 'Ficção Científica', 'Noir'],
+    resumo:
+      'Em uma Terra devastada pela poeira radioativa, o caçador de recompensas Rick Deckard precisa aposentar seis androides Nexus-6 fugitivos, quase indistinguíveis dos próprios humanos.',
+  },
+  {
+    id: 'br-fim-da-infancia',
+    title: 'O Fim da Infância',
+    author: 'Arthur C. Clarke',
+    publisher: 'Aleph',
+    year: 1953,
+    pages: 304,
+    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8576570548.01.LZZZZZZZ.jpg',
+    genres: ['Ficção Científica', 'Filosófico'],
+    resumo:
+      'Naves colossais pairam sobre as metrópoles da Terra. Os Senhores Supremos extinguem a guerra e a pobreza, mas o verdadeiro propósito de sua tutela pacífica guarda um destino melancólico para a humanidade.',
+  },
+  {
+    id: 'br-crime-e-castigo',
+    title: 'Crime e Castigo',
+    author: 'Fiódor Dostoiévski',
+    publisher: 'Editora 34',
+    year: 1866,
+    pages: 592,
+    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8573266465.01.LZZZZZZZ.jpg',
+    genres: ['Clássico Russo', 'Drama Psicológico', 'Filosofia Moral'],
+    resumo:
+      'Em São Petersburgo, o ex-estudante Raskólnikov assassina uma velha agiota acreditando estar acima da moral comum, mas mergulha em uma febre psicológica implacável de culpa, paranoia e redenção.',
+  },
+  {
+    id: 'br-a-metamorfose',
+    title: 'A Metamorfose',
+    author: 'Franz Kafka',
+    publisher: 'Companhia das Letras',
+    year: 1915,
+    pages: 96,
+    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8535900977.01.LZZZZZZZ.jpg',
+    genres: ['Clássico', 'Fábula Sombria', 'Drama Psicológico'],
+    resumo:
+      'Gregor Samsa desperta certa manhã transformado em um inseto monstruoso. Confinado no quarto, assiste à deterioração do afeto da própria família à medida que deixa de ser o provedor da casa.',
+  },
+  {
+    id: 'br-frankenstein',
+    title: 'Frankenstein',
+    author: 'Mary Shelley',
+    publisher: 'DarkSide',
+    year: 1818,
+    pages: 304,
+    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8594540183.01.LZZZZZZZ.jpg',
+    genres: ['Clássico Gótico', 'Ficção Científica', 'Tragédia Moral'],
+    resumo:
+      'Obcecado em vencer a morte, o jovem cientista Victor Frankenstein dá vida a uma criatura consciente, mas a abandona horrorizado, desencadeando um ciclo trágico de rejeição e vingança.',
+  },
+  {
+    id: 'br-materia-escura',
+    title: 'Matéria Escura',
+    author: 'Blake Crouch',
+    publisher: 'Intrínseca',
+    year: 2016,
+    pages: 352,
+    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8551001507.01.LZZZZZZZ.jpg',
+    genres: ['Ficção Científica', 'Thriller'],
+    resumo:
+      'Jason Dessen é sequestrado e acorda em uma realidade alternativa onde nunca se casou e se tornou um físico genial que construiu uma caixa capaz de atravessar o multiverso.',
+  },
+  {
+    id: 'br-recursao',
+    title: 'Recursão',
+    author: 'Blake Crouch',
+    publisher: 'Intrínseca',
+    year: 2019,
+    pages: 336,
+    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8551005375.01.LZZZZZZZ.jpg',
+    genres: ['Ficção Científica', 'Thriller Tecnológico'],
+    resumo:
+      'Uma misteriosa síndrome espalha memórias completas de vidas que nunca aconteceram, enquanto uma neurocientista e um detetive descobrem uma tecnologia capaz de reescrever o próprio tempo.',
+  },
+  {
+    id: 'br-devoradores-estrelas',
+    title: 'Devoradores de Estrelas',
+    author: 'Andy Weir',
+    publisher: 'Suma',
+    year: 2021,
+    pages: 480,
+    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/6555602244.01.LZZZZZZZ.jpg',
+    genres: ['Ficção Científica', 'Hard Sci-Fi', 'Sobrevivência'],
+    resumo:
+      'Ryland Grace é o único sobrevivente em uma missão interestelar desesperada para salvar a Terra da extinção solar — mas acorda do coma sem lembrar o próprio nome ou o que precisa fazer.',
+  },
+  {
+    id: 'br-perdido-em-marte',
+    title: 'Perdido em Marte',
+    author: 'Andy Weir',
+    publisher: 'Arqueiro',
+    year: 2011,
+    pages: 368,
+    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8580413001.01.LZZZZZZZ.jpg',
+    genres: ['Ficção Científica', 'Sobrevivência'],
+    resumo:
+      'Dado como morto após uma tempestade de areia devastadora, o astronauta Mark Watney fica sozinho em Marte e precisa usar engenharia, botânica e sangue-frio para sobreviver.',
+  },
+  {
+    id: 'br-ensaio-cegueira',
+    title: 'Ensaio Sobre a Cegueira',
+    author: 'José Saramago',
+    publisher: 'Companhia das Letras',
+    year: 1995,
+    pages: 312,
+    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8535933921.01.LZZZZZZZ.jpg',
+    genres: ['Distopia', 'Alegoria Moral', 'Drama Humano'],
+    resumo:
+      'Uma epidemia fulminante de cegueira branca se espalha por uma cidade. Isolados em quarentena brutal, os infectados testemunham a rápida dissolução da dignidade e da civilização.',
+  },
+  {
+    id: 'br-dom-casmurro',
+    title: 'Dom Casmurro',
+    author: 'Machado de Assis',
+    publisher: 'Penguin-Companhia',
+    year: 1899,
+    pages: 208,
+    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8563560859.01.LZZZZZZZ.jpg',
+    genres: ['Clássico Brasileiro', 'Drama Psicológico'],
+    resumo:
+      'Bento Santiago narra, na velhice e sob o peso de um ciúme corrosivo, sua história de amor com Capitu e sua suspeita obsessiva de traição com seu melhor amigo Escobar.',
+  },
+  {
+    id: 'br-memorias-postumas',
+    title: 'Memórias Póstumas de Brás Cubas',
+    author: 'Machado de Assis',
+    publisher: 'Penguin-Companhia',
+    year: 1881,
+    pages: 192,
+    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8563560832.01.LZZZZZZZ.jpg',
+    genres: ['Clássico Brasileiro', 'Sátira Filosófica'],
+    resumo:
+      'Um defunto autor decide narrar sua vida de privilégios, vaidades e frustrações do além-túmulo, dissecando a sociedade com ironia demolidora e zero hipocrisia.',
+  },
+  {
+    id: 'br-medico-e-monstro',
+    title: 'O Médico e o Monstro',
+    author: 'Robert Louis Stevenson',
+    publisher: 'DarkSide',
+    year: 1886,
+    pages: 192,
+    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8594540329.01.LZZZZZZZ.jpg',
+    genres: ['Clássico Gótico', 'Horror Psicológico'],
+    resumo:
+      'Em Londres, o advogado Utterson investiga a sinistra ligação entre seu respeitável amigo Dr. Henry Jekyll e o cruel Edward Hyde, revelando a dualidade sombria da natureza humana.',
+  },
+  {
+    id: 'br-2001-odisseia',
+    title: '2001: Uma Odisseia no Espaço',
+    author: 'Arthur C. Clarke',
+    publisher: 'Aleph',
+    year: 1968,
+    pages: 336,
+    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8576571552.01.LZZZZZZZ.jpg',
+    genres: ['Ficção Científica', 'Clássico'],
+    resumo:
+      'Após a descoberta de um enigmático monolito negro enterrado na Lua, a nave Discovery parte rumo a Saturno sob o controle da superinteligência HAL 9000.',
+  },
+  {
+    id: 'br-ubik',
+    title: 'Ubik',
+    author: 'Philip K. Dick',
+    publisher: 'Aleph',
+    year: 1969,
+    pages: 272,
+    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8576574349.01.LZZZZZZZ.jpg',
+    genres: ['Ficção Científica', 'Psicológico'],
+    resumo:
+      'Após uma emboscada na Lua, Joe Chip e sua equipe percebem que a própria realidade ao redor está regredindo no tempo, e a única salvação parece ser um misterioso spray chamado Ubik.',
+  },
+  {
+    id: 'br-mao-esquerda-escuridao',
+    title: 'A Mão Esquerda da Escuridão',
+    author: 'Ursula K. Le Guin',
+    publisher: 'Aleph',
+    year: 1969,
+    pages: 312,
+    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8576574365.01.LZZZZZZZ.jpg',
+    genres: ['Ficção Científica', 'Antropológico'],
+    resumo:
+      'Enviado ao planeta glacial Gethen para convencer seus habitantes a integrar uma aliança interplanetária, o emissário Genly Ai enfrenta intrigas políticas e uma cultura sem gênero fixo.',
+  },
 ];
+
+function normalizeForMatch(text: string): string {
+  return (text || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^\w\s]/gi, '')
+    .trim();
+}
+
+function pickRandomFour(
+  pool: Partial<BookEvaluation>[],
+  excludeIds: Set<string>
+): Partial<BookEvaluation>[] {
+  const freshCandidates = pool.filter((b) => b.id && !excludeIds.has(b.id));
+  const source = freshCandidates.length >= 4 ? freshCandidates : [...pool];
+  const shuffled = [...source];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled.slice(0, 4);
+}
+
+function getOrRotateSuggestions(existingBooks: BookEvaluation[]): Partial<BookEvaluation>[] {
+  const evaluatedTitles = new Set(
+    existingBooks.map((b) => normalizeForMatch(b.title)).filter(Boolean)
+  );
+  const availablePool = POPULAR_SUGGESTIONS_POOL.filter(
+    (b) => !evaluatedTitles.has(normalizeForMatch(b.title || ''))
+  );
+  const poolToUse = availablePool.length >= 4 ? availablePool : POPULAR_SUGGESTIONS_POOL;
+  const poolById = new Map(poolToUse.map((b) => [b.id!, b]));
+
+  const now = Date.now();
+  let prevIds: string[] = [];
+
+  try {
+    const raw = localStorage.getItem(SUGGESTIONS_STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw) as { ids?: string[]; timestamp?: number };
+      if (Array.isArray(parsed.ids) && typeof parsed.timestamp === 'number') {
+        prevIds = parsed.ids;
+        const isExpired = now - parsed.timestamp >= SUGGESTIONS_ROTATION_MS;
+        if (!isExpired) {
+          const validSaved = parsed.ids
+            .map((id) => poolById.get(id))
+            .filter((b): b is Partial<BookEvaluation> => Boolean(b));
+          if (validSaved.length === 4) {
+            return validSaved;
+          }
+          // Se algum dos 4 livros foi avaliado nesse meio-tempo, repõe apenas os faltantes
+          if (validSaved.length > 0) {
+            const currentIds = new Set(validSaved.map((b) => b.id!));
+            const replacements = pickRandomFour(poolToUse, currentIds).slice(
+              0,
+              4 - validSaved.length
+            );
+            const combined = [...validSaved, ...replacements];
+            localStorage.setItem(
+              SUGGESTIONS_STORAGE_KEY,
+              JSON.stringify({
+                ids: combined.map((b) => b.id),
+                timestamp: parsed.timestamp,
+              })
+            );
+            return combined;
+          }
+        }
+      }
+    }
+  } catch {
+    // fallback silencioso caso localStorage esteja indisponível
+  }
+
+  // Sorteia 4 novos livros inéditos (excluindo os 4 da janela anterior de 6h)
+  const selected = pickRandomFour(poolToUse, new Set(prevIds));
+  try {
+    localStorage.setItem(
+      SUGGESTIONS_STORAGE_KEY,
+      JSON.stringify({
+        ids: selected.map((b) => b.id),
+        timestamp: now,
+      })
+    );
+  } catch {
+    // ignore storage errors
+  }
+
+  return selected;
+}
 
 export const EvaluateModal: React.FC<EvaluateModalProps> = ({
   isOpen,
@@ -120,21 +455,37 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
   const [duplicateWarning, setDuplicateWarning] = useState<BookEvaluation | null>(null);
   const [evalError, setEvalError] = useState<string | null>(null);
   const [apiSuggestions, setApiSuggestions] = useState<Partial<BookEvaluation>[]>([]);
+  const [popularSuggestions, setPopularSuggestions] = useState<Partial<BookEvaluation>[]>(() =>
+    getOrRotateSuggestions(existingBooks)
+  );
 
   const searchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const searchAbortRef = useRef<AbortController | null>(null);
   const searchSeqRef = useRef(0);
 
   useEffect(() => {
+    const current = getOrRotateSuggestions(existingBooks);
+    setPopularSuggestions(current);
     prefetchBookCovers(
-      POPULAR_SUGGESTIONS.map((s) => s.coverUrl),
+      current.map((s) => s.coverUrl),
       true
     );
+
+    const rotationCheck = setInterval(() => {
+      const updated = getOrRotateSuggestions(existingBooks);
+      setPopularSuggestions(updated);
+      prefetchBookCovers(
+        updated.map((s) => s.coverUrl),
+        true
+      );
+    }, 60_000);
+
     return () => {
+      clearInterval(rotationCheck);
       if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
       searchAbortRef.current?.abort();
     };
-  }, []);
+  }, [existingBooks]);
 
   // Keyboard Escape listener for seamless dismissal on PC
   useEffect(() => {
@@ -886,7 +1237,7 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                     Sugestões Populares para Avaliar
                   </span>
                   <div className="grid grid-cols-4 gap-3 sm:gap-4 pt-0.5">
-                    {POPULAR_SUGGESTIONS.map((book) => (
+                    {popularSuggestions.map((book) => (
                       <div
                         key={book.id || book.title}
                         onClick={() => handleRequestEvaluation(book)}
