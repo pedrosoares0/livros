@@ -628,9 +628,9 @@ ${book.resumo}
           </div>
         </div>
 
-        {/* Footer Actions — Right-Aligned Action Bar */}
-        <div className="p-3.5 sm:p-4 md:px-8 border-t border-black/[0.06] bg-[#ffffff] flex items-center justify-end">
-          <div className="flex items-center justify-end gap-2 flex-wrap sm:flex-nowrap">
+        {/* Footer Actions — Centered Action Bar */}
+        <div className="p-3.5 sm:p-4 md:px-8 border-t border-black/[0.06] bg-[#ffffff] flex items-center justify-center">
+          <div className="flex items-center justify-center gap-2 flex-wrap sm:flex-nowrap">
             {/* 1. Avaliar Novo Livro — Botão padrão PearlButton (à esquerda) */}
             {onOpenEvaluate && (
               <PearlButton
