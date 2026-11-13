@@ -885,10 +885,6 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
 
               {/* Command Palette Styled Search Bar */}
               <form onSubmit={handleSearchSubmit} className="space-y-1.5">
-                <label className="text-xs font-semibold text-[#1d1d1f] block">
-                  Cole o link do livro na Amazon:
-                </label>
-
                 <div className="relative w-full">
                   <Search className="absolute left-3.5 sm:left-4 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-4.5 sm:h-4.5 text-[#86868b] pointer-events-none" />
                   <input
@@ -1113,14 +1109,9 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
 
                     return (
                       <div className="space-y-2.5 pt-2.5 border-t border-neutral-200/70">
-                        <div className="flex items-center justify-between">
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-[#86868b] block">
-                            Livros de Acordo com Personagens
-                          </span>
-                          <span className="text-[10px] text-[#86868b]">
-                            Toque no personagem para ver 4 obras
-                          </span>
-                        </div>
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-[#86868b] block">
+                          Livros de Acordo com Personagens
+                        </span>
 
                         <div className="grid grid-cols-4 gap-3 sm:gap-4 pt-0.5">
                           {characterSuggestions.map((char) => {
