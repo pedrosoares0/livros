@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Search, ListPlus, X, BookOpen, AlertTriangle, Check, Loader2, RefreshCw } from 'lucide-react';
+import { Search, X, BookOpen, AlertTriangle, Check, Loader2, RefreshCw } from 'lucide-react';
 import confetti from 'canvas-confetti';
-import { searchBookApi, evaluateBulkList, isAmazonUrl } from '../services/evaluator';
-import { evaluateWithGemini, evaluateBulkWithGemini } from '../services/geminiEvaluator';
+import { searchBookApi, isAmazonUrl } from '../services/evaluator';
+import { evaluateWithGemini } from '../services/geminiEvaluator';
 import { prefetchBookCovers } from '../services/imagePrefetch';
 import { fetchMoviePoster } from '../services/moviePosters';
 import { BookEvaluation } from '../types';
@@ -14,7 +14,7 @@ interface EvaluateModalProps {
   isOpen: boolean;
   onClose: () => void;
   onBookEvaluated: (book: BookEvaluation) => void;
-  onBulkEvaluated: (books: BookEvaluation[]) => void;
+  onBulkEvaluated?: (books: BookEvaluation[]) => void;
   existingBooks?: BookEvaluation[];
   onOpenBook?: (book: BookEvaluation) => void;
 }
@@ -246,13 +246,10 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
   isOpen,
   onClose,
   onBookEvaluated,
-  onBulkEvaluated,
   existingBooks = [],
   onOpenBook,
 }) => {
-  const [tab, setTab] = useState<'single' | 'bulk'>('single');
   const [query, setQuery] = useState('');
-  const [bulkText, setBulkText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isFinishing, setIsFinishing] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
@@ -567,66 +564,6 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
     }
   };
 
-  const handleBulkSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!bulkText.trim()) return;
-
-    (document.activeElement as HTMLElement)?.blur();
-    setEvalError(null);
-    const lines = bulkText
-      .split(/[\n;]+/)
-      .map((l) => l.trim())
-      .filter((l) => l.length > 2);
-    setEvaluatingBook({
-      title: 'Avaliação em lote',
-      author: `${lines.length} ${lines.length === 1 ? 'livro selecionado' : 'livros na lista'}`,
-    });
-    setIsLoading(true);
-    setIsFinishing(false);
-    setLoadingStepIndex(0);
-
-    const stepInterval = setInterval(() => {
-      setLoadingStepIndex((prev) => Math.min(prev + 1, EVALUATION_STAGES.length - 1));
-    }, 1400);
-
-    try {
-      let results: BookEvaluation[];
-      try {
-        results = await evaluateBulkWithGemini(lines);
-      } catch (geminiError) {
-        console.warn('Gemini bulk call failed, falling back:', geminiError);
-        results = evaluateBulkList(bulkText);
-      }
-
-      clearInterval(stepInterval);
-      setLoadingStepIndex(EVALUATION_STAGES.length - 1);
-      setIsFinishing(true);
-      await new Promise((resolve) => setTimeout(resolve, 220));
-
-      const newOnly = results.filter((b) => !findAlreadyEvaluated(b.title));
-      if (newOnly.length === 0 && results.length > 0) {
-        const firstDup = findAlreadyEvaluated(results[0].title);
-        if (firstDup) {
-          setDuplicateWarning(firstDup);
-          setIsLoading(false);
-          setIsFinishing(false);
-          return;
-        }
-      }
-      onBulkEvaluated(newOnly.length > 0 ? newOnly : results);
-      onClose();
-    } catch (err: any) {
-      console.error('Bulk error:', err);
-      setEvalError('Falha ao avaliar a lista. Tente novamente.');
-    } finally {
-      clearInterval(stepInterval);
-      setIsLoading(false);
-      setIsFinishing(false);
-      setLoadingStepIndex(0);
-      setEvaluatingBook(null);
-    }
-  };
-
   const activeStageIndex = Math.min(loadingStepIndex, EVALUATION_STAGES.length - 1);
   const activeStage = EVALUATION_STAGES[activeStageIndex];
   const progressFraction = isFinishing
@@ -657,7 +594,7 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
         <div className="w-10 h-1 bg-neutral-300 rounded-full mx-auto mt-2.5 sm:hidden shrink-0" />
 
         {/* Minimalist Top Close Bar */}
-        <div className="flex items-center justify-end px-5 sm:px-6 md:px-8 pt-3 pb-1 sticky top-0 z-20 bg-white/95 backdrop-blur-md">
+        <div className="flex items-center justify-end px-5 sm:px-6 md:px-8 pt-2.5 pb-0.5 sticky top-0 z-20 bg-white/95 backdrop-blur-md">
           {!isLoading && (
             <button
               onClick={onClose}
@@ -669,38 +606,10 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
           )}
         </div>
 
-        {/* Mode Switcher Tabs */}
-        {!isLoading && (
-          <div className="flex p-1 mx-5 sm:mx-6 md:mx-8 mt-2.5 rounded-xl bg-neutral-100 border border-neutral-200/70 shrink-0 max-w-xs md:max-w-sm">
-            <button
-              onClick={() => setTab('single')}
-              className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition-all duration-150 flex items-center justify-center gap-1.5 select-none active:scale-[0.98] cursor-pointer ${
-                tab === 'single'
-                  ? 'bg-white text-[#1d1d1f] shadow-xs font-bold'
-                  : 'text-[#86868b] hover:text-[#1d1d1f]'
-              }`}
-            >
-              <Search className="w-3.5 h-3.5" />
-              <span>Livro Único</span>
-            </button>
-            <button
-              onClick={() => setTab('bulk')}
-              className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition-all duration-150 flex items-center justify-center gap-1.5 select-none active:scale-[0.98] cursor-pointer ${
-                tab === 'bulk'
-                  ? 'bg-white text-[#1d1d1f] shadow-xs font-bold'
-                  : 'text-[#86868b] hover:text-[#1d1d1f]'
-              }`}
-            >
-              <ListPlus className="w-3.5 h-3.5" />
-              <span>Colar Lista</span>
-            </button>
-          </div>
-        )}
-
         {/* Content Area */}
         <div
           ref={contentScrollRef}
-          className="p-5 sm:p-6 md:px-8 overflow-y-auto hide-scrollbar space-y-4 flex-1"
+          className="px-5 pt-1.5 pb-5 sm:px-6 sm:pt-2 sm:pb-6 md:px-8 overflow-y-auto hide-scrollbar space-y-4 flex-1"
         >
           {isLoading ? (
             /* Apple-Style Editorial Evaluation Stage: Pure Animated Black Typography */
@@ -822,7 +731,7 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                 </div>
               </div>
             </div>
-          ) : tab === 'single' ? (
+          ) : (
             <div className="space-y-3.5">
               {/* Duplicate Book Warning Banner */}
               <AnimatePresence>
@@ -1312,46 +1221,6 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                 </div>
               )}
             </div>
-          ) : (
-            /* Bulk Mode ("Colar Lista") */
-            <form onSubmit={handleBulkSubmit} className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <label className="text-xs font-semibold text-[#1d1d1f] block">
-                    Cole sua lista de títulos (um por linha):
-                  </label>
-                  <p className="text-[11px] text-[#86868b]">
-                    Formato recomendado: <em>Título - Autor</em> ou apenas <em>Título</em>.
-                  </p>
-                </div>
-                <span className="text-xs font-bold px-2.5 py-1 rounded-lg bg-neutral-100 text-neutral-700 border border-neutral-200 font-score">
-                  {bulkText.split(/[\n;]+/).filter((l) => l.trim().length > 2).length} livros detectados
-                </span>
-              </div>
-
-              <textarea
-                value={bulkText}
-                onChange={(e) => setBulkText(e.target.value)}
-                placeholder={"Duna - Frank Herbert\nNeuromancer - William Gibson\nFundação - Isaac Asimov\n1984 - George Orwell"}
-                rows={6}
-                className="w-full p-3.5 rounded-2xl bg-neutral-100/90 focus:bg-white border border-neutral-200/90 focus:border-neutral-900 focus:ring-2 focus:ring-black/5 text-[#1d1d1f] placeholder-[#86868b] text-[16px] sm:text-xs font-mono focus:outline-none transition-colors duration-150 resize-none leading-relaxed"
-              />
-
-              <div className="flex items-center justify-between pt-1">
-                <span className="hidden md:inline text-[11px] text-[#86868b]">
-                  Cada livro receberá Nota Técnica, Nota de Encaixe e Veredito Crítico.
-                </span>
-                <AceternityButton
-                  type="submit"
-                  variant="primary"
-                  size="md"
-                  disabled={!bulkText.trim()}
-                  className="font-bold text-xs"
-                >
-                  Avaliar Lista em Lote
-                </AceternityButton>
-              </div>
-            </form>
           )}
         </div>
       </motion.div>
