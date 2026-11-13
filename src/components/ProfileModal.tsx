@@ -24,9 +24,13 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) =
   ];
 
   const favoriteCharacters = [
-    'Viktor (Arcane)', 'Ultron', 'Anakin Skywalker', 'Thanos',
+    'Viktor (Arcane)', 'Ekko (Arcane)', 'Ultron', 'Thanos', 'Tony Stark',
+    'Visão (Marvel)', 'Loki', 'Bruce Wayne', 'O Coringa', 'Sherlock Holmes',
+    'Cooper, Dra. Brand & Murph (Interestelar)', 'Anakin Skywalker',
+    'Harry Potter, Sirius Black & Snape', 'Abby & Ellie (TLOU Jogo)',
     'Carmy & Richie (The Bear)', 'K (Blade Runner 2049)', 'César (Planeta dos Macacos)',
-    'Loki', 'Michael Corleone', 'Abby & Ellie (TLOU Jogo)', 'Vegeta', 'Logan'
+    'Michael Corleone', 'Juiz Holden', 'Katniss Everdeen', 'Sebastian (La La Land)',
+    'Tai Lung', 'Jack (Senhor das Moscas)', 'Vegeta', 'Logan'
   ];
 
   return (

@@ -46,15 +46,15 @@ const EVALUATION_STAGES = [
 const STEP_INTERVAL_MS = 1450;
 const FINISH_HOLD_MS = 260;
 
-// Rotação automática de 4 sugestões inéditas a cada 6 horas
+// Rotação automática de 4 sugestões inéditas a cada 6 horas (livros) e a cada 1 hora (personagens)
 const SUGGESTIONS_ROTATION_MS = 6 * 60 * 60 * 1000;
+const CHARACTERS_ROTATION_MS = 1 * 60 * 60 * 1000;
 const SUGGESTIONS_STORAGE_KEY = 'veredito_modal_suggestions_v1';
-const CHARACTERS_STORAGE_KEY = 'veredito_modal_characters_v1';
+const CHARACTERS_STORAGE_KEY = 'veredito_modal_characters_v2';
 
 import { POPULAR_SUGGESTIONS_POOL } from '../data/suggestionBooks';
 import {
   CHARACTER_POOL,
-  DEFAULT_CHARACTER_IDS,
   getCharacterBooks,
   buildEvaluatedTitleSet,
   type CharacterReading,
@@ -71,7 +71,7 @@ function getOrRotateCharacters(): CharacterReading[] {
       const parsed = JSON.parse(raw) as { ids?: string[]; timestamp?: number };
       if (Array.isArray(parsed.ids) && typeof parsed.timestamp === 'number') {
         prevIds = parsed.ids;
-        const isExpired = now - parsed.timestamp >= SUGGESTIONS_ROTATION_MS;
+        const isExpired = now - parsed.timestamp >= CHARACTERS_ROTATION_MS;
         if (!isExpired) {
           const validSaved = parsed.ids
             .map((id) => poolById.get(id))
@@ -80,21 +80,6 @@ function getOrRotateCharacters(): CharacterReading[] {
             return validSaved;
           }
         }
-      }
-    } else {
-      // Primeira janela de 6h: inicia com os 4 personagens padrão
-      const initialChars = DEFAULT_CHARACTER_IDS.map((id) => poolById.get(id)).filter(
-        (c): c is CharacterReading => Boolean(c)
-      );
-      if (initialChars.length === 4) {
-        localStorage.setItem(
-          CHARACTERS_STORAGE_KEY,
-          JSON.stringify({
-            ids: initialChars.map((c) => c.id),
-            timestamp: now,
-          })
-        );
-        return initialChars;
       }
     }
   } catch {
