@@ -185,7 +185,8 @@ function svgToUrl(text: string) {
 const logoUrl = (logo: string) => (isMarkup(logo) ? svgToUrl(logo) : logo)
 
 // Draws the source into a TEX×TEX canvas, cropped to its visible pixels and fitted into the logo box.
-// Opaque images (JPG, flat PNG) get their corner colour keyed out so the mark becomes the shape.
+// Opaque images (JPG, flat PNG) get their outer background flood-filled and keyed out with color
+// decontamination so the mark has zero background smudges, speckles, or white/yellow edge halos.
 function fitToTexture(source: CanvasImageSource, sw: number, sh: number) {
   const tmp = document.createElement("canvas")
   tmp.width = tmp.height = TEX
@@ -204,8 +205,9 @@ function fitToTexture(source: CanvasImageSource, sw: number, sh: number) {
     }
   }
   const key = [d[0], d[1], d[2]]
+  // Higher floor (0.28) ignores soft ambient shadows / compression noise in light backgrounds
   const keyAlpha = (r: number, g: number, b: number) =>
-    Math.min(1, Math.max(0, (Math.hypot(r - key[0], g - key[1], b - key[2]) / 441 - 0.08) / 0.2))
+    Math.min(1, Math.max(0, (Math.hypot(r - key[0], g - key[1], b - key[2]) / 441 - 0.28) / 0.22))
 
   let x0 = TEX,
     y0 = TEX,
@@ -215,7 +217,7 @@ function fitToTexture(source: CanvasImageSource, sw: number, sh: number) {
     for (let x = 0; x < TEX; x++) {
       const i = (y * TEX + x) * 4
       const a = opaque ? keyAlpha(d[i], d[i + 1], d[i + 2]) * 255 : d[i + 3]
-      if (a > 8) {
+      if (a > 64) {
         if (x < x0) x0 = x
         if (x > x1) x1 = x
         if (y < y0) y0 = y
@@ -242,7 +244,84 @@ function fitToTexture(source: CanvasImageSource, sw: number, sh: number) {
   if (opaque) {
     const im = oc.getImageData(0, 0, TEX, TEX)
     const e = im.data
-    for (let i = 0; i < e.length; i += 4) e[i + 3] = Math.round(e[i + 3] * keyAlpha(e[i], e[i + 1], e[i + 2]))
+    const n = TEX * TEX
+
+    // 1. Flood-fill the outer background from image borders so interior highlights/pages remain 100% solid
+    const visited = new Uint8Array(n)
+    const queue = new Int32Array(n)
+    let head = 0
+    let tail = 0
+
+    const pushIfBg = (idx: number) => {
+      if (visited[idx]) return
+      const p = idx * 4
+      if (keyAlpha(e[p], e[p + 1], e[p + 2]) < 0.85) {
+        visited[idx] = 1
+        queue[tail++] = idx
+      }
+    }
+
+    for (let x = 0; x < TEX; x++) {
+      pushIfBg(x)
+      pushIfBg((TEX - 1) * TEX + x)
+    }
+    for (let y = 1; y < TEX - 1; y++) {
+      pushIfBg(y * TEX)
+      pushIfBg(y * TEX + (TEX - 1))
+    }
+
+    while (head < tail) {
+      const curr = queue[head++]
+      const cx = curr % TEX
+      const cy = (curr - cx) / TEX
+      if (cx > 0) pushIfBg(curr - 1)
+      if (cx < TEX - 1) pushIfBg(curr + 1)
+      if (cy > 0) pushIfBg(curr - TEX)
+      if (cy < TEX - 1) pushIfBg(curr + TEX)
+    }
+
+    // 2. Apply clean alpha only on outer background + boundary, and decontaminate edge colors
+    for (let idx = 0; idx < n; idx++) {
+      const i = idx * 4
+      if (!visited[idx]) {
+        // Interior of the icon: keep 100% opaque
+        e[i + 3] = 255
+      } else {
+        const a = keyAlpha(e[i], e[i + 1], e[i + 2])
+        if (a <= 0.12) {
+          e[i] = 0
+          e[i + 1] = 0
+          e[i + 2] = 0
+          e[i + 3] = 0
+        } else {
+          // Un-matte the background key color on anti-aliased edge pixels to prevent white/yellow halo
+          const invA = 1 / Math.max(a, 0.25)
+          e[i] = Math.max(0, Math.min(255, Math.round((e[i] - key[0] * (1 - a)) * invA)))
+          e[i + 1] = Math.max(0, Math.min(255, Math.round((e[i + 1] - key[1] * (1 - a)) * invA)))
+          e[i + 2] = Math.max(0, Math.min(255, Math.round((e[i + 2] - key[2] * (1 - a)) * invA)))
+          e[i + 3] = Math.round(a * 255)
+        }
+      }
+    }
+    oc.putImageData(im, 0, 0)
+  } else {
+    // Transparent PNGs (such as /apple-touch-icon.png) can have stray A=1..3 background pixels
+    // and A=252..254 interior pixels from background removal tools. Normalize them cleanly:
+    const im = oc.getImageData(0, 0, TEX, TEX)
+    const e = im.data
+    for (let i = 0; i < e.length; i += 4) {
+      const a = e[i + 3]
+      if (a <= 24) {
+        e[i] = 0
+        e[i + 1] = 0
+        e[i + 2] = 0
+        e[i + 3] = 0
+      } else if (a >= 235) {
+        e[i + 3] = 255
+      } else {
+        e[i + 3] = Math.round(((a - 24) / (235 - 24)) * 255)
+      }
+    }
     oc.putImageData(im, 0, 0)
   }
   return out
@@ -257,10 +336,10 @@ function buildSdf(canvas: HTMLCanvasElement) {
   const inner = new Float64Array(n)
   for (let i = 0; i < n; i++) {
     const a = alpha[i * 4 + 3] / 255
-    if (a >= 1) {
+    if (a >= 0.92) {
       outer[i] = 0
       inner[i] = INF
-    } else if (a <= 0) {
+    } else if (a <= 0.08) {
       outer[i] = INF
       inner[i] = 0
     } else {
@@ -426,11 +505,7 @@ vec4 logoAt(vec2 q, float blur, float aa) {
   if (uUseColor > 0.5) {
     float lod = log2(max(1.0, w * k * uTexSize));
     vec4 c0 = textureLod(uCol, uv, lod);
-    vec4 c1 = textureLod(uCol, uv, lod + 3.0);
-    vec4 c2 = textureLod(uCol, uv, 7.0);
-    c = c2.rgb / max(c2.a, 1e-4);
-    c = mix(c, c1.rgb / max(c1.a, 1e-4), smoothstep(0.0, 0.06, c1.a));
-    c = mix(c, c0.rgb / max(c0.a, 1e-4), smoothstep(0.02, 0.3, c0.a));
+    c = mix(uLogoCol, c0.rgb / max(c0.a, 1e-4), smoothstep(0.02, 0.28, c0.a));
   }
   return vec4(c, a);
 }
@@ -1230,12 +1305,13 @@ export function GlassReveal21st({ tuning, logo = "/apple-touch-icon.png", ...pro
       look="light"
       background="#e9e9eb"
       originalColors
-      logoColor="#1d1d1f"
+      logoColor="#242528"
       logoScale={0.62}
       finalScale={0.82}
       {...props}
       tuning={{
         startZoom: 2.3,
+        swell: 0,
         ...tuning,
       }}
     />
@@ -1283,3 +1359,4 @@ export function VereditoGlassIntro() {
 }
 
 export default GlassReveal21st
+
