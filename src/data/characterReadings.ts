@@ -305,7 +305,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Rocco',
     year: 2008,
     pages: 400,
-    coverUrl: amz('655532144X'),
+    coverUrl: amz('8579800242'),
     genres: ['Distopia', 'Sobrevivência', 'Ficção Científica'],
     resumo:
       'Nas ruínas da América do Norte, Katniss Everdeen se oferece no lugar da irmã para lutar até a morte em um massacre televisionado pela Capital — e vira a centelha de uma rebelião.',
@@ -317,7 +317,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Rocco',
     year: 1985,
     pages: 368,
-    coverUrl: amz('6555320982'),
+    coverUrl: amz('8532520669'),
     genres: ['Distopia', 'Drama Político'],
     resumo:
       'Na teocracia totalitária de Gilead, onde mulheres férteis são reduzidas a propriedade estatal, Offred registra em segredo sua resistência silenciosa para não perder o próprio nome.',
@@ -742,6 +742,90 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     resumo:
       'Em uma Guerra Fria alternativa à beira do apocalipse nuclear, o assassinato do Comediante expõe vigilantes quebrados, um semideus indiferente e um plano genocida para salvar o mundo.',
   },
+  {
+    id: 'br-rei-lear',
+    title: 'Rei Lear',
+    author: 'William Shakespeare',
+    publisher: 'Penguin-Companhia',
+    year: 1606,
+    pages: 288,
+    coverUrl: amz('8582851111'),
+    genres: ['Teatro', 'Tragédia', 'Clássico'],
+    resumo:
+      'Ao dividir o reino entre as filhas que mais o bajulam e deserdar a única que o ama com verdade, o velho rei Lear desencadeia uma guerra de ambição, ingratidão filial e loucura.',
+  },
+  {
+    id: 'br-fim-eternidade',
+    title: 'O Fim da Eternidade',
+    author: 'Isaac Asimov',
+    publisher: 'Aleph',
+    year: 1955,
+    pages: 288,
+    coverUrl: amz('8576574225'),
+    genres: ['Ficção Científica', 'Viagem no Tempo', 'Clássico'],
+    resumo:
+      'O técnico Andrew Harlan pertence à Eternidade, uma casta que altera os séculos para evitar catástrofes — até se apaixonar e perceber que a segurança absoluta está matando o futuro humano.',
+  },
+  {
+    id: 'br-homem-castelo-alto',
+    title: 'O Homem do Castelo Alto',
+    author: 'Philip K. Dick',
+    publisher: 'Aleph',
+    year: 1962,
+    pages: 304,
+    coverUrl: amz('8576574411'),
+    genres: ['Ficção Científica', 'Ucronia', 'Distopia Política'],
+    resumo:
+      'Em um 1962 alternativo em que a Alemanha nazista e o Império Japonês venceram a Segunda Guerra Mundial, um romance proibido circula pelas Américas ocupadas descrevendo um mundo onde o Eixo foi derrotado.',
+  },
+  {
+    id: 'br-tropas-estelares',
+    title: 'Tropas Estelares',
+    author: 'Robert A. Heinlein',
+    publisher: 'Aleph',
+    year: 1959,
+    pages: 368,
+    coverUrl: amz('8576574926'),
+    genres: ['Ficção Científica', 'Militar', 'Clássico'],
+    resumo:
+      'Da brutalidade do campo de treinamento de recrutas à guerra interestelar contra os Aracnídeos, Juan Rico é forjado pela disciplina marcial e pela filosofia implacável da Infantaria Móvel.',
+  },
+  {
+    id: 'br-caixa-passaros',
+    title: 'Caixa de Pássaros',
+    author: 'Josh Malerman',
+    publisher: 'Intrínseca',
+    year: 2014,
+    pages: 272,
+    coverUrl: amz('8580576539'),
+    genres: ['Pós-Apocalíptico', 'Suspense', 'Terror'],
+    resumo:
+      'Em um mundo onde um simples vislumbre de criaturas desconhecidas leva qualquer pessoa à violência suicida, Malorie precisa conduzir duas crianças vendadas por um rio em meio à neblina.',
+  },
+  {
+    id: 'br-o-iluminado',
+    title: 'O Iluminado',
+    author: 'Stephen King',
+    publisher: 'Suma',
+    year: 1977,
+    pages: 520,
+    coverUrl: amz('8581050484'),
+    genres: ['Terror Psicológico', 'Suspense', 'Drama Familiar'],
+    resumo:
+      'Contratado como zelador de inverno do isolado Hotel Overlook nas montanhas do Colorado, o escritor Jack Torrance vê seus próprios demônios serem alimentados pelas forças malignas do lugar.',
+  },
+  {
+    id: 'br-misery',
+    title: 'Misery',
+    author: 'Stephen King',
+    publisher: 'Suma',
+    year: 1987,
+    pages: 328,
+    coverUrl: amz('8581052142'),
+    genres: ['Thriller Psicológico', 'Suspense', 'Obsessão'],
+    resumo:
+      'Após sofrer um grave acidente na neve, o romancista Paul Sheldon é resgatado por Annie Wilkes — sua "fã número um" — que o mantém em cativeiro e o obriga sob tortura a reescrever sua obra.',
+  },
 ];
 
 const BOOKS_BY_ID = new Map<string, Partial<BookEvaluation>>(
@@ -808,18 +892,17 @@ export const CHARACTER_POOL: CharacterReading[] = [
     name: 'Tai Lung',
     source: 'Kung Fu Panda',
     imageUrl: 'https://i.pinimg.com/736x/a1/37/66/a137666a3d0f60df80bc1af2860082be.jpg',
-    thread: 'Prodígios criados para um destino que lhes foi negado.',
+    thread: 'Discípulos moldados no limite da disciplina que se rebelam quando o trono prometido lhes é negado.',
     bookIds: [
-      'br-frankenstein',
-      'br-morro-ventos-uivantes',
+      'br-arte-da-guerra',
+      'br-tropas-estelares',
       'br-paraiso-perdido',
       'br-conde-monte-cristo',
-      'br-memorias-subsolo',
+      'br-rei-lear',
+      'br-frankenstein',
       'br-moby-dick',
       'br-otelo',
-      'br-hamlet',
-      'br-arte-da-guerra',
-      'br-dorian-gray',
+      'br-memorias-subsolo',
     ],
   },
   {
@@ -866,13 +949,13 @@ export const CHARACTER_POOL: CharacterReading[] = [
     imageUrl: 'https://i.pinimg.com/736x/1e/88/0b/1e880bd2211b98dd20749402669f1571.jpg',
     thread: 'Rebeldes da periferia que desafiam o próprio tempo para proteger sua comunidade.',
     bookIds: [
+      'br-fim-eternidade',
       'br-maquina-do-tempo',
       'br-recursao',
       'br-neuromancer',
       'br-jogos-vorazes',
       'br-materia-escura',
       'br-fahrenheit-451',
-      'br-planeta-macacos',
       'br-1984',
     ],
   },
@@ -938,13 +1021,13 @@ export const CHARACTER_POOL: CharacterReading[] = [
     thread: 'Sobreviventes da perseguição que juraram nunca mais dobrar os joelhos aos seus carrascos.',
     bookIds: [
       'br-maus',
+      'br-homem-castelo-alto',
       'br-planeta-macacos',
       'br-revolucao-bichos',
       'br-watchmen',
       'br-duna',
       'br-conde-monte-cristo',
       'br-o-principe',
-      'br-paraiso-perdido',
       'br-1984',
     ],
   },
@@ -959,10 +1042,10 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-deuses-americanos',
       'br-mestre-margarida',
       'br-ricardo-iii',
+      'br-rei-lear',
       'br-paraiso-perdido',
       'br-hamlet',
       'br-dorian-gray',
-      'br-mochileiro-galaxias',
       'br-otelo',
     ],
   },
@@ -1031,11 +1114,11 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-perdido-em-marte',
       'br-2001-odisseia',
       'br-contato',
+      'br-fim-eternidade',
       'br-a-estrada',
       'br-maquina-do-tempo',
       'br-materia-escura',
       'br-solaris',
-      'br-fim-da-infancia',
     ],
   },
   {
@@ -1065,12 +1148,12 @@ export const CHARACTER_POOL: CharacterReading[] = [
     bookIds: [
       'br-contato',
       'br-tres-corpos',
+      'br-fim-eternidade',
       'br-recursao',
       'br-floresta-sombria',
       'br-fundacao',
       'br-materia-escura',
       'br-devoradores-estrelas',
-      'br-gambito-rainha',
       'br-2001-odisseia',
     ],
   },
@@ -1134,13 +1217,13 @@ export const CHARACTER_POOL: CharacterReading[] = [
     thread: 'Soldados que descobrem o vazio da vingança consumada e buscam redenção no inimigo.',
     bookIds: [
       'br-conde-monte-cristo',
-      'br-moby-dick',
-      'br-a-estrada',
-      'br-eu-sou-a-lenda',
-      'br-ensaio-cegueira',
       'br-onde-os-velhos',
+      'br-a-estrada',
+      'br-tropas-estelares',
+      'br-eu-sou-a-lenda',
+      'br-moby-dick',
+      'br-ensaio-cegueira',
       'br-crime-e-castigo',
-      'br-hamlet',
     ],
   },
   {
@@ -1151,14 +1234,14 @@ export const CHARACTER_POOL: CharacterReading[] = [
     thread: 'O luto que vira caçada implacável em um mundo em ruínas até não restar mais nada.',
     bookIds: [
       'br-a-estrada',
-      'br-morro-ventos-uivantes',
-      'br-ensaio-cegueira',
-      'br-aniquilacao',
-      'br-onde-os-velhos',
       'br-eu-sou-a-lenda',
-      'br-moby-dick',
+      'br-caixa-passaros',
+      'br-ensaio-cegueira',
+      'br-onde-os-velhos',
+      'br-aniquilacao',
       'br-jogos-vorazes',
       'br-o-cemiterio',
+      'br-moby-dick',
     ],
   },
   {
@@ -1169,12 +1252,12 @@ export const CHARACTER_POOL: CharacterReading[] = [
     thread: 'Pais endurecidos pela perda que condenariam a humanidade inteira para salvar uma filha.',
     bookIds: [
       'br-a-estrada',
+      'br-caixa-passaros',
       'br-o-cemiterio',
-      'br-ensaio-cegueira',
       'br-eu-sou-a-lenda',
+      'br-ensaio-cegueira',
       'br-onde-os-velhos',
-      'br-flores-algernon',
-      'br-irmaos-karamazov',
+      'br-rei-lear',
       'br-crime-e-castigo',
     ],
   },
@@ -1187,9 +1270,9 @@ export const CHARACTER_POOL: CharacterReading[] = [
     bookIds: [
       'br-duna',
       'br-paraiso-perdido',
+      'br-o-iluminado',
       'br-o-cemiterio',
-      'br-dorian-gray',
-      'br-morro-ventos-uivantes',
+      'br-rei-lear',
       'br-otelo',
       'br-duas-torres',
       'br-ricardo-iii',
@@ -1205,13 +1288,13 @@ export const CHARACTER_POOL: CharacterReading[] = [
     bookIds: [
       'br-o-principe',
       'br-ricardo-iii',
+      'br-rei-lear',
       'br-irmaos-karamazov',
       'br-conde-monte-cristo',
       'br-cem-anos-solidao',
       'br-arte-da-guerra',
       'br-hamlet',
       'br-crime-e-castigo',
-      'br-otelo',
     ],
   },
   {
@@ -1239,15 +1322,14 @@ export const CHARACTER_POOL: CharacterReading[] = [
     imageUrl: 'https://i.pinimg.com/1200x/8a/09/32/8a09323564fd6a88025b1e4a20334911.jpg',
     thread: 'Perfeccionismo febril, luto familiar engolido a seco e a angústia de nunca bastar.',
     bookIds: [
+      'br-o-iluminado',
+      'br-gambito-rainha',
       'br-apanhador-centeio',
       'br-a-metamorfose',
-      'br-gambito-rainha',
       'br-um-jogador',
       'br-memorias-subsolo',
       'br-norwegian-wood',
       'br-o-processo',
-      'br-o-estrangeiro',
-      'br-irmaos-karamazov',
     ],
   },
   {
@@ -1278,11 +1360,11 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-a-estrada',
       'br-onde-os-velhos',
       'br-eu-sou-a-lenda',
+      'br-caixa-passaros',
       'br-frankenstein',
       'br-o-cemiterio',
       'br-ensaio-cegueira',
       'br-coracao-trevas',
-      'br-o-estrangeiro',
     ],
   },
   {
@@ -1331,10 +1413,10 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-conto-da-aia',
       'br-1984',
       'br-revolucao-bichos',
+      'br-homem-castelo-alto',
       'br-senhor-das-moscas',
       'br-admiravel-mundo-novo',
       'br-floresta-nome-mundo',
-      'br-duna',
       'br-fahrenheit-451',
     ],
   },
@@ -1346,12 +1428,12 @@ export const CHARACTER_POOL: CharacterReading[] = [
     thread: 'A fúria do príncipe guerreiro que precisa vencer a própria soberba para superar seus limites.',
     bookIds: [
       'br-arte-da-guerra',
+      'br-tropas-estelares',
       'br-moby-dick',
       'br-paraiso-perdido',
       'br-conde-monte-cristo',
       'br-duna',
-      'br-otelo',
-      'br-morro-ventos-uivantes',
+      'br-rei-lear',
       'br-ricardo-iii',
     ],
   },
@@ -1363,14 +1445,14 @@ export const CHARACTER_POOL: CharacterReading[] = [
     thread: 'A obsessão implacável pela grandeza artística que sangra as mãos e destrói o resto da vida.',
     bookIds: [
       'br-gambito-rainha',
-      'br-o-perfume',
       'br-um-jogador',
-      'br-dorian-gray',
+      'br-misery',
+      'br-o-iluminado',
+      'br-o-perfume',
       'br-moby-dick',
+      'br-dorian-gray',
       'br-crime-e-castigo',
       'br-memorias-subsolo',
-      'br-apanhador-centeio',
-      'br-a-metamorfose',
     ],
   },
   {
@@ -1513,9 +1595,18 @@ export function getCharacterBooks(
 
 export function buildEvaluatedTitleSet(existing: { title: string; originalTitle?: string }[]): Set<string> {
   const set = new Set<string>();
+  const addVariants = (raw?: string) => {
+    if (!raw) return;
+    const full = normalize(raw);
+    if (full) set.add(full);
+    if (raw.includes(':')) {
+      const mainPart = normalize(raw.split(':')[0]);
+      if (mainPart.length >= 4) set.add(mainPart);
+    }
+  };
   for (const b of existing) {
-    if (b.title) set.add(normalize(b.title));
-    if (b.originalTitle) set.add(normalize(b.originalTitle));
+    addVariants(b.title);
+    addVariants(b.originalTitle);
   }
   return set;
 }

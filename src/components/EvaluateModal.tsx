@@ -49,8 +49,8 @@ const FINISH_HOLD_MS = 260;
 // Rotação automática de 4 sugestões inéditas a cada 6 horas (livros) e a cada 1 hora (personagens)
 const SUGGESTIONS_ROTATION_MS = 6 * 60 * 60 * 1000;
 const CHARACTERS_ROTATION_MS = 1 * 60 * 60 * 1000;
-const SUGGESTIONS_STORAGE_KEY = 'veredito_modal_suggestions_v1';
-const CHARACTERS_STORAGE_KEY = 'veredito_modal_characters_v4';
+const SUGGESTIONS_STORAGE_KEY = 'veredito_modal_suggestions_v2';
+const CHARACTERS_STORAGE_KEY = 'veredito_modal_characters_v5';
 
 import { POPULAR_SUGGESTIONS_POOL } from '../data/suggestionBooks';
 import {
@@ -175,9 +175,7 @@ function pickRandomFour(
 }
 
 function getOrRotateSuggestions(existingBooks: BookEvaluation[]): Partial<BookEvaluation>[] {
-  const evaluatedTitles = new Set(
-    existingBooks.map((b) => normalizeForMatch(b.title)).filter(Boolean)
-  );
+  const evaluatedTitles = buildEvaluatedTitleSet(existingBooks);
   const availablePool = POPULAR_SUGGESTIONS_POOL.filter(
     (b) => !evaluatedTitles.has(normalizeForMatch(b.title || ''))
   );
@@ -276,6 +274,7 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
   const searchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const searchAbortRef = useRef<AbortController | null>(null);
   const searchSeqRef = useRef(0);
+  const contentScrollRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const current = getOrRotateSuggestions(existingBooks);
@@ -352,14 +351,20 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
     if (!existingBooks || existingBooks.length === 0) return null;
     const normTarget = normalizeText(targetTitle);
     if (!normTarget || normTarget.length < 3) return null;
+    const mainTarget = targetTitle.includes(':')
+      ? normalizeText(targetTitle.split(':')[0])
+      : normTarget;
 
     return (
       existingBooks.find((b) => {
         const normTitle = normalizeText(b.title);
         if (normTitle === normTarget) return true;
         if (b.originalTitle && normalizeText(b.originalTitle) === normTarget) return true;
-        if (normTarget.length >= 4 && normTitle.length >= 4) {
-          if (normTitle.includes(normTarget) || normTarget.includes(normTitle)) return true;
+        if (b.title.includes(':') || targetTitle.includes(':')) {
+          const mainTitle = normalizeText(b.title.split(':')[0]);
+          if (mainTitle.length >= 4 && mainTarget.length >= 4 && mainTitle === mainTarget) {
+            return true;
+          }
         }
         return false;
       }) || null
@@ -488,6 +493,7 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
     (document.activeElement as HTMLElement)?.blur();
     searchAbortRef.current?.abort();
     setEvalError(null);
+    contentScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
 
     const existing = findAlreadyEvaluated(rawBook.title || query);
     if (existing) {
@@ -679,7 +685,10 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
         )}
 
         {/* Content Area */}
-        <div className="p-5 sm:p-6 md:px-8 overflow-y-auto hide-scrollbar space-y-4 flex-1">
+        <div
+          ref={contentScrollRef}
+          className="p-5 sm:p-6 md:px-8 overflow-y-auto hide-scrollbar space-y-4 flex-1"
+        >
           {isLoading ? (
             /* Apple-Style Editorial Evaluation Stage: Pure Animated Black Typography */
             <div className="py-3 sm:py-5 md:py-7 select-none">
@@ -1067,10 +1076,11 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                     </span>
                     <div className="grid grid-cols-4 gap-3 sm:gap-4 pt-0.5">
                       {popularSuggestions.map((book) => (
-                        <div
+                        <button
                           key={book.id || book.title}
+                          type="button"
                           onClick={() => handleRequestEvaluation(book)}
-                          className="flex flex-col cursor-pointer group active:scale-[0.97] transition-transform duration-200 select-none"
+                          className="flex flex-col text-left cursor-pointer group active:scale-[0.97] transition-transform duration-200 select-none w-full"
                         >
                           <div className="w-full mb-2 transition-transform duration-200 group-hover:-translate-y-1">
                             <BookCover
@@ -1079,7 +1089,7 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                               coverUrl={book.coverUrl}
                             />
                           </div>
-                          <div className="space-y-0.5 px-0.5">
+                          <div className="space-y-0.5 px-0.5 w-full">
                             <h4 className="text-[11px] sm:text-xs font-semibold text-[#1d1d1f] truncate group-hover:text-black leading-snug tracking-tight">
                               {book.title}
                             </h4>
@@ -1087,7 +1097,7 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                               {book.author}
                             </p>
                           </div>
-                        </div>
+                        </button>
                       ))}
                     </div>
                   </div>
@@ -1209,10 +1219,11 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
 
                               <div className="grid grid-cols-4 gap-3 sm:gap-4 pt-0.5">
                                 {activeCharacterBooks.map((book) => (
-                                  <div
+                                  <button
                                     key={`${activeCharacter.id}-${book.id || book.title}`}
+                                    type="button"
                                     onClick={() => handleRequestEvaluation(book)}
-                                    className="flex flex-col cursor-pointer group active:scale-[0.97] transition-transform duration-200 select-none"
+                                    className="flex flex-col text-left cursor-pointer group active:scale-[0.97] transition-transform duration-200 select-none w-full"
                                   >
                                     <div className="w-full mb-2 transition-transform duration-200 group-hover:-translate-y-1">
                                       <BookCover
@@ -1221,7 +1232,7 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                                         coverUrl={book.coverUrl}
                                       />
                                     </div>
-                                    <div className="space-y-0.5 px-0.5">
+                                    <div className="space-y-0.5 px-0.5 w-full">
                                       <h4 className="text-[11px] sm:text-xs font-semibold text-[#1d1d1f] truncate group-hover:text-black leading-snug tracking-tight">
                                         {book.title}
                                       </h4>
@@ -1229,7 +1240,7 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                                         {book.author}
                                       </p>
                                     </div>
-                                  </div>
+                                  </button>
                                 ))}
                               </div>
                             </motion.div>

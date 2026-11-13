@@ -121,7 +121,7 @@ export const POPULAR_SUGGESTIONS_POOL: Partial<BookEvaluation>[] = [
     publisher: 'Aleph',
     year: 1953,
     pages: 304,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8576570548.01.LZZZZZZZ.jpg',
+    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8576574578.01.LZZZZZZZ.jpg',
     genres: ['Ficção Científica', 'Filosófico'],
     resumo:
       'Naves colossais pairam sobre as metrópoles da Terra. Os Senhores Supremos extinguem a guerra e a pobreza, mas o verdadeiro propósito de sua tutela pacífica guarda um destino melancólico para a humanidade.',
@@ -145,7 +145,7 @@ export const POPULAR_SUGGESTIONS_POOL: Partial<BookEvaluation>[] = [
     publisher: 'Companhia das Letras',
     year: 1915,
     pages: 96,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8535900977.01.LZZZZZZZ.jpg',
+    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8571646856.01.LZZZZZZZ.jpg',
     genres: ['Clássico', 'Fábula Sombria', 'Drama Psicológico'],
     resumo:
       'Gregor Samsa desperta certa manhã transformado em um inseto monstruoso. Confinado no quarto, assiste à deterioração do afeto da própria família à medida que deixa de ser o provedor da casa.',
@@ -154,10 +154,10 @@ export const POPULAR_SUGGESTIONS_POOL: Partial<BookEvaluation>[] = [
     id: 'br-frankenstein',
     title: 'Frankenstein',
     author: 'Mary Shelley',
-    publisher: 'DarkSide',
+    publisher: 'Penguin-Companhia',
     year: 1818,
     pages: 304,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8594540183.01.LZZZZZZZ.jpg',
+    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8582850190.01.LZZZZZZZ.jpg',
     genres: ['Clássico Gótico', 'Ficção Científica', 'Tragédia Moral'],
     resumo:
       'Obcecado em vencer a morte, o jovem cientista Victor Frankenstein dá vida a uma criatura consciente, mas a abandona horrorizado, desencadeando um ciclo trágico de rejeição e vingança.',
@@ -169,7 +169,7 @@ export const POPULAR_SUGGESTIONS_POOL: Partial<BookEvaluation>[] = [
     publisher: 'Intrínseca',
     year: 2016,
     pages: 352,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8551001507.01.LZZZZZZZ.jpg',
+    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/655560655X.01.LZZZZZZZ.jpg',
     genres: ['Ficção Científica', 'Thriller'],
     resumo:
       'Jason Dessen é sequestrado e acorda em uma realidade alternativa onde nunca se casou e se tornou um físico genial que construiu uma caixa capaz de atravessar o multiverso.',
@@ -193,7 +193,7 @@ export const POPULAR_SUGGESTIONS_POOL: Partial<BookEvaluation>[] = [
     publisher: 'Suma',
     year: 2021,
     pages: 480,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/6555602244.01.LZZZZZZZ.jpg',
+    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/855651121X.01.LZZZZZZZ.jpg',
     genres: ['Ficção Científica', 'Hard Sci-Fi', 'Sobrevivência'],
     resumo:
       'Ryland Grace é o único sobrevivente em uma missão interestelar desesperada para salvar a Terra da extinção solar — mas acorda do coma sem lembrar o próprio nome ou o que precisa fazer.',
@@ -205,7 +205,7 @@ export const POPULAR_SUGGESTIONS_POOL: Partial<BookEvaluation>[] = [
     publisher: 'Arqueiro',
     year: 2011,
     pages: 368,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8580413001.01.LZZZZZZZ.jpg',
+    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8580414482.01.LZZZZZZZ.jpg',
     genres: ['Ficção Científica', 'Sobrevivência'],
     resumo:
       'Dado como morto após uma tempestade de areia devastadora, o astronauta Mark Watney fica sozinho em Marte e precisa usar engenharia, botânica e sangue-frio para sobreviver.',
@@ -229,7 +229,7 @@ export const POPULAR_SUGGESTIONS_POOL: Partial<BookEvaluation>[] = [
     publisher: 'Penguin-Companhia',
     year: 1899,
     pages: 208,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8563560859.01.LZZZZZZZ.jpg',
+    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8582850352.01.LZZZZZZZ.jpg',
     genres: ['Clássico Brasileiro', 'Drama Psicológico'],
     resumo:
       'Bento Santiago narra, na velhice e sob o peso de um ciúme corrosivo, sua história de amor com Capitu e sua suspeita obsessiva de traição com seu melhor amigo Escobar.',
@@ -241,7 +241,7 @@ export const POPULAR_SUGGESTIONS_POOL: Partial<BookEvaluation>[] = [
     publisher: 'Penguin-Companhia',
     year: 1881,
     pages: 192,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8563560832.01.LZZZZZZZ.jpg',
+    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8582850018.01.LZZZZZZZ.jpg',
     genres: ['Clássico Brasileiro', 'Sátira Filosófica'],
     resumo:
       'Um defunto autor decide narrar sua vida de privilégios, vaidades e frustrações do além-túmulo, dissecando a sociedade com ironia demolidora e zero hipocrisia.',
@@ -250,10 +250,10 @@ export const POPULAR_SUGGESTIONS_POOL: Partial<BookEvaluation>[] = [
     id: 'br-medico-e-monstro',
     title: 'O Médico e o Monstro',
     author: 'Robert Louis Stevenson',
-    publisher: 'DarkSide',
+    publisher: 'Penguin-Companhia',
     year: 1886,
     pages: 192,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8594540329.01.LZZZZZZZ.jpg',
+    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8582850131.01.LZZZZZZZ.jpg',
     genres: ['Clássico Gótico', 'Horror Psicológico'],
     resumo:
       'Em Londres, o advogado Utterson investiga a sinistra ligação entre seu respeitável amigo Dr. Henry Jekyll e o cruel Edward Hyde, revelando a dualidade sombria da natureza humana.',
@@ -277,7 +277,7 @@ export const POPULAR_SUGGESTIONS_POOL: Partial<BookEvaluation>[] = [
     publisher: 'Aleph',
     year: 1969,
     pages: 272,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8576574349.01.LZZZZZZZ.jpg',
+    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8576574519.01.LZZZZZZZ.jpg',
     genres: ['Ficção Científica', 'Psicológico'],
     resumo:
       'Após uma emboscada na Lua, Joe Chip e sua equipe percebem que a própria realidade ao redor está regredindo no tempo, e a única salvação parece ser um misterioso spray chamado Ubik.',
@@ -289,7 +289,7 @@ export const POPULAR_SUGGESTIONS_POOL: Partial<BookEvaluation>[] = [
     publisher: 'Aleph',
     year: 1969,
     pages: 312,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8576574365.01.LZZZZZZZ.jpg',
+    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8576574489.01.LZZZZZZZ.jpg',
     genres: ['Ficção Científica', 'Antropológico'],
     resumo:
       'Enviado ao planeta glacial Gethen para convencer seus habitantes a integrar uma aliança interplanetária, o emissário Genly Ai enfrenta intrigas políticas e uma cultura sem gênero fixo.',
