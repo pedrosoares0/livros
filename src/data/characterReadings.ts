@@ -394,6 +394,102 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     resumo:
       'Dissecação fria e realista de como conquistar, exercer e manter o poder, despindo a política de qualquer ilusão moralista.',
   },
+  {
+    id: 'br-1984',
+    title: '1984',
+    author: 'George Orwell',
+    publisher: 'Companhia das Letras',
+    year: 1949,
+    pages: 416,
+    coverUrl: amz('8535914846'),
+    genres: ['Distopia', 'Clássico', 'Ficção Política'],
+    resumo:
+      'Sob o olhar onipresente do Grande Irmão, Winston Smith trabalha reescrevendo o passado no Ministério da Verdade até ousar manter um diário e se apaixonar em segredo.',
+  },
+  {
+    id: 'br-revolucao-bichos',
+    title: 'A Revolução dos Bichos',
+    author: 'George Orwell',
+    publisher: 'Companhia das Letras',
+    year: 1945,
+    pages: 152,
+    coverUrl: amz('8535909559'),
+    genres: ['Alegoria Política', 'Clássico', 'Sátira'],
+    resumo:
+      'Os animais da Granja do Solar expulsam os humanos para criar uma sociedade igualitária, mas assistem aos porcos liderados por Napoleão converterem a utopia em tirania.',
+  },
+  {
+    id: 'br-senhor-das-moscas',
+    title: 'Senhor das Moscas',
+    author: 'William Golding',
+    publisher: 'Alfaguara',
+    year: 1954,
+    pages: 224,
+    coverUrl: amz('8556521223'),
+    genres: ['Clássico', 'Alegoria Moral', 'Drama Psicológico'],
+    resumo:
+      'Isolados numa ilha deserta após um acidente aéreo, um grupo de garotos britânicos tenta se autogovernar, mas a disputa entre Ralph e Jack rapidamente degenera em caça e barbárie.',
+  },
+  {
+    id: 'br-cavernas-aco',
+    title: 'As Cavernas de Aço',
+    author: 'Isaac Asimov',
+    publisher: 'Aleph',
+    year: 1954,
+    pages: 304,
+    coverUrl: amz('8576574535'),
+    genres: ['Ficção Científica', 'Investigação'],
+    resumo:
+      'Em uma Terra superpovoada e subterrânea, o detetive Elijah Baley é forçado a investigar um assassinato político ao lado de R. Daneel Olivaw, um robô idêntico a um ser humano.',
+  },
+  {
+    id: 'br-floresta-sombria',
+    title: 'A Floresta Sombria',
+    author: 'Cixin Liu',
+    publisher: 'Suma',
+    year: 2008,
+    pages: 472,
+    coverUrl: amz('8556510507'),
+    genres: ['Ficção Científica', 'Hard Sci-Fi', 'Estratégia Cósmica'],
+    resumo:
+      'Com a frota trissolariana a caminho da Terra e toda comunicação vigiada por sófons, a humanidade elege quatro Vallados para conceber planos secretos dentro da própria mente.',
+  },
+  {
+    id: 'br-solaris',
+    title: 'Solaris',
+    author: 'Stanisław Lem',
+    publisher: 'Aleph',
+    year: 1961,
+    pages: 272,
+    coverUrl: amz('8576573326'),
+    genres: ['Ficção Científica', 'Filosófico', 'Psicológico'],
+    resumo:
+      'O psicólogo Kris Kelvin chega a uma estação orbital sobre o planeta-oceano Solaris e descobre que aquela inteligência incompreensível materializa as memórias mais dolorosas da tripulação.',
+  },
+  {
+    id: 'br-hamlet',
+    title: 'Hamlet',
+    author: 'William Shakespeare',
+    publisher: 'Penguin-Companhia',
+    year: 1601,
+    pages: 320,
+    coverUrl: amz('858285014X'),
+    genres: ['Teatro', 'Tragédia', 'Clássico'],
+    resumo:
+      'Assombrado pelo espectro do pai assassinado, o príncipe da Dinamarca finge loucura na corte de Elsinore enquanto hesita entre a dúvida moral e a consumação da vingança.',
+  },
+  {
+    id: 'br-otelo',
+    title: 'Otelo',
+    author: 'William Shakespeare',
+    publisher: 'Penguin-Companhia',
+    year: 1604,
+    pages: 240,
+    coverUrl: amz('858285045X'),
+    genres: ['Teatro', 'Tragédia', 'Clássico'],
+    resumo:
+      'Manipulado pelas intrigas venenosas de Iago, o general mouro Otelo vê sua honra e seu amor por Desdêmona serem destruídos pela engrenagem implacável do ciúme e do ressentimento.',
+  },
 ];
 
 const BOOKS_BY_ID = new Map<string, Partial<BookEvaluation>>(
@@ -404,38 +500,62 @@ export interface CharacterReading {
   id: string;
   name: string;
   source: string;
+  /** Foto vertical (proporção capa) do personagem */
+  imageUrl?: string;
   /** O núcleo dramático do personagem: o que conecta os livros a ele */
   thread: string;
-  /** IDs em ordem de afinidade; os 4 primeiros ainda não avaliados são exibidos */
+  /**
+   * IDs em ordem de afinidade:
+   * - Os 4 primeiros são as obras-âncora do personagem;
+   * - Os demais formam o pool estendido que rotaciona 1 a 2 livros a cada aparição.
+   */
   bookIds: string[];
 }
 
 export const CHARACTER_POOL: CharacterReading[] = [
   {
+    id: 'ultron',
+    name: 'Ultron',
+    source: 'Marvel',
+    imageUrl: 'https://i.pinimg.com/736x/04/8a/2e/048a2ee796e96f8a11c5e706d72a467c.jpg',
+    thread: 'Criações que concluem que o criador é o problema.',
+    bookIds: [
+      'br-frankenstein',
+      'br-2001-odisseia',
+      'br-eu-robo',
+      'br-androides-sonham',
+      'br-neuromancer',
+      'br-cavernas-aco',
+      'br-klara-e-o-sol',
+      'br-fim-da-infancia',
+      'br-ubik',
+      'br-solaris',
+    ],
+  },
+  {
     id: 'thanos',
     name: 'Thanos',
     source: 'Marvel',
+    imageUrl: 'https://i.pinimg.com/736x/c6/c4/e4/c6c4e46289db210071f2cd424adc09c4.jpg',
     thread: 'Convictos de que a destruição é um ato de misericórdia.',
     bookIds: [
       'br-crime-e-castigo',
       'br-irmaos-karamazov',
       'br-tres-corpos',
       'br-duna',
+      'br-floresta-sombria',
       'br-admiravel-mundo-novo',
       'br-paraiso-perdido',
+      'br-o-principe',
+      'br-fim-da-infancia',
+      'br-fundacao',
     ],
-  },
-  {
-    id: 'ultron',
-    name: 'Ultron',
-    source: 'Marvel',
-    thread: 'Criações que concluem que o criador é o problema.',
-    bookIds: ['br-frankenstein', 'br-eu-robo', 'br-2001-odisseia', 'br-androides-sonham', 'br-neuromancer'],
   },
   {
     id: 'tai-lung',
     name: 'Tai Lung',
     source: 'Kung Fu Panda',
+    imageUrl: 'https://i.pinimg.com/736x/a1/37/66/a137666a3d0f60df80bc1af2860082be.jpg',
     thread: 'Prodígios rejeitados que transformam a mágoa em fúria.',
     bookIds: [
       'br-morro-ventos-uivantes',
@@ -443,28 +563,63 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-conde-monte-cristo',
       'br-paraiso-perdido',
       'br-memorias-subsolo',
+      'br-moby-dick',
+      'br-otelo',
+      'br-hamlet',
+      'br-arte-da-guerra',
+      'br-dorian-gray',
     ],
   },
   {
     id: 'jack',
     name: 'Jack',
     source: 'Senhor das Moscas',
+    imageUrl: 'https://i.pinimg.com/736x/6e/b4/4b/6eb44bf3859cbd111a530a3edd96c28a.jpg',
     thread: 'Quando a civilização cai, o poder vira instinto.',
-    bookIds: ['br-laranja-mecanica', 'br-ensaio-cegueira', 'br-ricardo-iii', 'br-medico-e-monstro', 'br-o-perfume'],
+    bookIds: [
+      'br-senhor-das-moscas',
+      'br-laranja-mecanica',
+      'br-ensaio-cegueira',
+      'br-ricardo-iii',
+      'br-revolucao-bichos',
+      'br-medico-e-monstro',
+      'br-coracao-trevas',
+      'br-o-perfume',
+      'br-1984',
+      'br-onde-os-velhos',
+    ],
   },
   {
     id: 'viktor',
     name: 'Viktor',
     source: 'Arcane',
     thread: 'Gênios que sacrificam o próprio corpo para superar a carne.',
-    bookIds: ['br-frankenstein', 'br-medico-e-monstro', 'br-devoradores-estrelas', 'br-a-metamorfose', 'br-recursao'],
+    bookIds: [
+      'br-frankenstein',
+      'br-medico-e-monstro',
+      'br-devoradores-estrelas',
+      'br-a-metamorfose',
+      'br-recursao',
+      'br-neuromancer',
+      'br-materia-escura',
+      'br-2001-odisseia',
+    ],
   },
   {
     id: 'ekko',
     name: 'Ekko',
     source: 'Arcane',
     thread: 'Revolucionários que lutam contra o tempo para salvar quem ficou para trás.',
-    bookIds: ['br-maquina-do-tempo', 'br-recursao', 'br-neuromancer', 'br-jogos-vorazes', 'br-fahrenheit-451'],
+    bookIds: [
+      'br-maquina-do-tempo',
+      'br-recursao',
+      'br-neuromancer',
+      'br-jogos-vorazes',
+      'br-fahrenheit-451',
+      'br-materia-escura',
+      'br-1984',
+      'br-planeta-macacos',
+    ],
   },
   {
     id: 'anakin',
@@ -477,6 +632,9 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-paraiso-perdido',
       'br-morro-ventos-uivantes',
       'br-crime-e-castigo',
+      'br-otelo',
+      'br-hamlet',
+      'br-moby-dick',
     ],
   },
   {
@@ -490,6 +648,9 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-irmaos-karamazov',
       'br-cem-anos-solidao',
       'br-conde-monte-cristo',
+      'br-hamlet',
+      'br-arte-da-guerra',
+      'br-crime-e-castigo',
     ],
   },
   {
@@ -497,7 +658,16 @@ export const CHARACTER_POOL: CharacterReading[] = [
     name: 'K',
     source: 'Blade Runner 2049',
     thread: 'Seres artificiais em busca de algo que os torne reais.',
-    bookIds: ['br-androides-sonham', 'br-klara-e-o-sol', 'br-eu-robo', 'br-frankenstein', 'br-ubik'],
+    bookIds: [
+      'br-androides-sonham',
+      'br-klara-e-o-sol',
+      'br-eu-robo',
+      'br-frankenstein',
+      'br-ubik',
+      'br-cavernas-aco',
+      'br-neuromancer',
+      'br-solaris',
+    ],
   },
   {
     id: 'carmy',
@@ -510,6 +680,9 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-memorias-subsolo',
       'br-o-estrangeiro',
       'br-crime-e-castigo',
+      'br-o-processo',
+      'br-grande-gatsby',
+      'br-moby-dick',
     ],
   },
   {
@@ -517,14 +690,32 @@ export const CHARACTER_POOL: CharacterReading[] = [
     name: 'César',
     source: 'Planeta dos Macacos',
     thread: 'Líderes que erguem os oprimidos contra quem os dominou.',
-    bookIds: ['br-planeta-macacos', 'br-duna', 'br-fundacao', 'br-admiravel-mundo-novo', 'br-frankenstein'],
+    bookIds: [
+      'br-planeta-macacos',
+      'br-duna',
+      'br-fundacao',
+      'br-admiravel-mundo-novo',
+      'br-frankenstein',
+      'br-revolucao-bichos',
+      'br-jogos-vorazes',
+      'br-arte-da-guerra',
+    ],
   },
   {
     id: 'logan',
     name: 'Logan',
     source: 'X-Men',
     thread: 'Sobreviventes cansados de violência que ainda protegem alguém.',
-    bookIds: ['br-a-estrada', 'br-onde-os-velhos', 'br-frankenstein', 'br-devoradores-estrelas', 'br-o-estrangeiro'],
+    bookIds: [
+      'br-a-estrada',
+      'br-onde-os-velhos',
+      'br-frankenstein',
+      'br-devoradores-estrelas',
+      'br-o-estrangeiro',
+      'br-ensaio-cegueira',
+      'br-coracao-trevas',
+      'br-perdido-em-marte',
+    ],
   },
   {
     id: 'loki',
@@ -537,6 +728,9 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-mestre-margarida',
       'br-paraiso-perdido',
       'br-dorian-gray',
+      'br-ricardo-iii',
+      'br-otelo',
+      'br-memorias-postumas',
     ],
   },
   {
@@ -550,6 +744,9 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-perdido-em-marte',
       'br-fundacao',
       'br-recursao',
+      'br-2001-odisseia',
+      'br-cavernas-aco',
+      'br-floresta-sombria',
     ],
   },
   {
@@ -563,6 +760,9 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-medico-e-monstro',
       'br-estudo-vermelho',
       'br-coracao-trevas',
+      'br-hamlet',
+      'br-cao-baskerville',
+      'br-o-processo',
     ],
   },
   {
@@ -576,6 +776,9 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-cao-baskerville',
       'br-o-processo',
       'br-medico-e-monstro',
+      'br-cavernas-aco',
+      'br-crime-e-castigo',
+      'br-o-perfume',
     ],
   },
   {
@@ -589,6 +792,9 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-androides-sonham',
       'br-2001-odisseia',
       'br-fim-da-infancia',
+      'br-solaris',
+      'br-cavernas-aco',
+      'br-mao-esquerda-escuridao',
     ],
   },
   {
@@ -602,6 +808,9 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-2001-odisseia',
       'br-a-estrada',
       'br-maquina-do-tempo',
+      'br-contato',
+      'br-solaris',
+      'br-materia-escura',
     ],
   },
   {
@@ -615,6 +824,9 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-mao-esquerda-escuridao',
       'br-fim-da-infancia',
       'br-tres-corpos',
+      'br-solaris',
+      'br-floresta-sombria',
+      'br-2001-odisseia',
     ],
   },
   {
@@ -628,6 +840,9 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-recursao',
       'br-fundacao',
       'br-materia-escura',
+      'br-floresta-sombria',
+      'br-devoradores-estrelas',
+      'br-2001-odisseia',
     ],
   },
   {
@@ -641,6 +856,9 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-fim-da-infancia',
       'br-a-estrada',
       'br-fahrenheit-451',
+      'br-hamlet',
+      'br-jogos-vorazes',
+      'br-irmaos-karamazov',
     ],
   },
   {
@@ -654,6 +872,9 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-apanhador-centeio',
       'br-memorias-subsolo',
       'br-crime-e-castigo',
+      'br-1984',
+      'br-a-estrada',
+      'br-hamlet',
     ],
   },
   {
@@ -667,6 +888,9 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-conde-monte-cristo',
       'br-dorian-gray',
       'br-irmaos-karamazov',
+      'br-dom-casmurro',
+      'br-grande-gatsby',
+      'br-hamlet',
     ],
   },
   {
@@ -680,6 +904,9 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-moby-dick',
       'br-ensaio-cegueira',
       'br-onde-os-velhos',
+      'br-crime-e-castigo',
+      'br-morro-ventos-uivantes',
+      'br-hamlet',
     ],
   },
   {
@@ -693,6 +920,9 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-onde-os-velhos',
       'br-ensaio-cegueira',
       'br-jogos-vorazes',
+      'br-moby-dick',
+      'br-conde-monte-cristo',
+      'br-apanhador-centeio',
     ],
   },
   {
@@ -706,6 +936,9 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-nome-do-vento',
       'br-dorian-gray',
       'br-memorias-postumas',
+      'br-cem-anos-solidao',
+      'br-apanhador-centeio',
+      'br-solaris',
     ],
   },
   {
@@ -719,6 +952,9 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-moby-dick',
       'br-paraiso-perdido',
       'br-o-principe',
+      'br-senhor-das-moscas',
+      'br-ricardo-iii',
+      'br-mestre-margarida',
     ],
   },
   {
@@ -732,6 +968,9 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-duna',
       'br-admiravel-mundo-novo',
       'br-ensaio-cegueira',
+      'br-1984',
+      'br-revolucao-bichos',
+      'br-fahrenheit-451',
     ],
   },
   {
@@ -745,6 +984,9 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-paraiso-perdido',
       'br-conde-monte-cristo',
       'br-duna',
+      'br-morro-ventos-uivantes',
+      'br-irmaos-karamazov',
+      'br-otelo',
     ],
   },
   {
@@ -758,6 +1000,9 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-o-estrangeiro',
       'br-mestre-margarida',
       'br-o-perfume',
+      'br-senhor-das-moscas',
+      'br-medico-e-monstro',
+      'br-crime-e-castigo',
     ],
   },
 ];
@@ -770,19 +1015,113 @@ const normalize = (text: string) =>
     .replace(/[^\w\s]/gi, '')
     .trim();
 
+function shuffleArray<T>(items: T[]): T[] {
+  const copy = [...items];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
+/**
+ * Sorteia `count` (4) livros para um personagem em uma rotação:
+ * - Mantém 2 ou 3 livros-âncora (dos 4 primeiros do personagem)
+ * - Mistura 1 ou 2 livros do pool estendido do personagem
+ * - Garante que, em relação à rotação anterior (`previousBookIds`), pelo menos 1 ou 2 livros mudem.
+ */
+export function selectVariedCharacterBookIds(
+  character: CharacterReading,
+  evaluatedTitles: Set<string>,
+  previousBookIds?: string[],
+  count = 4
+): string[] {
+  const validBooks = character.bookIds
+    .map((id) => BOOKS_BY_ID.get(id))
+    .filter((b): b is Partial<BookEvaluation> => Boolean(b));
+
+  const freshIds = validBooks
+    .filter((b) => !evaluatedTitles.has(normalize(b.title || '')))
+    .map((b) => b.id!);
+  const seenIds = validBooks
+    .filter((b) => evaluatedTitles.has(normalize(b.title || '')))
+    .map((b) => b.id!);
+
+  const pool = [...freshIds, ...seenIds];
+  if (pool.length <= count) return pool;
+
+  const corePool = pool.slice(0, Math.min(4, pool.length));
+  const extraPool = pool.slice(corePool.length);
+  const prevSet = new Set(previousBookIds || []);
+
+  const buildCandidate = (): string[] => {
+    // Mantém 2 ou 3 obras-âncora e varia 1 ou 2 com o pool estendido
+    const coreKeep =
+      extraPool.length >= 2
+        ? Math.random() < 0.55
+          ? 3
+          : 2
+        : Math.max(1, count - extraPool.length);
+    const extraTake = Math.min(extraPool.length, count - coreKeep);
+
+    const chosenCore = shuffleArray(corePool).slice(0, coreKeep);
+    const chosenExtra = shuffleArray(extraPool).slice(0, extraTake);
+    // Preserva os livros-âncora na frente seguidos das variações da rotação
+    const orderedCore = corePool.filter((id) => chosenCore.includes(id));
+    return [...orderedCore, ...chosenExtra].slice(0, count);
+  };
+
+  let best = buildCandidate();
+  if (prevSet.size > 0) {
+    for (let attempt = 0; attempt < 10; attempt++) {
+      const candidate = buildCandidate();
+      const overlap = candidate.filter((id) => prevSet.has(id)).length;
+      // Ideal: mudou 1 ou 2 livros em relação à aparição anterior (overlap de 2 ou 3)
+      if (overlap >= 1 && overlap <= count - 1) {
+        best = candidate;
+        break;
+      }
+    }
+  }
+
+  return best;
+}
+
 /**
  * Retorna até `count` livros do personagem, priorizando os que o leitor ainda não avaliou.
+ * Se `savedBookIds` (da rotação atual) for informado, respeita a seleção sorteada e repõe
+ * automaticamente qualquer livro que o leitor tenha avaliado nesse meio-tempo.
  */
 export function getCharacterBooks(
   character: CharacterReading,
   evaluatedTitles: Set<string>,
-  count = 4
+  count = 4,
+  savedBookIds?: string[]
 ): Partial<BookEvaluation>[] {
-  const books = character.bookIds
+  const allBooks = character.bookIds
     .map((id) => BOOKS_BY_ID.get(id))
     .filter((b): b is Partial<BookEvaluation> => Boolean(b));
-  const fresh = books.filter((b) => !evaluatedTitles.has(normalize(b.title || '')));
-  const seen = books.filter((b) => evaluatedTitles.has(normalize(b.title || '')));
+
+  const fresh = allBooks.filter((b) => !evaluatedTitles.has(normalize(b.title || '')));
+  const seen = allBooks.filter((b) => evaluatedTitles.has(normalize(b.title || '')));
+
+  if (savedBookIds && savedBookIds.length > 0) {
+    const savedValid = savedBookIds
+      .map((id) => BOOKS_BY_ID.get(id))
+      .filter(
+        (b): b is Partial<BookEvaluation> =>
+          Boolean(b) && !evaluatedTitles.has(normalize(b!.title || ''))
+      );
+
+    if (savedValid.length >= count) {
+      return savedValid.slice(0, count);
+    }
+
+    const usedIds = new Set(savedValid.map((b) => b.id!));
+    const fillers = [...fresh, ...seen].filter((b) => b.id && !usedIds.has(b.id));
+    return [...savedValid, ...fillers].slice(0, count);
+  }
+
   return [...fresh, ...seen].slice(0, count);
 }
 

@@ -50,25 +50,42 @@ const FINISH_HOLD_MS = 260;
 const SUGGESTIONS_ROTATION_MS = 6 * 60 * 60 * 1000;
 const CHARACTERS_ROTATION_MS = 1 * 60 * 60 * 1000;
 const SUGGESTIONS_STORAGE_KEY = 'veredito_modal_suggestions_v1';
-const CHARACTERS_STORAGE_KEY = 'veredito_modal_characters_v2';
+const CHARACTERS_STORAGE_KEY = 'veredito_modal_characters_v3';
 
 import { POPULAR_SUGGESTIONS_POOL } from '../data/suggestionBooks';
 import {
   CHARACTER_POOL,
   getCharacterBooks,
+  selectVariedCharacterBookIds,
   buildEvaluatedTitleSet,
   type CharacterReading,
 } from '../data/characterReadings';
 
-function getOrRotateCharacters(): CharacterReading[] {
-  const poolById = new Map(CHARACTER_POOL.map((c) => [c.id, c]));
+interface CharacterRotationState {
+  characters: CharacterReading[];
+  booksByCharId: Record<string, string[]>;
+}
+
+function getOrRotateCharacters(existingBooks: BookEvaluation[] = []): CharacterRotationState {
+  const evaluatedSet = buildEvaluatedTitleSet(existingBooks);
+  const visualPool = CHARACTER_POOL.filter((c) => Boolean(c.imageUrl));
+  const activePool = visualPool.length >= 4 ? visualPool : CHARACTER_POOL;
+  const poolById = new Map(activePool.map((c) => [c.id, c]));
   const now = Date.now();
   let prevIds: string[] = [];
+  let prevBooksByCharId: Record<string, string[]> = {};
 
   try {
     const raw = localStorage.getItem(CHARACTERS_STORAGE_KEY);
     if (raw) {
-      const parsed = JSON.parse(raw) as { ids?: string[]; timestamp?: number };
+      const parsed = JSON.parse(raw) as {
+        ids?: string[];
+        booksByCharId?: Record<string, string[]>;
+        timestamp?: number;
+      };
+      if (parsed.booksByCharId && typeof parsed.booksByCharId === 'object') {
+        prevBooksByCharId = parsed.booksByCharId;
+      }
       if (Array.isArray(parsed.ids) && typeof parsed.timestamp === 'number') {
         prevIds = parsed.ids;
         const isExpired = now - parsed.timestamp >= CHARACTERS_ROTATION_MS;
@@ -77,7 +94,10 @@ function getOrRotateCharacters(): CharacterReading[] {
             .map((id) => poolById.get(id))
             .filter((c): c is CharacterReading => Boolean(c));
           if (validSaved.length === 4) {
-            return validSaved;
+            return {
+              characters: validSaved,
+              booksByCharId: prevBooksByCharId,
+            };
           }
         }
       }
@@ -87,20 +107,37 @@ function getOrRotateCharacters(): CharacterReading[] {
   }
 
   const prevSet = new Set(prevIds);
-  const candidates = CHARACTER_POOL.filter((c) => !prevSet.has(c.id));
-  const source = candidates.length >= 4 ? candidates : [...CHARACTER_POOL];
-  const shuffled = [...source];
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  const candidates = activePool.filter((c) => !prevSet.has(c.id));
+  const source = candidates.length >= 4 ? candidates : [...activePool];
+  let selected: CharacterReading[];
+
+  if (activePool.length <= 4) {
+    selected = [...activePool].slice(0, 4);
+  } else {
+    const shuffled = [...source];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    selected = shuffled.slice(0, 4);
   }
-  const selected = shuffled.slice(0, 4);
+
+  const nextBooksByCharId: Record<string, string[]> = { ...prevBooksByCharId };
+  for (const char of selected) {
+    nextBooksByCharId[char.id] = selectVariedCharacterBookIds(
+      char,
+      evaluatedSet,
+      prevBooksByCharId[char.id],
+      4
+    );
+  }
 
   try {
     localStorage.setItem(
       CHARACTERS_STORAGE_KEY,
       JSON.stringify({
         ids: selected.map((c) => c.id),
+        booksByCharId: nextBooksByCharId,
         timestamp: now,
       })
     );
@@ -108,7 +145,10 @@ function getOrRotateCharacters(): CharacterReading[] {
     // ignore storage errors
   }
 
-  return selected;
+  return {
+    characters: selected,
+    booksByCharId: nextBooksByCharId,
+  };
 }
 
 function normalizeForMatch(text: string): string {
@@ -228,8 +268,8 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
   const [popularSuggestions, setPopularSuggestions] = useState<Partial<BookEvaluation>[]>(() =>
     getOrRotateSuggestions(existingBooks)
   );
-  const [characterSuggestions, setCharacterSuggestions] = useState<CharacterReading[]>(() =>
-    getOrRotateCharacters()
+  const [characterRotation, setCharacterRotation] = useState<CharacterRotationState>(() =>
+    getOrRotateCharacters(existingBooks)
   );
   const [selectedCharacterId, setSelectedCharacterId] = useState<string | null>(null);
 
@@ -239,30 +279,34 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
 
   useEffect(() => {
     const current = getOrRotateSuggestions(existingBooks);
-    const currentChars = getOrRotateCharacters();
+    const currentCharRot = getOrRotateCharacters(existingBooks);
     const evalSet = buildEvaluatedTitleSet(existingBooks);
     setPopularSuggestions(current);
-    setCharacterSuggestions(currentChars);
+    setCharacterRotation(currentCharRot);
 
-    const charCoverUrls = currentChars.flatMap((c) =>
-      getCharacterBooks(c, evalSet, 4).map((b) => b.coverUrl)
+    const charCoverUrls = currentCharRot.characters.flatMap((c) =>
+      getCharacterBooks(c, evalSet, 4, currentCharRot.booksByCharId[c.id]).map((b) => b.coverUrl)
     );
+    const charPortraitUrls = currentCharRot.characters.map((c) => c.imageUrl);
     prefetchBookCovers(
-      [...current.map((s) => s.coverUrl), ...charCoverUrls],
+      [...current.map((s) => s.coverUrl), ...charPortraitUrls, ...charCoverUrls],
       true
     );
 
     const rotationCheck = setInterval(() => {
       const updated = getOrRotateSuggestions(existingBooks);
-      const updatedChars = getOrRotateCharacters();
+      const updatedCharRot = getOrRotateCharacters(existingBooks);
       const updatedEvalSet = buildEvaluatedTitleSet(existingBooks);
       setPopularSuggestions(updated);
-      setCharacterSuggestions(updatedChars);
-      const nextCharCovers = updatedChars.flatMap((c) =>
-        getCharacterBooks(c, updatedEvalSet, 4).map((b) => b.coverUrl)
+      setCharacterRotation(updatedCharRot);
+      const nextCharCovers = updatedCharRot.characters.flatMap((c) =>
+        getCharacterBooks(c, updatedEvalSet, 4, updatedCharRot.booksByCharId[c.id]).map(
+          (b) => b.coverUrl
+        )
       );
+      const nextPortraits = updatedCharRot.characters.map((c) => c.imageUrl);
       prefetchBookCovers(
-        [...updated.map((s) => s.coverUrl), ...nextCharCovers],
+        [...updated.map((s) => s.coverUrl), ...nextPortraits, ...nextCharCovers],
         true
       );
     }, 60_000);
@@ -1052,13 +1096,19 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                     </div>
                   </div>
 
-                  {/* Row 2: Books by Favorite Characters (4 rotating characters every 6h) */}
+                  {/* Row 2: Books by Favorite Characters (4 character covers + rotating book sets) */}
                   {(() => {
                     const evaluatedSet = buildEvaluatedTitleSet(existingBooks);
+                    const { characters: characterSuggestions, booksByCharId } = characterRotation;
                     const activeCharacter =
                       characterSuggestions.find((c) => c.id === selectedCharacterId) || null;
                     const activeCharacterBooks = activeCharacter
-                      ? getCharacterBooks(activeCharacter, evaluatedSet, 4)
+                      ? getCharacterBooks(
+                          activeCharacter,
+                          evaluatedSet,
+                          4,
+                          booksByCharId[activeCharacter.id]
+                        )
                       : [];
 
                     return (
@@ -1068,15 +1118,13 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                             Livros de Acordo com Personagens
                           </span>
                           <span className="text-[10px] text-[#86868b]">
-                            Toque para ver 4 obras
+                            Toque no personagem para ver 4 obras
                           </span>
                         </div>
 
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5">
+                        <div className="grid grid-cols-4 gap-3 sm:gap-4 pt-0.5">
                           {characterSuggestions.map((char) => {
                             const isSelected = activeCharacter?.id === char.id;
-                            const previewBooks = getCharacterBooks(char, evaluatedSet, 2);
-                            const [cover1, cover2] = previewBooks.map((b) => b.coverUrl);
 
                             return (
                               <button
@@ -1087,49 +1135,43 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                                     prev === char.id ? null : char.id
                                   )
                                 }
-                                className={`p-2 sm:p-2.5 rounded-2xl flex items-center gap-2.5 text-left transition-all duration-150 cursor-pointer select-none active:scale-[0.98] border ${
-                                  isSelected
-                                    ? 'bg-[#1d1d1f] text-white border-[#1d1d1f] shadow-[0_6px_18px_rgba(0,0,0,0.16)]'
-                                    : 'bg-neutral-50/90 hover:bg-neutral-100/90 text-[#1d1d1f] border-neutral-200/80 hover:border-neutral-300 shadow-2xs'
-                                }`}
+                                className="flex flex-col text-left cursor-pointer group active:scale-[0.97] transition-transform duration-200 select-none"
                               >
-                                {/* Mini par de capas reais sobrepostas */}
-                                <div className="flex items-center shrink-0">
-                                  {cover1 && (
-                                    <div className="w-6.5 h-9 sm:w-7 sm:h-10 rounded-[5px] overflow-hidden bg-neutral-200 border border-white shadow-2xs shrink-0">
-                                      <img
-                                        src={cover1}
-                                        alt=""
-                                        className="w-full h-full object-cover"
-                                        loading="lazy"
-                                      />
+                                <div
+                                  className={`relative w-full aspect-[2/3] rounded-lg overflow-hidden mb-2 bg-neutral-100 transition-all duration-200 ${
+                                    isSelected
+                                      ? 'ring-2 ring-[#1d1d1f] ring-offset-2 ring-offset-white shadow-[0_10px_24px_rgba(0,0,0,0.2)] -translate-y-0.5'
+                                      : 'border border-black/[0.08] shadow-[0_4px_12px_rgba(0,0,0,0.08)] group-hover:-translate-y-1'
+                                  }`}
+                                >
+                                  {char.imageUrl ? (
+                                    <img
+                                      src={char.imageUrl}
+                                      alt={char.name}
+                                      className="w-full h-full object-cover object-top"
+                                      loading="eager"
+                                      decoding="async"
+                                      referrerPolicy="no-referrer"
+                                    />
+                                  ) : (
+                                    <div className="w-full h-full flex items-center justify-center bg-neutral-200 text-[#1d1d1f] font-bold text-sm">
+                                      {char.name.slice(0, 2).toUpperCase()}
                                     </div>
                                   )}
-                                  {cover2 && (
-                                    <div className="relative -ml-3 z-10 w-6.5 h-9 sm:w-7 sm:h-10 rounded-[5px] overflow-hidden bg-neutral-200 border border-white shadow-xs shrink-0">
-                                      <img
-                                        src={cover2}
-                                        alt=""
-                                        className="w-full h-full object-cover"
-                                        loading="lazy"
-                                      />
-                                    </div>
-                                  )}
+                                  <div className="absolute inset-0 rounded-lg ring-1 ring-inset ring-black/[0.06] pointer-events-none" />
                                 </div>
 
-                                <div className="min-w-0 flex-1">
+                                <div className="space-y-0.5 px-0.5 w-full">
                                   <h4
-                                    className={`text-xs font-bold truncate leading-tight tracking-tight ${
-                                      isSelected ? 'text-white' : 'text-[#1d1d1f]'
+                                    className={`text-[11px] sm:text-xs font-semibold truncate leading-snug tracking-tight ${
+                                      isSelected
+                                        ? 'text-black font-bold'
+                                        : 'text-[#1d1d1f] group-hover:text-black'
                                     }`}
                                   >
                                     {char.name}
                                   </h4>
-                                  <p
-                                    className={`text-[10px] truncate mt-0.5 ${
-                                      isSelected ? 'text-neutral-300' : 'text-[#86868b]'
-                                    }`}
-                                  >
+                                  <p className="text-[10px] text-[#86868b] truncate font-normal">
                                     {char.source}
                                   </p>
                                 </div>

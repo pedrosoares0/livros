@@ -61,7 +61,7 @@ export const POPULAR_SUGGESTIONS_POOL: Partial<BookEvaluation>[] = [
     publisher: 'Suma',
     year: 2008,
     pages: 320,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8556510213.01.LZZZZZZZ.jpg',
+    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8556510205.01.LZZZZZZZ.jpg',
     genres: ['Ficção Científica', 'Hard Sci-Fi'],
     resumo:
       'Durante a Revolução Cultural Chinesa, um projeto militar secreto envia sinais ao espaço e estabelece contato com uma civilização alienígena à beira do colapso que planeja invadir a Terra.',
@@ -217,7 +217,7 @@ export const POPULAR_SUGGESTIONS_POOL: Partial<BookEvaluation>[] = [
     publisher: 'Companhia das Letras',
     year: 1995,
     pages: 312,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8535933921.01.LZZZZZZZ.jpg',
+    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8571644950.01.LZZZZZZZ.jpg',
     genres: ['Distopia', 'Alegoria Moral', 'Drama Humano'],
     resumo:
       'Uma epidemia fulminante de cegueira branca se espalha por uma cidade. Isolados em quarentena brutal, os infectados testemunham a rápida dissolução da dignidade e da civilização.',
