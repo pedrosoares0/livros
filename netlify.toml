@@ -2,6 +2,9 @@
   command = "npm run build"
   publish = "dist"
 
+[build.environment]
+  SECRETS_SCAN_OMIT_KEYS = "VITE_GEMINI_API_KEY,VITE_TMDB_API_KEY,VITE_SUPABASE_ANON_KEY,VITE_SUPABASE_URL"
+
 [[redirects]]
   from = "/*"
   to = "/index.html"
