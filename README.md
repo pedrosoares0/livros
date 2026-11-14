@@ -1,94 +1,161 @@
-# Veredito — Sistema de Curadoria e Avaliação Crítica de Livros
+# Veredito
 
-Guia técnico e arquitetural voltado para desenvolvedores e agentes de IA que venham manter ou expandir esta base de código.
+Um avaliador e curador pessoal de livros e HQs que separa a qualidade técnica de uma obra do quanto ela realmente combina com o seu gosto.
 
----
-
-## 1. Visão Geral da Aplicação
-
-O **Veredito** é um web app pessoal focado em avaliação crítica, encaixe de leitura e catálogo de livros, HQs e edições consagradas.
-- **Stack:** React 19 + TypeScript + Vite + Tailwind CSS + Lucide Icons + Motion (Framer Motion) + Supabase + Google Gemini API.
-- **Diferencial Crítico:** O app prioriza a experiência de catálogo editorial brasileiro moderno (equivalente ao acervo e bestsellers da Amazon Brasil, Antofágica, Companhia das Letras, Aleph, DarkSide, Todavia, Editora 34, Principis, Record, Rocco e Zahar), com foco em obras densas, ficção científica, distopias, clássicos e dramas humanos.
+![Tela inicial do Veredito](./public/docs/home-discover.jpg)
 
 ---
 
-## 2. Mapa de Diretórios e Arquivos-Chave
+## Parte 1 — O Produto
 
+### O problema que originou o app
+
+Escolher o próximo livro para ler costuma dar errado por três motivos simples:
+
+1. **Sinopses de editora são peças de marketing:** todas prometem "uma obra-prima arrebatadora", mas escondem se o ritmo é arrastado, se o tom é juvenil ou se a história se apoia em clichês.
+2. **Notas médias na internet misturam públicos opostos:** um livro com nota 4,8 na Amazon ou no Goodreads pode ser excelente para quem busca um romance leve de fim de semana e insuportável para quem procura densidade moral ou ficção científica mais séria.
+3. **Resenhas quase sempre entregam demais:** tentar descobrir se um livro vale o seu tempo pesquisando em vídeos ou textos longos geralmente termina em *spoilers* de reviravoltas que você não queria saber.
+
+O **Veredito** nasceu para responder uma pergunta direta antes de você gastar dinheiro ou horas de leitura: *"Esse livro é bom de verdade e conversa com o que eu gosto, ou vou largar na página 40?"*
+
+---
+
+### Como ele pensa: Nota Técnica vs. Nota de Encaixe
+
+A principal decisão do produto foi dividir a avaliação em duas notas independentes:
+
+- **Nota Técnica (0 a 10):** avalia a obra pelo que ela é — construção de prosa, estrutura narrativa, originalidade e execução do autor.
+- **Nota de Encaixe (0 a 10):** mede o quanto aquele livro bate com o perfil específico do leitor.
+
+Um clássico consagrado pode receber **Nota Técnica 9** e **Nota de Encaixe 4** se tiver um ritmo contemplativo demais ou temas que não conversam com o usuário. Com base nisso, cada ficha traz um veredito direto (**Leia**, **Vale com Ressalvas** ou **Evite**) e uma premissa escrita sem revelar reviravoltas do meio ou do fim do livro.
+
+---
+
+### Entendimento do usuário e calibração que aprende com a leitura
+
+Em vez de pedir ao leitor para marcar categorias genéricas como "Suspense" ou "Ficção", o Veredito calibra as análises a partir do repertório real da pessoa: filmes e séries que são referência para ela, arquétipos de personagens favoritos e o que ela rejeita de imediato (como prolixidade sem recompensa, romance adolescente focado em fórmula ou autoajuda disfarçada de ficção).
+
+Quando o usuário termina um livro e registra a própria nota no botão **"Já li"** (podendo marcar impressões rápidas como *"Ritmo impecável"*, *"Me marcou"*, *"Ideia boa, ritmo lento"* ou *"Raso / besta"*), o app passa a usar esse histórico real nas próximas avaliações:
+
+- Se o sistema previu nota **9** para um livro e você deu **6** porque achou o ritmo arrastado, ele registra essa divergência e passa a ser mais rigoroso com obras de estrutura parecida.
+- O livro lido sai automaticamente da lista de desejos (*Salvos*) e vai para a prateleira de *Lidos*, mantendo a estante limpa sem trabalho manual.
+
+---
+
+### Descoberta visual, personagens e UI/UX
+
+<p align="center">
+  <img src="./public/docs/evaluate-modal.jpg" alt="Modal de avaliação e sugestões" width="32%" />
+  &nbsp;
+  <img src="./public/docs/character-readings.jpg" alt="Curadoria de livros por personagem" width="32%" />
+  &nbsp;
+  <img src="./public/docs/ficha-criteria.png" alt="Critérios detalhados da ficha" width="32%" />
+</p>
+
+A interface foi pensada para fugir da aparência de planilha ou painel cheio de texto e funcionar como uma estante limpa e tátil:
+
+- **Acabamento físico nas capas:** cada capa recebe iluminação de lombada, vinco de encadernação de capa dura e sombra projetada. Quando uma edição antiga não tem imagem disponível nas bases públicas (ou retorna imagem quebrada), o componente desenha automaticamente uma capa tipográfica em couro.
+- **Filmes com atmosfera equivalente:** toda ficha aponta 3 filmes que compartilham o mesmo clima ou tensão psicológica do livro, com pôsteres reais para situar o tom da obra em segundos.
+- **"O que este personagem leria?":** para os momentos em que o usuário quer ler algo novo mas não tem um título em mente, o modal de avaliação sugere obras a partir da psicologia de personagens conhecidos (como *Anakin Skywalker*, *Carmy* de *The Bear*, *Ellie* de *The Last of Us* ou *Thanos*), priorizando livros que ainda não estão na sua estante.
+- **Fluxos rápidos para o dia a dia:**
+  - Colar o link de qualquer livro da Amazon identifica a edição na hora.
+  - A aba **Colar Lista** permite jogar vários títulos de uma vez para avaliar em lote.
+  - Ao lado dos filtros de nota (`10`, `9`, `8`), o botão **Selecionar** permite marcar vários livros ou avaliações de uma só vez para salvar na estante ou excluir, com opção de desfazer.
+
+---
+
+## Parte 2 — Engenharia e Decisões Técnicas
+
+### Stack
+
+- **Frontend:** React 19, TypeScript, Vite, Tailwind CSS 4, Motion (`motion/react`), Lucide Icons
+- **Banco de Dados & Persistência:** Supabase (PostgreSQL) + cache local assíncrono (`localStorage` + memória)
+- **IA & Dados Editoriais:** Google Gemini API, Câmara Brasileira do Livro (via BrasilAPI), Amazon Image CDN, Open Library e iTunes/Apple Media API (pôsteres de filmes)
+
+---
+
+### Decisões de arquitetura que valem destaque
+
+#### 1. Busca de edições brasileiras em camadas (`src/services/evaluator.ts`)
+APIs públicas de livros como a Open Library funcionam bem para edições em inglês dos anos 80, mas falham com frequência no mercado editorial brasileiro (trazem traduções erradas, livros acadêmicos homônimos ou capas inexistentes), enquanto a API pública do Google Books sofre com limites severos de cota (`HTTP 429`) sem OAuth.
+
+Para garantir que a busca encontre a edição brasileira correta em menos de 2 segundos, a resolução segue uma cascata:
+1. **Parser de links da Amazon (`amazonRecognizer.ts`):** extrai o `ASIN`/`ISBN-10` direto da URL, identifica a edição e resolve a capa em alta definição direto pela CDN da Amazon.
+2. **Busca por ISBN:** consulta a base da Câmara Brasileira do Livro (BrasilAPI) em paralelo com a Open Library.
+3. **Catálogo curado em memória (`0ms`):** resposta instantânea para clássicos e edições brasileiras recorrentes (Companhia das Letras, Aleph, DarkSide, Antofágica, Editora 34, Todavia).
+4. **Separação entre busca rápida e análise crítica (`geminiEvaluator.ts`):** o autocompletar usa modelos leves (`flash-lite`) pedindo apenas metadados enxutos (`title`, `author`, `publisher`, `pages`, `isbn13`), enquanto a avaliação completa aciona os modelos com raciocínio ativado para julgar os critérios da obra.
+
+#### 2. Corrida de modelos com *hedging* contra falhas e latência (`src/services/geminiRace.ts`)
+Depender de uma chamada sequencial única para uma API de LLM deixa o usuário esperando quando um endpoint específico sofre lentidão ou retorna erro `503`.
+
+O utilitário `raceGemini` implementa *request hedging*:
+- Dispara a avaliação no modelo principal de raciocínio (`tier: 'preferred'`).
+- Se a requisição retornar erro ou ultrapassar a janela de tolerância (`hedgeAfterMs`), um segundo modelo qualificado da fila de reserva é disparado em paralelo sem cancelar o primeiro.
+- Assim que o primeiro modelo retorna um JSON íntegro e validado, todas as outras conexões em voo são encerradas na hora via `AbortController`.
+
+#### 3. Calibração dinâmica por desvio de nota (`src/services/ratings.ts`)
+Em vez de manter um prompt estático, o módulo `buildReadingHistoryBlock` cruza as avaliações geradas pela IA com as notas dadas pelo usuário após a leitura. Ele seleciona as leituras mais recentes e os casos de maior divergência matemática (`|nota_leitor - nota_prevista|`), gerando um histórico enxuto no formato:
+
+```text
+* Título (Autor) [Gêneros] — previsto 9 → leitor 6 (IA superestimou em 3) | Ideia boa, ritmo lento
 ```
+
+Esse bloco é memoizado por versão de cache e injetado nas avaliações seguintes, fazendo o modelo ajustar o peso de ritmo, tom e estilo sem custo extra de latência.
+
+#### 4. UI sem travamentos e estratégia Offline-First (`src/services/supabase.ts` e `src/components/BookCover.tsx`)
+- **Zero-blocking I/O na thread principal:** leituras de avaliações e notas batem em um cache em memória (`O(1)`) após a montagem inicial, e as gravações em `localStorage` são agendadas fora do frame de animação antes de sincronizar com o Supabase.
+- **Validação de capas em tempo real:** algumas CDNs de livros retornam um pixel transparente `1x1` com status `HTTP 200` quando não possuem a capa do ISBN consultado. O componente `BookCover` inspeciona `naturalWidth` e `naturalHeight` no carregamento, descarta falsos positivos automaticamente e mantém um `Set` em memória das capas já decodificadas para que a troca entre as abas *Início* e *Estante* aconteça sem *flicker*.
+
+---
+
+### Estrutura de pastas
+
+```text
 src/
 ├── components/
-│   ├── EvaluateModal.tsx     # Modal principal: busca de livro único e avaliação em lote
-│   ├── BookCover.tsx         # Renderizador de capa com fallback tipográfico em couro
-│   ├── DiscoverView.tsx      # Grade de descoberta e feed de leituras
-│   ├── DetailModal.tsx       # Ficha analítica detalhada da obra avaliada
-│   └── ScoreBadge.tsx        # Badges visuais de nota técnica e encaixe
+│   ├── DiscoverView.tsx      # Tela inicial: busca, filtros por nota, seleção em lote e recomendações
+│   ├── EstanteView.tsx       # Prateleiras dinâmicas por categoria, favoritos, salvos e lidos
+│   ├── FichaModal.tsx        # Ficha completa do livro, seletor de capas e comparativo com filmes
+│   ├── EvaluateModal.tsx     # Busca de livro único, avaliação em lote e curadoria por personagem
+│   ├── RateBookModal.tsx     # Registro de leitura ("Já li") com slider e tags por faixa de nota
+│   ├── ProfileModal.tsx      # Visualização dos pesos e referências do perfil calibrado
+│   └── BookCover.tsx         # Capa física 3D com detecção de imagem inválida e fallback em couro
 ├── services/
-│   ├── geminiEvaluator.ts    # Motor de busca rápida IA + Avaliação crítica aprofundada
-│   ├── evaluator.ts          # Orquestrador de busca, catálogo em memória e regras do Veredito
-│   ├── amazonRecognizer.ts   # Parser de links Amazon (ASIN/ISBN10) e resolução de edição
-│   ├── coverSearch.ts        # Resolução de capas alternativas e aliases internacionais
-│   ├── ratings.ts            # Histórico pessoal de notas do leitor para calibração
-│   └── supabase.ts           # Persistência de avaliações e avaliações do usuário
-├── data/
-│   ├── curatedCovers.ts      # Banco de capas verificadas em alta definição (0ms)
-│   └── initialBooks.ts       # Livros iniciais de referência do acervo
-└── types/
-    └── index.ts              # Interfaces: BookEvaluation, CriteriaScores, VereditoTipo
+│   ├── evaluator.ts          # Orquestrador de busca em camadas e regras de negócio
+│   ├── geminiEvaluator.ts    # Prompts estruturados de busca, avaliação crítica e reposição de acervo
+│   ├── geminiRace.ts         # Motor de concorrência com hedge e cancelamento via AbortController
+│   ├── amazonRecognizer.ts   # Extração de ASIN/ISBN e metadados a partir de links da Amazon
+│   ├── coverSearch.ts        # Busca de edições e capas alternativas para troca manual
+│   ├── ratings.ts            # Persistência das notas do leitor e cálculo de divergência para a IA
+│   └── supabase.ts           # Sincronização com PostgreSQL (Supabase) e cache local
+└── data/
+    ├── characterReadings.ts  # Pool de personagens e livros associados ao perfil psicológico de cada um
+    ├── curatedCovers.ts      # Capas verificadas em alta resolução para resposta em 0ms
+    └── initialBooks.ts       # Acervo base calibrado do leitor
 ```
 
 ---
 
-## 3. O Motor de Busca Comercial (Atualização Crítica)
+### Como rodar localmente
 
-### 3.1. Contexto do Problema Anterior
-No passado, a busca por texto consultava prioritariamente a **Open Library** (`openlibrary.org`). Como a Open Library é um arquivo voluntário internacional de bibliotecas físicas dos anos 70/80/90, ela não conhece edições comerciais brasileiras recentes e ranqueava livros acadêmicos aleatórios (ex: *"O nariz do morto"* de 1975 em vez do clássico de Nikolai Gógol, e zero resultados para livros recentes como *"Quarta Asa"*). Além disso, a API pública do Google Books atinge erro 429 (quota exceeded) sem autenticação OAuth.
-
-### 3.2. A Nova Arquitetura de Busca em `searchBookApi` ([evaluator.ts](file:///c:/Users/Suporte/Desktop/livros/src/services/evaluator.ts))
-A ordem de resolução é estritamente em camadas:
-
-1. **Link da Amazon direto:** Se a entrada for URL da Amazon (`isAmazonUrl`), aciona [amazonRecognizer.ts](file:///c:/Users/Suporte/Desktop/livros/src/services/amazonRecognizer.ts), que extrai o ASIN e baixa a capa oficial via CDN.
-2. **Busca por ISBN:** Se for código ISBN (10 ou 13 dígitos), consulta BrasilAPI (CBL) e OpenLibrary ISBN.
-3. **Catálogo Curado em Memória:** Se o termo coincidir com os clássicos canônicos (`BRAZILIAN_EDITIONS_CATALOG`), responde em 0ms.
-4. **Motor Comercial Inteligente via Gemini:** Invoca `searchPopularBooksWithGemini` em [geminiEvaluator.ts](file:///c:/Users/Suporte/Desktop/livros/src/services/geminiEvaluator.ts).
-5. **Fallback:** Caso a rede ou IA falhe, a Open Library atua como contingência secundária.
-
----
-
-## 4. Regras Fundamentais para Novas IAs (Performance e Busca)
-
-> [!IMPORTANT]
-> **NÃO utilize modelos pesados ou prompts prolixos no autocomplete da busca!**
-> Usuários esperam que a lista de edições surja em menos de 2 a 3 segundos ao digitar.
-
-### Regras de Ouro:
-1. **Modelos para a Busca Rápida:**
-   - Use estritamente: `gemini-3.1-flash-lite`, `gemini-flash-lite-latest` ou `gemini-3.5-flash-lite`.
-   - **NUNCA** use `gemini-3.8-flash` ou `gemini-pro` no autocomplete: eles demoram mais de 8 a 10 segundos para gerar JSON e travam o fluxo de digitação.
-2. **Carga Enxuta de Tokens:**
-   - O prompt da busca rápida **deve retornar apenas 3 a 4 itens** com campos objetivos: `title`, `author`, `publisher`, `year`, `pages`, `isbn13`.
-   - **NÃO** peça sinopses (`resumo`), análises de ritmo ou comparações na busca rápida. Toda a análise aprofundada é gerada apenas na avaliação completa (`evaluateWithGemini`).
-3. **Resolução de Capas em 3 Estágios:**
-   - **Estágio 1 (0ms):** [curatedCovers.ts](file:///c:/Users/Suporte/Desktop/livros/src/data/curatedCovers.ts) (`getCuratedCovers`). Sempre adicione novos bestsellers aqui.
-   - **Estágio 2:** CDN da Amazon via ISBN-10/ASIN: `https://images-na.ssl-images-amazon.com/images/P/${isbn10}.01.LZZZZZZZ.jpg`.
-   - **Estágio 3:** Fallback Open Library: `https://covers.openlibrary.org/b/isbn/${isbn13}-L.jpg`.
-   - **Fallback Visual:** [BookCover.tsx](file:///c:/Users/Suporte/Desktop/livros/src/components/BookCover.tsx) detecta imagens quebradas ou gifs 1x1 (43 bytes) e desenha uma capa tipográfica em couro clássica.
-4. **Debounce no Input:**
-   - Em [EvaluateModal.tsx](file:///c:/Users/Suporte/Desktop/livros/src/components/EvaluateModal.tsx), mantenha o debounce entre 350ms e 400ms para evitar chamadas sobrepostas enquanto o usuário digita.
-   - Ao teclar `Enter`, o envio é imediato.
-5. **Cache em Memória:**
-   - `searchMemoryCache` em [geminiEvaluator.ts](file:///c:/Users/Suporte/Desktop/livros/src/services/geminiEvaluator.ts) armazena resultados de buscas recentes para resposta instantânea (0ms).
-
----
-
-## 5. Como Testar e Fazer Build
-
+1. Instale as dependências:
 ```bash
-# Validar tipagem TypeScript
-npx tsc --noEmit
+npm install
+```
 
-# Gerar bundle de produção
-npm run build
+2. Crie um arquivo `.env` na raiz do projeto com as suas chaves:
+```env
+VITE_GEMINI_API_KEY=sua_chave_do_gemini
+VITE_SUPABASE_URL=sua_url_do_supabase
+VITE_SUPABASE_ANON_KEY=sua_chave_anon_do_supabase
+```
 
-# Executar ambiente local
+3. Inicie o servidor de desenvolvimento:
+```bash
 npm run dev
+```
+
+4. Para validar a tipagem e gerar o build de produção:
+```bash
+npm run build
 ```
