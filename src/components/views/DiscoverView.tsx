@@ -1,13 +1,13 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { BookOpen, ArrowUpDown, Search, X, Check, Bookmark, Trash2, CheckSquare } from 'lucide-react';
-import { BookEvaluation, UserRatingsMap } from '../types';
-import { isUserEvaluation } from '../data/initialBooks';
-import { getEffectiveScore } from '../services/ratings';
-import { BookCover } from './BookCover';
-import { ScoreBadge } from './ScoreBadge';
-import { PearlButton } from './PearlButton';
-import { BorderBeam } from './BorderBeam';
+import { BookEvaluation, UserRatingsMap } from '../../types';
+import { isUserEvaluation } from '../../data/initialBooks';
+import { getEffectiveScore } from '../../services/ratings';
+import { BookCover } from '../BookCover';
+import { ScoreBadge } from '../ui/ScoreBadge';
+import { PearlButton } from '../ui/PearlButton';
+import { BorderBeam } from '../ui/BorderBeam';
 
 interface DiscoverViewProps {
   books: BookEvaluation[];

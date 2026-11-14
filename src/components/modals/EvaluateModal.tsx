@@ -2,16 +2,16 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Search, X, BookOpen, AlertTriangle, Check, Loader2, RefreshCw } from 'lucide-react';
 import confetti from 'canvas-confetti';
-import { searchBookApi, isAmazonUrl } from '../services/evaluator';
+import { searchBookApi, isAmazonUrl } from '../../services/evaluator';
 import {
   evaluateWithGemini,
   replenishCharacterBooksWithGemini,
-} from '../services/geminiEvaluator';
-import { prefetchBookCovers } from '../services/imagePrefetch';
-import { fetchMoviePoster } from '../services/moviePosters';
-import { BookEvaluation } from '../types';
-import { BookCover } from './BookCover';
-import { AceternityButton } from './AceternityButton';
+} from '../../services/geminiEvaluator';
+import { prefetchBookCovers } from '../../services/imagePrefetch';
+import { fetchMoviePoster } from '../../services/moviePosters';
+import { BookEvaluation } from '../../types';
+import { BookCover } from '../BookCover';
+import { AceternityButton } from '../ui/AceternityButton';
 
 interface EvaluateModalProps {
   isOpen: boolean;
@@ -53,7 +53,7 @@ const FINISH_HOLD_MS = 260;
 const SUGGESTIONS_STORAGE_KEY = 'veredito_modal_suggestions_v2';
 const CHARACTERS_STORAGE_KEY = 'veredito_modal_characters_v6';
 
-import { POPULAR_SUGGESTIONS_POOL } from '../data/suggestionBooks';
+import { POPULAR_SUGGESTIONS_POOL } from '../../data/suggestionBooks';
 import {
   CHARACTER_POOL,
   getCharacterBooks,
@@ -64,7 +64,7 @@ import {
   isCharacterReplenishInFlight,
   markCharacterReplenishInFlight,
   type CharacterReading,
-} from '../data/characterReadings';
+} from '../../data/characterReadings';
 
 interface CharacterRotationState {
   characters: CharacterReading[];

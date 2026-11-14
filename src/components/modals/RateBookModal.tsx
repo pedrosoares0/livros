@@ -1,9 +1,9 @@
 import React, { useState, useMemo, ChangeEvent } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Trash2, Check } from 'lucide-react';
-import { BookEvaluation, UserRating } from '../types';
-import { getPillsForRating, getRatingBand, RatingBand } from '../services/ratings';
-import { AceternityButton } from './AceternityButton';
+import { BookEvaluation, UserRating } from '../../types';
+import { getPillsForRating, getRatingBand, RatingBand } from '../../services/ratings';
+import { AceternityButton } from '../ui/AceternityButton';
 
 interface RateBookModalProps {
   isOpen: boolean;

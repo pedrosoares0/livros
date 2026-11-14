@@ -2,14 +2,14 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { SlidersHorizontal, CheckCircle2, RotateCcw } from 'lucide-react';
 import { BookEvaluation, UserRatingsMap, UserRating } from './types';
-import { DiscoverView } from './components/DiscoverView';
-import { EstanteView } from './components/EstanteView';
-import { FichaModal } from './components/FichaModal';
-import { EvaluateModal } from './components/EvaluateModal';
-import { ProfileModal } from './components/ProfileModal';
-import { RateBookModal } from './components/RateBookModal';
-import { BottomNavBar } from './components/BottomNavBar';
-import { PearlButton } from './components/PearlButton';
+import { DiscoverView } from './components/views/DiscoverView';
+import { EstanteView } from './components/views/EstanteView';
+import { FichaModal } from './components/modals/FichaModal';
+import { EvaluateModal } from './components/modals/EvaluateModal';
+import { ProfileModal } from './components/modals/ProfileModal';
+import { RateBookModal } from './components/modals/RateBookModal';
+import { BottomNavBar } from './components/ui/BottomNavBar';
+import { PearlButton } from './components/ui/PearlButton';
 import { VereditoGlassIntro } from './components/ui/liquid-glass-logo-reveal';
 import {
   fetchEvaluations,

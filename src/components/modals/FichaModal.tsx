@@ -1,21 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { 
-  X, Film, BookOpen, AlertTriangle, CheckCircle2, 
+import {
+  X, Film, BookOpen, AlertTriangle, CheckCircle2,
   XCircle, Share2, Bookmark, Gauge,
   Feather, Compass, Zap, Moon, HeartHandshake,
   Trash2, Image as ImageIcon, Check
 } from 'lucide-react';
-import { BookEvaluation, UserRating } from '../types';
-import { BookCover } from './BookCover';
-import { ScoreBadge, getScoreTone } from './ScoreBadge';
-import { MovieThumb } from './MovieThumb';
-import { fetchAlternativeCovers } from '../services/coverSearch';
-import { getCuratedCovers } from '../data/curatedCovers';
-import { INITIAL_BOOKS } from '../data/initialBooks';
-import { AceternityButton } from './AceternityButton';
-import { CopyButton } from './CopyButton';
-import { PearlButton } from './PearlButton';
+import { BookEvaluation, UserRating } from '../../types';
+import { BookCover } from '../BookCover';
+import { ScoreBadge, getScoreTone } from '../ui/ScoreBadge';
+import { MovieThumb } from '../MovieThumb';
+import { fetchAlternativeCovers } from '../../services/coverSearch';
+import { getCuratedCovers } from '../../data/curatedCovers';
+import { INITIAL_BOOKS } from '../../data/initialBooks';
+import { AceternityButton } from '../ui/AceternityButton';
+import { CopyButton } from '../ui/CopyButton';
+import { PearlButton } from '../ui/PearlButton';
 
 interface FichaModalProps {
   book: BookEvaluation | null;
@@ -306,7 +306,7 @@ ${book.resumo}
         {/* Scrollable Content: 12-Column Editorial Grid on Desktop, Single Column on Mobile */}
         <div className="overflow-y-auto px-5 sm:px-6 md:px-8 py-4 sm:py-5 md:py-6 hide-scrollbar flex-1">
           <div className="flex flex-col md:grid md:grid-cols-12 md:gap-8 items-start">
-            
+
             {/* Left Column (Desktop Hero: Cover, Edition Tools & Metadata) */}
             <div className="w-full md:col-span-4 lg:col-span-4 flex flex-col items-center md:items-start space-y-3.5 md:sticky md:top-0">
               {/* Extra-Large Clean Cover */}
@@ -446,7 +446,7 @@ ${book.resumo}
 
             {/* Right Column (Title, Scoreboard, Veredito, Premissa, Filmes, Critérios) */}
             <div className="w-full md:col-span-8 lg:col-span-8 space-y-4 md:space-y-5 min-w-0 mt-5 md:mt-0">
-              
+
               {/* Header: Tags, Title, Author */}
               <div className="space-y-1.5 text-center sm:text-left">
                 <div className="flex flex-wrap items-center justify-center sm:justify-start gap-1.5">
@@ -553,7 +553,7 @@ ${book.resumo}
                       {Math.min(3, book.movieComparisons.length)} {Math.min(3, book.movieComparisons.length) === 1 ? 'indicação' : 'indicações'}
                     </span>
                   </div>
-                  
+
                   {/* Single Row of up to 3 Movie Thumbnails */}
                   <div className="grid grid-cols-3 gap-2.5 md:gap-3">
                     {book.movieComparisons.slice(0, 3).map((movie, i) => (
@@ -594,13 +594,12 @@ ${book.resumo}
                       {/* 3D Tactile Progress Track */}
                       <div className="w-full h-3 rounded-full overflow-hidden bg-neutral-200/90 shadow-[inset_0_1.5px_2.5px_rgba(0,0,0,0.18),0_1px_1px_rgba(255,255,255,0.8)] border border-neutral-300/40 p-[1.5px]">
                         <div
-                          className={`h-full rounded-full transition-all duration-300 relative overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.22),inset_0_1px_1px_rgba(255,255,255,0.7),inset_0_-1px_1px_rgba(0,0,0,0.25)] ${
-                            crit.tone === 'green'
+                          className={`h-full rounded-full transition-all duration-300 relative overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.22),inset_0_1px_1px_rgba(255,255,255,0.7),inset_0_-1px_1px_rgba(0,0,0,0.25)] ${crit.tone === 'green'
                               ? 'bg-gradient-to-b from-emerald-400 via-emerald-500 to-emerald-600'
                               : crit.tone === 'yellow'
-                              ? 'bg-gradient-to-b from-amber-300 via-amber-400 to-amber-500'
-                              : 'bg-gradient-to-b from-rose-400 via-rose-500 to-rose-600'
-                          }`}
+                                ? 'bg-gradient-to-b from-amber-300 via-amber-400 to-amber-500'
+                                : 'bg-gradient-to-b from-rose-400 via-rose-500 to-rose-600'
+                            }`}
                           style={{ width: `${Math.min(100, Math.max(8, Math.floor(crit.score) * 10))}%` }}
                         >
                           {/* 3D Specular highlight reflection */}
@@ -609,13 +608,12 @@ ${book.resumo}
                       </div>
 
                       <div className="flex items-center justify-between text-[11px]">
-                        <span className={`font-bold ${
-                          crit.tone === 'green'
+                        <span className={`font-bold ${crit.tone === 'green'
                             ? 'text-emerald-700'
                             : crit.tone === 'yellow'
-                            ? 'text-amber-800'
-                            : 'text-rose-700'
-                        }`}>
+                              ? 'text-amber-800'
+                              : 'text-rose-700'
+                          }`}>
                           {crit.tag}
                         </span>
                       </div>
@@ -666,11 +664,10 @@ ${book.resumo}
                 variant={isSaved ? "primary" : "secondary"}
                 size="md"
                 onClick={() => onSaveToWishlist(book)}
-                className={`shrink-0 px-3.5 ${
-                  isSaved
+                className={`shrink-0 px-3.5 ${isSaved
                     ? '!bg-neutral-900 hover:!bg-black !text-white !border-neutral-800 shadow-sm'
                     : ''
-                }`}
+                  }`}
                 title={isSaved ? "Salvo na sua estante" : "Salvar livro"}
                 aria-label={isSaved ? "Salvo na sua estante" : "Salvar livro"}
               >

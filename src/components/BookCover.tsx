@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { ScoreBadge } from './ScoreBadge';
+import { ScoreBadge } from './ui/ScoreBadge';
 
 interface BookCoverProps {
   title: string;

@@ -1,10 +1,10 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { BookOpen, ArrowLeft, ArrowUpDown, Check, Bookmark, Trash2, CheckSquare, X } from 'lucide-react';
-import { BookEvaluation, UserRatingsMap } from '../types';
-import { getEffectiveScore } from '../services/ratings';
-import { BookShelf } from './BookShelf';
-import { BookCover } from './BookCover';
+import { BookEvaluation, UserRatingsMap } from '../../types';
+import { getEffectiveScore } from '../../services/ratings';
+import { BookShelf } from '../BookShelf';
+import { BookCover } from '../BookCover';
 
 interface EstanteViewProps {
   books: BookEvaluation[];
