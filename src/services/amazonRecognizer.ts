@@ -2,9 +2,7 @@ import { BookEvaluation } from '../types';
 import { getCuratedCovers } from '../data/curatedCovers';
 import { raceGemini, parseJsonLoose, RaceModel } from './geminiRace';
 
-const GEMINI_API_KEY =
-  import.meta.env.VITE_GEMINI_API_KEY ||
-  'AQ.Ab8RN6LNzoEEpQlupq2n1dJRY5APsOuFfXmRLp7ESySq8-A3Uw';
+const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || '';
 
 const AMAZON_INITIAL_MODELS: RaceModel[] = [
   {

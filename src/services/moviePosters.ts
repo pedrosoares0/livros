@@ -1,7 +1,7 @@
 // TMDb API Integration Service for Brazilian Portuguese Movie Posters
 // Prioritizes Portuguese (pt-BR) localized posters with robust fallbacks
 
-const TMDB_API_KEY = import.meta.env.VITE_TMDB_API_KEY || '3fd2be6f0c70a2a598f084ddfb75487c';
+const TMDB_API_KEY = import.meta.env.VITE_TMDB_API_KEY || '';
 const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
 const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p/w500';
 
