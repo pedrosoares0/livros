@@ -176,7 +176,7 @@ Identifique a EDIÇÃO ESPECÍFICA comercializada neste link da Amazon.
 5. "pages": Quantidade real aproximada de páginas desta edição brasileira do link (ex: 296 para Maus volume único; 320 ou 352 para O Cair da Noite).
 6. "originalTitle": Título original no idioma de origem.
 7. "genres": 2 a 3 gêneros principais.
-8. "resumo": Sinopse concisa de 2 linhas sobre premissa, clima e conflito sem spoilers.
+8. "resumo": Premissa e atmosfera inicial em 2 linhas sutis, preservando o mistério da obra sem spoilers nem revelações explícitas da trama.
 
 Responda ESTRITAMENTE em formato JSON:
 {

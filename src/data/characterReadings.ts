@@ -740,7 +740,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     coverUrl: amz('857351549X'),
     genres: ['Graphic Novel', 'Distopia Política', 'Sci-Fi'],
     resumo:
-      'Em uma Guerra Fria alternativa à beira do apocalipse nuclear, o assassinato do Comediante expõe vigilantes quebrados, um semideus indiferente e um plano genocida para salvar o mundo.',
+      'Em uma Guerra Fria alternativa à beira do apocalipse nuclear, o assassinato do Comediante arrasta ex-vigilantes mascarados e um semideus indiferente para uma conspiração que coloca em xeque o destino da humanidade.',
   },
   {
     id: 'br-rei-lear',
@@ -1028,7 +1028,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     coverUrl: amz('8576573822'),
     genres: ['Ficção Científica', 'Tragédia Política'],
     resumo:
-      'Doze anos após ascender ao trono imperial, Paul Atreides vê sua jihad devorar bilhões de vidas no cosmos enquanto tenta impedir a visão profética da morte de Chani no parto.',
+      'Doze anos após ascender ao trono imperial, Paul Atreides vê a jihad travada em seu nome devorar bilhões de vidas pelo cosmos, enquanto uma conspiração silenciosa e as armadilhas da própria presciência fecham o cerco ao seu redor.',
   },
   {
     id: 'br-cidade-ladroes',
@@ -1076,7 +1076,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     coverUrl: amz('8535926550'),
     genres: ['Ficção Científica', 'Distopia', 'Drama Humano'],
     resumo:
-      'Criados no internato de Hailsham como clones destinados à doação de órgãos, Kathy, Ruth e Tommy buscam na arte, na memória e no amor a prova de que possuem uma alma.',
+      'No isolado e aparente idílio do internato inglês de Hailsham, Kathy, Ruth e Tommy crescem cercados por regras veladas e pelo incentivo constante de produzir arte — até compreenderem, aos poucos, o propósito silencioso para o qual foram criados.',
   },
   {
     id: 'br-homem-bicentenario',
@@ -1088,7 +1088,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     coverUrl: amz('8576575868'),
     genres: ['Ficção Científica', 'Filosófico', 'Drama'],
     resumo:
-      'Ao longo de duzentos anos, o robô positrônico Andrew Martin descobre a arte, a liberdade e o luto por quem ama, até escolher abrir mão da própria imortalidade para ser reconhecido como humano.',
+      'Ao longo de dois séculos, o robô positrônico Andrew Martin desperta para a arte, a liberdade e o luto por quem ama, travando uma longa jornada ética e existencial para descobrir o que define um ser humano.',
   },
   {
     id: 'br-encontro-rama',
@@ -1138,6 +1138,1038 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     resumo:
       'Para capturar um assassino em série que esfola suas vítimas, a jovem investigadora Clarice Starling precisa mergulhar nos labirintos mentais do brilhante psiquiatra canibal Hannibal Lecter.',
   },
+  {
+    id: 'br-mito-sisifo',
+    title: 'O Mito de Sísifo',
+    author: 'Albert Camus',
+    publisher: 'Record',
+    year: 1942,
+    pages: 160,
+    coverUrl: amz('8501067598'),
+    genres: ['Filosofia', 'Existencialismo', 'Ensaio'],
+    resumo:
+      'Diante do silêncio irracional do mundo e da ausência de sentido último, Camus investiga o absurdo da condição humana e a revolta lúcida de continuar empurrando a rocha.',
+  },
+  {
+    id: 'br-duplo',
+    title: 'O Duplo',
+    author: 'Fiódor Dostoiévski',
+    publisher: 'Editora 34',
+    year: 1846,
+    pages: 232,
+    coverUrl: amz('8573264861'),
+    genres: ['Clássico Russo', 'Drama Psicológico'],
+    resumo:
+      'Em uma noite úmida de São Petersburgo, o funcionário público Iákov Goliádkin encontra um homem idêntico a si mesmo em nome e feições que passa a usurpar seu lugar na repartição e na vida.',
+  },
+  {
+    id: 'br-guerra-e-paz',
+    title: 'Guerra e Paz',
+    author: 'Liev Tolstói',
+    publisher: 'Companhia das Letras',
+    year: 1869,
+    pages: 1544,
+    coverUrl: amz('8535930043'),
+    genres: ['Clássico Russo', 'Épico Histórico', 'Drama'],
+    resumo:
+      'Enquanto os exércitos de Napoleão marcham sobre a Rússia czarista, cinco famílias aristocráticas atravessam salões imperiais e campos de batalha em busca de sentido moral na história.',
+  },
+  {
+    id: 'br-anna-karienina',
+    title: 'Anna Kariênina',
+    author: 'Liev Tolstói',
+    publisher: 'Companhia das Letras',
+    year: 1877,
+    pages: 808,
+    coverUrl: amz('8535929622'),
+    genres: ['Clássico Russo', 'Drama', 'Tragédia'],
+    resumo:
+      'Dividida entre as convenções implacáveis da alta sociedade russa e a paixão avassaladora pelo oficial Vrónski, Anna Kariênina enfrenta o preço brutal do exílio moral.',
+  },
+  {
+    id: 'br-sociedade-anel',
+    title: 'O Senhor dos Anéis: A Sociedade do Anel',
+    author: 'J. R. R. Tolkien',
+    publisher: 'HarperCollins',
+    year: 1954,
+    pages: 576,
+    coverUrl: amz('8595084750'),
+    genres: ['Fantasia Épica', 'Clássico', 'Aventura'],
+    resumo:
+      'Herdando um anel de poder ancestral que corrompe quem o carrega, Frodo Bolseiro deixa o Condado ao lado de uma comitiva improvável rumo às sombras de Mordor.',
+  },
+  {
+    id: 'br-retorno-rei',
+    title: 'O Senhor dos Anéis: O Retorno do Rei',
+    author: 'J. R. R. Tolkien',
+    publisher: 'HarperCollins',
+    year: 1955,
+    pages: 448,
+    coverUrl: amz('8595084777'),
+    genres: ['Fantasia Épica', 'Guerra', 'Clássico'],
+    resumo:
+      'Enquanto os exércitos do Oeste sustentam um último cerco diante dos portões negros para atrair o Olho do Inimigo, dois pequenos hobbits se arrastam pelas cinzas da Montanha da Perdição.',
+  },
+  {
+    id: 'br-silmarillion',
+    title: 'O Silmarillion',
+    author: 'J. R. R. Tolkien',
+    publisher: 'HarperCollins',
+    year: 1977,
+    pages: 496,
+    coverUrl: amz('8595084378'),
+    genres: ['Mitologia', 'Fantasia Épica', 'Tragédia'],
+    resumo:
+      'Da música primordial da criação à rebelião de Morgoth e ao juramento trágico de Fëanor pelas gemas de luz, as crônicas ancestrais da Primeira Era da Terra-média.',
+  },
+  {
+    id: 'br-fundacao-imperio',
+    title: 'Fundação e Império',
+    author: 'Isaac Asimov',
+    publisher: 'Aleph',
+    year: 1952,
+    pages: 272,
+    coverUrl: amz('857657067X'),
+    genres: ['Ficção Científica', 'Estratégia Cósmica'],
+    resumo:
+      'A psico-história de Hari Seldon enfrenta a única anomalia que suas equações matemáticas jamais poderiam prever: o surgimento do Mulo, um mutante capaz de dobrar emoções humanas.',
+  },
+  {
+    id: 'br-segunda-fundacao',
+    title: 'Segunda Fundação',
+    author: 'Isaac Asimov',
+    publisher: 'Aleph',
+    year: 1953,
+    pages: 288,
+    coverUrl: amz('8576570688'),
+    genres: ['Ficção Científica', 'Suspense Mental'],
+    resumo:
+      'Na outra extremidade da galáxia, uma ordem secreta de psicólogos e estrategistas mentais trabalha nas sombras para restaurar o Plano Seldon sem jamais revelar onde se esconde.',
+  },
+  {
+    id: 'br-sol-desvelado',
+    title: 'O Sol Desvelado',
+    author: 'Isaac Asimov',
+    publisher: 'Aleph',
+    year: 1957,
+    pages: 304,
+    coverUrl: amz('8576571986'),
+    genres: ['Ficção Científica', 'Investigação'],
+    resumo:
+      'No planeta Solaria, onde vinte mil habitantes vivem isolados em propriedades gigantescas cercados por robôs e têm pavor do contato físico, ocorre um assassinato aparentemente impossível.',
+  },
+  {
+    id: 'br-robos-alvorada',
+    title: 'Os Robôs da Alvorada',
+    author: 'Isaac Asimov',
+    publisher: 'Aleph',
+    year: 1983,
+    pages: 528,
+    coverUrl: amz('8576572605'),
+    genres: ['Ficção Científica', 'Investigação'],
+    resumo:
+      'Chamado ao mundo espacial de Aurora, o detetive Elijah Baley precisa solucionar o "roboticídio" mental de um androide humaniforme antes que a crise destrua o futuro político da Terra.',
+  },
+  {
+    id: 'br-proprios-deuses',
+    title: 'Os Próprios Deuses',
+    author: 'Isaac Asimov',
+    publisher: 'Aleph',
+    year: 1972,
+    pages: 344,
+    coverUrl: amz('8576570254'),
+    genres: ['Hard Sci-Fi', 'Ficção Científica'],
+    resumo:
+      'Uma fonte inesgotável de energia trocada com um universo paralelo garante prosperidade à Terra, mas poucos cientistas ousam enxergar o preço físico que essa transação cobra das estrelas.',
+  },
+  {
+    id: 'br-guerra-tronos',
+    title: 'A Guerra dos Tronos',
+    author: 'George R. R. Martin',
+    publisher: 'Suma',
+    year: 1996,
+    pages: 600,
+    coverUrl: amz('8556510787'),
+    genres: ['Fantasia Sombria', 'Intriga Política'],
+    resumo:
+      'Nos Sete Reinos de Westeros, onde os verões duram décadas e o inverno se aproxima, a honra inflexível de Eddard Stark colide com o ninho de traições da corte de Porto Real.',
+  },
+  {
+    id: 'br-furia-reis',
+    title: 'A Fúria dos Reis',
+    author: 'George R. R. Martin',
+    publisher: 'Suma',
+    year: 1998,
+    pages: 656,
+    coverUrl: amz('8556510795'),
+    genres: ['Fantasia Sombria', 'Guerra', 'Política'],
+    resumo:
+      'Sob o rastro de um cometa cor de sangue, cinco pretendentes reivindicam o Trono de Ferro em uma guerra civil brutal que incendeia rios, castelos e alianças.',
+  },
+  {
+    id: 'br-tormenta-espadas',
+    title: 'A Tormenta de Espadas',
+    author: 'George R. R. Martin',
+    publisher: 'Suma',
+    year: 2000,
+    pages: 884,
+    coverUrl: amz('8556510906'),
+    genres: ['Fantasia Sombria', 'Tragédia', 'Guerra'],
+    resumo:
+      'Com os Sete Reinos exauridos pelo conflito, a guerra deixa o campo de batalha aberto e se decide nos banquetes, nas alianças quebradas e nas muralhas de gelo do Norte.',
+  },
+  {
+    id: 'br-temor-sabio',
+    title: 'O Temor do Sábio',
+    author: 'Patrick Rothfuss',
+    publisher: 'Arqueiro',
+    year: 2011,
+    pages: 960,
+    coverUrl: amz('8599296361'),
+    genres: ['Fantasia', 'Formação', 'Aventura'],
+    resumo:
+      'Forçado a se afastar da Universidade, Kvothe viaja até cortes distantes, florestas feéricas e a terra dos guerreiros Ademre em sua caçada silenciosa por respostas sobre os Chandrian.',
+  },
+  {
+    id: 'br-mentiras-locke-lamora',
+    title: 'As Mentiras de Locke Lamora',
+    author: 'Scott Lynch',
+    publisher: 'Arqueiro',
+    year: 2006,
+    pages: 480,
+    coverUrl: amz('8580412994'),
+    genres: ['Fantasia', 'Submundo', 'Golpes'],
+    resumo:
+      'Nos canais sombrios de Camorr, o prodígio da trapaça Locke Lamora e seu bando de Nobres Vigaristas aplicam golpes audaciosos contra a elite até caírem na teia de uma guerra secreta.',
+  },
+  {
+    id: 'br-caminho-reis',
+    title: 'O Caminho dos Reis',
+    author: 'Brandon Sanderson',
+    publisher: 'Trama',
+    year: 2010,
+    pages: 1232,
+    coverUrl: amz('6589132690'),
+    genres: ['Fantasia Épica', 'Guerra'],
+    resumo:
+      'No mundo assolado por tempestades de Roshar, um cirurgião reduzido à escravidão nas pontes de guerra e um general assombrado por visões buscam o código perdido dos Cavaleiros Radiantes.',
+  },
+  {
+    id: 'br-count-zero',
+    title: 'Count Zero',
+    author: 'William Gibson',
+    publisher: 'Aleph',
+    year: 1986,
+    pages: 320,
+    coverUrl: amz('8576573016'),
+    genres: ['Cyberpunk', 'Ficção Científica'],
+    resumo:
+      'Sete anos após os eventos de Neuromancer, a Matriz mudou: entidades enigmáticas circulam pelo ciberespaço enquanto mercenários corporativos e um jovem hacker cruzam destinos.',
+  },
+  {
+    id: 'br-mona-lisa-overdrive',
+    title: 'Mona Lisa Overdrive',
+    author: 'William Gibson',
+    publisher: 'Aleph',
+    year: 1988,
+    pages: 320,
+    coverUrl: amz('8576573024'),
+    genres: ['Cyberpunk', 'Ficção Científica'],
+    resumo:
+      'Uma jovem de rua com semelhança cirúrgica a uma superestrela do SimStim, a filha de um chefe da Yakuza e inteligências artificiais convergem no desfecho da Trilogia do Sprawl.',
+  },
+  {
+    id: 'br-matadouro-cinco',
+    title: 'Matadouro-Cinco',
+    author: 'Kurt Vonnegut',
+    publisher: 'Rocco',
+    year: 1969,
+    pages: 224,
+    coverUrl: amz('8532531431'),
+    genres: ['Clássico', 'Guerra', 'Ficção Científica'],
+    resumo:
+      'Desprendido no tempo, Billy Pilgrim oscila sem controle entre o bombardeio incendiário de Dresden na Segunda Guerra Mundial e um zoológico alienígena no planeta Tralfamadore.',
+  },
+  {
+    id: 'br-guerra-velho',
+    title: 'Guerra do Velho',
+    author: 'John Scalzi',
+    publisher: 'Aleph',
+    year: 2005,
+    pages: 368,
+    coverUrl: amz('8576573156'),
+    genres: ['Ficção Científica Militar', 'Space Opera'],
+    resumo:
+      'Aos setenta e cinco anos, John Perry se alista nas Forças Coloniais de Defesa, deixando a Terra para sempre para lutar pela sobrevivência humana num universo implacavelmente hostil.',
+  },
+  {
+    id: 'br-orador-mortos',
+    title: 'Orador dos Mortos',
+    author: 'Orson Scott Card',
+    publisher: 'Aleph',
+    year: 1986,
+    pages: 416,
+    coverUrl: amz('8576572079'),
+    genres: ['Ficção Científica', 'Filosófico', 'Antropológico'],
+    resumo:
+      'Três milênios após a guerra que o marcou para sempre, Ender Wiggin viaja como Orador pelos mundos humanos até chegar à colônia de Lusitânia, onde uma nova espécie inteligente guarda um segredo.',
+  },
+  {
+    id: 'br-filhos-duna',
+    title: 'Filhos de Duna',
+    author: 'Frank Herbert',
+    publisher: 'Aleph',
+    year: 1976,
+    pages: 528,
+    coverUrl: amz('8576573849'),
+    genres: ['Ficção Científica', 'Tragédia Dinástica'],
+    resumo:
+      'Com Arrakis tornando-se verdejante e o império religioso dos Atreides corrompido por intrigas, os gêmeos Leto II e Ghanima herdam as memórias de todos os seus ancestrais e o peso do Caminho Dourado.',
+  },
+  {
+    id: 'br-imperador-deus-duna',
+    title: 'Imperador Deus de Duna',
+    author: 'Frank Herbert',
+    publisher: 'Aleph',
+    year: 1981,
+    pages: 544,
+    coverUrl: amz('8576574284'),
+    genres: ['Ficção Científica', 'Filosófico', 'Política'],
+    resumo:
+      'Após três mil e quinhentos anos de reinado absoluto, Leto II abdicou da forma humana para conduzir a espécie pelo Caminho Dourado, sabendo que a própria destruição faz parte de seu desígnio.',
+  },
+  {
+    id: 'br-curva-sonho',
+    title: 'A Curva do Sonho',
+    author: 'Ursula K. Le Guin',
+    publisher: 'Morro Branco',
+    year: 1971,
+    pages: 224,
+    coverUrl: amz('6586015014'),
+    genres: ['Ficção Científica', 'Psicológico'],
+    resumo:
+      'George Orr descobre que seus sonhos alteram retroativamente a realidade. Ao buscar ajuda psiquiátrica para parar de sonhar, cai nas mãos de um médico decidido a redesenhar o mundo.',
+  },
+  {
+    id: 'br-dracula',
+    title: 'Drácula',
+    author: 'Bram Stoker',
+    publisher: 'DarkSide',
+    year: 1897,
+    pages: 580,
+    coverUrl: amz('8594541473'),
+    genres: ['Clássico Gótico', 'Terror'],
+    resumo:
+      'Através de diários, cartas e registros fonográficos, a chegada silenciosa de um conde ancestral da Transilvânia espalha uma sombra predatória sobre a Londres vitoriana.',
+  },
+  {
+    id: 'br-2666',
+    title: '2666',
+    author: 'Roberto Bolaño',
+    publisher: 'Companhia das Letras',
+    year: 2004,
+    pages: 856,
+    coverUrl: amz('8535917098'),
+    genres: ['Clássico Contemporâneo', 'Mistério', 'Drama Sombrio'],
+    resumo:
+      'Críticos literários europeus, um professor exilado, um jornalista americano e um misterioso romancista alemão convergem para a cidade fronteiriça de Santa Teresa, palco de crimes impunes.',
+  },
+  {
+    id: 'br-detetives-selvagens',
+    title: 'Os Detetives Selvagens',
+    author: 'Roberto Bolaño',
+    publisher: 'Companhia das Letras',
+    year: 1998,
+    pages: 632,
+    coverUrl: amz('8535908455'),
+    genres: ['Clássico Contemporâneo', 'Formação', 'Arte'],
+    resumo:
+      'Da Cidade do México dos anos 1970 aos desertos de Sonora, os poetas vanguardistas Arturo Belano e Ulises Lima partem no rastro de uma autora desaparecida e da própria juventude.',
+  },
+  {
+    id: 'br-pedro-paramo',
+    title: 'Pedro Páramo',
+    author: 'Juan Rulfo',
+    publisher: 'BestBolso',
+    year: 1955,
+    pages: 160,
+    coverUrl: amz('8520922260'),
+    genres: ['Clássico', 'Realismo Fantástico', 'Gótico'],
+    resumo:
+      'Cumprindo a promessa feita à mãe no leito de morte, Juan Preciado desce ao vilarejo árido de Comala em busca do pai que nunca conheceu, encontrando uma cidade povoada por murmúrios.',
+  },
+  {
+    id: 'br-capitaes-areia',
+    title: 'Capitães da Areia',
+    author: 'Jorge Amado',
+    publisher: 'Companhia das Letras',
+    year: 1937,
+    pages: 280,
+    coverUrl: amz('8535911693'),
+    genres: ['Clássico Brasileiro', 'Drama Social'],
+    resumo:
+      'Nos trapiches abandonados de Salvador, o jovem Pedro Bala lidera um bando de meninos órfãos e marginalizados que sobrevivem entre a liberdade das ruas e a brutalidade da cidade.',
+  },
+  {
+    id: 'br-paixao-gh',
+    title: 'A Paixão Segundo G.H.',
+    author: 'Clarice Lispector',
+    publisher: 'Rocco',
+    year: 1964,
+    pages: 192,
+    coverUrl: amz('8532524362'),
+    genres: ['Clássico Brasileiro', 'Filosófico', 'Psicológico'],
+    resumo:
+      'Ao entrar no quarto vazio da ex-empregada em seu apartamento no Rio de Janeiro, uma escultora sofre um colapso epifânico que desmonta todas as suas certezas sobre identidade e linguagem.',
+  },
+  {
+    id: 'br-quincas-borba',
+    title: 'Quincas Borba',
+    author: 'Machado de Assis',
+    publisher: 'Penguin-Companhia',
+    year: 1891,
+    pages: 360,
+    coverUrl: amz('8582850328'),
+    genres: ['Clássico Brasileiro', 'Sátira Psicológica'],
+    resumo:
+      'Herdando a fortuna e o cachorro de um filósofo excêntrico sob a máxima "ao vencedor, as batatas", o ingênuo professor Rubião mergulha na corte carioca até a fronteira do delírio.',
+  },
+  {
+    id: 'br-intermitencias-morte',
+    title: 'As Intermitências da Morte',
+    author: 'José Saramago',
+    publisher: 'Companhia das Letras',
+    year: 2005,
+    pages: 208,
+    coverUrl: amz('8535907130'),
+    genres: ['Fábula Filosófica', 'Sátira', 'Clássico'],
+    resumo:
+      'À meia-noite de primeiro de janeiro, ninguém mais morre em um pequeno país. A euforia inicial pela vida eterna logo cede lugar ao colapso político, religioso e familiar.',
+  },
+  {
+    id: 'br-evangelho-jesus',
+    title: 'O Evangelho Segundo Jesus Cristo',
+    author: 'José Saramago',
+    publisher: 'Companhia das Letras',
+    year: 1991,
+    pages: 448,
+    coverUrl: amz('8535906967'),
+    genres: ['Clássico', 'Drama Filosófico'],
+    resumo:
+      'Uma releitura profundamente humana e trágica da juventude de Jesus de Nazaré, atormentado pela culpa dos inocentes de Belém e por um destino imposto pelos desígnios do poder divino.',
+  },
+  {
+    id: 'br-caim',
+    title: 'Caim',
+    author: 'José Saramago',
+    publisher: 'Companhia das Letras',
+    year: 2009,
+    pages: 176,
+    coverUrl: amz('8535915532'),
+    genres: ['Sátira Filosófica', 'Clássico'],
+    resumo:
+      'Condenado a vagar após o primeiro fratricídio, Caim atravessa episódios do Antigo Testamento questionando de frente a justiça e a crueldade das ordens divinas.',
+  },
+  {
+    id: 'br-todos-os-nomes',
+    title: 'Todos os Nomes',
+    author: 'José Saramago',
+    publisher: 'Companhia das Letras',
+    year: 1997,
+    pages: 288,
+    coverUrl: amz('8571647151'),
+    genres: ['Drama Existencial', 'Clássico'],
+    resumo:
+      'O solitário escriturário Sr. José, funcionário subalterno da Conservatória Geral do Registo Civil, encontra por acaso a ficha de uma mulher desconhecida e arrisca tudo para descobrir quem ela é.',
+  },
+  {
+    id: 'br-colonia-penal',
+    title: 'Na Colônia Penal',
+    author: 'Franz Kafka',
+    publisher: 'Companhia das Letras',
+    year: 1919,
+    pages: 80,
+    coverUrl: amz('8535918787'),
+    genres: ['Clássico', 'Horror Burocrático'],
+    resumo:
+      'Um explorador estrangeiro assiste à demonstração orgulhosa de um oficial sobre um aparelho de execução que inscreve a sentença judicial na própria pele do condenado.',
+  },
+  {
+    id: 'br-montanha-magica',
+    title: 'A Montanha Mágica',
+    author: 'Thomas Mann',
+    publisher: 'Companhia das Letras',
+    year: 1924,
+    pages: 848,
+    coverUrl: amz('8535927794'),
+    genres: ['Clássico', 'Filosófico', 'Formação'],
+    resumo:
+      'Hans Castorp sobe aos Alpes suíços para visitar o primo num sanatório por três semanas, mas o magnetismo daquele mundo suspenso no tempo o retém por sete anos à beira da Grande Guerra.',
+  },
+  {
+    id: 'br-morte-veneza',
+    title: 'A Morte em Veneza',
+    author: 'Thomas Mann',
+    publisher: 'Companhia das Letras',
+    year: 1912,
+    pages: 144,
+    coverUrl: amz('8535915028'),
+    genres: ['Clássico', 'Estética', 'Tragédia'],
+    resumo:
+      'Em busca de alívio para o rigor sufocante de sua disciplina criativa, o renomado escritor Gustav von Aschenbach viaja a uma Veneza silenciosamente tomada pelo cólera.',
+  },
+  {
+    id: 'br-demian',
+    title: 'Demian',
+    author: 'Hermann Hesse',
+    publisher: 'Record',
+    year: 1919,
+    pages: 192,
+    coverUrl: amz('8501095508'),
+    genres: ['Clássico', 'Formação', 'Psicológico'],
+    resumo:
+      'Guiado pelo enigmático colega de escola Max Demian, o jovem Emil Sinclair rompe a fronteira entre o mundo luminoso da infância e as zonas proibidas da própria consciência.',
+  },
+  {
+    id: 'br-sidarta',
+    title: 'Sidarta',
+    author: 'Hermann Hesse',
+    publisher: 'Record',
+    year: 1922,
+    pages: 176,
+    coverUrl: amz('8577990710'),
+    genres: ['Clássico', 'Filosófico'],
+    resumo:
+      'Na Índia antiga, o filho de um brâmane abandona o conforto paterno, o ascetismo e os ensinamentos prontos para experimentar na própria carne a riqueza, a perda e a escuta de um rio.',
+  },
+  {
+    id: 'br-entre-quatro-paredes',
+    title: 'Entre Quatro Paredes',
+    author: 'Jean-Paul Sartre',
+    publisher: 'Civilização Brasileira',
+    year: 1944,
+    pages: 112,
+    coverUrl: amz('8528612244'),
+    genres: ['Teatro', 'Existencialismo', 'Psicológico'],
+    resumo:
+      'Três desconhecidos são conduzidos a uma sala fechada sem espelhos nem janelas, onde a ausência de carrascos físicos revela que o verdadeiro tormento reside no olhar implacável do outro.',
+  },
+  {
+    id: 'br-gigante-enterrado',
+    title: 'O Gigante Enterrado',
+    author: 'Kazuo Ishiguro',
+    publisher: 'Companhia das Letras',
+    year: 2015,
+    pages: 384,
+    coverUrl: amz('853592602X'),
+    genres: ['Fantasia Melancólica', 'Memória', 'Drama'],
+    resumo:
+      'Em uma Bretanha pós-arturiana envolta por uma névoa que apaga as lembranças de todos os habitantes, um velho casal parte em busca do filho sem saber que feridas o retorno da memória pode reabrir.',
+  },
+  {
+    id: 'br-kafka-beira-mar',
+    title: 'Kafka à Beira-Mar',
+    author: 'Haruki Murakami',
+    publisher: 'Alfaguara',
+    year: 2002,
+    pages: 576,
+    coverUrl: amz('8560281452'),
+    genres: ['Realismo Fantástico', 'Formação', 'Mistério'],
+    resumo:
+      'Fugindo de casa aos quinze anos e de uma maldição paterna, o jovem Kafka Tamura encontra abrigo numa biblioteca particular costeira enquanto seu destino cruza o de um velho que conversa com gatos.',
+  },
+  {
+    id: 'br-1q84',
+    title: '1Q84',
+    author: 'Haruki Murakami',
+    publisher: 'Alfaguara',
+    year: 2009,
+    pages: 992,
+    coverUrl: amz('857962181X'),
+    genres: ['Distopia Surreal', 'Mistério', 'Drama'],
+    resumo:
+      'Ao descer uma escada de emergência numa via expressa de Tóquio, Aomame percebe que entrou numa realidade ligeiramente alterada, onde duas luas pairam no céu noturno.',
+  },
+  {
+    id: 'br-cronica-passaro-corda',
+    title: 'Crônica do Pássaro de Corda',
+    author: 'Haruki Murakami',
+    publisher: 'Alfaguara',
+    year: 1994,
+    pages: 664,
+    coverUrl: amz('8556520529'),
+    genres: ['Mistério Psicológico', 'Surrealismo'],
+    resumo:
+      'A busca por um gato desaparecido nos subúrbios de Tóquio conduz Toru Okada ao fundo de um poço seco e aos ecos sombrios da ocupação japonesa na Manchúria.',
+  },
+  {
+    id: 'br-homens-sem-mulheres',
+    title: 'Homens Sem Mulheres',
+    author: 'Haruki Murakami',
+    publisher: 'Alfaguara',
+    year: 2014,
+    pages: 240,
+    coverUrl: amz('8581053025'),
+    genres: ['Contos', 'Melancolia', 'Drama'],
+    resumo:
+      'Sete contos atravessados por clubes de jazz, estradas noturnas e a solidão silenciosa de homens marcados pela ausência irremediável de quem amaram.',
+  },
+  {
+    id: 'br-it-a-coisa',
+    title: 'It: A Coisa',
+    author: 'Stephen King',
+    publisher: 'Suma',
+    year: 1986,
+    pages: 1104,
+    coverUrl: amz('8560280944'),
+    genres: ['Terror', 'Amizade', 'Suspense'],
+    resumo:
+      'Na pacata cidade de Derry, sete crianças marginalizadas enfrentam uma entidade ancestral que desperta nos esgotos a cada vinte e sete anos assumindo a forma de seus piores medos.',
+  },
+  {
+    id: 'br-a-danca-da-morte',
+    title: 'A Dança da Morte',
+    author: 'Stephen King',
+    publisher: 'Suma',
+    year: 1978,
+    pages: 1248,
+    coverUrl: amz('8581050476'),
+    genres: ['Pós-Apocalíptico', 'Épico Sombrio'],
+    resumo:
+      'Após o vazamento de uma supergripe dizimar a população mundial, os poucos sobreviventes são atraídos por sonhos opostos rumo ao confronto inevitável nas ruínas da América.',
+  },
+  {
+    id: 'br-outsider',
+    title: 'Outsider',
+    author: 'Stephen King',
+    publisher: 'Suma',
+    year: 2018,
+    pages: 528,
+    coverUrl: amz('8556510671'),
+    genres: ['Investigação', 'Suspense', 'Horror'],
+    resumo:
+      'Impressões digitais e testemunhas apontam de forma irrefutável para um treinador respeitado em um crime brutal, mas gravações de vídeo provam que ele estava em outra cidade no mesmo instante.',
+  },
+  {
+    id: 'br-novembro-63',
+    title: 'Novembro de 63',
+    author: 'Stephen King',
+    publisher: 'Suma',
+    year: 2011,
+    pages: 728,
+    coverUrl: amz('8581051901'),
+    genres: ['Viagem no Tempo', 'Suspense Histórico', 'Drama'],
+    resumo:
+      'O professor de inglês Jake Epping descobre nos fundos de uma lanchonete uma passagem para o ano de 1958 e assume a missão de impedir o assassinato de John F. Kennedy — mas o passado resiste a mudanças.',
+  },
+  {
+    id: 'br-carrie',
+    title: 'Carrie',
+    author: 'Stephen King',
+    publisher: 'Suma',
+    year: 1974,
+    pages: 200,
+    coverUrl: amz('8581050441'),
+    genres: ['Terror Psicológico', 'Tragédia'],
+    resumo:
+      'Oprimida pelo fanatismo religioso da mãe em casa e pela humilhação cruel dos colegas na escola, a adolescente Carrie White descobre uma força telecinética que avança rumo à noite do baile.',
+  },
+  {
+    id: 'br-salem',
+    title: 'Salem',
+    author: 'Stephen King',
+    publisher: 'Suma',
+    year: 1975,
+    pages: 464,
+    coverUrl: amz('858105045X'),
+    genres: ['Terror Gótico', 'Suspense'],
+    resumo:
+      'O escritor Ben Mears retorna à pequena Jerusalem’s Lot para enfrentar um trauma de infância no exato momento em que novos moradores compram a velha mansão Marsten no alto da colina.',
+  },
+  {
+    id: 'br-doutor-sono',
+    title: 'Doutor Sono',
+    author: 'Stephen King',
+    publisher: 'Suma',
+    year: 2013,
+    pages: 480,
+    coverUrl: amz('8581051952'),
+    genres: ['Terror Psicológico', 'Sobrenatural'],
+    resumo:
+      'Décadas após sobreviver ao Hotel Overlook, um Dan Torrance marcado pelo alcoolismo e pelos fantasmas do pai tenta proteger uma menina cujo brilho atrai um clã de predadores imortais.',
+  },
+  {
+    id: 'br-coraline',
+    title: 'Coraline',
+    author: 'Neil Gaiman',
+    publisher: 'Intrínseca',
+    year: 2002,
+    pages: 224,
+    coverUrl: amz('8551006754'),
+    genres: ['Fábula Sombria', 'Terror'],
+    resumo:
+      'Ao atravessar uma porta trancada na sala de visitas da casa nova, Coraline encontra um apartamento idêntico ao seu, onde uma "Outra Mãe" de olhos de botões promete realizar todos os seus desejos.',
+  },
+  {
+    id: 'br-lugar-nenhum',
+    title: 'Lugar Nenhum',
+    author: 'Neil Gaiman',
+    publisher: 'Intrínseca',
+    year: 1996,
+    pages: 368,
+    coverUrl: amz('8551000837'),
+    genres: ['Fantasia Urbana', 'Sombrio'],
+    resumo:
+      'Após socorrer uma garota ferida na calçada, um jovem comum vê sua existência ser apagada da superfície e é arrastado para a Londres de Baixo, um submundo feudal nos túneis do metrô.',
+  },
+  {
+    id: 'br-sandman',
+    title: 'Sandman: Prelúdios e Noturnos',
+    author: 'Neil Gaiman',
+    publisher: 'Panini',
+    year: 1989,
+    pages: 240,
+    coverUrl: amz('857351695X'),
+    genres: ['Graphic Novel', 'Mitologia Sombria'],
+    resumo:
+      'Aprisionado por ocultistas humanos durante setenta anos em um porão de vidro, Morfeus, o Senhor dos Sonhos, conquista a liberdade e parte para reconstruir seu reino em ruínas.',
+  },
+  {
+    id: 'br-piada-mortal',
+    title: 'Batman: A Piada Mortal',
+    author: 'Alan Moore & Brian Bolland',
+    publisher: 'Panini',
+    year: 1988,
+    pages: 64,
+    coverUrl: amz('8573515481'),
+    genres: ['Graphic Novel', 'Psicológico', 'Noir'],
+    resumo:
+      'Determinado a provar que basta um único dia ruim para reduzir o mais são dos homens à loucura, o Coringa escapa do Asilo Arkham e coloca o Comissário Gordon e o Batman no limite.',
+  },
+  {
+    id: 'br-ano-um',
+    title: 'Batman: Ano Um',
+    author: 'Frank Miller & David Mazzucchelli',
+    publisher: 'Panini',
+    year: 1987,
+    pages: 136,
+    coverUrl: amz('857351812X'),
+    genres: ['Graphic Novel', 'Noir', 'Policial'],
+    resumo:
+      'Em uma Gotham City apodrecida pela corrupção policial e pela máfia, as jornadas iniciais de um jovem Bruce Wayne e do tenente recém-transferido James Gordon se entrelaçam nas ruas.',
+  },
+  {
+    id: 'br-persepolis',
+    title: 'Persépolis',
+    author: 'Marjane Satrapi',
+    publisher: 'Companhia das Letras',
+    year: 2000,
+    pages: 352,
+    coverUrl: amz('8535911626'),
+    genres: ['Graphic Novel', 'Biografia', 'História'],
+    resumo:
+      'Pelos olhos de uma menina audaciosa em Teerã que ama rock e questiona autoridades, o retrato autobiográfico da Revolução Islâmica, da guerra e do exílio.',
+  },
+  {
+    id: 'br-akira',
+    title: 'Akira',
+    author: 'Katsuhiro Otomo',
+    publisher: 'JBC',
+    year: 1982,
+    pages: 362,
+    coverUrl: amz('8545702876'),
+    genres: ['Mangá', 'Cyberpunk', 'Pós-Apocalíptico'],
+    resumo:
+      'Nas avenidas reconstruídas de Neo-Tóquio após a Terceira Guerra Mundial, a gangue de motoqueiros de Kaneda esbarra em um projeto militar secreto que desperta um poder psíquico incontrolável em Tetsuo.',
+  },
+  {
+    id: 'br-garota-exemplar',
+    title: 'Garota Exemplar',
+    author: 'Gillian Flynn',
+    publisher: 'Intrínseca',
+    year: 2012,
+    pages: 448,
+    coverUrl: amz('8580573106'),
+    genres: ['Thriller Psicológico', 'Mistério'],
+    resumo:
+      'Na manhã do quinto aniversário de casamento, Amy Dunne desaparece sem deixar rastro e todas as pistas deixadas na casa transformam o marido, Nick, no principal suspeito diante da mídia.',
+  },
+  {
+    id: 'br-objetos-cortantes',
+    title: 'Objetos Cortantes',
+    author: 'Gillian Flynn',
+    publisher: 'Intrínseca',
+    year: 2006,
+    pages: 256,
+    coverUrl: amz('858057661X'),
+    genres: ['Thriller Psicológico', 'Gótico Sulista'],
+    resumo:
+      'Recém-saída de uma clínica psiquiátrica, a repórter Camille Preaker é enviada de volta à sua sufocante cidade natal no Missouri para cobrir o assassinato de duas meninas e reencontrar a mãe.',
+  },
+  {
+    id: 'br-lugares-escuros',
+    title: 'Lugares Escuros',
+    author: 'Gillian Flynn',
+    publisher: 'Intrínseca',
+    year: 2009,
+    pages: 384,
+    coverUrl: amz('8580574447'),
+    genres: ['Thriller Psicológico', 'Investigação'],
+    resumo:
+      'Vinte e cinco anos após testemunhar contra o próprio irmão pelo massacre da família numa fazenda do Kansas, Libby Day é forçada a revisitar a noite do crime.',
+  },
+  {
+    id: 'br-paciente-silenciosa',
+    title: 'A Paciente Silenciosa',
+    author: 'Alex Michaelides',
+    publisher: 'Record',
+    year: 2019,
+    pages: 350,
+    coverUrl: amz('8501116432'),
+    genres: ['Thriller Psicológico', 'Mistério'],
+    resumo:
+      'Após disparar cinco tiros no rosto do marido e nunca mais pronunciar uma única palavra, a pintora Alicia Berenson é internada numa ala forense, onde um psicoterapeuta tenta decifrar seu silêncio.',
+  },
+  {
+    id: 'br-outra-volta-parafuso',
+    title: 'A Outra Volta do Parafuso',
+    author: 'Henry James',
+    publisher: 'Penguin-Companhia',
+    year: 1898,
+    pages: 232,
+    coverUrl: amz('8563560220'),
+    genres: ['Clássico Gótico', 'Terror Psicológico'],
+    resumo:
+      'Contratada para cuidar de dois órfãos exemplares na isolada propriedade rural de Bly, uma jovem preceptora passa a enxergar aparições silenciosas nos jardins e nas torres da mansão.',
+  },
+  {
+    id: 'br-sempre-vivemos-castelo',
+    title: 'Sempre Vivemos no Castelo',
+    author: 'Shirley Jackson',
+    publisher: 'Suma',
+    year: 1962,
+    pages: 192,
+    coverUrl: amz('8556510426'),
+    genres: ['Gótico', 'Suspense Psicológico'],
+    resumo:
+      'Isoladas na propriedade da família após uma tragédia à mesa de jantar e odiadas pelos moradores do vilarejo vizinho, as irmãs Merricat e Constance têm sua rotina ameaçada pela chegada de um primo.',
+  },
+  {
+    id: 'br-bebe-rosemary',
+    title: 'O Bebê de Rosemary',
+    author: 'Ira Levin',
+    publisher: 'DarkSide',
+    year: 1967,
+    pages: 320,
+    coverUrl: amz('8594540329'),
+    genres: ['Terror Psicológico', 'Suspense'],
+    resumo:
+      'Recém-mudados para um antigo edifício gótico em Nova York, Rosemary e seu ambicioso marido ator estreitam laços com um casal de vizinhos idosos excessivamente solícitos.',
+  },
+  {
+    id: 'br-exorcista',
+    title: 'O Exorcista',
+    author: 'William Peter Blatty',
+    publisher: 'HarperCollins',
+    year: 1971,
+    pages: 336,
+    coverUrl: amz('8595085323'),
+    genres: ['Terror', 'Drama Teológico'],
+    resumo:
+      'Quando a medicina e a psiquiatria falham em explicar a transformação aterradora de uma menina de onze anos em Washington, um padre jesuíta em crise de fé é chamado ao quarto.',
+  },
+  {
+    id: 'br-dragao-vermelho',
+    title: 'Dragão Vermelho',
+    author: 'Thomas Harris',
+    publisher: 'Record',
+    year: 1981,
+    pages: 432,
+    coverUrl: amz('8501114596'),
+    genres: ['Thriller Psicológico', 'Investigação'],
+    resumo:
+      'Para deter um assassino ritualístico que ataca famílias nas noites de lua cheia, o ex-agente Will Graham precisa reativar sua empatia sombria e consultar na cela seu antigo inimigo, Hannibal Lecter.',
+  },
+  {
+    id: 'br-odisseia',
+    title: 'Odisseia',
+    author: 'Homero',
+    publisher: 'Penguin-Companhia',
+    year: -720,
+    pages: 576,
+    coverUrl: amz('8563560204'),
+    genres: ['Épico', 'Clássico', 'Mitologia'],
+    resumo:
+      'Terminado o cerco de Troia, o astuto Odisseu enfrenta dez anos de mares tempestuosos, monstros e deuses coléricos na luta obstinada para retornar à ilha de Ítaca.',
+  },
+  {
+    id: 'br-eneida',
+    title: 'Eneida',
+    author: 'Virgílio',
+    publisher: 'Editora 34',
+    year: -19,
+    pages: 760,
+    coverUrl: amz('8573265922'),
+    genres: ['Épico', 'Clássico', 'Mitologia'],
+    resumo:
+      'Carregando o pai idoso nos ombros em meio às chamas de Troia, Eneias lidera os sobreviventes pelo Mediterrâneo sob o fardo implacável de fundar uma nova pátria.',
+  },
+  {
+    id: 'br-meditacoes',
+    title: 'Meditações',
+    author: 'Marco Aurélio',
+    publisher: 'Edipro',
+    year: 180,
+    pages: 160,
+    coverUrl: amz('8595084432'),
+    genres: ['Filosofia', 'Estoicismo', 'Clássico'],
+    resumo:
+      'Escritos nas tendas militares das fronteiras germânicas para si mesmo, os apontamentos íntimos do imperador romano sobre o dever, a brevidade da vida e o domínio das paixões.',
+  },
+  {
+    id: 'br-assim-falou-zaratustra',
+    title: 'Assim Falou Zaratustra',
+    author: 'Friedrich Nietzsche',
+    publisher: 'Companhia das Letras',
+    year: 1883,
+    pages: 360,
+    coverUrl: amz('8535919724'),
+    genres: ['Filosofia', 'Clássico'],
+    resumo:
+      'Após dez anos de solidão na montanha, o profeta Zaratustra desce de volta aos homens para anunciar a superação de si mesmo, a vontade de potência e o amor ao destino.',
+  },
+  {
+    id: 'br-alem-bem-mal',
+    title: 'Além do Bem e do Mal',
+    author: 'Friedrich Nietzsche',
+    publisher: 'Companhia das Letras',
+    year: 1886,
+    pages: 248,
+    coverUrl: amz('8535907440'),
+    genres: ['Filosofia', 'Clássico'],
+    resumo:
+      'Com aforismos cortantes, Nietzsche desmonta os preconceitos dos filósofos e expõe as raízes psicológicas de dominação e medo ocultas por trás das convenções morais.',
+  },
+  {
+    id: 'br-genealogia-moral',
+    title: 'Genealogia da Moral',
+    author: 'Friedrich Nietzsche',
+    publisher: 'Companhia das Letras',
+    year: 1887,
+    pages: 168,
+    coverUrl: amz('8535914269'),
+    genres: ['Filosofia', 'Psicologia Moral'],
+    resumo:
+      'Três dissertações demolidoras que investigam como o ressentimento, a culpa e o ideal ascético forjaram a consciência moral do Ocidente.',
+  },
+  {
+    id: 'br-vigiar-punir',
+    title: 'Vigiar e Punir',
+    author: 'Michel Foucault',
+    publisher: 'Vozes',
+    year: 1975,
+    pages: 304,
+    coverUrl: amz('8532605087'),
+    genres: ['Filosofia Política', 'História'],
+    resumo:
+      'Dos suplícios públicos à arquitetura silenciosa do Panóptico, a investigação de como o poder moderno deixou de castigar o corpo para adestrar e vigiar a própria alma.',
+  },
+  {
+    id: 'br-origens-totalitarismo',
+    title: 'As Origens do Totalitarismo',
+    author: 'Hannah Arendt',
+    publisher: 'Companhia das Letras',
+    year: 1951,
+    pages: 648,
+    coverUrl: amz('8535922180'),
+    genres: ['Filosofia Política', 'História'],
+    resumo:
+      'Análise monumental das engrenagens históricas — antissemitismo, imperialismo e propaganda de massas — que converteram sociedades modernas em regimes de terror total.',
+  },
+  {
+    id: 'br-eichmann-jerusalem',
+    title: 'Eichmann em Jerusalém',
+    author: 'Hannah Arendt',
+    publisher: 'Companhia das Letras',
+    year: 1963,
+    pages: 336,
+    coverUrl: amz('8571649626'),
+    genres: ['História', 'Filosofia Moral'],
+    resumo:
+      'Diante da gaiola de vidro no tribunal de Jerusalém, Arendt observa um burocrata metódico e formula o conceito perturbador da banalidade do mal.',
+  },
+  {
+    id: 'br-em-busca-sentido',
+    title: 'Em Busca de Sentido',
+    author: 'Viktor Frankl',
+    publisher: 'Vozes',
+    year: 1946,
+    pages: 184,
+    coverUrl: amz('8532606261'),
+    genres: ['Psicologia', 'Memórias', 'História'],
+    resumo:
+      'Sobrevivente de quatro campos de concentração, o psiquiatra vienense Viktor Frankl narra a experiência limite do prisioneiro e a liberdade interior que nenhuma barbárie consegue arrancar.',
+  },
+  {
+    id: 'br-e-isto-um-homem',
+    title: 'É Isto um Homem?',
+    author: 'Primo Levi',
+    publisher: 'Rocco',
+    year: 1947,
+    pages: 256,
+    coverUrl: amz('8532507573'),
+    genres: ['Memórias', 'História', 'Clássico'],
+    resumo:
+      'Com a precisão serena de um químico e sem jamais apelar ao ódio fácil, Primo Levi registra o cotidiano de Auschwitz como o mais terrível experimento de desumanização da história.',
+  },
+  {
+    id: 'br-arquipelago-gulag',
+    title: 'Arquipélago Gulag',
+    author: 'Aleksandr Soljenítsin',
+    publisher: 'Carambaia',
+    year: 1973,
+    pages: 640,
+    coverUrl: amz('8595070679'),
+    genres: ['História', 'Denúncia', 'Clássico Russo'],
+    resumo:
+      'Reunindo a própria experiência no cárcere e o testemunho de centenas de prisioneiros, Soljenítsin revela a rede subterrânea de campos de trabalhos forçados do Estado soviético.',
+  },
+  {
+    id: 'br-um-dia-ivan-denissovitch',
+    title: 'Um Dia na Vida de Ivan Deníssovitch',
+    author: 'Aleksandr Soljenítsin',
+    publisher: 'Editora 34',
+    year: 1962,
+    pages: 176,
+    coverUrl: amz('8573267488'),
+    genres: ['Clássico Russo', 'Drama Humano'],
+    resumo:
+      'Do toque da alvorada ao apagar das luzes sob trinta graus negativos na Sibéria, um único dia na rotina do prisioneiro Chukhov tentando preservar um pedaço de pão e a própria dignidade.',
+  },
+  {
+    id: 'br-nada-novo-front',
+    title: 'Nada de Novo no Front',
+    author: 'Erich Maria Remarque',
+    publisher: 'L&PM',
+    year: 1929,
+    pages: 240,
+    coverUrl: amz('8525413283'),
+    genres: ['Clássico', 'Guerra', 'Drama'],
+    resumo:
+      'Arrancados da sala de aula por discursos patrióticos e jogados na lama das trincheiras da Primeira Guerra Mundial, Paul Bäumer e seus colegas veem a juventude ser triturada pelo artilharia.',
+  },
+  {
+    id: 'br-espiao-saiu-frio',
+    title: 'O Espião que Saiu do Frio',
+    author: 'John le Carré',
+    publisher: 'Record',
+    year: 1963,
+    pages: 266,
+    coverUrl: amz('850111457X'),
+    genres: ['Espionagem', 'Guerra Fria', 'Suspense'],
+    resumo:
+      'Diante do Muro de Berlim, o veterano agente britânico Alec Leamas aceita uma última operação de desinformação na Alemanha Oriental, onde lealdade e traição deixam de ter fronteira.',
+  },
 ];
 
 const BOOKS_BY_ID = new Map<string, Partial<BookEvaluation>>(
@@ -1154,8 +2186,8 @@ export interface CharacterReading {
   thread: string;
   /**
    * IDs em ordem de afinidade:
-   * - Os 4 primeiros são as obras-âncora do personagem;
-   * - Os demais formam o pool estendido que rotaciona 1 a 2 livros a cada aparição.
+   * - Os 6 primeiros são as obras-âncora do personagem;
+   * - Os demais formam o pool estendido que rotaciona a cada aparição.
    */
   bookIds: string[];
 }
@@ -1176,6 +2208,14 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-ilha-dr-moreau',
       'br-fim-da-infancia',
       'br-homem-bicentenario',
+      'br-robos-alvorada',
+      'br-sol-desvelado',
+      'br-count-zero',
+      'br-mona-lisa-overdrive',
+      'br-snow-crash',
+      'br-akira',
+      'br-paraiso-perdido',
+      'br-admiravel-mundo-novo',
     ],
   },
   {
@@ -1194,6 +2234,13 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-o-principe',
       'br-irmaos-karamazov',
       'br-fim-da-infancia',
+      'br-imperador-deus-duna',
+      'br-filhos-duna',
+      'br-fim-da-morte',
+      'br-crime-e-castigo',
+      'br-demonios',
+      'br-alem-bem-mal',
+      'br-fundacao-imperio',
     ],
   },
   {
@@ -1211,6 +2258,14 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-frankenstein',
       'br-rei-lear',
       'br-conde-monte-cristo',
+      'br-silmarillion',
+      'br-caim',
+      'br-macbeth',
+      'br-otelo',
+      'br-jogo-exterminador',
+      'br-temor-sabio',
+      'br-caminho-reis',
+      'br-assim-falou-zaratustra',
     ],
   },
   {
@@ -1228,6 +2283,14 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-revolucao-bichos',
       'br-longa-marcha',
       'br-meridiano-sangue',
+      'br-a-danca-da-morte',
+      'br-clube-da-luta',
+      'br-jogos-vorazes',
+      'br-ilha-dr-moreau',
+      'br-genealogia-moral',
+      'br-demonios',
+      'br-ensaio-lucidez',
+      'br-vigiar-punir',
     ],
   },
   {
@@ -1245,6 +2308,14 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-admiravel-mundo-novo',
       'br-neuromancer',
       'br-homem-bicentenario',
+      'br-carbono-alterado',
+      'br-doutor-fausto',
+      'br-proprios-deuses',
+      'br-curva-sonho',
+      'br-akira',
+      'br-montanha-magica',
+      'br-count-zero',
+      'br-snow-crash',
     ],
   },
   {
@@ -1262,6 +2333,14 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-jogos-vorazes',
       'br-battle-royale',
       'br-1984',
+      'br-novembro-63',
+      'br-capitaes-areia',
+      'br-v-de-vinganca',
+      'br-despossuidos',
+      'br-mentiras-locke-lamora',
+      'br-snow-crash',
+      'br-akira',
+      'br-matadouro-cinco',
     ],
   },
   {
@@ -1279,6 +2358,14 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-recursao',
       'br-2001-odisseia',
       'br-floresta-sombria',
+      'br-fundacao-imperio',
+      'br-segunda-fundacao',
+      'br-proprios-deuses',
+      'br-fim-da-morte',
+      'br-jogo-exterminador',
+      'br-robos-alvorada',
+      'br-tres-corpos',
+      'br-materia-escura',
     ],
   },
   {
@@ -1296,6 +2383,14 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-watchmen',
       'br-fim-da-infancia',
       'br-2001-odisseia',
+      'br-robos-alvorada',
+      'br-sol-desvelado',
+      'br-cavernas-aco',
+      'br-orador-mortos',
+      'br-solaris',
+      'br-intermitencias-morte',
+      'br-vestigios-dia',
+      'br-idiota',
     ],
   },
   {
@@ -1313,6 +2408,14 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-perdido-em-marte',
       'br-planeta-macacos',
       'br-androides-sonham',
+      'br-guerra-velho',
+      'br-matadouro-cinco',
+      'br-akira',
+      'br-carbono-alterado',
+      'br-mentiras-locke-lamora',
+      'br-apanhador-centeio',
+      'br-memorias-postumas',
+      'br-snow-crash',
     ],
   },
   {
@@ -1331,6 +2434,13 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-conde-monte-cristo',
       'br-o-principe',
       'br-1984',
+      'br-e-isto-um-homem',
+      'br-em-busca-sentido',
+      'br-origens-totalitarismo',
+      'br-eichmann-jerusalem',
+      'br-v-de-vinganca',
+      'br-arquipelago-gulag',
+      'br-persepolis',
     ],
   },
   {
@@ -1348,6 +2458,14 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-paraiso-perdido',
       'br-macbeth',
       'br-hamlet',
+      'br-sandman',
+      'br-lugar-nenhum',
+      'br-mentiras-locke-lamora',
+      'br-caim',
+      'br-silmarillion',
+      'br-guerra-tronos',
+      'br-furia-reis',
+      'br-irmaos-karamazov',
     ],
   },
   {
@@ -1365,6 +2483,14 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-estudo-vermelho',
       'br-cao-baskerville',
       'br-nome-da-rosa',
+      'br-ano-um',
+      'br-piada-mortal',
+      'br-dragao-vermelho',
+      'br-outsider',
+      'br-v-de-vinganca',
+      'br-carbono-alterado',
+      'br-meditacoes',
+      'br-crime-e-castigo',
     ],
   },
   {
@@ -1382,6 +2508,14 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-watchmen',
       'br-silencio-inocentes',
       'br-medico-e-monstro',
+      'br-piada-mortal',
+      'br-clube-da-luta',
+      'br-duplo',
+      'br-demonios',
+      'br-o-perfume',
+      'br-quincas-borba',
+      'br-dragao-vermelho',
+      'br-entre-quatro-paredes',
     ],
   },
   {
@@ -1399,6 +2533,14 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-nome-da-rosa',
       'br-silencio-inocentes',
       'br-cavernas-aco',
+      'br-sol-desvelado',
+      'br-robos-alvorada',
+      'br-dragao-vermelho',
+      'br-paciente-silenciosa',
+      'br-garota-exemplar',
+      'br-ficcoes',
+      'br-espiao-saiu-frio',
+      'br-outsider',
     ],
   },
   {
@@ -1416,6 +2558,14 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-fim-eternidade',
       'br-a-estrada',
       'br-materia-escura',
+      'br-odisseia',
+      'br-fim-da-morte',
+      'br-solaris',
+      'br-recursao',
+      'br-orador-mortos',
+      'br-novembro-63',
+      'br-maquina-do-tempo',
+      'br-guerra-velho',
     ],
   },
   {
@@ -1433,6 +2583,14 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-2001-odisseia',
       'br-fim-da-infancia',
       'br-tres-corpos',
+      'br-fim-da-morte',
+      'br-despossuidos',
+      'br-aniquilacao',
+      'br-orador-mortos',
+      'br-proprios-deuses',
+      'br-perdido-em-marte',
+      'br-fim-eternidade',
+      'br-estacao-onze',
     ],
   },
   {
@@ -1450,6 +2608,14 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-encontro-rama',
       'br-materia-escura',
       'br-devoradores-estrelas',
+      'br-fim-da-morte',
+      'br-proprios-deuses',
+      'br-despossuidos',
+      'br-ficcoes',
+      'br-aleph',
+      'br-fundacao',
+      'br-segunda-fundacao',
+      'br-2001-odisseia',
     ],
   },
   {
@@ -1467,6 +2633,14 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-duna',
       'br-sombra-do-vento',
       'br-jogos-vorazes',
+      'br-sociedade-anel',
+      'br-retorno-rei',
+      'br-temor-sabio',
+      'br-jogo-exterminador',
+      'br-demian',
+      'br-coraline',
+      'br-lugar-nenhum',
+      'br-it-a-coisa',
     ],
   },
   {
@@ -1484,6 +2658,14 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-1984',
       'br-crime-e-castigo',
       'br-oceano-fim-caminho',
+      'br-um-dia-ivan-denissovitch',
+      'br-arquipelago-gulag',
+      'br-em-busca-sentido',
+      'br-castelo',
+      'br-colonia-penal',
+      'br-sandman',
+      'br-caminho-reis',
+      'br-guerra-tronos',
     ],
   },
   {
@@ -1501,6 +2683,14 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-grande-gatsby',
       'br-irmaos-karamazov',
       'br-hamlet',
+      'br-espiao-saiu-frio',
+      'br-vestigios-dia',
+      'br-anna-karienina',
+      'br-segunda-fundacao',
+      'br-orador-mortos',
+      'br-gigante-enterrado',
+      'br-todos-os-nomes',
+      'br-doutor-sono',
     ],
   },
   {
@@ -1518,6 +2708,14 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-ensaio-cegueira',
       'br-iliada',
       'br-crime-e-castigo',
+      'br-nada-novo-front',
+      'br-tormenta-espadas',
+      'br-guerra-e-paz',
+      'br-caminho-reis',
+      'br-orador-mortos',
+      'br-estacao-onze',
+      'br-a-danca-da-morte',
+      'br-grande-sertao',
     ],
   },
   {
@@ -1535,6 +2733,14 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-onde-os-velhos',
       'br-aniquilacao',
       'br-jogos-vorazes',
+      'br-estacao-onze',
+      'br-a-danca-da-morte',
+      'br-morro-ventos-uivantes',
+      'br-moby-dick',
+      'br-tormenta-espadas',
+      'br-objetos-cortantes',
+      'br-lugares-escuros',
+      'br-carrie',
     ],
   },
   {
@@ -1552,6 +2758,14 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-ensaio-cegueira',
       'br-onde-os-velhos',
       'br-rei-lear',
+      'br-estacao-onze',
+      'br-a-danca-da-morte',
+      'br-vidas-secas',
+      'br-peste',
+      'br-doutor-sono',
+      'br-o-iluminado',
+      'br-guerra-tronos',
+      'br-eneida',
     ],
   },
   {
@@ -1569,6 +2783,14 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-o-cemiterio',
       'br-duas-torres',
       'br-ricardo-iii',
+      'br-filhos-duna',
+      'br-imperador-deus-duna',
+      'br-silmarillion',
+      'br-doutor-fausto',
+      'br-dorian-gray',
+      'br-o-iluminado',
+      'br-tormenta-espadas',
+      'br-akira',
     ],
   },
   {
@@ -1586,6 +2808,14 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-arte-da-guerra',
       'br-irmaos-karamazov',
       'br-rei-lear',
+      'br-guerra-tronos',
+      'br-furia-reis',
+      'br-tormenta-espadas',
+      'br-duna',
+      'br-messias-duna',
+      'br-hamlet',
+      'br-vigiar-punir',
+      'br-meditacoes',
     ],
   },
   {
@@ -1603,6 +2833,14 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-cavernas-aco',
       'br-ubik',
       'br-eu-robo',
+      'br-carbono-alterado',
+      'br-count-zero',
+      'br-mona-lisa-overdrive',
+      'br-snow-crash',
+      'br-robos-alvorada',
+      'br-sol-desvelado',
+      'br-homem-duplicado',
+      'br-duplo',
     ],
   },
   {
@@ -1620,6 +2858,14 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-martin-eden',
       'br-a-metamorfose',
       'br-norwegian-wood',
+      'br-fome',
+      'br-livro-do-xadrez',
+      'br-morte-veneza',
+      'br-vestigios-dia',
+      'br-nausea',
+      'br-lobo-estepe',
+      'br-morte-ivan-ilitch',
+      'br-irmaos-karamazov',
     ],
   },
   {
@@ -1637,6 +2883,14 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-fundacao',
       'br-maus',
       'br-arte-da-guerra',
+      'br-despossuidos',
+      'br-caminho-reis',
+      'br-eneida',
+      'br-sociedade-anel',
+      'br-retorno-rei',
+      'br-orador-mortos',
+      'br-meditacoes',
+      'br-peste',
     ],
   },
   {
@@ -1654,6 +2908,14 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-caixa-passaros',
       'br-frankenstein',
       'br-o-cemiterio',
+      'br-guerra-velho',
+      'br-nada-novo-front',
+      'br-grande-sertao',
+      'br-doutor-sono',
+      'br-espiao-saiu-frio',
+      'br-deserto-tartaros',
+      'br-iliada',
+      'br-musashi',
     ],
   },
   {
@@ -1671,6 +2933,14 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-sombra-do-vento',
       'br-martin-eden',
       'br-jogo-contas-vidro',
+      'br-homens-sem-mulheres',
+      'br-vestigios-dia',
+      'br-1q84',
+      'br-kafka-beira-mar',
+      'br-cronica-passaro-corda',
+      'br-detetives-selvagens',
+      'br-novembro-63',
+      'br-morte-veneza',
     ],
   },
   {
@@ -1688,6 +2958,14 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-senhor-das-moscas',
       'br-o-principe',
       'br-mestre-margarida',
+      'br-2666',
+      'br-alem-bem-mal',
+      'br-genealogia-moral',
+      'br-demonios',
+      'br-grande-sertao',
+      'br-dracula',
+      'br-colonia-penal',
+      'br-caim',
     ],
   },
   {
@@ -1705,6 +2983,14 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-revolucao-bichos',
       'br-fahrenheit-451',
       'br-senhor-das-moscas',
+      'br-v-de-vinganca',
+      'br-jogo-exterminador',
+      'br-ensaio-lucidez',
+      'br-persepolis',
+      'br-capitaes-areia',
+      'br-admiravel-mundo-novo',
+      'br-origens-totalitarismo',
+      'br-vigiar-punir',
     ],
   },
   {
@@ -1722,6 +3008,14 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-duna',
       'br-tropas-estelares',
       'br-conde-monte-cristo',
+      'br-assim-falou-zaratustra',
+      'br-meditacoes',
+      'br-silmarillion',
+      'br-caminho-reis',
+      'br-jogo-exterminador',
+      'br-odisseia',
+      'br-eneida',
+      'br-rei-lear',
     ],
   },
   {
@@ -1739,6 +3033,14 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-doutor-fausto',
       'br-jogo-contas-vidro',
       'br-fome',
+      'br-morte-veneza',
+      'br-cozinha-confidencial',
+      'br-cinco-aneis',
+      'br-musashi',
+      'br-um-jogador',
+      'br-lobo-estepe',
+      'br-misery',
+      'br-assim-falou-zaratustra',
     ],
   },
   {
@@ -1756,6 +3058,14 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-feiticeiro-terramar',
       'br-o-hobbit',
       'br-planeta-macacos',
+      'br-sociedade-anel',
+      'br-retorno-rei',
+      'br-silmarillion',
+      'br-gigante-enterrado',
+      'br-kafka-beira-mar',
+      'br-orador-mortos',
+      'br-despossuidos',
+      'br-sidarta',
     ],
   },
 ];
@@ -1768,6 +3078,137 @@ const normalize = (text: string) =>
     .replace(/[^\w\s]/gi, '')
     .trim();
 
+const DYNAMIC_CHAR_BOOKS_STORAGE_KEY = 'veredito_dynamic_char_books_v1';
+
+interface DynamicCharBooksStore {
+  books: Partial<BookEvaluation>[];
+  charBookIds: Record<string, string[]>;
+}
+
+let dynamicStoreHydrated = false;
+const dynamicCharBookIds = new Map<string, string[]>();
+const inFlightReplenishCharIds = new Set<string>();
+
+function hydrateDynamicCharacterBooks(): void {
+  if (dynamicStoreHydrated || typeof window === 'undefined') return;
+  dynamicStoreHydrated = true;
+  try {
+    const raw = localStorage.getItem(DYNAMIC_CHAR_BOOKS_STORAGE_KEY);
+    if (!raw) return;
+    const parsed = JSON.parse(raw) as DynamicCharBooksStore;
+    if (Array.isArray(parsed.books)) {
+      for (const b of parsed.books) {
+        if (b && b.id && b.title) {
+          BOOKS_BY_ID.set(b.id, b);
+        }
+      }
+    }
+    if (parsed.charBookIds && typeof parsed.charBookIds === 'object') {
+      for (const [charId, ids] of Object.entries(parsed.charBookIds)) {
+        if (Array.isArray(ids)) {
+          dynamicCharBookIds.set(charId, ids);
+        }
+      }
+    }
+  } catch {
+    // ignore storage errors
+  }
+}
+
+function persistDynamicCharacterBooks(): void {
+  if (typeof window === 'undefined') return;
+  try {
+    const dynamicBooks: Partial<BookEvaluation>[] = [];
+    const charBookIdsObj: Record<string, string[]> = {};
+    for (const [charId, ids] of dynamicCharBookIds.entries()) {
+      charBookIdsObj[charId] = ids;
+      for (const id of ids) {
+        const book = BOOKS_BY_ID.get(id);
+        if (book && !dynamicBooks.some((b) => b.id === id)) {
+          dynamicBooks.push(book);
+        }
+      }
+    }
+    const payload: DynamicCharBooksStore = {
+      books: dynamicBooks,
+      charBookIds: charBookIdsObj,
+    };
+    localStorage.setItem(DYNAMIC_CHAR_BOOKS_STORAGE_KEY, JSON.stringify(payload));
+  } catch {
+    // ignore storage errors
+  }
+}
+
+export function getCharacterAllBookIds(character: CharacterReading): string[] {
+  hydrateDynamicCharacterBooks();
+  const extra = dynamicCharBookIds.get(character.id) || [];
+  if (extra.length === 0) return character.bookIds;
+  const set = new Set(character.bookIds);
+  const merged = [...character.bookIds];
+  for (const id of extra) {
+    if (!set.has(id)) {
+      set.add(id);
+      merged.push(id);
+    }
+  }
+  return merged;
+}
+
+export function countFreshCharacterBooks(
+  character: CharacterReading,
+  evaluatedTitles: Set<string>
+): number {
+  const allIds = getCharacterAllBookIds(character);
+  let freshCount = 0;
+  for (const id of allIds) {
+    const book = BOOKS_BY_ID.get(id);
+    if (book && !evaluatedTitles.has(normalize(book.title || ''))) {
+      freshCount++;
+    }
+  }
+  return freshCount;
+}
+
+export function registerDynamicCharacterBooks(
+  characterId: string,
+  newBooks: Partial<BookEvaluation>[]
+): string[] {
+  hydrateDynamicCharacterBooks();
+  const currentIds = dynamicCharBookIds.get(characterId) || [];
+  const addedIds: string[] = [];
+
+  for (const book of newBooks) {
+    if (!book.title || !book.author) continue;
+    const id =
+      book.id ||
+      `dyn-${characterId}-${normalize(book.title).replace(/\s+/g, '-').slice(0, 28)}`;
+    const fullBook: Partial<BookEvaluation> = {
+      ...book,
+      id,
+    };
+    BOOKS_BY_ID.set(id, fullBook);
+    if (!currentIds.includes(id)) {
+      currentIds.push(id);
+      addedIds.push(id);
+    }
+  }
+
+  if (addedIds.length > 0) {
+    dynamicCharBookIds.set(characterId, currentIds);
+    persistDynamicCharacterBooks();
+  }
+  return addedIds;
+}
+
+export function isCharacterReplenishInFlight(characterId: string): boolean {
+  return inFlightReplenishCharIds.has(characterId);
+}
+
+export function markCharacterReplenishInFlight(characterId: string, active: boolean): void {
+  if (active) inFlightReplenishCharIds.add(characterId);
+  else inFlightReplenishCharIds.delete(characterId);
+}
+
 function shuffleArray<T>(items: T[]): T[] {
   const copy = [...items];
   for (let i = copy.length - 1; i > 0; i--) {
@@ -1779,8 +3220,8 @@ function shuffleArray<T>(items: T[]): T[] {
 
 /**
  * Sorteia `count` (4) livros para um personagem em uma rotação:
- * - Mantém 2 ou 3 livros-âncora (dos 4 primeiros do personagem)
- * - Mistura 1 ou 2 livros do pool estendido do personagem
+ * - Mantém 2 obras-âncora (das 6 primeiras disponíveis do personagem)
+ * - Mistura 2 livros do pool estendido do personagem
  * - Garante que, em relação à rotação anterior (`previousBookIds`), pelo menos 1 ou 2 livros mudem.
  */
 export function selectVariedCharacterBookIds(
@@ -1789,7 +3230,8 @@ export function selectVariedCharacterBookIds(
   previousBookIds?: string[],
   count = 4
 ): string[] {
-  const validBooks = character.bookIds
+  const allIds = getCharacterAllBookIds(character);
+  const validBooks = allIds
     .map((id) => BOOKS_BY_ID.get(id))
     .filter((b): b is Partial<BookEvaluation> => Boolean(b));
 
@@ -1803,15 +3245,14 @@ export function selectVariedCharacterBookIds(
   const pool = [...freshIds, ...seenIds];
   if (pool.length <= count) return pool;
 
-  const corePool = pool.slice(0, Math.min(4, pool.length));
+  const corePool = pool.slice(0, Math.min(6, pool.length));
   const extraPool = pool.slice(corePool.length);
   const prevSet = new Set(previousBookIds || []);
 
   const buildCandidate = (): string[] => {
-    // Mantém 2 ou 3 obras-âncora e varia 1 ou 2 com o pool estendido
     const coreKeep =
       extraPool.length >= 2
-        ? Math.random() < 0.55
+        ? Math.random() < 0.45
           ? 3
           : 2
         : Math.max(1, count - extraPool.length);
@@ -1819,7 +3260,6 @@ export function selectVariedCharacterBookIds(
 
     const chosenCore = shuffleArray(corePool).slice(0, coreKeep);
     const chosenExtra = shuffleArray(extraPool).slice(0, extraTake);
-    // Preserva os livros-âncora na frente seguidos das variações da rotação
     const orderedCore = corePool.filter((id) => chosenCore.includes(id));
     return [...orderedCore, ...chosenExtra].slice(0, count);
   };
@@ -1829,7 +3269,6 @@ export function selectVariedCharacterBookIds(
     for (let attempt = 0; attempt < 10; attempt++) {
       const candidate = buildCandidate();
       const overlap = candidate.filter((id) => prevSet.has(id)).length;
-      // Ideal: mudou 1 ou 2 livros em relação à aparição anterior (overlap de 2 ou 3)
       if (overlap >= 1 && overlap <= count - 1) {
         best = candidate;
         break;
@@ -1851,7 +3290,8 @@ export function getCharacterBooks(
   count = 4,
   savedBookIds?: string[]
 ): Partial<BookEvaluation>[] {
-  const allBooks = character.bookIds
+  const allIds = getCharacterAllBookIds(character);
+  const allBooks = allIds
     .map((id) => BOOKS_BY_ID.get(id))
     .filter((b): b is Partial<BookEvaluation> => Boolean(b));
 

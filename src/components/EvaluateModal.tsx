@@ -3,7 +3,10 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Search, X, BookOpen, AlertTriangle, Check, Loader2, RefreshCw } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { searchBookApi, isAmazonUrl } from '../services/evaluator';
-import { evaluateWithGemini } from '../services/geminiEvaluator';
+import {
+  evaluateWithGemini,
+  replenishCharacterBooksWithGemini,
+} from '../services/geminiEvaluator';
 import { prefetchBookCovers } from '../services/imagePrefetch';
 import { fetchMoviePoster } from '../services/moviePosters';
 import { BookEvaluation } from '../types';
@@ -56,6 +59,10 @@ import {
   getCharacterBooks,
   selectVariedCharacterBookIds,
   buildEvaluatedTitleSet,
+  countFreshCharacterBooks,
+  registerDynamicCharacterBooks,
+  isCharacterReplenishInFlight,
+  markCharacterReplenishInFlight,
   type CharacterReading,
 } from '../data/characterReadings';
 
@@ -107,8 +114,13 @@ function getOrRotateCharacters(
   }
 
   const prevSet = new Set(prevIds);
-  const candidates = activePool.filter((c) => !prevSet.has(c.id));
-  const source = candidates.length >= 4 ? candidates : [...activePool];
+  const nonPrevCandidates = activePool.filter((c) => !prevSet.has(c.id));
+  const baseCandidates = nonPrevCandidates.length >= 4 ? nonPrevCandidates : [...activePool];
+  // Prioriza personagens que ainda possuem ao menos 4 livros inéditos para o leitor
+  const freshRichCandidates = baseCandidates.filter(
+    (c) => countFreshCharacterBooks(c, evaluatedSet) >= 4
+  );
+  const source = freshRichCandidates.length >= 4 ? freshRichCandidates : baseCandidates;
   let selected: CharacterReading[];
 
   if (activePool.length <= 4) {
@@ -300,6 +312,49 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
       ],
       false
     );
+
+    // Reabastecimento infinito em background (Opção B): se algum dos 4 personagens visíveis
+    // estiver com menos de 4 livros inéditos, gera 4 novas obras compatíveis com o fio dramático dele
+    for (const char of currentCharRot.characters) {
+      if (
+        countFreshCharacterBooks(char, evalSet) < 4 &&
+        !isCharacterReplenishInFlight(char.id)
+      ) {
+        markCharacterReplenishInFlight(char.id, true);
+        const existingTitles = [
+          ...existingBooks.map((b) => b.title),
+          ...getCharacterBooks(char, new Set(), 50).map((b) => b.title || ''),
+        ].filter(Boolean);
+
+        setTimeout(() => {
+          replenishCharacterBooksWithGemini(char, existingTitles)
+            .then((newBooks) => {
+              if (newBooks.length > 0) {
+                registerDynamicCharacterBooks(char.id, newBooks);
+                prefetchBookCovers(
+                  newBooks.map((b) => b.coverUrl),
+                  false
+                );
+                setCharacterRotation((prev) => ({
+                  ...prev,
+                  booksByCharId: {
+                    ...prev.booksByCharId,
+                    [char.id]: selectVariedCharacterBookIds(
+                      char,
+                      buildEvaluatedTitleSet(existingBooks),
+                      prev.booksByCharId[char.id],
+                      4
+                    ),
+                  },
+                }));
+              }
+            })
+            .finally(() => {
+              markCharacterReplenishInFlight(char.id, false);
+            });
+        }, 250);
+      }
+    }
 
     return () => {
       if (searchTimerRef.current) clearTimeout(searchTimerRef.current);

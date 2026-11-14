@@ -34,40 +34,73 @@ const scheduleEvaluationsFlush = () => {
   }, 0);
 };
 
-// Map database row to BookEvaluation
-export const mapRowToEvaluation = (row: any): BookEvaluation => ({
-  id: row.id,
-  title: row.title,
-  author: row.author,
-  originalTitle: row.original_title || row.criteria?.originalTitle || undefined,
-  pages: row.pages || 0,
-  coverUrl: row.cover_url || '',
-  year: row.year || undefined,
-  genres: Array.isArray(row.genres) ? row.genres : [],
-  resumo: row.resumo || '',
-  movieComparisons: Array.isArray(row.movie_comparisons) ? row.movie_comparisons : [],
-  adaptacoes: row.adaptacoes || 'Nenhuma adaptação conhecida',
-  criteria: row.criteria || {
-    genericidade: 5,
-    infantilidade: 5,
-    infantilidadeStatus: 'aceitavel',
-    qualidadeTecnica: 5,
-    worldbuilding: 5,
-    ritmo: 5,
-    ritmoDescricao: 'Moderado',
-    tomSombrio: 5,
-    impactoEmocional: 5,
+const SUBTLE_PREMISE_OVERRIDES: Array<{
+  matchTitle: RegExp;
+  spoilerPattern: RegExp;
+  subtleResumo: string;
+}> = [
+  {
+    matchTitle: /n[aã]o\s+me\s+abandone\s+jamais|never\s+let\s+me\s+go/i,
+    spoilerPattern: /clones?|doa[cç][aã]o\s+de\s+[oó]rg[aã]os/i,
+    subtleResumo:
+      'Em uma Inglaterra alternativa, jovens crescem no isolado internato de Hailsham cercados por regras veladas e pelo estímulo constante à arte, até compreenderem aos poucos o propósito silencioso para o qual foram criados.',
   },
-  notaTecnica: Number(row.nota_tecnica) || 0,
-  notaEncaixe: Number(row.nota_encaixe) || 0,
-  veredito: row.veredito || '',
-  vereditoTipo: row.veredito_tipo || 'ressalvas',
-  justificativaEncaixe: row.justificativa_encaixe || '',
-  userStatus: row.criteria?.userStatus || (row.criteria?.isSaved ? 'wishlist' : undefined),
-  categoryShelf: row.criteria?.categoryShelf,
-  isSaved: Boolean(row.criteria?.isSaved || row.criteria?.userStatus === 'wishlist'),
-  createdAt: row.created_at || new Date().toISOString(),
-});
+];
+
+function sanitizeEvaluationPremise(evalItem: BookEvaluation): {
+  item: BookEvaluation;
+  changed: boolean;
+} {
+  for (const rule of SUBTLE_PREMISE_OVERRIDES) {
+    if (
+      (rule.matchTitle.test(evalItem.title || '') ||
+        rule.matchTitle.test(evalItem.originalTitle || '')) &&
+      rule.spoilerPattern.test(evalItem.resumo || '')
+    ) {
+      return {
+        item: { ...evalItem, resumo: rule.subtleResumo },
+        changed: true,
+      };
+    }
+  }
+  return { item: evalItem, changed: false };
+}
+
+// Map database row to BookEvaluation
+export const mapRowToEvaluation = (row: any): BookEvaluation =>
+  sanitizeEvaluationPremise({
+    id: row.id,
+    title: row.title,
+    author: row.author,
+    originalTitle: row.original_title || row.criteria?.originalTitle || undefined,
+    pages: row.pages || 0,
+    coverUrl: row.cover_url || '',
+    year: row.year || undefined,
+    genres: Array.isArray(row.genres) ? row.genres : [],
+    resumo: row.resumo || '',
+    movieComparisons: Array.isArray(row.movie_comparisons) ? row.movie_comparisons : [],
+    adaptacoes: row.adaptacoes || 'Nenhuma adaptação conhecida',
+    criteria: row.criteria || {
+      genericidade: 5,
+      infantilidade: 5,
+      infantilidadeStatus: 'aceitavel',
+      qualidadeTecnica: 5,
+      worldbuilding: 5,
+      ritmo: 5,
+      ritmoDescricao: 'Moderado',
+      tomSombrio: 5,
+      impactoEmocional: 5,
+    },
+    notaTecnica: Number(row.nota_tecnica) || 0,
+    notaEncaixe: Number(row.nota_encaixe) || 0,
+    veredito: row.veredito || '',
+    vereditoTipo: row.veredito_tipo || 'ressalvas',
+    justificativaEncaixe: row.justificativa_encaixe || '',
+    userStatus: row.criteria?.userStatus || (row.criteria?.isSaved ? 'wishlist' : undefined),
+    categoryShelf: row.criteria?.categoryShelf,
+    isSaved: Boolean(row.criteria?.isSaved || row.criteria?.userStatus === 'wishlist'),
+    createdAt: row.created_at || new Date().toISOString(),
+  }).item;
 
 // Map BookEvaluation to database row
 export const mapEvaluationToRow = (b: BookEvaluation) => ({
@@ -104,7 +137,8 @@ export const getLocalEvaluations = (): BookEvaluation[] => {
   try {
     if (typeof localStorage === 'undefined') return [];
     const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
-    memoryEvaluations = raw ? JSON.parse(raw) : [];
+    const parsed: BookEvaluation[] = raw ? JSON.parse(raw) : [];
+    memoryEvaluations = parsed.map((b) => sanitizeEvaluationPremise(b).item);
     return memoryEvaluations!;
   } catch (e) {
     console.error('Error reading local evaluations:', e);
@@ -133,7 +167,18 @@ export const fetchEvaluations = async (): Promise<BookEvaluation[]> => {
     }
 
     if (data && Array.isArray(data)) {
-      const parsed = data.map(mapRowToEvaluation);
+      const parsed: BookEvaluation[] = [];
+      for (const row of data) {
+        const mapped = mapRowToEvaluation(row);
+        parsed.push(mapped);
+        if (row.resumo && mapped.resumo !== row.resumo) {
+          supabase
+            .from('evaluations')
+            .update({ resumo: mapped.resumo })
+            .eq('id', mapped.id)
+            .then(() => {});
+        }
+      }
       saveLocalEvaluations(parsed);
       return parsed;
     }

@@ -265,6 +265,9 @@ INSTRUÇÕES OBRIGATÓRIAS DE CONTEÚDO E FIDELIDADE:
    - infantilidade: 0-2 adulto/pesado, 3-5 aceitável/geral, 6 risco juvenil, 7-10 infantil ("infantilidadeStatus": "ideal" | "aceitavel" | "risco" | "rejeicao")
    - qualidadeTecnica, worldbuilding, ritmo, tomSombrio, impactoEmocional: 0 a 10
 5. NOTAS INTEIRAS: "notaTecnica" e "notaEncaixe" devem ser NÚMEROS INTEIROS (0 a 10), arredondados para baixo. "vereditoTipo": "leia" | "ressalvas" | "evite".
+6. PREMISSA & CLIMA SUTIS E SEM SPOILERS (REGRA DE OURO DO "resumo"):
+   - O campo "resumo" deve apresentar o ponto de partida, a atmosfera e a inquietação central da obra de forma instigante e sutil, preservando a descoberta da leitura.
+   - NUNCA entregue de forma explícita segredos da trama, revelações da natureza do mundo ou reviravoltas — mesmo quando constarem em sinopses comerciais ou nos metadados de apoio (Exemplo: em "Não Me Abandone Jamais", descreva o internato isolado de Hailsham, as regras veladas e a descoberta gradual do propósito para o qual aqueles jovens foram criados, mas NUNCA entregue explicitamente termos como "clones" ou "doação de órgãos").
 
 Responda ESTRITAMENTE em JSON válido com estas exatas chaves:
 {
@@ -273,7 +276,7 @@ Responda ESTRITAMENTE em JSON válido com estas exatas chaves:
   "originalTitle": "Título original no idioma original",
   "pages": 320,
   "genres": ["Gênero Principal", "Subgênero"],
-  "resumo": "2 a 3 linhas focando o conflito central, clima, premissa e tom sem spoilers",
+  "resumo": "2 a 3 linhas focando a premissa inicial, atmosfera e tensão central com sutileza, sem spoilers nem revelações explícitas da trama",
   "movieComparisons": ["Filme 1", "Filme 2", "Filme 3"],
   "adaptacoes": "Menção a adaptações reais ou 'Nenhuma adaptação audiovisual oficial até o momento.'",
   "criteria": {
@@ -379,6 +382,7 @@ INSTRUÇÕES OBRIGATÓRIAS:
 2. VERACIDADE CRÍTICA: avalie cada obra fielmente quanto a ritmo, densidade dramática e encaixe real com o perfil.
 3. FILMES CONEXOS: indique filmes cujos temas e atmosfera realmente dialoguem com a obra.
 4. NOTAS INTEIRAS: notas inteiras (0 a 10) arredondadas para menos.
+5. PREMISSA & CLIMA SUTIS E SEM SPOILERS: no campo "resumo", descreva apenas o ponto de partida, a atmosfera e a inquietação inicial sem entregar revelações da trama, reviravoltas ou a natureza explícita de mistérios que o leitor descobre aos poucos.
 
 Retorne ESTRITAMENTE um array JSON de objetos válidos:
 [
@@ -388,7 +392,7 @@ Retorne ESTRITAMENTE um array JSON de objetos válidos:
     "originalTitle": "Título original",
     "pages": 300,
     "genres": ["Gênero 1"],
-    "resumo": "Sinopse concisa sem spoiler de 2 linhas",
+    "resumo": "Premissa inicial e clima em 2 linhas sutis, sem spoilers ou revelações explícitas",
     "movieComparisons": ["Filme 1", "Filme 2"],
     "adaptacoes": "Menção curta",
     "criteria": {
@@ -571,6 +575,98 @@ Responda ESTRITAMENTE em formato JSON (array de objetos compactos):
   } catch (err: any) {
     if (err?.name === 'AbortError') return [];
     console.warn('[searchPopularBooksWithGemini] Falha na busca rápida:', err);
+    return [];
+  }
+}
+
+/**
+ * Reabastece em background o pool de livros de um personagem quando restam poucos inéditos,
+ * gerando 4 novas obras reais publicadas no Brasil que compartilhem o mesmo fio dramático.
+ */
+export async function replenishCharacterBooksWithGemini(
+  character: { id: string; name: string; source: string; thread: string },
+  excludeTitles: string[]
+): Promise<Partial<BookEvaluation>[]> {
+  const excludedSample = excludeTitles.slice(0, 80).join(', ');
+  const prompt = `Você é o curador literário do app Veredito.
+O leitor esgotou quase todas as indicações do personagem "${character.name}" (${character.source}).
+Fio dramático do personagem: "${character.thread}"
+
+Indique 4 OBRAS LITERÁRIAS REAIS (romances, novelas, clássicos, ficção científica, distopias ou graphic novels adultas consagradas e publicadas no Brasil) que compartilhem visceralmente esse mesmo núcleo dramático e psicológico.
+PROIBIDO repetir qualquer uma destas obras já listadas ou avaliadas: [${excludedSample}].
+PROIBIDO indicar livros infantis, autoajuda ou romances água-com-açúcar.
+No campo "resumo", escreva 2 linhas sutis focando apenas o ponto de partida e a atmosfera, SEM spoilers ou revelações explícitas da trama.
+
+Responda ESTRITAMENTE em JSON válido (array de 4 objetos):
+[
+  {
+    "title": "Título oficial em português no Brasil",
+    "author": "Nome do Autor",
+    "publisher": "Editora brasileira",
+    "year": 1995,
+    "pages": 320,
+    "genres": ["Gênero 1", "Gênero 2"],
+    "resumo": "Premissa sutil de 2 linhas sem spoilers"
+  }
+]`;
+
+  try {
+    const { value: rawItems } = await raceGemini<any[]>({
+      apiKey: GEMINI_API_KEY,
+      prompt,
+      initial: SEARCH_INITIAL_MODELS,
+      backups: EVAL_INITIAL_MODELS,
+      parse: (text) => {
+        const parsed = parseJsonLoose<any>(text);
+        if (!Array.isArray(parsed) || parsed.length === 0) {
+          throw new Error('Sem novos livros retornados.');
+        }
+        return parsed;
+      },
+      baseGenerationConfig: {
+        responseMimeType: 'application/json',
+        temperature: 0.35,
+        maxOutputTokens: 900,
+      },
+      preferWindowMs: 0,
+      hedgeAfterMs: 2500,
+      perRequestTimeoutMs: 9000,
+      overallTimeoutMs: 12000,
+      label: `Replenish ${character.name}`,
+    });
+
+    const enriched = await Promise.all(
+      rawItems.slice(0, 4).map(async (item, idx) => {
+        const title = String(item.title || '').trim();
+        const author = String(item.author || '').trim();
+        if (!title || !author) return null;
+
+        const curated = getCuratedCovers(title);
+        const facts = curated?.[0]
+          ? null
+          : await fetchVerifiedCatalogFacts(title, author);
+        const coverUrl = curated?.[0] || facts?.coverUrl || '';
+
+        return {
+          id: `dyn-${character.id}-${Date.now()}-${idx}`,
+          title,
+          author,
+          publisher: item.publisher || facts?.publisher || undefined,
+          year: Number(item.year) || facts?.year || undefined,
+          pages:
+            (Number(item.pages) > 30 ? Math.round(Number(item.pages)) : undefined) ||
+            facts?.pages ||
+            280,
+          coverUrl,
+          genres: Array.isArray(item.genres) && item.genres.length > 0 ? item.genres : ['Ficção'],
+          resumo: String(item.resumo || '').trim(),
+        } as Partial<BookEvaluation>;
+      })
+    );
+
+    return enriched.filter((b): b is Partial<BookEvaluation> => Boolean(b));
+  } catch (err) {
+    console.warn('[replenishCharacterBooksWithGemini] Aviso:', err);
     return [];
   }
 }
