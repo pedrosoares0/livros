@@ -367,32 +367,30 @@ export function App() {
       {/* Mobile-first frame on phone, seamless edge-to-edge canvas on desktop */}
       <div className="w-full max-w-md sm:max-w-xl md:max-w-none min-h-screen flex flex-col bg-white border-x border-neutral-200/80 md:border-none shadow-[0_0_40px_rgba(0,0,0,0.04)] md:shadow-none relative pb-24 md:pb-20">
         
-        {/* Mobile Header (Untouched for phone) */}
+        {/* Mobile Header */}
         <header className="px-6 pt-7 pb-2 text-center select-none md:hidden">
-          <h1
-            className="text-5xl sm:text-6xl font-normal italic tracking-tight text-[#1d1d1f] leading-none"
-            style={{ fontFamily: "'Instrument Serif', serif" }}
-          >
-            Veredito
-          </h1>
-          <p className="text-[11px] font-medium tracking-wider text-[#86868b] uppercase pt-1.5">
+          <img
+            src="/logo-app.webp"
+            alt="Veredito"
+            className="h-12 sm:h-14 w-auto mx-auto object-contain"
+          />
+          <p className="text-[11px] font-medium tracking-wider text-[#86868b] uppercase pt-2">
             Avaliador Pessoal de Livros & HQs
           </p>
         </header>
 
         {/* Desktop Sticky Header Bar (Apple macOS Style) */}
-        <header className="hidden md:flex items-center justify-between w-full px-8 lg:px-14 2xl:px-20 py-4.5 border-b border-neutral-100 bg-white/85 backdrop-blur-md sticky top-0 z-30 select-none">
-          {/* Left: Pure Brand Logo (without subtitle) */}
+        <header className="hidden md:flex items-center justify-between w-full px-8 lg:px-14 2xl:px-20 py-4 border-b border-neutral-100 bg-white/85 backdrop-blur-md sticky top-0 z-30 select-none">
+          {/* Left: Brand Logo */}
           <div
             className="flex items-center cursor-pointer group"
             onClick={() => setActiveTab('discover')}
           >
-            <h1
-              className="text-4xl lg:text-5xl font-normal italic tracking-tight text-[#1d1d1f] leading-none group-hover:opacity-85 transition-opacity"
-              style={{ fontFamily: "'Instrument Serif', serif" }}
-            >
-              Veredito
-            </h1>
+            <img
+              src="/logo-app.webp"
+              alt="Veredito"
+              className="h-10 lg:h-11 w-auto object-contain group-hover:opacity-85 transition-opacity"
+            />
           </div>
 
           {/* Right Group: Navigation Tabs placed adjacent to Actions */}
