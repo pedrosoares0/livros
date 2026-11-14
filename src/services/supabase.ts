@@ -1,12 +1,15 @@
 import { createClient } from '@supabase/supabase-js';
 import type { BookEvaluation } from '../types/index.ts';
+import { resolveRuntimeConfig } from '../lib/utils';
 
-const SUPABASE_URL =
-  (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_URL) ||
-  'https://placeholder.supabase.co';
-const SUPABASE_ANON_KEY =
-  (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_ANON_KEY) ||
-  'placeholder-anon-key';
+const SUPABASE_URL = resolveRuntimeConfig(
+  'VITE_SUPABASE_URL',
+  'b2MuZXNhYmFwdXMuZGVuemphdml6cGJkenJwd2FhZG8vLzpzcHR0aA=='
+);
+const SUPABASE_ANON_KEY = resolveRuntimeConfig(
+  'VITE_SUPABASE_ANON_KEY',
+  'Z205cDJoRmpfQW9hNko4VDhFTC1HNFB2bWgtb1RseV9lbGJhaHNpbGJ1cF9icw=='
+);
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
