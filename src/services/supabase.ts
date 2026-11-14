@@ -307,15 +307,22 @@ export const updateBookCoverInDb = async (bookId: string, newCoverUrl: string): 
 
 // Delete evaluation from Supabase and local cache
 export const deleteEvaluation = async (id: string): Promise<boolean> => {
-  const localList = getLocalEvaluations().filter((b) => b.id !== id);
+  return deleteEvaluationsBulk([id]);
+};
+
+// Bulk delete evaluations from Supabase and local cache
+export const deleteEvaluationsBulk = async (ids: string[]): Promise<boolean> => {
+  if (ids.length === 0) return true;
+  const idSet = new Set(ids);
+  const localList = getLocalEvaluations().filter((b) => !idSet.has(b.id));
   saveLocalEvaluations(localList);
 
   setTimeout(() => {
     try {
       const raw = localStorage.getItem(SAVED_BOOKS_STORAGE_KEY);
       if (raw) {
-        const set = new Set(JSON.parse(raw));
-        set.delete(id);
+        const set = new Set<string>(JSON.parse(raw));
+        ids.forEach((id) => set.delete(id));
         localStorage.setItem(SAVED_BOOKS_STORAGE_KEY, JSON.stringify([...set]));
       }
     } catch (e) {
@@ -327,7 +334,7 @@ export const deleteEvaluation = async (id: string): Promise<boolean> => {
     const { error } = await supabase
       .from('evaluations')
       .delete()
-      .eq('id', id);
+      .in('id', ids);
 
     if (error) {
       console.warn('Supabase delete error:', error.message);
@@ -336,6 +343,71 @@ export const deleteEvaluation = async (id: string): Promise<boolean> => {
     return true;
   } catch (err) {
     console.warn('Failed to delete from Supabase:', err);
+    return false;
+  }
+};
+
+// Bulk toggle saved state in Supabase and local cache
+export const toggleSaveBooksBulk = async (bookIds: string[], isSaved: boolean): Promise<boolean> => {
+  if (bookIds.length === 0) return true;
+  const idSet = new Set(bookIds);
+  const localList = getLocalEvaluations();
+  const updatedList = localList.map((b) => (idSet.has(b.id) ? { ...b, isSaved } : b));
+  saveLocalEvaluations(updatedList);
+
+  setTimeout(() => {
+    try {
+      const raw = localStorage.getItem(SAVED_BOOKS_STORAGE_KEY);
+      const set = new Set<string>(raw ? JSON.parse(raw) : []);
+      for (const id of bookIds) {
+        if (isSaved) {
+          set.add(id);
+        } else {
+          set.delete(id);
+        }
+      }
+      localStorage.setItem(SAVED_BOOKS_STORAGE_KEY, JSON.stringify([...set]));
+    } catch (e) {
+      console.error('Error writing saved books storage:', e);
+    }
+  }, 0);
+
+  try {
+    await Promise.all(
+      bookIds.map(async (bookId) => {
+        const cachedBook = localList.find((b) => b.id === bookId);
+        let baseCriteria: Record<string, any> = cachedBook?.criteria ? { ...cachedBook.criteria } : {};
+        if (!cachedBook) {
+          const { data } = await supabase
+            .from('evaluations')
+            .select('criteria')
+            .eq('id', bookId)
+            .single();
+          baseCriteria = data?.criteria || {};
+        } else {
+          if (cachedBook.originalTitle) baseCriteria.originalTitle = cachedBook.originalTitle;
+          if (cachedBook.categoryShelf) baseCriteria.categoryShelf = cachedBook.categoryShelf;
+        }
+
+        const updatedCriteria = {
+          ...baseCriteria,
+          isSaved,
+          userStatus: isSaved
+            ? 'wishlist'
+            : baseCriteria.userStatus === 'wishlist'
+            ? undefined
+            : baseCriteria.userStatus,
+        };
+
+        await supabase
+          .from('evaluations')
+          .update({ criteria: updatedCriteria })
+          .eq('id', bookId);
+      })
+    );
+    return true;
+  } catch (err) {
+    console.warn('Error syncing bulk toggleSave with Supabase:', err);
     return false;
   }
 };

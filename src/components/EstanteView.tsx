@@ -1,5 +1,6 @@
-import React, { useState, useMemo } from 'react';
-import { BookOpen, ArrowLeft, ArrowUpDown } from 'lucide-react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import { AnimatePresence, motion } from 'motion/react';
+import { BookOpen, ArrowLeft, ArrowUpDown, Check, Bookmark, Trash2, CheckSquare, X } from 'lucide-react';
 import { BookEvaluation, UserRatingsMap } from '../types';
 import { getEffectiveScore } from '../services/ratings';
 import { BookShelf } from './BookShelf';
@@ -10,6 +11,8 @@ interface EstanteViewProps {
   onSelectBook: (book: BookEvaluation) => void;
   savedBookIds?: Set<string>;
   userRatings?: UserRatingsMap;
+  onBulkToggleSave?: (bookIds: string[], willBeSaved: boolean) => void;
+  onBulkDeleteBooks?: (bookIds: string[]) => void;
 }
 
 type FilterOption = 
@@ -75,9 +78,50 @@ export const EstanteView: React.FC<EstanteViewProps> = React.memo(({
   onSelectBook,
   savedBookIds,
   userRatings,
+  onBulkToggleSave,
+  onBulkDeleteBooks,
 }) => {
   const [selectedFilter, setSelectedFilter] = useState<FilterOption>('all');
   const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
+  const [isSelectionMode, setIsSelectionMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set());
+
+  const exitSelectionMode = useCallback(() => {
+    setIsSelectionMode(false);
+    setSelectedIds(new Set());
+  }, []);
+
+  const toggleSelectionMode = useCallback(() => {
+    setIsSelectionMode((prev) => {
+      if (prev) {
+        setSelectedIds(new Set());
+      }
+      return !prev;
+    });
+  }, []);
+
+  const toggleSelectBook = useCallback((bookId: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(bookId)) {
+        next.delete(bookId);
+      } else {
+        next.add(bookId);
+      }
+      return next;
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!isSelectionMode) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        exitSelectionMode();
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [isSelectionMode, exitSelectionMode]);
 
   // Memoize savedBooks to prevent recalculations
   const savedBooks = useMemo(
@@ -231,7 +275,37 @@ export const EstanteView: React.FC<EstanteViewProps> = React.memo(({
 
   const handleSelectShelf = (id: FilterOption) => {
     setSelectedFilter(id);
+    exitSelectionMode();
   };
+
+  const selectedArray = useMemo(() => Array.from(selectedIds), [selectedIds]);
+  const allSelectedAreSaved = useMemo(() => {
+    if (selectedArray.length === 0) return false;
+    return selectedArray.every((id) => savedBookIds?.has(id));
+  }, [selectedArray, savedBookIds]);
+
+  const allShelfSelected =
+    sortedActiveBooks.length > 0 && sortedActiveBooks.every((b) => selectedIds.has(b.id));
+
+  const handleToggleSelectAllShelf = useCallback(() => {
+    if (allShelfSelected) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(sortedActiveBooks.map((b) => b.id)));
+    }
+  }, [allShelfSelected, sortedActiveBooks]);
+
+  const handleBulkSave = useCallback(() => {
+    if (selectedArray.length === 0 || !onBulkToggleSave) return;
+    onBulkToggleSave(selectedArray, !allSelectedAreSaved);
+    exitSelectionMode();
+  }, [selectedArray, onBulkToggleSave, allSelectedAreSaved, exitSelectionMode]);
+
+  const handleBulkDelete = useCallback(() => {
+    if (selectedArray.length === 0 || !onBulkDeleteBooks) return;
+    onBulkDeleteBooks(selectedArray);
+    exitSelectionMode();
+  }, [selectedArray, onBulkDeleteBooks, exitSelectionMode]);
 
   return (
     <div className="space-y-4 pb-12 md:pb-16">
@@ -323,16 +397,16 @@ export const EstanteView: React.FC<EstanteViewProps> = React.memo(({
       {selectedFilter !== 'all' && activeShelf && (
         <div className="space-y-6 pt-1 pb-24 md:pb-16">
           {/* Shelf Navigation and Controls Header */}
-          <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center justify-between gap-2 flex-wrap">
             <button
-              onClick={() => setSelectedFilter('all')}
+              onClick={() => handleSelectShelf('all')}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-neutral-200/90 hover:border-neutral-300 text-xs font-semibold text-[#1d1d1f] hover:bg-neutral-50 active:scale-95 transition-all shadow-2xs cursor-pointer select-none"
             >
               <ArrowLeft className="w-3.5 h-3.5 text-[#86868b]" />
               <span>Prateleiras</span>
             </button>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 flex-wrap">
               {/* Sort Order Toggle - apenas setinhas */}
               <button
                 type="button"
@@ -344,7 +418,49 @@ export const EstanteView: React.FC<EstanteViewProps> = React.memo(({
                 <ArrowUpDown className="w-3.5 h-3.5 text-[#1d1d1f]" />
               </button>
 
-              <span className="text-xs font-semibold text-[#86868b] ml-0.5">
+              <button
+                type="button"
+                onClick={toggleSelectionMode}
+                className={`h-7 sm:h-7.5 px-3 rounded-full text-xs font-semibold transition-all active:scale-95 cursor-pointer select-none border flex items-center gap-1.5 justify-center ${
+                  isSelectionMode
+                    ? 'bg-[#1d1d1f] text-white border-[#1d1d1f] shadow-xs'
+                    : 'bg-white text-[#636366] hover:text-[#1d1d1f] border-neutral-200/90 hover:border-neutral-300 shadow-3xs hover:bg-neutral-50'
+                }`}
+                title={isSelectionMode ? 'Cancelar seleção' : 'Selecionar vários livros para salvar ou excluir'}
+              >
+                <span>{isSelectionMode ? 'Cancelar' : 'Selecionar'}</span>
+              </button>
+
+              {isSelectionMode && (
+                <div className="hidden sm:flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    disabled={selectedIds.size === 0}
+                    onClick={handleBulkSave}
+                    className="h-7 sm:h-7.5 px-3 rounded-full text-xs font-semibold transition-all active:scale-95 cursor-pointer select-none border flex items-center gap-1.5 justify-center bg-white text-[#1d1d1f] hover:bg-neutral-50 border-neutral-200/90 hover:border-neutral-300 shadow-3xs disabled:opacity-40 disabled:pointer-events-none"
+                  >
+                    <Bookmark className={`w-3 h-3 ${allSelectedAreSaved ? 'fill-[#1d1d1f]' : ''}`} />
+                    <span>
+                      {allSelectedAreSaved ? 'Remover salvo' : 'Salvar'}
+                      {selectedIds.size > 0 ? ` (${selectedIds.size})` : ''}
+                    </span>
+                  </button>
+
+                  <button
+                    type="button"
+                    disabled={selectedIds.size === 0}
+                    onClick={handleBulkDelete}
+                    className="h-7 sm:h-7.5 px-3 rounded-full text-xs font-semibold transition-all active:scale-95 cursor-pointer select-none border flex items-center gap-1.5 justify-center bg-rose-50 text-rose-600 hover:bg-rose-100 border-rose-200/90 shadow-3xs disabled:opacity-40 disabled:pointer-events-none"
+                  >
+                    <Trash2 className="w-3 h-3" />
+                    <span>
+                      Excluir{selectedIds.size > 0 ? ` (${selectedIds.size})` : ''}
+                    </span>
+                  </button>
+                </div>
+              )}
+
+              <span className="text-xs font-semibold text-[#86868b] ml-1">
                 {activeShelf.books.length} {activeShelf.books.length === 1 ? 'obra' : 'obras'}
               </span>
             </div>
@@ -358,13 +474,31 @@ export const EstanteView: React.FC<EstanteViewProps> = React.memo(({
 
           {/* Grid presentation matching Início */}
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-7 2xl:grid-cols-8 gap-x-4 sm:gap-x-5 md:gap-x-6 lg:gap-x-6 xl:gap-x-7 gap-y-9 sm:gap-y-10 md:gap-y-12 lg:gap-y-14 xl:gap-y-16">
-            {sortedActiveBooks.map((book) => (
+            {sortedActiveBooks.map((book) => {
+              const isSelected = selectedIds.has(book.id);
+              const isBookSaved = Boolean(savedBookIds?.has(book.id) || book.isSaved);
+
+              return (
                 <div
                   key={book.id}
-                  onClick={() => onSelectBook(book)}
+                  onClick={() => {
+                    if (isSelectionMode) {
+                      toggleSelectBook(book.id);
+                    } else {
+                      onSelectBook(book);
+                    }
+                  }}
                   className="flex flex-col cursor-pointer group active:scale-[0.98] transition-transform duration-200 select-none"
                 >
-                  <div className="w-full mb-3 transition-transform duration-200 group-hover:-translate-y-1.5">
+                  <div
+                    className={`relative w-full mb-3 transition-all duration-200 ${
+                      isSelectionMode
+                        ? isSelected
+                          ? 'ring-2 ring-[#1d1d1f] ring-offset-2 rounded-[4px] scale-[0.98]'
+                          : 'opacity-85 hover:opacity-100'
+                        : 'group-hover:-translate-y-1.5'
+                    }`}
+                  >
                     <BookCover
                       title={book.title}
                       author={book.author}
@@ -372,6 +506,25 @@ export const EstanteView: React.FC<EstanteViewProps> = React.memo(({
                       notaEncaixe={book.notaEncaixe}
                       userRating={userRatings?.[book.id]?.rating}
                     />
+                    {isSelectionMode && (
+                      <div
+                        className={`absolute top-2 left-2 z-30 w-6 h-6 rounded-full flex items-center justify-center transition-all duration-150 ${
+                          isSelected
+                            ? 'bg-[#1d1d1f] text-white border-[1.5px] border-white shadow-md scale-105'
+                            : 'bg-black/40 backdrop-blur-md border-[1.5px] border-white/90 text-transparent shadow-xs group-hover:bg-black/55'
+                        }`}
+                      >
+                        <Check className="w-3.5 h-3.5 stroke-[3]" />
+                      </div>
+                    )}
+                    {isBookSaved && (
+                      <div
+                        className="absolute bottom-2 right-2 z-20 w-5 h-5 rounded-full bg-black/65 backdrop-blur-xs text-white flex items-center justify-center shadow-xs pointer-events-none"
+                        title="Salvo na sua estante"
+                      >
+                        <Bookmark className="w-2.5 h-2.5 fill-white text-white" />
+                      </div>
+                    )}
                   </div>
                   <div className="space-y-0.5 px-0.5">
                     <h4 className="text-xs sm:text-[13px] font-semibold text-[#1d1d1f] truncate group-hover:text-black leading-snug tracking-tight">
@@ -388,8 +541,69 @@ export const EstanteView: React.FC<EstanteViewProps> = React.memo(({
                     </p>
                   </div>
                 </div>
-              ))}
+              );
+            })}
           </div>
+
+          <AnimatePresence>
+            {isSelectionMode && (
+              <motion.div
+                initial={{ opacity: 0, y: 24, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 20, scale: 0.95 }}
+                transition={{ type: 'spring', damping: 26, stiffness: 360, mass: 0.8 }}
+                className="fixed bottom-24 md:bottom-7 left-1/2 -translate-x-1/2 z-40 w-[94%] max-w-lg pointer-events-auto"
+              >
+                <div className="px-3.5 py-2.5 rounded-full bg-white/95 backdrop-blur-xl border border-neutral-200/90 shadow-[0_12px_36px_rgba(0,0,0,0.16),0_2px_8px_rgba(0,0,0,0.06)] flex items-center justify-between gap-2 select-none">
+                  <div className="flex items-center gap-2 min-w-0 pl-1">
+                    <button
+                      type="button"
+                      onClick={handleToggleSelectAllShelf}
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-semibold text-[#1d1d1f] hover:bg-neutral-100 active:scale-95 transition-all cursor-pointer shrink-0"
+                    >
+                      <CheckSquare className="w-3.5 h-3.5 text-[#1d1d1f]" />
+                      <span className="truncate">
+                        {selectedIds.size > 0
+                          ? `${selectedIds.size} ${selectedIds.size === 1 ? 'selecionado' : 'selecionados'}`
+                          : 'Selecionar todos'}
+                      </span>
+                    </button>
+                  </div>
+
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <button
+                      type="button"
+                      disabled={selectedIds.size === 0}
+                      onClick={handleBulkSave}
+                      className="h-9 px-3.5 rounded-full text-xs font-bold bg-[#1d1d1f] text-white hover:bg-black active:scale-95 transition-all cursor-pointer flex items-center gap-1.5 shadow-xs disabled:opacity-35 disabled:pointer-events-none"
+                    >
+                      <Bookmark className={`w-3.5 h-3.5 ${allSelectedAreSaved ? 'fill-white' : ''}`} />
+                      <span>{allSelectedAreSaved ? 'Remover salvo' : 'Salvar'}</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      disabled={selectedIds.size === 0}
+                      onClick={handleBulkDelete}
+                      className="h-9 px-3.5 rounded-full text-xs font-bold bg-rose-600 text-white hover:bg-rose-700 active:scale-95 transition-all cursor-pointer flex items-center gap-1.5 shadow-xs disabled:opacity-35 disabled:pointer-events-none"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Excluir</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={exitSelectionMode}
+                      className="w-9 h-9 rounded-full bg-neutral-100 hover:bg-neutral-200/80 text-[#636366] hover:text-[#1d1d1f] active:scale-95 transition-all cursor-pointer flex items-center justify-center"
+                      aria-label="Cancelar seleção"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       )}
     </div>

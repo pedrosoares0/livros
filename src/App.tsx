@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import { SlidersHorizontal } from 'lucide-react';
+import { SlidersHorizontal, CheckCircle2, RotateCcw } from 'lucide-react';
 import { BookEvaluation, UserRatingsMap, UserRating } from './types';
 import { DiscoverView } from './components/DiscoverView';
 import { EstanteView } from './components/EstanteView';
@@ -15,7 +15,9 @@ import {
   fetchEvaluations,
   saveEvaluation,
   deleteEvaluation,
+  deleteEvaluationsBulk,
   toggleSaveBook,
+  toggleSaveBooksBulk,
   updateBookCoverInDb,
   getLocalEvaluations,
 } from './services/supabase';
@@ -23,6 +25,7 @@ import {
   fetchRatings,
   upsertRating,
   deleteRating,
+  deleteRatingsBulk,
   getLocalRatings,
 } from './services/ratings';
 import { prefetchBookCovers } from './services/imagePrefetch';
@@ -153,6 +156,149 @@ export function App() {
     });
     await deleteRating(bookId);
   };
+
+  const [bulkToast, setBulkToast] = useState<{
+    message: string;
+    canUndo?: boolean;
+  } | null>(null);
+  const lastDeletedRef = useRef<{
+    books: BookEvaluation[];
+    ratings: UserRating[];
+    savedIds: string[];
+  } | null>(null);
+  const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const showBulkToast = useCallback((message: string, canUndo = false) => {
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    setBulkToast({ message, canUndo });
+    toastTimerRef.current = setTimeout(() => {
+      setBulkToast(null);
+      lastDeletedRef.current = null;
+    }, 5000);
+  }, []);
+
+  const handleBulkToggleSave = useCallback(
+    async (bookIds: string[], willBeSaved: boolean) => {
+      if (bookIds.length === 0) return;
+      const idSet = new Set(bookIds);
+
+      setSavedBookIds((prev) => {
+        const next = new Set(prev);
+        for (const id of bookIds) {
+          if (willBeSaved) {
+            next.add(id);
+          } else {
+            next.delete(id);
+          }
+        }
+        return next;
+      });
+
+      setBooks((prev) =>
+        prev.map((b) => (idSet.has(b.id) ? { ...b, isSaved: willBeSaved } : b))
+      );
+
+      setSelectedBook((prev) =>
+        prev && idSet.has(prev.id) ? { ...prev, isSaved: willBeSaved } : prev
+      );
+
+      const count = bookIds.length;
+      showBulkToast(
+        willBeSaved
+          ? `${count} ${count === 1 ? 'livro salvo na estante' : 'livros salvos na estante'}`
+          : `${count} ${count === 1 ? 'livro removido dos salvos' : 'livros removidos dos salvos'}`,
+        false
+      );
+
+      await toggleSaveBooksBulk(bookIds, willBeSaved);
+    },
+    [showBulkToast]
+  );
+
+  const handleBulkDeleteBooks = useCallback(
+    async (bookIds: string[]) => {
+      if (bookIds.length === 0) return;
+      const idSet = new Set(bookIds);
+
+      const deletedBooks = books.filter((b) => idSet.has(b.id));
+      const deletedRatings = bookIds
+        .map((id) => userRatings[id])
+        .filter((r): r is UserRating => Boolean(r));
+      const deletedSavedIds = bookIds.filter((id) => savedBookIds.has(id));
+
+      lastDeletedRef.current = {
+        books: deletedBooks,
+        ratings: deletedRatings,
+        savedIds: deletedSavedIds,
+      };
+
+      setBooks((prev) => prev.filter((b) => !idSet.has(b.id)));
+      setSavedBookIds((prev) => {
+        const next = new Set(prev);
+        bookIds.forEach((id) => next.delete(id));
+        return next;
+      });
+      setUserRatings((prev) => {
+        const next = { ...prev };
+        bookIds.forEach((id) => delete next[id]);
+        return next;
+      });
+      if (selectedBook && idSet.has(selectedBook.id)) {
+        setSelectedBook(null);
+      }
+      if (ratingBook && idSet.has(ratingBook.id)) {
+        setRatingBook(null);
+      }
+
+      const count = bookIds.length;
+      showBulkToast(
+        `${count} ${count === 1 ? 'livro excluído' : 'livros excluídos'}`,
+        true
+      );
+
+      await Promise.all([
+        deleteEvaluationsBulk(bookIds),
+        deleteRatingsBulk(bookIds),
+      ]);
+    },
+    [books, userRatings, savedBookIds, selectedBook, ratingBook, showBulkToast]
+  );
+
+  const handleUndoBulkDelete = useCallback(async () => {
+    const backup = lastDeletedRef.current;
+    if (!backup) return;
+    lastDeletedRef.current = null;
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    setBulkToast(null);
+
+    const restoredIds = new Set(backup.books.map((b) => b.id));
+    setBooks((prev) => [
+      ...backup.books,
+      ...prev.filter((b) => !restoredIds.has(b.id)),
+    ]);
+
+    if (backup.savedIds.length > 0) {
+      setSavedBookIds((prev) => new Set([...prev, ...backup.savedIds]));
+    }
+
+    if (backup.ratings.length > 0) {
+      setUserRatings((prev) => {
+        const next = { ...prev };
+        for (const r of backup.ratings) {
+          next[r.bookId] = r;
+        }
+        return next;
+      });
+    }
+
+    await Promise.all([
+      ...backup.books.map((b) => saveEvaluation(b)),
+      ...backup.ratings.map((r) => upsertRating(r)),
+      ...(backup.savedIds.length > 0
+        ? [toggleSaveBooksBulk(backup.savedIds, true)]
+        : []),
+    ]);
+  }, []);
 
   const handleDeleteBook = async (bookId: string) => {
     // Optimistic removal
@@ -344,6 +490,9 @@ export function App() {
               onSelectBook={setSelectedBook}
               onOpenEvaluate={openEvaluate}
               userRatings={userRatings}
+              savedBookIds={savedBookIds}
+              onBulkToggleSave={handleBulkToggleSave}
+              onBulkDeleteBooks={handleBulkDeleteBooks}
               isActive={isDiscoverActive}
             />
           </div>
@@ -354,9 +503,37 @@ export function App() {
               onSelectBook={setSelectedBook}
               savedBookIds={savedBookIds}
               userRatings={userRatings}
+              onBulkToggleSave={handleBulkToggleSave}
+              onBulkDeleteBooks={handleBulkDeleteBooks}
             />
           </div>
         </main>
+
+        {/* Feedback Toast para ações em lote (Salvar / Excluir com opção Desfazer) */}
+        <AnimatePresence>
+          {bulkToast && (
+            <motion.div
+              initial={{ opacity: 0, y: -20, scale: 0.94 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -14, scale: 0.94 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 420 }}
+              className="fixed top-4 md:top-20 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-full bg-[#1d1d1f] text-white shadow-xl flex items-center gap-3 text-xs font-semibold border border-white/10 select-none"
+            >
+              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+              <span>{bulkToast.message}</span>
+              {bulkToast.canUndo && (
+                <button
+                  type="button"
+                  onClick={handleUndoBulkDelete}
+                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/15 hover:bg-white/25 text-white text-[11px] font-bold transition-colors cursor-pointer active:scale-95"
+                >
+                  <RotateCcw className="w-3 h-3" />
+                  <span>Desfazer</span>
+                </button>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Apple-style Bottom Navigation Bar (Início, +, Estante) */}
         <BottomNavBar

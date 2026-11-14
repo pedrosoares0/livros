@@ -147,14 +147,25 @@ export const upsertRating = async (rating: UserRating): Promise<void> => {
 };
 
 export const deleteRating = async (bookId: string): Promise<void> => {
+  await deleteRatingsBulk([bookId]);
+};
+
+export const deleteRatingsBulk = async (bookIds: string[]): Promise<void> => {
+  if (bookIds.length === 0) return;
   const current = getLocalRatings();
-  if (current[bookId]) {
-    const next = { ...current };
-    delete next[bookId];
+  const next = { ...current };
+  let changed = false;
+  for (const id of bookIds) {
+    if (next[id]) {
+      delete next[id];
+      changed = true;
+    }
+  }
+  if (changed) {
     saveLocalRatings(next);
   }
   try {
-    const { error } = await supabase.from('user_ratings').delete().eq('book_id', bookId);
+    const { error } = await supabase.from('user_ratings').delete().in('book_id', bookIds);
     if (error) console.warn('Could not delete rating:', error.message);
   } catch (err) {
     console.warn('Error deleting rating in Supabase:', err);
