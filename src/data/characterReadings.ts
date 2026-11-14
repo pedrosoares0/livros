@@ -2197,7 +2197,7 @@ export const CHARACTER_POOL: CharacterReading[] = [
     id: 'ultron',
     name: 'Ultron',
     source: 'Marvel',
-    imageUrl: 'https://i.pinimg.com/736x/04/8a/2e/048a2ee796e96f8a11c5e706d72a467c.jpg',
+    imageUrl: 'https://i.pinimg.com/736x/0c/9d/f5/0c9df5f9b4380bb94b1f8a23e37e5767.jpg',
     thread: 'Criações que concluem que o criador é o problema.',
     bookIds: [
       'br-2001-odisseia',
@@ -2347,7 +2347,7 @@ export const CHARACTER_POOL: CharacterReading[] = [
     id: 'tony-stark',
     name: 'Tony Stark',
     source: 'Marvel',
-    imageUrl: 'https://i.pinimg.com/736x/dc/fc/a2/dcfca2bb4dc9e17587718688304d9c2b.jpg',
+    imageUrl: 'https://i.pinimg.com/736x/66/02/5e/66025ead21fc4079459acf4b361864c3.jpg',
     thread: 'Engenheiros assombrados pelo futuro que usam o intelecto como armadura.',
     bookIds: [
       'br-perdido-em-marte',

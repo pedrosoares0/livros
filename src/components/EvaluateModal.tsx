@@ -643,20 +643,24 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
         animate={{ y: 0, opacity: 1, scale: 1 }}
         exit={{ y: 24, opacity: 0, scale: 0.98 }}
         transition={{ type: 'spring', bounce: 0, duration: 0.36 }}
-        className="relative w-full max-w-lg md:max-w-3xl lg:max-w-4xl max-h-[92dvh] sm:max-h-[88vh] md:max-h-[88vh] bg-white border border-neutral-200/90 rounded-t-3xl sm:rounded-3xl shadow-[0_25px_70px_-15px_rgba(0,0,0,0.25)] flex flex-col overflow-hidden text-[#1d1d1f] z-20 pb-safe will-change-transform"
+        className={`relative w-full ${
+          isLoading || apiSuggestions.length > 0
+            ? 'max-w-lg md:max-w-2xl lg:max-w-3xl'
+            : 'max-w-lg md:max-w-[550px] lg:max-w-[560px]'
+        } max-h-[92dvh] sm:max-h-[94vh] md:max-h-[95vh] bg-white border border-neutral-200/90 rounded-t-3xl sm:rounded-3xl shadow-[0_25px_70px_-15px_rgba(0,0,0,0.25)] flex flex-col overflow-hidden text-[#1d1d1f] z-20 pb-safe will-change-transform transition-[max-width] duration-200`}
       >
         {/* iOS Handle Indicator on mobile */}
         <div className="w-10 h-1 bg-neutral-300 rounded-full mx-auto mt-2.5 sm:hidden shrink-0" />
 
         {/* Minimalist Top Close Bar */}
-        <div className="flex items-center justify-end px-5 sm:px-6 md:px-8 pt-2.5 pb-0.5 sticky top-0 z-20 bg-white/95 backdrop-blur-md">
+        <div className="flex items-center justify-end px-5 sm:px-6 pt-2 pb-0 sticky top-0 z-20 bg-white/95 backdrop-blur-md">
           {!isLoading && (
             <button
               onClick={onClose}
               aria-label="Fechar"
-              className="p-2 -mr-2 rounded-full hover:bg-neutral-100 active:bg-neutral-200/70 text-[#86868b] hover:text-[#1d1d1f] transition-colors cursor-pointer"
+              className="p-1.5 -mr-1.5 rounded-full hover:bg-neutral-100 active:bg-neutral-200/70 text-[#86868b] hover:text-[#1d1d1f] transition-colors cursor-pointer"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4.5 h-4.5 sm:w-5 sm:h-5" />
             </button>
           )}
         </div>
@@ -664,7 +668,7 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
         {/* Content Area */}
         <div
           ref={contentScrollRef}
-          className="px-5 pt-1.5 pb-5 sm:px-6 sm:pt-2 sm:pb-6 md:px-8 overflow-y-auto hide-scrollbar space-y-4 flex-1"
+          className="px-5 pt-1 pb-4 sm:px-6 sm:pt-1 sm:pb-5 overflow-y-auto hide-scrollbar space-y-3 flex-1"
         >
           {isLoading ? (
             /* Apple-Style Editorial Evaluation Stage: Pure Animated Black Typography */
@@ -872,13 +876,13 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
               {/* Command Palette Styled Search Bar */}
               <form onSubmit={handleSearchSubmit} className="space-y-1.5">
                 <div className="relative w-full">
-                  <Search className="absolute left-3.5 sm:left-4 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-4.5 sm:h-4.5 text-[#86868b] pointer-events-none" />
+                  <Search className="absolute left-3.5 sm:left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#86868b] pointer-events-none" />
                   <input
                     type="text"
                     value={query}
                     onChange={(e) => handleInputChange(e.target.value)}
                     placeholder="Cole aqui o link da Amazon..."
-                    className="w-full pl-10 sm:pl-11 pr-10 py-2.5 sm:py-3 rounded-2xl bg-neutral-100/90 focus:bg-white border border-neutral-200/90 focus:border-neutral-900 focus:ring-2 focus:ring-black/5 text-[#1d1d1f] placeholder-[#86868b] text-[16px] sm:text-sm md:text-base focus:outline-none transition-colors duration-150 shadow-2xs"
+                    className="w-full pl-10 sm:pl-10.5 pr-10 py-2 sm:py-2.5 rounded-2xl bg-neutral-100/90 focus:bg-white border border-neutral-200/90 focus:border-neutral-900 focus:ring-2 focus:ring-black/5 text-[#1d1d1f] placeholder-[#86868b] text-[16px] sm:text-sm focus:outline-none transition-colors duration-150 shadow-2xs"
                     autoComplete="off"
                     autoCorrect="off"
                     autoCapitalize="none"
@@ -1045,63 +1049,74 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                 </div>
               ) : (
                 /* Initial Empty State: Visual Book Suggestions + Character-Driven Recommendations */
-                <div className="space-y-4 pt-1.5">
-                  {/* Row 1: Popular Book Suggestions */}
-                  <div className="space-y-2.5">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-[#86868b]">
-                        Sugestões Populares para Avaliar
-                      </span>
-                      <button
-                        type="button"
-                        onClick={handleSwapSuggestions}
-                        aria-label="Trocar sugestões de livros"
-                        title="Trocar sugestões"
-                        className="p-1 -mr-1 rounded-full text-[#86868b] hover:text-[#1d1d1f] hover:bg-neutral-100 active:bg-neutral-200/70 active:scale-90 transition-all cursor-pointer"
-                      >
-                        <RefreshCw
-                          className="w-3.5 h-3.5 transition-transform duration-300 ease-out"
-                          style={{ transform: `rotate(${suggestionsSpinCount * 180}deg)` }}
-                        />
-                      </button>
-                    </div>
-
-                    <AnimatePresence mode="wait" initial={false}>
+                <div className="space-y-3 pt-0.5">
+                  {/* Row 1: Popular Book Suggestions (collapses when a character shelf is open so everything fits on screen) */}
+                  <AnimatePresence initial={false}>
+                    {!selectedCharacterId && (
                       <motion.div
-                        key={popularSuggestions.map((b) => b.id || b.title).join('|')}
-                        initial={{ opacity: 0, y: 4, scale: 0.985, filter: 'blur(2px)' }}
-                        animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
-                        exit={{ opacity: 0, y: -4, scale: 0.985, filter: 'blur(2px)' }}
-                        transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
-                        className="grid grid-cols-4 gap-3 sm:gap-4 pt-0.5"
+                        key="popular-suggestions-row"
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+                        className="space-y-2 overflow-hidden"
                       >
-                        {popularSuggestions.map((book) => (
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-[#86868b]">
+                            Sugestões Populares para Avaliar
+                          </span>
                           <button
-                            key={book.id || book.title}
                             type="button"
-                            onClick={() => handleRequestEvaluation(book)}
-                            className="flex flex-col text-left cursor-pointer group active:scale-[0.97] transition-transform duration-200 select-none w-full"
+                            onClick={handleSwapSuggestions}
+                            aria-label="Trocar sugestões de livros"
+                            title="Trocar sugestões"
+                            className="p-1 -mr-1 rounded-full text-[#86868b] hover:text-[#1d1d1f] hover:bg-neutral-100 active:bg-neutral-200/70 active:scale-90 transition-all cursor-pointer"
                           >
-                            <div className="w-full mb-2 transition-transform duration-200 group-hover:-translate-y-1">
-                              <BookCover
-                                title={book.title || 'Livro'}
-                                author={book.author || ''}
-                                coverUrl={book.coverUrl}
-                              />
-                            </div>
-                            <div className="space-y-0.5 px-0.5 w-full">
-                              <h4 className="text-[11px] sm:text-xs font-semibold text-[#1d1d1f] truncate group-hover:text-black leading-snug tracking-tight">
-                                {book.title}
-                              </h4>
-                              <p className="text-[10px] text-[#86868b] truncate font-normal">
-                                {book.author}
-                              </p>
-                            </div>
+                            <RefreshCw
+                              className="w-3.5 h-3.5 transition-transform duration-300 ease-out"
+                              style={{ transform: `rotate(${suggestionsSpinCount * 180}deg)` }}
+                            />
                           </button>
-                        ))}
+                        </div>
+
+                        <AnimatePresence mode="wait" initial={false}>
+                          <motion.div
+                            key={popularSuggestions.map((b) => b.id || b.title).join('|')}
+                            initial={{ opacity: 0, y: 4, scale: 0.985, filter: 'blur(2px)' }}
+                            animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
+                            exit={{ opacity: 0, y: -4, scale: 0.985, filter: 'blur(2px)' }}
+                            transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+                            className="grid grid-cols-4 gap-3 pt-0.5"
+                          >
+                            {popularSuggestions.map((book) => (
+                              <button
+                                key={book.id || book.title}
+                                type="button"
+                                onClick={() => handleRequestEvaluation(book)}
+                                className="flex flex-col text-left cursor-pointer group active:scale-[0.97] transition-transform duration-200 select-none w-full"
+                              >
+                                <div className="w-full mb-1.5 transition-transform duration-200 group-hover:-translate-y-1">
+                                  <BookCover
+                                    title={book.title || 'Livro'}
+                                    author={book.author || ''}
+                                    coverUrl={book.coverUrl}
+                                  />
+                                </div>
+                                <div className="space-y-0.5 px-0.5 w-full">
+                                  <h4 className="text-[11px] sm:text-xs font-semibold text-[#1d1d1f] truncate group-hover:text-black leading-snug tracking-tight">
+                                    {book.title}
+                                  </h4>
+                                  <p className="text-[10px] text-[#86868b] truncate font-normal">
+                                    {book.author}
+                                  </p>
+                                </div>
+                              </button>
+                            ))}
+                          </motion.div>
+                        </AnimatePresence>
                       </motion.div>
-                    </AnimatePresence>
-                  </div>
+                    )}
+                  </AnimatePresence>
 
                   {/* Row 2: Books by Favorite Characters (4 character covers + rotating book sets) */}
                   {(() => {
@@ -1119,7 +1134,11 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                       : [];
 
                     return (
-                      <div className="space-y-2.5 pt-2.5 border-t border-neutral-200/70">
+                      <div
+                        className={`space-y-2 ${
+                          selectedCharacterId ? 'pt-0.5' : 'pt-2 border-t border-neutral-200/70'
+                        }`}
+                      >
                         <div className="flex items-center justify-between">
                           <span className="text-[10px] font-bold uppercase tracking-wider text-[#86868b]">
                             Livros de Acordo com Personagens
@@ -1145,7 +1164,7 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                             animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
                             exit={{ opacity: 0, y: -4, scale: 0.985, filter: 'blur(2px)' }}
                             transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
-                            className="grid grid-cols-4 gap-3 sm:gap-4 pt-1"
+                            className="grid grid-cols-4 gap-3 pt-0.5"
                           >
                             {characterSuggestions.map((char) => {
                               const hasSelection = Boolean(activeCharacter);
@@ -1163,7 +1182,7 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                                   }
                                   className="relative flex flex-col text-left cursor-pointer group active:scale-[0.97] transition-all duration-300 ease-out select-none"
                                 >
-                                  <div className="relative w-full mb-2">
+                                  <div className="relative w-full mb-1.5">
                                     {/* Ambient Color Glow behind the selected character portrait */}
                                     {isSelected && char.imageUrl && (
                                       <div
@@ -1240,7 +1259,7 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                                   </div>
 
                                   {/* Shared spring indicator pill below the active character */}
-                                  <div className="h-2.5 w-full flex items-center justify-start px-0.5 mt-0.5">
+                                  <div className="h-2 w-full flex items-center justify-start px-0.5 mt-0.5">
                                     {isSelected && (
                                       <motion.div
                                         layoutId="active-character-indicator"
@@ -1268,7 +1287,7 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                               animate={{ opacity: 1, y: 0 }}
                               exit={{ opacity: 0, y: -4 }}
                               transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-                              className="p-3 sm:p-3.5 rounded-2xl bg-neutral-50 border border-neutral-200/80 space-y-2.5"
+                              className="p-3 rounded-2xl bg-neutral-50 border border-neutral-200/80 space-y-2"
                             >
                               <div className="flex items-start justify-between gap-2">
                                 <div className="min-w-0">
@@ -1295,7 +1314,7 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                                 </button>
                               </div>
 
-                              <div className="grid grid-cols-4 gap-3 sm:gap-4 pt-0.5">
+                              <div className="grid grid-cols-4 gap-3 pt-0.5">
                                 {activeCharacterBooks.map((book) => (
                                   <button
                                     key={`${activeCharacter.id}-${book.id || book.title}`}
@@ -1303,7 +1322,7 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                                     onClick={() => handleRequestEvaluation(book)}
                                     className="flex flex-col text-left cursor-pointer group active:scale-[0.97] transition-transform duration-200 select-none w-full"
                                   >
-                                    <div className="w-full mb-2 transition-transform duration-200 group-hover:-translate-y-1">
+                                    <div className="w-full mb-1.5 transition-transform duration-200 group-hover:-translate-y-1">
                                       <BookCover
                                         title={book.title || 'Livro'}
                                         author={book.author || ''}
