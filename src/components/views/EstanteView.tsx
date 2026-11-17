@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { BookOpen, ArrowLeft, ArrowUpDown, Check, Bookmark, Trash2, CheckSquare, X } from 'lucide-react';
 import { BookEvaluation, UserRatingsMap } from '../../types';
@@ -15,18 +15,14 @@ interface EstanteViewProps {
   onBulkDeleteBooks?: (bookIds: string[]) => void;
 }
 
-type FilterOption = 
-  | 'all' 
+type FilterOption =
+  | 'all'
   | 'lidos'
   | 'salvos'
-  | 'obras-primas' 
-  | 'recomendados' 
-  | 'ressalvas' 
-  | 'rejeicao' 
-  | 'scifi' 
-  | 'classicos' 
-  | 'darkside' 
-  | 'curtos';
+  | 'ouro-puro'
+  | 'sem-enrolacao'
+  | 'clima-pesado'
+  | 'passar-longe';
 
 interface ShelfDefinition {
   id: FilterOption;
@@ -36,40 +32,30 @@ interface ShelfDefinition {
   covers?: string[];
 }
 
-// Representantes icônicos e não-repetidos para cada gênero/prateleira
+// Representantes icônicos e não-repetidos para cada filtro/prateleira
 const PREFERRED_REPRESENTATIVES: Record<string, string[]> = {
-  scifi: [
-    'a-chegada-historia-da-sua-vida',
-    'o-cair-da-noite',
+  'ouro-puro': [
+    'senhor-das-moscas',
     'flores-para-algernon',
-    'br-duna',
+    'a-chegada-historia-da-sua-vida',
   ],
-  classicos: [
-    'noites-brancas',
-    'o-inferno-de-dante',
+  'sem-enrolacao': [
     'entre-quatro-paredes',
+    'o-cair-da-noite',
+    'contos-de-beedle-o-bardo',
     'diario-de-um-homem-superfluo',
   ],
-  darkside: [
-    'colapso',
-    'o-gato-preto',
-    'a-menina-do-outro-lado',
-    'o-estranho-misterioso',
-  ],
-  curtos: [
-    'de-quanta-terra-precisa-o-homem',
-    'contos-de-beedle-o-bardo',
-    'a-morte-de-ivan-ilitch',
-  ],
-  'obras-primas': [
-    'senhor-das-moscas',
-    'a-revolucao-dos-bichos',
+  'clima-pesado': [
     '1984',
     'a-estrada',
+    'o-inferno-de-dante',
+    'o-gato-preto',
+    'colapso',
   ],
-  rejeicao: [
+  'passar-longe': [
     'patinando-no-amor',
     'a-cabeca-do-santo',
+    'o-velho-e-o-mar',
   ],
 };
 
@@ -85,6 +71,54 @@ export const EstanteView: React.FC<EstanteViewProps> = React.memo(({
   const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
   const [isSelectionMode, setIsSelectionMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set());
+  const [isDraggingPills, setIsDraggingPills] = useState(false);
+
+  const pillsScrollRef = useRef<HTMLDivElement>(null);
+  const isPointerDownRef = useRef(false);
+  const startXRef = useRef(0);
+  const startScrollLeftRef = useRef(0);
+  const didDragRef = useRef(false);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isPointerDownRef.current || !pillsScrollRef.current) return;
+      const dx = e.pageX - startXRef.current;
+      if (Math.abs(dx) > 4 && !didDragRef.current) {
+        didDragRef.current = true;
+        setIsDraggingPills(true);
+      }
+      if (didDragRef.current) {
+        pillsScrollRef.current.scrollLeft = startScrollLeftRef.current - dx;
+      }
+    };
+
+    const stopDragging = () => {
+      if (!isPointerDownRef.current) return;
+      isPointerDownRef.current = false;
+      setIsDraggingPills(false);
+      // Limpa didDrag após o evento click síncrono do mouseup
+      requestAnimationFrame(() => {
+        didDragRef.current = false;
+      });
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', stopDragging);
+    window.addEventListener('blur', stopDragging);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', stopDragging);
+      window.removeEventListener('blur', stopDragging);
+    };
+  }, []);
+
+  const handlePillsMouseDown = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.button !== 0 || !pillsScrollRef.current) return;
+    isPointerDownRef.current = true;
+    didDragRef.current = false;
+    startXRef.current = e.pageX;
+    startScrollLeftRef.current = pillsScrollRef.current.scrollLeft;
+  }, []);
 
   const exitSelectionMode = useCallback(() => {
     setIsSelectionMode(false);
@@ -134,78 +168,35 @@ export const EstanteView: React.FC<EstanteViewProps> = React.memo(({
     // Livros lidos e avaliados pessoalmente pelo leitor
     const lidosBooks = books.filter((b) => Boolean(userRatings?.[b.id]));
 
-    // Helper matching functions for dynamic, intelligent categorization driven by effective score
+    // Helper matching functions for relaxed, mood-driven shelves (no generic genres)
     const isRejeicao = (b: BookEvaluation) => {
       const eff = getEffectiveScore(b, userRatings);
       return Math.floor(eff) < 5 || b.userStatus === 'disliked' || b.vereditoTipo === 'evite';
     };
 
-    const isObrasPrimas = (b: BookEvaluation) => {
+    const isOuroPuro = (b: BookEvaluation) => {
       const eff = getEffectiveScore(b, userRatings);
       return !isRejeicao(b) && (Math.floor(eff) >= 9 || b.userStatus === 'loved');
     };
 
-    const isRecomendados = (b: BookEvaluation) => {
-      const eff = getEffectiveScore(b, userRatings);
-      return !isRejeicao(b) && !isObrasPrimas(b) && Math.floor(eff) >= 8;
-    };
+    const isSemEnrolacao = (b: BookEvaluation) =>
+      !isRejeicao(b) && (b.criteria?.ritmo ?? 0) >= 8;
 
-    const isRessalvas = (b: BookEvaluation) => {
-      const eff = getEffectiveScore(b, userRatings);
-      return !isRejeicao(b) && !isObrasPrimas(b) && !isRecomendados(b) && (Math.floor(eff) >= 5 || b.vereditoTipo === 'ressalvas');
-    };
+    const isClimaPesado = (b: BookEvaluation) =>
+      !isRejeicao(b) && (b.criteria?.tomSombrio ?? 0) >= 9;
 
-    const isSciFi = (b: BookEvaluation) => 
-      b.categoryShelf === 'Ficção Científica' || 
-      b.genres.some((g) => {
-        const gl = g.toLowerCase();
-        return gl.includes('ficção') || gl.includes('sci-fi') || gl.includes('espaço') || gl.includes('distopia') || gl.includes('cyberpunk');
-      });
-
-    const isClassicos = (b: BookEvaluation) =>
-      b.categoryShelf === 'Clássicos & Drama Humano' ||
-      b.genres.some((g) => {
-        const gl = g.toLowerCase();
-        return gl.includes('clássico') || gl.includes('filosofia') || gl.includes('teatro') || gl.includes('moral') || gl.includes('ensaio');
-      });
-
-    const isDarkSide = (b: BookEvaluation) =>
-      b.categoryShelf === 'Fantasia Sombria & Distopia' ||
-      b.genres.some((g) => {
-        const gl = g.toLowerCase();
-        return gl.includes('darkside') || gl.includes('sombria') || gl.includes('gótico') || gl.includes('horror') || gl.includes('thriller');
-      });
-
-    const isCurtos = (b: BookEvaluation) =>
-      b.pages <= 180 ||
-      b.categoryShelf === 'Graphic Novels & Contos' ||
-      b.genres.some((g) => {
-        const gl = g.toLowerCase();
-        return gl.includes('conto') || gl.includes('novela') || gl.includes('graphic');
-      });
-
-    // Calculate shelf groups
-    const obrasPrimasBooks = books.filter(isObrasPrimas);
-    const recomendadosBooks = books.filter(isRecomendados);
-    const ressalvasBooks = books.filter(isRessalvas);
-    const rejeicaoBooks = books.filter(isRejeicao);
-
-    const sciFiBooks = books.filter(isSciFi);
-    const classicosBooks = books.filter(isClassicos);
-    const darkSideBooks = books.filter(isDarkSide);
-    const curtosBooks = books.filter(isCurtos);
+    const ouroPuroBooks = books.filter(isOuroPuro);
+    const semEnrolacaoBooks = books.filter(isSemEnrolacao);
+    const climaPesadoBooks = books.filter(isClimaPesado);
+    const passarLongeBooks = books.filter(isRejeicao);
 
     return [
       ...(lidosBooks.length > 0 ? [{ id: 'lidos' as FilterOption, title: 'Lidos & Avaliados por Você', chipLabel: 'Lidos', books: lidosBooks }] : []),
-      ...(savedBooks.length > 0 ? [{ id: 'salvos' as FilterOption, title: 'Salvos', chipLabel: 'Salvos', books: savedBooks }] : []),
-      ...(obrasPrimasBooks.length > 0 ? [{ id: 'obras-primas' as FilterOption, title: 'Obras-Primas & Favoritos', chipLabel: 'Obras-Primas', books: obrasPrimasBooks }] : []),
-      ...(sciFiBooks.length > 0 ? [{ id: 'scifi' as FilterOption, title: 'Ficção Científica & Existencial', chipLabel: 'Ficção Científica', books: sciFiBooks }] : []),
-      ...(classicosBooks.length > 0 ? [{ id: 'classicos' as FilterOption, title: 'Clássicos, Filosofia & Drama Humano', chipLabel: 'Clássicos', books: classicosBooks }] : []),
-      ...(darkSideBooks.length > 0 ? [{ id: 'darkside' as FilterOption, title: 'Fantasia Sombria, DarkSide & Contos', chipLabel: 'DarkSide', books: darkSideBooks }] : []),
-      ...(curtosBooks.length > 0 ? [{ id: 'curtos' as FilterOption, title: 'Contos & Obras Curtas', chipLabel: 'Contos Curtos', books: curtosBooks }] : []),
-      ...(recomendadosBooks.length > 0 ? [{ id: 'recomendados' as FilterOption, title: 'Recomendados pelo Veredito', chipLabel: 'Recomendados', books: recomendadosBooks }] : []),
-      ...(ressalvasBooks.length > 0 ? [{ id: 'ressalvas' as FilterOption, title: 'Vale com Ressalvas', chipLabel: 'Ressalvas', books: ressalvasBooks }] : []),
-      ...(rejeicaoBooks.length > 0 ? [{ id: 'rejeicao' as FilterOption, title: 'Zona de Rejeição & Evite', chipLabel: 'Zona de Rejeição', books: rejeicaoBooks }] : []),
+      ...(savedBooks.length > 0 ? [{ id: 'salvos' as FilterOption, title: 'Salvos na Sua Fila', chipLabel: 'Salvos', books: savedBooks }] : []),
+      ...(ouroPuroBooks.length > 0 ? [{ id: 'ouro-puro' as FilterOption, title: 'Ouro Puro', chipLabel: 'Ouro Puro', books: ouroPuroBooks }] : []),
+      ...(semEnrolacaoBooks.length > 0 ? [{ id: 'sem-enrolacao' as FilterOption, title: 'Ritmo Forte & Sem Enrolação', chipLabel: 'Sem Enrolação', books: semEnrolacaoBooks }] : []),
+      ...(climaPesadoBooks.length > 0 ? [{ id: 'clima-pesado' as FilterOption, title: 'Clima Pesado & Sombrio', chipLabel: 'Clima Pesado', books: climaPesadoBooks }] : []),
+      ...(passarLongeBooks.length > 0 ? [{ id: 'passar-longe' as FilterOption, title: 'Melhor Passar Longe', chipLabel: 'Passar Longe', books: passarLongeBooks }] : []),
     ];
   }, [books, savedBooks, userRatings]);
 
@@ -309,9 +300,16 @@ export const EstanteView: React.FC<EstanteViewProps> = React.memo(({
 
   return (
     <div className="space-y-4 pb-12 md:pb-16">
-      {/* Smart Filter Pills Row */}
-      <div className="px-5 sm:px-6 md:px-8 lg:px-12 pt-1 pb-1.5">
-        <div className="flex items-center gap-2.5 overflow-x-auto md:flex-wrap md:overflow-visible py-2 px-1 hide-scrollbar select-none -mx-1">
+      {/* Smart Filter Pills Row — sempre em linha única, arrastável para os lados no PC */}
+      <div className="px-2 sm:px-3 md:px-2 lg:px-3 pt-1 pb-1">
+        <div
+          ref={pillsScrollRef}
+          onMouseDown={handlePillsMouseDown}
+          onDragStart={(e) => e.preventDefault()}
+          className={`flex items-center gap-2.5 overflow-x-auto flex-nowrap py-2.5 px-1 hide-scrollbar select-none -mx-1 touch-pan-x ${
+            isDraggingPills ? 'cursor-grabbing' : 'md:cursor-grab'
+          }`}
+        >
           {shelvesWithCovers.map((shelf) => {
             const isActive = selectedFilter === shelf.id;
             const [cover1, cover2] = shelf.covers || [];
@@ -320,20 +318,26 @@ export const EstanteView: React.FC<EstanteViewProps> = React.memo(({
               <button
                 key={shelf.id}
                 type="button"
-                onClick={() => handleSelectShelf(isActive ? 'all' : shelf.id)}
-                className={`h-11 sm:h-11.5 pl-2 sm:pl-2.5 pr-4.5 sm:pr-5 rounded-full flex items-center gap-2.5 sm:gap-3 shrink-0 transition-all duration-150 cursor-pointer active:scale-95 ${
+                onClick={() => {
+                  if (didDragRef.current) return;
+                  handleSelectShelf(isActive ? 'all' : shelf.id);
+                }}
+                className={`h-11 sm:h-11.5 pl-2 sm:pl-2.5 pr-4.5 sm:pr-5 rounded-full flex items-center gap-2.5 sm:gap-3 shrink-0 transition-all duration-150 active:scale-95 ${
+                  isDraggingPills ? 'cursor-grabbing' : 'cursor-pointer'
+                } ${
                   isActive
                     ? 'bg-[#1d1d1f] text-white border border-[#1d1d1f] shadow-[0_4px_14px_rgba(0,0,0,0.2)]'
                     : 'bg-white text-[#1d1d1f] hover:bg-neutral-50/90 border border-neutral-100/90 shadow-[0_2.5px_10px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_14px_rgba(0,0,0,0.12)]'
                 }`}
               >
                 {/* Duas capas quadradas sobrepostas com cantos arredondados e borda branca */}
-                <div className="flex items-center shrink-0">
+                <div className="flex items-center shrink-0 pointer-events-none">
                   {cover1 && (
                     <div className="w-7.5 h-7.5 sm:w-8 sm:h-8 rounded-[8px] sm:rounded-[9px] overflow-hidden bg-neutral-100 border-[1.5px] sm:border-2 border-white shadow-xs shrink-0 flex items-center justify-center">
                       <img
                         src={cover1}
                         alt=""
+                        draggable={false}
                         className="w-full h-full object-cover"
                         loading="lazy"
                       />
@@ -344,6 +348,7 @@ export const EstanteView: React.FC<EstanteViewProps> = React.memo(({
                       <img
                         src={cover2}
                         alt=""
+                        draggable={false}
                         className="w-full h-full object-cover"
                         loading="lazy"
                       />
@@ -351,7 +356,7 @@ export const EstanteView: React.FC<EstanteViewProps> = React.memo(({
                   )}
                 </div>
 
-                {/* Título do Gênero/Prateleira */}
+                {/* Título do Filtro/Prateleira */}
                 <span className="text-xs sm:text-[13.5px] font-semibold tracking-tight whitespace-nowrap">
                   {shelf.chipLabel}
                 </span>
