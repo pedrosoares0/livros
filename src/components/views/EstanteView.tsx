@@ -254,8 +254,8 @@ export const EstanteView: React.FC<EstanteViewProps> = React.memo(({
     }
 
     return [
-      ...(lidosBooks.length > 0 ? [{ id: 'lidos' as FilterOption, title: 'Lidos & Avaliados por Você', chipLabel: 'Lidos', books: lidosBooks }] : []),
-      ...(orderedSavedBooks.length > 0 ? [{ id: 'salvos' as FilterOption, title: 'Salvos na Sua Fila', chipLabel: 'Salvos', books: orderedSavedBooks }] : []),
+      ...(lidosBooks.length > 0 ? [{ id: 'lidos' as FilterOption, title: 'Lidos', chipLabel: 'Lidos', books: lidosBooks }] : []),
+      ...(orderedSavedBooks.length > 0 ? [{ id: 'salvos' as FilterOption, title: 'Salvos', chipLabel: 'Salvos', books: orderedSavedBooks }] : []),
       ...(buckets['ouro-puro'].length > 0 ? [{ id: 'ouro-puro' as FilterOption, title: 'Ouro Puro', chipLabel: 'Ouro Puro', books: buckets['ouro-puro'] }] : []),
       ...(buckets['clima-pesado'].length > 0 ? [{ id: 'clima-pesado' as FilterOption, title: 'Clima Pesado & Sombrio', chipLabel: 'Clima Pesado', books: buckets['clima-pesado'] }] : []),
       ...(buckets['sem-enrolacao'].length > 0 ? [{ id: 'sem-enrolacao' as FilterOption, title: 'Ritmo Forte & Sem Enrolação', chipLabel: 'Sem Enrolação', books: buckets['sem-enrolacao'] }] : []),
