@@ -380,10 +380,10 @@ export function App() {
         </header>
 
         {/* Desktop Sticky Header Bar */}
-        <header className="hidden md:flex items-center justify-between w-full px-8 lg:px-14 2xl:px-20 py-4 bg-transparent sticky top-0 z-30 select-none pointer-events-none">
+        <header className="hidden md:flex items-center justify-between w-full px-8 lg:px-14 2xl:px-20 py-4 bg-white/90 backdrop-blur-xs sticky top-0 z-30 select-none">
           {/* Left: Brand Logo */}
           <div
-            className="pointer-events-auto flex items-center cursor-pointer group"
+            className="flex items-center cursor-pointer group"
             onClick={() => setActiveTab('discover')}
           >
             <img
@@ -394,7 +394,7 @@ export function App() {
           </div>
 
           {/* Right Group: Navigation Tabs placed adjacent to Actions */}
-          <div className="pointer-events-auto flex items-center gap-3.5 lg:gap-4.5">
+          <div className="flex items-center gap-3.5 lg:gap-4.5">
             {/* Desktop Navigation Tabs */}
             <div className="relative flex items-center bg-neutral-100/90 p-1 rounded-full border border-neutral-200/80 shadow-2xs">
               <button
