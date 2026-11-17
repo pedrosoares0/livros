@@ -20,8 +20,10 @@ type FilterOption =
   | 'lidos'
   | 'salvos'
   | 'ouro-puro'
-  | 'sem-enrolacao'
   | 'clima-pesado'
+  | 'sem-enrolacao'
+  | 'fora-da-curva'
+  | 'boas-apostas'
   | 'passar-longe';
 
 interface ShelfDefinition {
@@ -35,22 +37,35 @@ interface ShelfDefinition {
 // Representantes icônicos e não-repetidos para cada filtro/prateleira
 const PREFERRED_REPRESENTATIVES: Record<string, string[]> = {
   'ouro-puro': [
-    'senhor-das-moscas',
-    'flores-para-algernon',
-    'a-chegada-historia-da-sua-vida',
-  ],
-  'sem-enrolacao': [
-    'entre-quatro-paredes',
+    'noites-brancas',
     'o-cair-da-noite',
-    'contos-de-beedle-o-bardo',
-    'diario-de-um-homem-superfluo',
+    'a-menina-do-outro-lado',
+    'vidas-secas',
   ],
   'clima-pesado': [
-    '1984',
-    'a-estrada',
-    'o-inferno-de-dante',
+    'senhor-das-moscas',
+    'flores-para-algernon',
     'o-gato-preto',
+    'a-estrada',
     'colapso',
+  ],
+  'sem-enrolacao': [
+    'a-revolucao-dos-bichos',
+    'de-quanta-terra-precisa-o-homem',
+    'entre-quatro-paredes',
+    'contos-de-beedle-o-bardo',
+    'a-morte-de-ivan-ilitch',
+  ],
+  'fora-da-curva': [
+    '1984',
+    'o-inferno-de-dante',
+    'a-chegada-historia-da-sua-vida',
+    'hyperion',
+    'o-estranho-misterioso',
+  ],
+  'boas-apostas': [
+    'kallocaina',
+    'a-guerra-da-papoula',
   ],
   'passar-longe': [
     'patinando-no-amor',
@@ -163,40 +178,90 @@ export const EstanteView: React.FC<EstanteViewProps> = React.memo(({
     [books, savedBookIds]
   );
 
-  // Memoize all categorized shelves dynamically
+  // Memoize all categorized shelves dynamically without repeating books across editorial shelves
   const allShelves: ShelfDefinition[] = useMemo(() => {
     // Livros lidos e avaliados pessoalmente pelo leitor
     const lidosBooks = books.filter((b) => Boolean(userRatings?.[b.id]));
+    const lidosIds = new Set(lidosBooks.map((b) => b.id));
 
-    // Helper matching functions for relaxed, mood-driven shelves (no generic genres)
-    const isRejeicao = (b: BookEvaluation) => {
-      const eff = getEffectiveScore(b, userRatings);
-      return Math.floor(eff) < 5 || b.userStatus === 'disliked' || b.vereditoTipo === 'evite';
+    // Em "Salvos", prioriza na vitrine obras que ainda não aparecem em "Lidos"
+    const orderedSavedBooks = [...savedBooks].sort((a, b) => {
+      const aInLidos = lidosIds.has(a.id) ? 1 : 0;
+      const bInLidos = lidosIds.has(b.id) ? 1 : 0;
+      return aInLidos - bInLidos;
+    });
+
+    type EditorialShelfId =
+      | 'ouro-puro'
+      | 'clima-pesado'
+      | 'sem-enrolacao'
+      | 'fora-da-curva'
+      | 'boas-apostas'
+      | 'passar-longe';
+
+    const buckets: Record<EditorialShelfId, BookEvaluation[]> = {
+      'ouro-puro': [],
+      'clima-pesado': [],
+      'sem-enrolacao': [],
+      'fora-da-curva': [],
+      'boas-apostas': [],
+      'passar-longe': [],
     };
 
-    const isOuroPuro = (b: BookEvaluation) => {
+    for (const b of books) {
       const eff = getEffectiveScore(b, userRatings);
-      return !isRejeicao(b) && (Math.floor(eff) >= 9 || b.userStatus === 'loved');
-    };
+      const floored = Math.floor(eff);
 
-    const isSemEnrolacao = (b: BookEvaluation) =>
-      !isRejeicao(b) && (b.criteria?.ritmo ?? 0) >= 8;
+      if (floored < 5 || b.userStatus === 'disliked' || b.vereditoTipo === 'evite') {
+        buckets['passar-longe'].push(b);
+        continue;
+      }
 
-    const isClimaPesado = (b: BookEvaluation) =>
-      !isRejeicao(b) && (b.criteria?.tomSombrio ?? 0) >= 9;
+      if (floored < 9 && b.userStatus !== 'loved') {
+        buckets['boas-apostas'].push(b);
+        continue;
+      }
 
-    const ouroPuroBooks = books.filter(isOuroPuro);
-    const semEnrolacaoBooks = books.filter(isSemEnrolacao);
-    const climaPesadoBooks = books.filter(isClimaPesado);
-    const passarLongeBooks = books.filter(isRejeicao);
+      const c = b.criteria;
+      const candidates: Array<{ id: EditorialShelfId; fit: number }> = [
+        {
+          id: 'ouro-puro',
+          fit: eff + (b.notaTecnica || 0) * 0.15 + (c?.impactoEmocional || 0) * 0.25,
+        },
+      ];
+
+      if ((c?.tomSombrio ?? 0) >= 9) {
+        candidates.push({ id: 'clima-pesado', fit: (c?.tomSombrio ?? 0) * 1.6 });
+      }
+      if ((c?.ritmo ?? 0) >= 8) {
+        candidates.push({
+          id: 'sem-enrolacao',
+          fit: (c?.ritmo ?? 0) * 1.5 + (b.pages > 0 && b.pages <= 160 ? 2.5 : 0),
+        });
+      }
+      if ((c?.worldbuilding ?? 0) >= 8 || (c?.genericidade ?? 5) <= 1) {
+        candidates.push({
+          id: 'fora-da-curva',
+          fit: (c?.worldbuilding ?? 0) * 1.45 + (10 - (c?.genericidade ?? 5)) * 0.25,
+        });
+      }
+
+      // Aloca cada obra em uma única estante editorial, equilibrando quantidade e afinidade
+      const minLen = Math.min(...candidates.map((cand) => buckets[cand.id].length));
+      const balanced = candidates.filter((cand) => buckets[cand.id].length <= minLen + 1);
+      balanced.sort((a, d) => (d.fit - a.fit) || (buckets[a.id].length - buckets[d.id].length));
+      buckets[balanced[0].id].push(b);
+    }
 
     return [
       ...(lidosBooks.length > 0 ? [{ id: 'lidos' as FilterOption, title: 'Lidos & Avaliados por Você', chipLabel: 'Lidos', books: lidosBooks }] : []),
-      ...(savedBooks.length > 0 ? [{ id: 'salvos' as FilterOption, title: 'Salvos na Sua Fila', chipLabel: 'Salvos', books: savedBooks }] : []),
-      ...(ouroPuroBooks.length > 0 ? [{ id: 'ouro-puro' as FilterOption, title: 'Ouro Puro', chipLabel: 'Ouro Puro', books: ouroPuroBooks }] : []),
-      ...(semEnrolacaoBooks.length > 0 ? [{ id: 'sem-enrolacao' as FilterOption, title: 'Ritmo Forte & Sem Enrolação', chipLabel: 'Sem Enrolação', books: semEnrolacaoBooks }] : []),
-      ...(climaPesadoBooks.length > 0 ? [{ id: 'clima-pesado' as FilterOption, title: 'Clima Pesado & Sombrio', chipLabel: 'Clima Pesado', books: climaPesadoBooks }] : []),
-      ...(passarLongeBooks.length > 0 ? [{ id: 'passar-longe' as FilterOption, title: 'Melhor Passar Longe', chipLabel: 'Passar Longe', books: passarLongeBooks }] : []),
+      ...(orderedSavedBooks.length > 0 ? [{ id: 'salvos' as FilterOption, title: 'Salvos na Sua Fila', chipLabel: 'Salvos', books: orderedSavedBooks }] : []),
+      ...(buckets['ouro-puro'].length > 0 ? [{ id: 'ouro-puro' as FilterOption, title: 'Ouro Puro', chipLabel: 'Ouro Puro', books: buckets['ouro-puro'] }] : []),
+      ...(buckets['clima-pesado'].length > 0 ? [{ id: 'clima-pesado' as FilterOption, title: 'Clima Pesado & Sombrio', chipLabel: 'Clima Pesado', books: buckets['clima-pesado'] }] : []),
+      ...(buckets['sem-enrolacao'].length > 0 ? [{ id: 'sem-enrolacao' as FilterOption, title: 'Ritmo Forte & Sem Enrolação', chipLabel: 'Sem Enrolação', books: buckets['sem-enrolacao'] }] : []),
+      ...(buckets['fora-da-curva'].length > 0 ? [{ id: 'fora-da-curva' as FilterOption, title: 'Ideias Fora da Curva', chipLabel: 'Fora da Curva', books: buckets['fora-da-curva'] }] : []),
+      ...(buckets['boas-apostas'].length > 0 ? [{ id: 'boas-apostas' as FilterOption, title: 'Boas Apostas & Ressalvas', chipLabel: 'Boas Apostas', books: buckets['boas-apostas'] }] : []),
+      ...(buckets['passar-longe'].length > 0 ? [{ id: 'passar-longe' as FilterOption, title: 'Melhor Passar Longe', chipLabel: 'Passar Longe', books: buckets['passar-longe'] }] : []),
     ];
   }, [books, savedBooks, userRatings]);
 
