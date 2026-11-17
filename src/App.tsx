@@ -383,10 +383,10 @@ export function App() {
         <header className="hidden md:flex items-center justify-between w-full px-8 lg:px-14 2xl:px-20 py-4 sticky top-0 z-30 select-none">
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-x-0 top-0 -bottom-5 bg-white/60 backdrop-blur-xl backdrop-saturate-150"
+            className="pointer-events-none absolute inset-0 bg-white/80 backdrop-blur-md"
             style={{
-              maskImage: 'linear-gradient(to bottom, black 62%, transparent 100%)',
-              WebkitMaskImage: 'linear-gradient(to bottom, black 62%, transparent 100%)',
+              maskImage: 'linear-gradient(to bottom, black 84%, transparent 100%)',
+              WebkitMaskImage: 'linear-gradient(to bottom, black 84%, transparent 100%)',
             }}
           />
           {/* Left: Brand Logo */}
