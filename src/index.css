@@ -169,16 +169,128 @@
   scrollbar-width: none;
 }
 
-/* 3D Book perspective */
-.book-cover-3d {
-  transform: perspective(600px) rotateY(-8deg);
-  box-shadow: -6px 6px 18px rgba(0, 0, 0, 0.5), -1px 1px 4px rgba(255, 255, 255, 0.1);
-  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+/* 3D Hardcover Book (Geist-inspired, GPU-light: hidden side/back planes until hover) */
+.book-3d-stage {
+  perspective: 900px;
+  contain: layout style;
 }
 
-.book-cover-3d:hover {
-  transform: perspective(600px) rotateY(-2deg) translateY(-6px) scale(1.04);
-  box-shadow: -10px 12px 28px rgba(0, 0, 0, 0.6), 0 0 15px rgba(255, 255, 255, 0.15);
+.book-3d-body {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  transform-style: preserve-3d;
+  container-type: inline-size;
+  transform: rotateY(0deg);
+  transition: transform 250ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.book-3d-front {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 6px 4px 4px 6px;
+  overflow: hidden;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.06),
+    2px 5px 12px -2px rgba(0, 0, 0, 0.16),
+    7px 14px 26px -4px rgba(0, 0, 0, 0.18);
+}
+
+.book-3d-front::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 15;
+  border: 1px solid rgba(0, 0, 0, 0.09);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.32),
+    inset -1px 0 0 rgba(255, 255, 255, 0.16);
+}
+
+.book-3d-bind {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 8.2%;
+  pointer-events: none;
+  z-index: 12;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0) 12%,
+      rgba(255, 255, 255, 0.25) 29.25%,
+      rgba(255, 255, 255, 0) 50.5%,
+      rgba(255, 255, 255, 0) 75.25%,
+      rgba(255, 255, 255, 0.25) 91%,
+      rgba(255, 255, 255, 0) 100%
+    ),
+    linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.04) 0%,
+      rgba(0, 0, 0, 0.14) 12%,
+      transparent 30%,
+      rgba(0, 0, 0, 0.03) 50%,
+      rgba(0, 0, 0, 0.22) 73.5%,
+      rgba(0, 0, 0, 0.45) 75.25%,
+      rgba(0, 0, 0, 0.16) 85.25%,
+      transparent 100%
+    );
+}
+
+.book-3d-pages {
+  position: absolute;
+  top: 3px;
+  left: 0;
+  height: calc(100% - 6px);
+  width: calc(20cqw - 2px);
+  pointer-events: none;
+  visibility: hidden;
+  transition: visibility 0s linear 250ms;
+  background:
+    linear-gradient(90deg, #e5e5e5, transparent 70%),
+    linear-gradient(#ffffff, #f7f7f7);
+  transform: translateX(calc(100cqw - 20cqw / 2 - 3px)) rotateY(90deg) translateX(calc(20cqw / 2));
+}
+
+.book-3d-back {
+  position: absolute;
+  inset: 0;
+  border-radius: 6px 4px 4px 6px;
+  background: #e4e4e7;
+  pointer-events: none;
+  visibility: hidden;
+  transition: visibility 0s linear 250ms;
+  transform: translateZ(calc(-1 * 20cqw));
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .book-3d-stage:hover .book-3d-body,
+  .group:hover .book-3d-body {
+    transform: rotateY(-18deg);
+  }
+
+  .book-3d-stage:hover .book-3d-pages,
+  .group:hover .book-3d-pages,
+  .book-3d-stage:hover .book-3d-back,
+  .group:hover .book-3d-back {
+    visibility: visible;
+    transition-delay: 0s;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .book-3d-body {
+    transition: none;
+  }
+  .book-3d-stage:hover .book-3d-body,
+  .group:hover .book-3d-body {
+    transform: rotateY(0deg);
+  }
 }
 
 /* iOS Mobile Usability & Safari Auto-Zoom Prevention */

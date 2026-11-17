@@ -8,14 +8,16 @@ interface BookCoverProps {
   notaEncaixe?: number;
   userRating?: number;
   className?: string;
+  enable3d?: boolean;
 }
 
 const COVER_PALETTES = [
-  { bg: 'from-amber-950 via-stone-900 to-black', text: 'text-amber-200', border: 'border-amber-500/30' },
-  { bg: 'from-blue-950 via-slate-900 to-black', text: 'text-sky-200', border: 'border-sky-500/30' },
-  { bg: 'from-emerald-950 via-zinc-900 to-black', text: 'text-emerald-200', border: 'border-emerald-500/30' },
-  { bg: 'from-purple-950 via-neutral-900 to-black', text: 'text-purple-200', border: 'border-purple-500/30' },
-  { bg: 'from-red-950 via-stone-900 to-black', text: 'text-rose-200', border: 'border-rose-500/30' },
+  { stripe: '#f59e0b', accent: '#b45309' },
+  { stripe: '#0070f3', accent: '#0369a1' },
+  { stripe: '#10b981', accent: '#047857' },
+  { stripe: '#6366f1', accent: '#4338ca' },
+  { stripe: '#e5484d', accent: '#b91c1c' },
+  { stripe: '#27272a', accent: '#18181b' },
 ];
 
 // Cache em memória de URLs já validadas: elimina cascata de re-renders (opacity 0 -> 100) ao montar ou trocar abas
@@ -38,6 +40,7 @@ export const BookCover: React.FC<BookCoverProps> = React.memo(({
   notaEncaixe,
   userRating,
   className = '',
+  enable3d = true,
 }) => {
   const [failedUrl, setFailedUrl] = useState<string | null>(() =>
     coverUrl && failedCoverUrls.has(coverUrl) ? coverUrl : null
@@ -75,113 +78,105 @@ export const BookCover: React.FC<BookCoverProps> = React.memo(({
   const palette = COVER_PALETTES[charSum % COVER_PALETTES.length];
 
   return (
-    <div
-      className={`relative rounded-[3px] select-none bg-neutral-100 ${className}`}
-      style={{
-        aspectRatio: '2 / 3',
-        contain: 'layout style',
-        boxShadow:
-          '2px 4px 10px -1px rgba(0, 0, 0, 0.20), 7px 14px 28px -2px rgba(0, 0, 0, 0.22), 12px 24px 38px -4px rgba(0, 0, 0, 0.14)',
-      }}
-    >
-      {/* Outer hardcover clip wrapper to maintain crisp 3px corners without clipping outer shadow */}
-      <div className="relative w-full h-full rounded-[3px] overflow-hidden" style={{ contain: 'paint' }}>
-        {/* Real Image or Typographic Leather Cover */}
-        {!hasError && coverUrl ? (
-          <img
-            ref={handleImgRef}
-            key={coverUrl}
-            src={coverUrl}
-            alt={title}
-            onLoad={(e) => {
-              const img = e.currentTarget;
-              if (img.naturalWidth <= 1 || img.naturalHeight <= 1) {
+    <div className={`relative select-none ${enable3d ? 'book-3d-stage' : ''} ${className}`}>
+      <div className={enable3d ? 'book-3d-body' : 'relative w-full aspect-[2/3]'}>
+        {/* Front Hardcover Face */}
+        <div className="book-3d-front bg-neutral-100">
+          {/* Real Image or Geist-inspired Typographic Stripe Cover */}
+          {!hasError && coverUrl ? (
+            <img
+              ref={handleImgRef}
+              key={coverUrl}
+              src={coverUrl}
+              alt={title}
+              onLoad={(e) => {
+                const img = e.currentTarget;
+                if (img.naturalWidth <= 1 || img.naturalHeight <= 1) {
+                  failedCoverUrls.add(coverUrl);
+                  setFailedUrl(coverUrl);
+                } else {
+                  markCoverLoaded(coverUrl);
+                  setLoadedUrl(coverUrl);
+                }
+              }}
+              onError={() => {
                 failedCoverUrls.add(coverUrl);
                 setFailedUrl(coverUrl);
-              } else {
-                markCoverLoaded(coverUrl);
-                setLoadedUrl(coverUrl);
-              }
-            }}
-            onError={() => {
-              failedCoverUrls.add(coverUrl);
-              setFailedUrl(coverUrl);
-            }}
-            className={`w-full h-full object-cover select-none pointer-events-none transition-opacity duration-150 ${
-              isLoaded ? 'opacity-100' : 'opacity-0'
-            }`}
-            loading="lazy"
-            decoding="async"
-          />
-        ) : (
-          <div
-            className={`w-full h-full bg-gradient-to-br ${palette.bg} p-3 flex flex-col justify-between border ${palette.border} relative overflow-hidden`}
-          >
-            {/* Subtle cloth texture overlay */}
-            <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:8px_8px]" />
-
-            {/* Top ornamental line */}
-            <div className="border-b border-white/20 pb-1 z-10">
-              <span className="text-[8px] uppercase tracking-widest text-neutral-400 font-mono block truncate">
-                {author}
-              </span>
-            </div>
-
-            {/* Title */}
-            <div className="my-auto z-10 py-1">
-              <h4
-                className={`text-xs font-serif font-bold ${palette.text} leading-tight line-clamp-3 tracking-tight`}
-                style={{ fontFamily: "'Cinzel', serif" }}
+              }}
+              className={`w-full h-full object-cover select-none pointer-events-none transition-opacity duration-150 ${
+                isLoaded ? 'opacity-100' : 'opacity-0'
+              }`}
+              loading="lazy"
+              decoding="async"
+            />
+          ) : (
+            <div className="w-full h-full flex flex-col bg-[#fafafa]">
+              {/* Upper colored stripe band */}
+              <div
+                className="relative flex-1 w-full overflow-hidden"
+                style={{ backgroundColor: palette.stripe }}
               >
-                {title}
-              </h4>
+                <div
+                  className="absolute inset-0 opacity-20 pointer-events-none"
+                  style={{
+                    background: `radial-gradient(circle at 85% 20%, rgba(255,255,255,0.45), transparent 55%), linear-gradient(135deg, transparent 40%, ${palette.accent} 100%)`,
+                  }}
+                />
+              </div>
+
+              {/* Lower paper gradient band with editorial typography */}
+              <div
+                className="relative flex-1 w-full flex flex-col justify-between p-[8%] pl-[14.3%]"
+                style={{
+                  background: 'linear-gradient(180deg, #ffffff 0%, #f3f3f5 100%)',
+                }}
+              >
+                <div className="space-y-1 min-w-0">
+                  <span className="block text-[7cqw] leading-[1.2] tracking-[-0.02em] font-semibold text-[#1d1d1f] line-clamp-3 text-balance">
+                    {title}
+                  </span>
+                  <span className="block text-[5cqw] leading-tight text-[#6e6e73] truncate">
+                    {author}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between pt-1">
+                  <svg className="w-[10cqw] h-[10cqw] fill-[#1d1d1f]/85" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M21,21H3L12,3Z" />
+                  </svg>
+                  <span className="text-[4.2cqw] font-mono uppercase tracking-wider text-[#86868b]">
+                    Veredito
+                  </span>
+                </div>
+              </div>
             </div>
+          )}
 
-            {/* Bottom ornament */}
-            <div className="border-t border-white/20 pt-1 flex items-center justify-between z-10">
-              <span className="text-[7px] text-neutral-400 font-mono uppercase">
-                Veredito
-              </span>
-              <div className="w-1.5 h-1.5 rounded-full bg-white/30" />
+          {/* Geist Book Bind / Spine Crease (8.2% left gutter) */}
+          <div className="book-3d-bind" />
+
+          {/* Delicate overall specular sheen */}
+          <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.04] to-white/[0.14] pointer-events-none z-10" />
+
+          {/* Fit Score or User Rating Badge on Cover */}
+          {userRating !== undefined ? (
+            <div className="absolute top-1.5 right-1.5 z-20">
+              <ScoreBadge score={userRating} size="sm" isUserRating />
             </div>
-          </div>
-        )}
-
-        {/* --- PHYSICAL HARDCOVER SPINE & HINGE CREASE (MATCHING REFERENCE IMAGE) --- */}
-
-        {/* 1. Curved spine cylinder effect on far-left edge */}
-        <div className="absolute top-0 bottom-0 left-0 w-[5%] min-w-[7px] max-w-[12px] pointer-events-none bg-gradient-to-r from-black/30 via-white/10 to-transparent z-10" />
-
-        {/* 2. Authentic hardcover joint crease (vinca / canaleta de encadernação) */}
-        <div
-          className="absolute top-0 bottom-0 pointer-events-none z-10 flex"
-          style={{ left: '5.2%' }}
-        >
-          {/* Crease shadow groove */}
-          <div className="w-[1.5px] h-full bg-black/45 shadow-[0_0_1px_rgba(0,0,0,0.6)]" />
-          {/* Specular ridge highlight line */}
-          <div className="w-[1px] h-full bg-white/40" />
-          {/* Soft falloff shadow transitioning onto front cover */}
-          <div className="w-2.5 h-full bg-gradient-to-r from-black/20 via-black/5 to-transparent" />
+          ) : notaEncaixe !== undefined ? (
+            <div className="absolute top-1.5 right-1.5 z-20">
+              <ScoreBadge score={notaEncaixe} size="sm" />
+            </div>
+          ) : null}
         </div>
 
-        {/* 3. Subtle Right & Top Board Thickness Rim Highlight */}
-        <div className="absolute top-0 bottom-0 right-0 w-[1px] pointer-events-none bg-white/25 z-10" />
-        <div className="absolute top-0 left-0 right-0 h-[1px] pointer-events-none bg-gradient-to-r from-white/35 via-white/15 to-transparent z-10" />
-
-        {/* 4. Delicate overall sheen */}
-        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-white/15 pointer-events-none z-10" />
-
-        {/* Fit Score or User Rating Badge on Cover */}
-        {userRating !== undefined ? (
-          <div className="absolute top-1.5 right-1.5 z-20">
-            <ScoreBadge score={userRating} size="sm" isUserRating />
-          </div>
-        ) : notaEncaixe !== undefined ? (
-          <div className="absolute top-1.5 right-1.5 z-20">
-            <ScoreBadge score={notaEncaixe} size="sm" />
-          </div>
-        ) : null}
+        {/* 3D Stacked Paper Pages Edge & Back Cover (visible only on hover) */}
+        {enable3d && (
+          <>
+            <div className="book-3d-pages" aria-hidden="true" />
+            <div className="book-3d-back" aria-hidden="true" />
+          </>
+        )}
       </div>
     </div>
   );
