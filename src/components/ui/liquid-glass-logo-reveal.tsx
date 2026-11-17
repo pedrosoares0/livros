@@ -305,7 +305,7 @@ function fitToTexture(source: CanvasImageSource, sw: number, sh: number) {
     }
     oc.putImageData(im, 0, 0)
   } else {
-    // Transparent PNGs (such as /apple-touch-icon.png) can have stray A=1..3 background pixels
+    // Transparent PNGs (such as /logo-intro.png) can have stray A=1..3 background pixels
     // and A=252..254 interior pixels from background removal tools. Normalize them cleanly:
     const im = oc.getImageData(0, 0, TEX, TEX)
     const e = im.data
@@ -414,7 +414,7 @@ export function loadLogo(logo: string) {
 
 // Pre-warm the system logo immediately on module import
 if (typeof window !== "undefined") {
-  loadLogo("/apple-touch-icon.png").catch(() => {})
+  loadLogo("/logo-intro.png").catch(() => {})
 }
 
 /* ------------------------------------------------------------------ *
@@ -1067,7 +1067,7 @@ export function GlassIconReveal({
       },
       (err) => {
         console.error(err)
-        if (!cancelled) onComplete?.()
+        if (!cancelled) live.current.onComplete?.()
       },
     )
     return () => {
@@ -1297,7 +1297,7 @@ export type GlassReveal21stProps = Omit<GlassIconRevealProps, "logo"> & {
 }
 
 /** Every prop is optional and overrides the baked-in look; `tuning` merges into it */
-export function GlassReveal21st({ tuning, logo = "/apple-touch-icon.png", ...props }: GlassReveal21stProps) {
+export function GlassReveal21st({ tuning, logo = "/logo-intro.png", ...props }: GlassReveal21stProps) {
   return (
     <GlassIconReveal
       logo={logo}
@@ -1323,14 +1323,21 @@ export function GlassReveal21st({ tuning, logo = "/apple-touch-icon.png", ...pro
  * ------------------------------------------------------------------ */
 export function VereditoGlassIntro() {
   const [visible, setVisible] = React.useState(true)
+  const completeTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null)
 
   React.useEffect(() => {
     if (!visible) return
     // Safety fallback timeout so the user is never blocked if WebGL or image loading stalls
     const fallbackTimer = setTimeout(() => {
       setVisible(false)
-    }, 4500)
-    return () => clearTimeout(fallbackTimer)
+    }, 5500)
+    return () => {
+      clearTimeout(fallbackTimer)
+      if (completeTimerRef.current) {
+        clearTimeout(completeTimerRef.current)
+        completeTimerRef.current = null
+      }
+    }
   }, [visible])
 
   return (
@@ -1348,7 +1355,8 @@ export function VereditoGlassIntro() {
             loop={false}
             speed={1.15}
             onComplete={() => {
-              setTimeout(() => setVisible(false), 180)
+              if (completeTimerRef.current) clearTimeout(completeTimerRef.current)
+              completeTimerRef.current = setTimeout(() => setVisible(false), 180)
             }}
             className="h-svh min-h-[420px] w-full"
           />
