@@ -1,8 +1,9 @@
-import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { BookOpen, ArrowLeft, ArrowUpDown, Check, Bookmark, Trash2, CheckSquare, X } from 'lucide-react';
 import { BookEvaluation, UserRatingsMap } from '../../types';
 import { getEffectiveScore } from '../../services/ratings';
+import { useHorizontalDragScroll } from '../../hooks/useHorizontalDragScroll';
 import { BookShelf } from '../BookShelf';
 import { BookCover } from '../BookCover';
 
@@ -86,54 +87,14 @@ export const EstanteView: React.FC<EstanteViewProps> = React.memo(({
   const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
   const [isSelectionMode, setIsSelectionMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set());
-  const [isDraggingPills, setIsDraggingPills] = useState(false);
 
-  const pillsScrollRef = useRef<HTMLDivElement>(null);
-  const isPointerDownRef = useRef(false);
-  const startXRef = useRef(0);
-  const startScrollLeftRef = useRef(0);
-  const didDragRef = useRef(false);
-
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!isPointerDownRef.current || !pillsScrollRef.current) return;
-      const dx = e.pageX - startXRef.current;
-      if (Math.abs(dx) > 4 && !didDragRef.current) {
-        didDragRef.current = true;
-        setIsDraggingPills(true);
-      }
-      if (didDragRef.current) {
-        pillsScrollRef.current.scrollLeft = startScrollLeftRef.current - dx;
-      }
-    };
-
-    const stopDragging = () => {
-      if (!isPointerDownRef.current) return;
-      isPointerDownRef.current = false;
-      setIsDraggingPills(false);
-      // Limpa didDrag após o evento click síncrono do mouseup
-      requestAnimationFrame(() => {
-        didDragRef.current = false;
-      });
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseup', stopDragging);
-    window.addEventListener('blur', stopDragging);
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', stopDragging);
-      window.removeEventListener('blur', stopDragging);
-    };
-  }, []);
-
-  const handlePillsMouseDown = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    if (e.button !== 0 || !pillsScrollRef.current) return;
-    isPointerDownRef.current = true;
-    didDragRef.current = false;
-    startXRef.current = e.pageX;
-    startScrollLeftRef.current = pillsScrollRef.current.scrollLeft;
-  }, []);
+  const {
+    scrollRef: pillsScrollRef,
+    isDragging: isDraggingPills,
+    onMouseDown: handlePillsMouseDown,
+    onDragStart: handlePillsDragStart,
+    shouldSuppressClick: shouldSuppressPillClick,
+  } = useHorizontalDragScroll<HTMLDivElement>();
 
   const exitSelectionMode = useCallback(() => {
     setIsSelectionMode(false);
@@ -370,7 +331,7 @@ export const EstanteView: React.FC<EstanteViewProps> = React.memo(({
         <div
           ref={pillsScrollRef}
           onMouseDown={handlePillsMouseDown}
-          onDragStart={(e) => e.preventDefault()}
+          onDragStart={handlePillsDragStart}
           className={`flex items-center gap-2.5 overflow-x-auto flex-nowrap py-2.5 px-1 hide-scrollbar select-none -mx-1 touch-pan-x ${
             isDraggingPills ? 'cursor-grabbing' : 'md:cursor-grab'
           }`}
@@ -384,7 +345,7 @@ export const EstanteView: React.FC<EstanteViewProps> = React.memo(({
                 key={shelf.id}
                 type="button"
                 onClick={() => {
-                  if (didDragRef.current) return;
+                  if (shouldSuppressPillClick()) return;
                   handleSelectShelf(isActive ? 'all' : shelf.id);
                 }}
                 className={`h-11 sm:h-11.5 pl-2 sm:pl-2.5 pr-4.5 sm:pr-5 rounded-full flex items-center gap-2.5 sm:gap-3 shrink-0 transition-all duration-150 active:scale-95 ${
