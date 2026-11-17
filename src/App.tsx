@@ -379,8 +379,8 @@ export function App() {
           </p>
         </header>
 
-        {/* Desktop Sticky Header Bar (Apple macOS Style) */}
-        <header className="hidden md:flex items-center justify-between w-full px-8 lg:px-14 2xl:px-20 py-4 border-b border-neutral-100 bg-white/85 backdrop-blur-md sticky top-0 z-30 select-none">
+        {/* Desktop Sticky Header Bar */}
+        <header className="hidden md:flex items-center justify-between w-full px-8 lg:px-14 2xl:px-20 py-4 bg-white sticky top-0 z-30 select-none">
           {/* Left: Brand Logo */}
           <div
             className="flex items-center cursor-pointer group"
