@@ -10,10 +10,10 @@ const GEMINI_API_KEY = resolveRuntimeConfig(
 );
 
 /**
- * Avaliação crítica: SOMENTE modelos Gemini Flash completos com raciocínio (thinking) ativo.
- * Nenhum modelo `flash-lite` ou `thinkingBudget: 0` entra na avaliação, preservando 100% da
- * profundidade analítica, fidelidade bibliográfica e calibragem com o histórico do leitor.
- * O ganho de velocidade vem exclusivamente do paralelismo e do corte imediato de 503/stalls.
+ * Avaliação crítica: prioriza modelos Gemini Flash completos com raciocínio (thinking) ativo
+ * (`tier: 'preferred'`). Em caso de pico severo de 503/timeout em todos os modelos principais,
+ * aciona contingência `tier: 'fast'` (com thinking ativo quando suportado) após `preferWindowMs`,
+ * evitando erro fatal para o leitor.
  */
 const EVAL_INITIAL_MODELS: RaceModel[] = [
   {
@@ -22,16 +22,42 @@ const EVAL_INITIAL_MODELS: RaceModel[] = [
     generationConfig: { thinkingConfig: { thinkingLevel: 'medium' } },
   },
   {
-    model: 'gemini-3.8-flash',
+    model: 'gemini-3.6-flash',
     tier: 'preferred',
+    generationConfig: { thinkingConfig: { thinkingLevel: 'low' } },
   },
 ];
 
 const EVAL_BACKUP_MODELS: RaceModel[] = [
-  { model: 'gemini-3-flash-preview', tier: 'preferred' },
-  { model: 'gemini-3.6-flash', tier: 'preferred' },
-  { model: 'gemini-3.5-flash', tier: 'preferred' },
-  { model: 'gemini-flash-latest', tier: 'preferred' },
+  {
+    model: 'gemini-3.7-flash',
+    tier: 'preferred',
+    generationConfig: { thinkingConfig: { thinkingLevel: 'low' } },
+  },
+  {
+    model: 'gemini-3.8-flash',
+    tier: 'preferred',
+    generationConfig: { thinkingConfig: { thinkingLevel: 'low' } },
+  },
+  {
+    model: 'gemini-3.5-flash',
+    tier: 'preferred',
+    generationConfig: { thinkingConfig: { thinkingLevel: 'low' } },
+  },
+  {
+    model: 'gemini-flash-latest',
+    tier: 'preferred',
+    generationConfig: { thinkingConfig: { thinkingBudget: 2048 } },
+  },
+  {
+    model: 'gemini-3.1-flash-lite',
+    tier: 'fast',
+    generationConfig: { thinkingConfig: { thinkingLevel: 'medium' } },
+  },
+  {
+    model: 'gemini-3.5-flash-lite',
+    tier: 'fast',
+  },
 ];
 
 const EVAL_GENERATION_CONFIG = {
@@ -122,6 +148,9 @@ function isCatalogVerifiedSource(sourceId?: string): boolean {
   );
 }
 
+const catalogFactsCache = new Map<string, VerifiedCatalogFacts | null>();
+let googleBooksRateLimitedUntil = 0;
+
 /**
  * Consulta rápida (máx. 800ms) ao catálogo público do Google Books em português
  * para ancorar páginas reais, ano, autor e sinopse oficial quando o usuário digita
@@ -131,6 +160,14 @@ async function fetchVerifiedCatalogFacts(
   bookTitle: string,
   authorHint?: string
 ): Promise<VerifiedCatalogFacts | null> {
+  const cacheKey = `${bookTitle.toLowerCase().trim()}|${(authorHint || '').toLowerCase().trim()}`;
+  if (catalogFactsCache.has(cacheKey)) {
+    return catalogFactsCache.get(cacheKey) ?? null;
+  }
+  if (Date.now() < googleBooksRateLimitedUntil) {
+    return null;
+  }
+
   try {
     const q = authorHint && authorHint !== 'Autor a consultar' && authorHint !== 'Autor a verificar'
       ? `intitle:${bookTitle} inauthor:${authorHint}`
@@ -139,9 +176,16 @@ async function fetchVerifiedCatalogFacts(
       `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(q)}&langRestrict=pt&maxResults=3`,
       { signal: AbortSignal.timeout(800) }
     );
+    if (res.status === 429 || res.status === 403) {
+      googleBooksRateLimitedUntil = Date.now() + 5 * 60 * 1000;
+      return null;
+    }
     if (!res.ok) return null;
     const data = await res.json();
-    if (!Array.isArray(data?.items) || data.items.length === 0) return null;
+    if (!Array.isArray(data?.items) || data.items.length === 0) {
+      catalogFactsCache.set(cacheKey, null);
+      return null;
+    }
 
     const normTarget = bookTitle
       .toLowerCase()
@@ -170,7 +214,7 @@ async function fetchVerifiedCatalogFacts(
 
       const parsedYear = info.publishedDate ? parseInt(String(info.publishedDate).slice(0, 4), 10) : NaN;
 
-      return {
+      const facts: VerifiedCatalogFacts = {
         author: Array.isArray(info.authors) && info.authors.length > 0 ? info.authors.join(', ') : undefined,
         publisher: info.publisher || undefined,
         pages: info.pageCount && info.pageCount > 30 ? Number(info.pageCount) : undefined,
@@ -178,6 +222,8 @@ async function fetchVerifiedCatalogFacts(
         description: typeof info.description === 'string' ? info.description.slice(0, 900) : undefined,
         coverUrl,
       };
+      catalogFactsCache.set(cacheKey, facts);
+      return facts;
     }
   } catch {
     // Silencioso: se exceder 800ms ou falhar, segue direto sem bloquear a avaliação
@@ -307,9 +353,10 @@ Responda ESTRITAMENTE em JSON válido com estas exatas chaves:
     backups: EVAL_BACKUP_MODELS,
     parse: parseEvaluationJson,
     baseGenerationConfig: EVAL_GENERATION_CONFIG,
-    hedgeAfterMs: 4500,
+    preferWindowMs: 11000,
+    hedgeAfterMs: 3200,
     perRequestTimeoutMs: 16000,
-    overallTimeoutMs: 22000,
+    overallTimeoutMs: 26000,
     label: 'Gemini Avaliação',
   });
 

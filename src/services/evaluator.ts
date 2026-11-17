@@ -22,6 +22,8 @@ const NEGATIVE_KEYWORDS = [
   'triângulo amoroso', 'prolixo', 'sem payoff', 'infantil', 'escolar', 'cozy'
 ];
 
+let searchGoogleBooksRateLimitedUntil = 0;
+
 // Catálogo enriquecido de edições brasileiras populares e clássicos nacionais
 const BRAZILIAN_EDITIONS_CATALOG: Partial<BookEvaluation>[] = [
   {
@@ -347,13 +349,16 @@ export async function searchBookApi(query: string, signal?: AbortSignal): Promis
   }
 
   // 3. Google Books como fallback apenas se a Open Library não retornar candidatos
-  if (candidates.length === 0) {
+  if (candidates.length === 0 && Date.now() >= searchGoogleBooksRateLimitedUntil) {
     try {
       const encoded = encodeURIComponent(query.trim());
       const res = await fetch(
-        `https://www.googleapis.com/books/v1/volumes?q=${encoded}&langRestrict=pt&printType=books&maxResults=8`
+        `https://www.googleapis.com/books/v1/volumes?q=${encoded}&langRestrict=pt&printType=books&maxResults=8`,
+        { signal: signal || AbortSignal.timeout(3500) }
       );
-      if (res.ok) {
+      if (res.status === 429 || res.status === 403) {
+        searchGoogleBooksRateLimitedUntil = Date.now() + 5 * 60 * 1000;
+      } else if (res.ok) {
         const data = await res.json();
         if (data.items && data.items.length > 0) {
           for (const item of data.items) {

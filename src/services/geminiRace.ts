@@ -195,7 +195,16 @@ export function raceGemini<T>(opts: RaceOptions<T>): Promise<RaceResult<T>> {
     if (preferWindowMs > 0) {
       timers.push(
         setTimeout(() => {
-          if (heldFast) win(heldFast);
+          if (settled) return;
+          if (heldFast) {
+            win(heldFast);
+            return;
+          }
+          const fastIdx = backups.findIndex((b) => b.tier === 'fast');
+          if (fastIdx !== -1) {
+            const [fastBackup] = backups.splice(fastIdx, 1);
+            launch(fastBackup);
+          }
         }, preferWindowMs)
       );
     }
