@@ -52,7 +52,7 @@ const BRAZILIAN_EDITIONS_CATALOG: Partial<BookEvaluation>[] = [
     author: 'Isaac Asimov',
     year: 1951,
     pages: 240,
-    coverUrl: 'https://covers.openlibrary.org/b/id/8718915-L.jpg', // Edição Aleph
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication112/v4/e4/1f/c1/e41fc107-c9d5-3178-9038-25201bb9dfdb/1011450937.jpg/600x900bb.jpg', // Edição Aleph
     genres: ['Ficção Científica', 'Clássico'],
     resumo: 'O matemático Hari Seldon prevê a queda inevitável do Império Galáctico e 30.000 anos de barbárie. Para encurtar essa era das trevas, ele cria a Fundação nas bordas da galáxia.',
   },
@@ -62,7 +62,7 @@ const BRAZILIAN_EDITIONS_CATALOG: Partial<BookEvaluation>[] = [
     author: 'Machado de Assis',
     year: 1899,
     pages: 208,
-    coverUrl: 'https://covers.openlibrary.org/b/id/12369688-L.jpg',
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication/v4/b8/a3/4f/b8a34fb3-cbd1-0b1f-6f08-ee18b755c604/Dom_Casmurro.jpg/600x900bb.jpg',
     genres: ['Clássico Brasileiro', 'Drama Psicológico'],
     resumo: 'Bento Santiago narra, na velhice e sob o peso de um ciúme doentio, sua história de amor com Capitu e sua obsessão eterna com a suspeita de traição com seu melhor amigo Escobar.',
   },
@@ -72,7 +72,7 @@ const BRAZILIAN_EDITIONS_CATALOG: Partial<BookEvaluation>[] = [
     author: 'Machado de Assis',
     year: 1881,
     pages: 192,
-    coverUrl: 'https://covers.openlibrary.org/b/id/12369689-L.jpg',
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication113/v4/d3/64/5d/d3645d81-a71f-2395-2ee4-d44411e9b899/cover-8.png/600x900bb.jpg',
     genres: ['Clássico Brasileiro', 'Sátira Filosófica'],
     resumo: 'Um defunto autor decide narrar sua vida de privilégios, vaidades e frustrações do além-túmulo, dissecando a sociedade do Rio de Janeiro com ironia demolidora e zero hipocrisia.',
   },
@@ -82,7 +82,7 @@ const BRAZILIAN_EDITIONS_CATALOG: Partial<BookEvaluation>[] = [
     author: 'Ray Bradbury',
     year: 1953,
     pages: 216,
-    coverUrl: 'https://covers.openlibrary.org/b/id/10574042-L.jpg', // Globo Livros
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication116/v4/3d/c2/78/3dc2788d-d675-51b8-e89d-a4b33e94e654/Hum-Books-Red-Cover.jpg/600x900bb.jpg', // Globo Livros
     genres: ['Distopia', 'Ficção Científica'],
     resumo: 'Guy Montag é um bombeiro encarregado de queimar livros numa sociedade totalitária onde pensar é proibido e as pessoas vivem entorpecidas por telas de parede.',
   },
@@ -92,7 +92,7 @@ const BRAZILIAN_EDITIONS_CATALOG: Partial<BookEvaluation>[] = [
     author: 'Anthony Burgess',
     year: 1962,
     pages: 288,
-    coverUrl: 'https://covers.openlibrary.org/b/id/10376644-L.jpg', // Aleph
+    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8576571366.01.LZZZZZZZ.jpg', // Aleph
     genres: ['Distopia', 'Drama Psicológico'],
     resumo: 'Alex e seus druguis aterrorizam as noites de uma cidade decadente. Preso pelo Estado, ele é submetido ao condicionamento aversivo Ludovico, perdendo sua capacidade de livre-arbítrio.',
   },
@@ -102,7 +102,7 @@ const BRAZILIAN_EDITIONS_CATALOG: Partial<BookEvaluation>[] = [
     author: 'Franz Kafka',
     year: 1925,
     pages: 264,
-    coverUrl: 'https://covers.openlibrary.org/b/id/12370857-L.jpg', // Companhia das Letras
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication116/v4/3b/c4/c2/3bc4c2c1-0a0e-cc06-43ac-f40f2cb401b3/9781619652873.jpg/600x900bb.jpg', // Companhia das Letras
     genres: ['Clássico', 'Absurdo Existencial'],
     resumo: 'Josef K. é preso numa manhã qualquer sem saber que crime cometeu. O tribunal invisível e labiríntico o consome aos poucos sob um pesadelo burocrático e culpa inexplicável.',
   },

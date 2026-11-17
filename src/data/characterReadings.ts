@@ -9,7 +9,7 @@ import { POPULAR_SUGGESTIONS_POOL } from './suggestionBooks';
 
 const amz = (isbn10: string) => `https://images-na.ssl-images-amazon.com/images/P/${isbn10}.01.LZZZZZZZ.jpg`;
 
-const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
+export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
   {
     id: 'br-irmaos-karamazov',
     title: 'Os Irmãos Karamázov',
@@ -41,7 +41,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Aleph',
     year: 1962,
     pages: 288,
-    coverUrl: amz('8576574462'),
+    coverUrl: amz('8576571366'),
     genres: ['Distopia', 'Drama Psicológico'],
     resumo:
       'Alex e seus druguis aterrorizam as noites de uma cidade decadente. Preso pelo Estado, ele é submetido ao condicionamento Ludovico e perde a capacidade de escolher entre o bem e o mal.',
@@ -593,7 +593,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Editora 34',
     year: 1848,
     pages: 96,
-    coverUrl: amz('8573263350'),
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication113/v4/2d/e3/0e/2de30e96-1fcb-44de-6f73-a3e7b40a923c/1031666439.jpg/600x900bb.jpg',
     genres: ['Clássico Russo', 'Drama Romântico', 'Melancolia'],
     resumo:
       'Durante quatro madrugadas claras em São Petersburgo, um sonhador solitário encontra Nástenka às margens de um canal e se apaixona sabendo que ela espera por outro homem.',
@@ -1133,7 +1133,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Record',
     year: 1988,
     pages: 392,
-    coverUrl: amz('850111362X'),
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication128/v4/a7/d4/eb/a7d4eb75-544b-c897-7d90-c7286a11e2fb/1026900421.jpg/600x900bb.jpg',
     genres: ['Thriller Psicológico', 'Investigação', 'Crime'],
     resumo:
       'Para capturar um assassino em série que esfola suas vítimas, a jovem investigadora Clarice Starling precisa mergulhar nos labirintos mentais do brilhante psiquiatra canibal Hannibal Lecter.',
@@ -1145,7 +1145,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Record',
     year: 1942,
     pages: 160,
-    coverUrl: amz('8501067598'),
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication211/v4/6b/9e/ec/6b9eecab-1111-4295-9796-4034a94ddce9/919d3abf-9bf3-411d-92a4-501186ab9736_cover_image.jpg/600x900bb.jpg',
     genres: ['Filosofia', 'Existencialismo', 'Ensaio'],
     resumo:
       'Diante do silêncio irracional do mundo e da ausência de sentido último, Camus investiga o absurdo da condição humana e a revolta lúcida de continuar empurrando a rocha.',
@@ -1157,7 +1157,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Editora 34',
     year: 1846,
     pages: 232,
-    coverUrl: amz('8573264861'),
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication211/v4/31/5e/4f/315e4fbb-be19-5005-127a-caa032541414/9786558907657_cover.jpg/600x900bb.jpg',
     genres: ['Clássico Russo', 'Drama Psicológico'],
     resumo:
       'Em uma noite úmida de São Petersburgo, o funcionário público Iákov Goliádkin encontra um homem idêntico a si mesmo em nome e feições que passa a usurpar seu lugar na repartição e na vida.',
@@ -1181,7 +1181,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Companhia das Letras',
     year: 1877,
     pages: 808,
-    coverUrl: amz('8535929622'),
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication127/v4/1e/50/7c/1e507ccf-b823-828c-3e63-e5a18db93734/1019040573.jpg/600x900bb.jpg',
     genres: ['Clássico Russo', 'Drama', 'Tragédia'],
     resumo:
       'Dividida entre as convenções implacáveis da alta sociedade russa e a paixão avassaladora pelo oficial Vrónski, Anna Kariênina enfrenta o preço brutal do exílio moral.',
@@ -1253,7 +1253,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Aleph',
     year: 1957,
     pages: 304,
-    coverUrl: amz('8576571986'),
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication123/v4/f1/df/1b/f1df1b5c-4f4f-32b2-d7d7-99befacb09fa/1011451026.jpg/600x900bb.jpg',
     genres: ['Ficção Científica', 'Investigação'],
     resumo:
       'No planeta Solaria, onde vinte mil habitantes vivem isolados em propriedades gigantescas cercados por robôs e têm pavor do contato físico, ocorre um assassinato aparentemente impossível.',
@@ -1265,7 +1265,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Aleph',
     year: 1983,
     pages: 528,
-    coverUrl: amz('8576572605'),
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication114/v4/01/24/a8/0124a837-b4de-a8c5-c01d-af7c52cda691/1025881572.jpg/600x900bb.jpg',
     genres: ['Ficção Científica', 'Investigação'],
     resumo:
       'Chamado ao mundo espacial de Aurora, o detetive Elijah Baley precisa solucionar o "roboticídio" mental de um androide humaniforme antes que a crise destrua o futuro político da Terra.',
@@ -1277,7 +1277,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Aleph',
     year: 1972,
     pages: 344,
-    coverUrl: amz('8576570254'),
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication114/v4/45/28/89/45288952-b8da-f7d3-e191-991cf5c1d787/1011451034.jpg/600x900bb.jpg',
     genres: ['Hard Sci-Fi', 'Ficção Científica'],
     resumo:
       'Uma fonte inesgotável de energia trocada com um universo paralelo garante prosperidade à Terra, mas poucos cientistas ousam enxergar o preço físico que essa transação cobra das estrelas.',
@@ -1313,7 +1313,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Suma',
     year: 2000,
     pages: 884,
-    coverUrl: amz('8556510906'),
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication123/v4/c5/dc/ab/c5dcabee-1b0d-7c06-1c32-0c8825a16fee/1028785853.jpg/600x900bb.jpg',
     genres: ['Fantasia Sombria', 'Tragédia', 'Guerra'],
     resumo:
       'Com os Sete Reinos exauridos pelo conflito, a guerra deixa o campo de batalha aberto e se decide nos banquetes, nas alianças quebradas e nas muralhas de gelo do Norte.',
@@ -1325,7 +1325,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Arqueiro',
     year: 2011,
     pages: 960,
-    coverUrl: amz('8599296361'),
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication125/v4/c7/56/b0/c756b0d3-cc98-08b9-8832-e1f6322b1c7b/9788580410662_202107061451.jpg/600x900bb.jpg',
     genres: ['Fantasia', 'Formação', 'Aventura'],
     resumo:
       'Forçado a se afastar da Universidade, Kvothe viaja até cortes distantes, florestas feéricas e a terra dos guerreiros Ademre em sua caçada silenciosa por respostas sobre os Chandrian.',
@@ -1337,7 +1337,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Arqueiro',
     year: 2006,
     pages: 480,
-    coverUrl: amz('8580412994'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/13587688-L.jpg',
     genres: ['Fantasia', 'Submundo', 'Golpes'],
     resumo:
       'Nos canais sombrios de Camorr, o prodígio da trapaça Locke Lamora e seu bando de Nobres Vigaristas aplicam golpes audaciosos contra a elite até caírem na teia de uma guerra secreta.',
@@ -1349,7 +1349,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Trama',
     year: 2010,
     pages: 1232,
-    coverUrl: amz('6589132690'),
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication122/v4/09/dd/06/09dd06a0-f2cf-16e9-9d17-0bf636484d1b/1037881982.jpg/600x900bb.jpg',
     genres: ['Fantasia Épica', 'Guerra'],
     resumo:
       'No mundo assolado por tempestades de Roshar, um cirurgião reduzido à escravidão nas pontes de guerra e um general assombrado por visões buscam o código perdido dos Cavaleiros Radiantes.',
@@ -1385,7 +1385,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Rocco',
     year: 1969,
     pages: 224,
-    coverUrl: amz('8532531431'),
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication221/v4/43/1a/a9/431aa955-e260-cc2f-d555-1bd1f431e91f/9788551004609.jpg/600x900bb.jpg',
     genres: ['Clássico', 'Guerra', 'Ficção Científica'],
     resumo:
       'Desprendido no tempo, Billy Pilgrim oscila sem controle entre o bombardeio incendiário de Dresden na Segunda Guerra Mundial e um zoológico alienígena no planeta Tralfamadore.',
@@ -1397,7 +1397,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Aleph',
     year: 2005,
     pages: 368,
-    coverUrl: amz('8576573156'),
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication30/v4/3b/23/44/3b234468-0459-742a-d489-11809d9f7c3a/1014831943.jpg/600x900bb.jpg',
     genres: ['Ficção Científica Militar', 'Space Opera'],
     resumo:
       'Aos setenta e cinco anos, John Perry se alista nas Forças Coloniais de Defesa, deixando a Terra para sempre para lutar pela sobrevivência humana num universo implacavelmente hostil.',
@@ -1409,7 +1409,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Aleph',
     year: 1986,
     pages: 416,
-    coverUrl: amz('8576572079'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/9315123-L.jpg',
     genres: ['Ficção Científica', 'Filosófico', 'Antropológico'],
     resumo:
       'Três milênios após a guerra que o marcou para sempre, Ender Wiggin viaja como Orador pelos mundos humanos até chegar à colônia de Lusitânia, onde uma nova espécie inteligente guarda um segredo.',
@@ -1421,7 +1421,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Aleph',
     year: 1976,
     pages: 528,
-    coverUrl: amz('8576573849'),
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication118/v4/63/3a/97/633a97f8-063f-270d-0c0e-447d944bf1bf/1011641451.jpg/600x900bb.jpg',
     genres: ['Ficção Científica', 'Tragédia Dinástica'],
     resumo:
       'Com Arrakis tornando-se verdejante e o império religioso dos Atreides corrompido por intrigas, os gêmeos Leto II e Ghanima herdam as memórias de todos os seus ancestrais e o peso do Caminho Dourado.',
@@ -1433,7 +1433,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Aleph',
     year: 1981,
     pages: 544,
-    coverUrl: amz('8576574284'),
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication113/v4/ff/72/55/ff7255b1-b062-b1ca-8342-65844a7b8c5d/1021504640.jpg/600x900bb.jpg',
     genres: ['Ficção Científica', 'Filosófico', 'Política'],
     resumo:
       'Após três mil e quinhentos anos de reinado absoluto, Leto II abdicou da forma humana para conduzir a espécie pelo Caminho Dourado, sabendo que a própria destruição faz parte de seu desígnio.',
@@ -1445,7 +1445,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Morro Branco',
     year: 1971,
     pages: 224,
-    coverUrl: amz('6586015014'),
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication211/v4/7f/2a/46/7f2a4615-27d2-568f-d9a7-f4707eb55103/b9495b3c-dd88-42d6-af07-88ecaefbdf2d_cover_image.jpg/600x900bb.jpg',
     genres: ['Ficção Científica', 'Psicológico'],
     resumo:
       'George Orr descobre que seus sonhos alteram retroativamente a realidade. Ao buscar ajuda psiquiátrica para parar de sonhar, cai nas mãos de um médico decidido a redesenhar o mundo.',
@@ -1457,7 +1457,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'DarkSide',
     year: 1897,
     pages: 580,
-    coverUrl: amz('8594541473'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/12216503-L.jpg',
     genres: ['Clássico Gótico', 'Terror'],
     resumo:
       'Através de diários, cartas e registros fonográficos, a chegada silenciosa de um conde ancestral da Transilvânia espalha uma sombra predatória sobre a Londres vitoriana.',
@@ -1469,7 +1469,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Companhia das Letras',
     year: 2004,
     pages: 856,
-    coverUrl: amz('8535917098'),
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication122/v4/aa/d5/83/aad58326-c714-e687-978e-ffc6985e649e/1018581973.jpg/600x900bb.jpg',
     genres: ['Clássico Contemporâneo', 'Mistério', 'Drama Sombrio'],
     resumo:
       'Críticos literários europeus, um professor exilado, um jornalista americano e um misterioso romancista alemão convergem para a cidade fronteiriça de Santa Teresa, palco de crimes impunes.',
@@ -1481,7 +1481,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Companhia das Letras',
     year: 1998,
     pages: 632,
-    coverUrl: amz('8535908455'),
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication221/v4/e4/81/98/e4819814-065d-02c0-923d-e507259bc0bc/1017791276.jpg/600x900bb.jpg',
     genres: ['Clássico Contemporâneo', 'Formação', 'Arte'],
     resumo:
       'Da Cidade do México dos anos 1970 aos desertos de Sonora, os poetas vanguardistas Arturo Belano e Ulises Lima partem no rastro de uma autora desaparecida e da própria juventude.',
@@ -1493,7 +1493,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'BestBolso',
     year: 1955,
     pages: 160,
-    coverUrl: amz('8520922260'),
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication211/v4/f2/07/e4/f207e428-cee2-efa9-26b5-19192bad8761/1062181506.jpg/600x900bb.jpg',
     genres: ['Clássico', 'Realismo Fantástico', 'Gótico'],
     resumo:
       'Cumprindo a promessa feita à mãe no leito de morte, Juan Preciado desce ao vilarejo árido de Comala em busca do pai que nunca conheceu, encontrando uma cidade povoada por murmúrios.',
@@ -1517,7 +1517,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Rocco',
     year: 1964,
     pages: 192,
-    coverUrl: amz('8532524362'),
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication124/v4/ea/ef/19/eaef1910-c0c8-9f52-a25e-ac472917dd88/1032205328.jpg/600x900bb.jpg',
     genres: ['Clássico Brasileiro', 'Filosófico', 'Psicológico'],
     resumo:
       'Ao entrar no quarto vazio da ex-empregada em seu apartamento no Rio de Janeiro, uma escultora sofre um colapso epifânico que desmonta todas as suas certezas sobre identidade e linguagem.',
@@ -1529,7 +1529,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Penguin-Companhia',
     year: 1891,
     pages: 360,
-    coverUrl: amz('8582850328'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/15156101-L.jpg',
     genres: ['Clássico Brasileiro', 'Sátira Psicológica'],
     resumo:
       'Herdando a fortuna e o cachorro de um filósofo excêntrico sob a máxima "ao vencedor, as batatas", o ingênuo professor Rubião mergulha na corte carioca até a fronteira do delírio.',
@@ -1541,7 +1541,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Companhia das Letras',
     year: 2005,
     pages: 208,
-    coverUrl: amz('8535907130'),
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication114/v4/7a/d0/46/7ad04649-cad5-3040-fae8-8f1fca4f5643/1013937931.jpg/600x900bb.jpg',
     genres: ['Fábula Filosófica', 'Sátira', 'Clássico'],
     resumo:
       'À meia-noite de primeiro de janeiro, ninguém mais morre em um pequeno país. A euforia inicial pela vida eterna logo cede lugar ao colapso político, religioso e familiar.',
@@ -1553,7 +1553,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Companhia das Letras',
     year: 1991,
     pages: 448,
-    coverUrl: amz('8535906967'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/7427765-L.jpg',
     genres: ['Clássico', 'Drama Filosófico'],
     resumo:
       'Uma releitura profundamente humana e trágica da juventude de Jesus de Nazaré, atormentado pela culpa dos inocentes de Belém e por um destino imposto pelos desígnios do poder divino.',
@@ -1565,7 +1565,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Companhia das Letras',
     year: 2009,
     pages: 176,
-    coverUrl: amz('8535915532'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/15256213-L.jpg',
     genres: ['Sátira Filosófica', 'Clássico'],
     resumo:
       'Condenado a vagar após o primeiro fratricídio, Caim atravessa episódios do Antigo Testamento questionando de frente a justiça e a crueldade das ordens divinas.',
@@ -1577,7 +1577,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Companhia das Letras',
     year: 1997,
     pages: 288,
-    coverUrl: amz('8571647151'),
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication112/v4/fb/87/81/fb8781d3-d124-a87f-a3be-75d8918f2f74/1013938723.jpg/600x900bb.jpg',
     genres: ['Drama Existencial', 'Clássico'],
     resumo:
       'O solitário escriturário Sr. José, funcionário subalterno da Conservatória Geral do Registo Civil, encontra por acaso a ficha de uma mulher desconhecida e arrisca tudo para descobrir quem ela é.',
@@ -1589,7 +1589,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Companhia das Letras',
     year: 1919,
     pages: 80,
-    coverUrl: amz('8535918787'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/15249974-L.jpg',
     genres: ['Clássico', 'Horror Burocrático'],
     resumo:
       'Um explorador estrangeiro assiste à demonstração orgulhosa de um oficial sobre um aparelho de execução que inscreve a sentença judicial na própria pele do condenado.',
@@ -1601,7 +1601,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Companhia das Letras',
     year: 1924,
     pages: 848,
-    coverUrl: amz('8535927794'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/12370425-L.jpg',
     genres: ['Clássico', 'Filosófico', 'Formação'],
     resumo:
       'Hans Castorp sobe aos Alpes suíços para visitar o primo num sanatório por três semanas, mas o magnetismo daquele mundo suspenso no tempo o retém por sete anos à beira da Grande Guerra.',
@@ -1613,7 +1613,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Companhia das Letras',
     year: 1912,
     pages: 144,
-    coverUrl: amz('8535915028'),
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication211/v4/21/ca/85/21ca85d8-6312-2103-83f2-e5c11ed299c5/1063660490.jpg/600x900bb.jpg',
     genres: ['Clássico', 'Estética', 'Tragédia'],
     resumo:
       'Em busca de alívio para o rigor sufocante de sua disciplina criativa, o renomado escritor Gustav von Aschenbach viaja a uma Veneza silenciosamente tomada pelo cólera.',
@@ -1625,7 +1625,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Record',
     year: 1919,
     pages: 192,
-    coverUrl: amz('8501095508'),
+    coverUrl: amz('850102029X'),
     genres: ['Clássico', 'Formação', 'Psicológico'],
     resumo:
       'Guiado pelo enigmático colega de escola Max Demian, o jovem Emil Sinclair rompe a fronteira entre o mundo luminoso da infância e as zonas proibidas da própria consciência.',
@@ -1637,7 +1637,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Record',
     year: 1922,
     pages: 176,
-    coverUrl: amz('8577990710'),
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication126/v4/e8/4d/d9/e84dd9ae-191f-a5bf-8e65-4ad6a86b59d7/1035033859.jpg/600x900bb.jpg',
     genres: ['Clássico', 'Filosófico'],
     resumo:
       'Na Índia antiga, o filho de um brâmane abandona o conforto paterno, o ascetismo e os ensinamentos prontos para experimentar na própria carne a riqueza, a perda e a escuta de um rio.',
@@ -1649,7 +1649,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Civilização Brasileira',
     year: 1944,
     pages: 112,
-    coverUrl: amz('8528612244'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/14899128-L.jpg',
     genres: ['Teatro', 'Existencialismo', 'Psicológico'],
     resumo:
       'Três desconhecidos são conduzidos a uma sala fechada sem espelhos nem janelas, onde a ausência de carrascos físicos revela que o verdadeiro tormento reside no olhar implacável do outro.',
@@ -1661,7 +1661,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Companhia das Letras',
     year: 2015,
     pages: 384,
-    coverUrl: amz('853592602X'),
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication118/v4/e1/8f/50/e18f509d-f2ab-97d9-300c-11e721be24e8/1013925068.jpg/600x900bb.jpg',
     genres: ['Fantasia Melancólica', 'Memória', 'Drama'],
     resumo:
       'Em uma Bretanha pós-arturiana envolta por uma névoa que apaga as lembranças de todos os habitantes, um velho casal parte em busca do filho sem saber que feridas o retorno da memória pode reabrir.',
@@ -1673,7 +1673,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Alfaguara',
     year: 2002,
     pages: 576,
-    coverUrl: amz('8560281452'),
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication118/v4/3b/8c/50/3b8c500e-950e-caed-43d0-868ec96cffa8/1018742104.jpg/600x900bb.jpg',
     genres: ['Realismo Fantástico', 'Formação', 'Mistério'],
     resumo:
       'Fugindo de casa aos quinze anos e de uma maldição paterna, o jovem Kafka Tamura encontra abrigo numa biblioteca particular costeira enquanto seu destino cruza o de um velho que conversa com gatos.',
@@ -1685,7 +1685,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Alfaguara',
     year: 2009,
     pages: 992,
-    coverUrl: amz('857962181X'),
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication221/v4/28/fe/22/28fe22ee-c5ae-b657-4001-44f0c09a5903/9780307957023.d.jpg/600x900bb.jpg',
     genres: ['Distopia Surreal', 'Mistério', 'Drama'],
     resumo:
       'Ao descer uma escada de emergência numa via expressa de Tóquio, Aomame percebe que entrou numa realidade ligeiramente alterada, onde duas luas pairam no céu noturno.',
@@ -1697,7 +1697,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Alfaguara',
     year: 1994,
     pages: 664,
-    coverUrl: amz('8556520529'),
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication128/v4/28/ec/da/28ecdae5-1b92-e2d8-0281-9ce75c299e13/1021500663.jpg/600x900bb.jpg',
     genres: ['Mistério Psicológico', 'Surrealismo'],
     resumo:
       'A busca por um gato desaparecido nos subúrbios de Tóquio conduz Toru Okada ao fundo de um poço seco e aos ecos sombrios da ocupação japonesa na Manchúria.',
@@ -1709,7 +1709,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Alfaguara',
     year: 2014,
     pages: 240,
-    coverUrl: amz('8581053025'),
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication127/v4/22/eb/8b/22eb8b73-3d45-f670-f44b-e81cd3294a4e/1018742112.jpg/600x900bb.jpg',
     genres: ['Contos', 'Melancolia', 'Drama'],
     resumo:
       'Sete contos atravessados por clubes de jazz, estradas noturnas e a solidão silenciosa de homens marcados pela ausência irremediável de quem amaram.',
@@ -1733,7 +1733,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Suma',
     year: 1978,
     pages: 1248,
-    coverUrl: amz('8581050476'),
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication128/v4/1a/d4/97/1ad49766-c8f9-1631-ad8b-9c24c9af2fa8/1018744506.jpg/600x900bb.jpg',
     genres: ['Pós-Apocalíptico', 'Épico Sombrio'],
     resumo:
       'Após o vazamento de uma supergripe dizimar a população mundial, os poucos sobreviventes são atraídos por sonhos opostos rumo ao confronto inevitável nas ruínas da América.',
@@ -1769,7 +1769,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Suma',
     year: 1974,
     pages: 200,
-    coverUrl: amz('8581050441'),
+    coverUrl: amz('8581050360'),
     genres: ['Terror Psicológico', 'Tragédia'],
     resumo:
       'Oprimida pelo fanatismo religioso da mãe em casa e pela humilhação cruel dos colegas na escola, a adolescente Carrie White descobre uma força telecinética que avança rumo à noite do baile.',
@@ -1793,7 +1793,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Suma',
     year: 2013,
     pages: 480,
-    coverUrl: amz('8581051952'),
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication221/v4/d9/64/17/d96417f7-c5b0-ae04-698d-06a2cb307e45/1018744530.jpg/600x900bb.jpg',
     genres: ['Terror Psicológico', 'Sobrenatural'],
     resumo:
       'Décadas após sobreviver ao Hotel Overlook, um Dan Torrance marcado pelo alcoolismo e pelos fantasmas do pai tenta proteger uma menina cujo brilho atrai um clã de predadores imortais.',
@@ -1817,7 +1817,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Intrínseca',
     year: 1996,
     pages: 368,
-    coverUrl: amz('8551000837'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/13872807-L.jpg',
     genres: ['Fantasia Urbana', 'Sombrio'],
     resumo:
       'Após socorrer uma garota ferida na calçada, um jovem comum vê sua existência ser apagada da superfície e é arrastado para a Londres de Baixo, um submundo feudal nos túneis do metrô.',
@@ -1829,7 +1829,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Panini',
     year: 1989,
     pages: 240,
-    coverUrl: amz('857351695X'),
+    coverUrl: amz('8542617428'),
     genres: ['Graphic Novel', 'Mitologia Sombria'],
     resumo:
       'Aprisionado por ocultistas humanos durante setenta anos em um porão de vidro, Morfeus, o Senhor dos Sonhos, conquista a liberdade e parte para reconstruir seu reino em ruínas.',
@@ -1841,7 +1841,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Panini',
     year: 1988,
     pages: 64,
-    coverUrl: amz('8573515481'),
+    coverUrl: amz('6559605833'),
     genres: ['Graphic Novel', 'Psicológico', 'Noir'],
     resumo:
       'Determinado a provar que basta um único dia ruim para reduzir o mais são dos homens à loucura, o Coringa escapa do Asilo Arkham e coloca o Comissário Gordon e o Batman no limite.',
@@ -1853,7 +1853,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Panini',
     year: 1987,
     pages: 136,
-    coverUrl: amz('857351812X'),
+    coverUrl: amz('8573517948'),
     genres: ['Graphic Novel', 'Noir', 'Policial'],
     resumo:
       'Em uma Gotham City apodrecida pela corrupção policial e pela máfia, as jornadas iniciais de um jovem Bruce Wayne e do tenente recém-transferido James Gordon se entrelaçam nas ruas.',
@@ -1889,7 +1889,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Intrínseca',
     year: 2012,
     pages: 448,
-    coverUrl: amz('8580573106'),
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication221/v4/f3/ce/0b/f3ce0b28-de98-8a0a-45ae-7cec7beee2d6/9788580572896.jpg/600x900bb.jpg',
     genres: ['Thriller Psicológico', 'Mistério'],
     resumo:
       'Na manhã do quinto aniversário de casamento, Amy Dunne desaparece sem deixar rastro e todas as pistas deixadas na casa transformam o marido, Nick, no principal suspeito diante da mídia.',
@@ -1901,7 +1901,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Intrínseca',
     year: 2006,
     pages: 256,
-    coverUrl: amz('858057661X'),
+    coverUrl: amz('858057658X'),
     genres: ['Thriller Psicológico', 'Gótico Sulista'],
     resumo:
       'Recém-saída de uma clínica psiquiátrica, a repórter Camille Preaker é enviada de volta à sua sufocante cidade natal no Missouri para cobrir o assassinato de duas meninas e reencontrar a mãe.',
@@ -1913,7 +1913,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Intrínseca',
     year: 2009,
     pages: 384,
-    coverUrl: amz('8580574447'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/13201359-L.jpg',
     genres: ['Thriller Psicológico', 'Investigação'],
     resumo:
       'Vinte e cinco anos após testemunhar contra o próprio irmão pelo massacre da família numa fazenda do Kansas, Libby Day é forçada a revisitar a noite do crime.',
@@ -1937,7 +1937,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Penguin-Companhia',
     year: 1898,
     pages: 232,
-    coverUrl: amz('8563560220'),
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication49/v4/2b/88/3b/2b883bfb-b698-11e4-001a-dfcb44869a95/1013937543.jpg/600x900bb.jpg',
     genres: ['Clássico Gótico', 'Terror Psicológico'],
     resumo:
       'Contratada para cuidar de dois órfãos exemplares na isolada propriedade rural de Bly, uma jovem preceptora passa a enxergar aparições silenciosas nos jardins e nas torres da mansão.',
@@ -1949,7 +1949,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Suma',
     year: 1962,
     pages: 192,
-    coverUrl: amz('8556510426'),
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication118/v4/15/ee/5f/15ee5ff0-02dd-a6a4-b16d-39d97d80f483/1020120356.jpg/600x900bb.jpg',
     genres: ['Gótico', 'Suspense Psicológico'],
     resumo:
       'Isoladas na propriedade da família após uma tragédia à mesa de jantar e odiadas pelos moradores do vilarejo vizinho, as irmãs Merricat e Constance têm sua rotina ameaçada pela chegada de um primo.',
@@ -1961,7 +1961,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'DarkSide',
     year: 1967,
     pages: 320,
-    coverUrl: amz('8594540329'),
+    coverUrl: amz('6555981571'),
     genres: ['Terror Psicológico', 'Suspense'],
     resumo:
       'Recém-mudados para um antigo edifício gótico em Nova York, Rosemary e seu ambicioso marido ator estreitam laços com um casal de vizinhos idosos excessivamente solícitos.',
@@ -1973,7 +1973,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'HarperCollins',
     year: 1971,
     pages: 336,
-    coverUrl: amz('8595085323'),
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication114/v4/a0/3e/6b/a03e6b6f-71e6-66fe-51e7-412facb78146/The_Exorcist.jpg/600x900bb.jpg',
     genres: ['Terror', 'Drama Teológico'],
     resumo:
       'Quando a medicina e a psiquiatria falham em explicar a transformação aterradora de uma menina de onze anos em Washington, um padre jesuíta em crise de fé é chamado ao quarto.',
@@ -1985,7 +1985,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Record',
     year: 1981,
     pages: 432,
-    coverUrl: amz('8501114596'),
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication128/v4/c4/b3/3f/c4b33fd5-d71a-61ba-b4d6-217053aa08b8/1023701707.jpg/600x900bb.jpg',
     genres: ['Thriller Psicológico', 'Investigação'],
     resumo:
       'Para deter um assassino ritualístico que ataca famílias nas noites de lua cheia, o ex-agente Will Graham precisa reativar sua empatia sombria e consultar na cela seu antigo inimigo, Hannibal Lecter.',
@@ -1997,7 +1997,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Penguin-Companhia',
     year: -720,
     pages: 576,
-    coverUrl: amz('8563560204'),
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication211/v4/45/6a/fb/456afb65-59ab-cc65-40c7-a0bece30d06a/1067824431.jpg/600x900bb.jpg',
     genres: ['Épico', 'Clássico', 'Mitologia'],
     resumo:
       'Terminado o cerco de Troia, o astuto Odisseu enfrenta dez anos de mares tempestuosos, monstros e deuses coléricos na luta obstinada para retornar à ilha de Ítaca.',
@@ -2009,7 +2009,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Editora 34',
     year: -19,
     pages: 760,
-    coverUrl: amz('8573265922'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/13185877-L.jpg',
     genres: ['Épico', 'Clássico', 'Mitologia'],
     resumo:
       'Carregando o pai idoso nos ombros em meio às chamas de Troia, Eneias lidera os sobreviventes pelo Mediterrâneo sob o fardo implacável de fundar uma nova pátria.',
@@ -2021,7 +2021,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Edipro',
     year: 180,
     pages: 160,
-    coverUrl: amz('8595084432'),
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication126/v4/2e/01/0d/2e010dc0-31fa-f011-9682-def1b99ee038/Meditacoes_capa.jpg/600x900bb.jpg',
     genres: ['Filosofia', 'Estoicismo', 'Clássico'],
     resumo:
       'Escritos nas tendas militares das fronteiras germânicas para si mesmo, os apontamentos íntimos do imperador romano sobre o dever, a brevidade da vida e o domínio das paixões.',
@@ -2033,7 +2033,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Companhia das Letras',
     year: 1883,
     pages: 360,
-    coverUrl: amz('8535919724'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/14367830-L.jpg',
     genres: ['Filosofia', 'Clássico'],
     resumo:
       'Após dez anos de solidão na montanha, o profeta Zaratustra desce de volta aos homens para anunciar a superação de si mesmo, a vontade de potência e o amor ao destino.',
@@ -2045,7 +2045,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Companhia das Letras',
     year: 1886,
     pages: 248,
-    coverUrl: amz('8535907440'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/15230651-L.jpg',
     genres: ['Filosofia', 'Clássico'],
     resumo:
       'Com aforismos cortantes, Nietzsche desmonta os preconceitos dos filósofos e expõe as raízes psicológicas de dominação e medo ocultas por trás das convenções morais.',
@@ -2057,7 +2057,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Companhia das Letras',
     year: 1887,
     pages: 168,
-    coverUrl: amz('8535914269'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/13345772-L.jpg',
     genres: ['Filosofia', 'Psicologia Moral'],
     resumo:
       'Três dissertações demolidoras que investigam como o ressentimento, a culpa e o ideal ascético forjaram a consciência moral do Ocidente.',
@@ -2081,7 +2081,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Companhia das Letras',
     year: 1951,
     pages: 648,
-    coverUrl: amz('8535922180'),
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication221/v4/e1/10/60/e1106008-feda-865d-bbf3-e6b77f6fbcaa/350811ec-fd4b-4707-8c63-9066ec805007_cover_image.jpg/600x900bb.jpg',
     genres: ['Filosofia Política', 'História'],
     resumo:
       'Análise monumental das engrenagens históricas — antissemitismo, imperialismo e propaganda de massas — que converteram sociedades modernas em regimes de terror total.',
@@ -2117,7 +2117,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Rocco',
     year: 1947,
     pages: 256,
-    coverUrl: amz('8532507573'),
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication221/v4/4d/b0/12/4db012af-58c7-01da-dfb9-c3cee927d1c8/1036514188.jpg/600x900bb.jpg',
     genres: ['Memórias', 'História', 'Clássico'],
     resumo:
       'Com a precisão serena de um químico e sem jamais apelar ao ódio fácil, Primo Levi registra o cotidiano de Auschwitz como o mais terrível experimento de desumanização da história.',
@@ -2129,7 +2129,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Carambaia',
     year: 1973,
     pages: 640,
-    coverUrl: amz('8595070679'),
+    coverUrl: amz('8569002661'),
     genres: ['História', 'Denúncia', 'Clássico Russo'],
     resumo:
       'Reunindo a própria experiência no cárcere e o testemunho de centenas de prisioneiros, Soljenítsin revela a rede subterrânea de campos de trabalhos forçados do Estado soviético.',
@@ -2141,7 +2141,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Editora 34',
     year: 1962,
     pages: 176,
-    coverUrl: amz('8573267488'),
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication3/v4/58/cf/d4/58cfd43f-e9ba-4299-1f7b-ba041cabbd04/9781466839410.jpg/600x900bb.jpg',
     genres: ['Clássico Russo', 'Drama Humano'],
     resumo:
       'Do toque da alvorada ao apagar das luzes sob trinta graus negativos na Sibéria, um único dia na rotina do prisioneiro Chukhov tentando preservar um pedaço de pão e a própria dignidade.',
@@ -2153,7 +2153,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'L&PM',
     year: 1929,
     pages: 240,
-    coverUrl: amz('8525413283'),
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication211/v4/84/9e/76/849e763b-4ccc-7c5a-a563-d5b01ea25adc/1029123344.jpg/600x900bb.jpg',
     genres: ['Clássico', 'Guerra', 'Drama'],
     resumo:
       'Arrancados da sala de aula por discursos patrióticos e jogados na lama das trincheiras da Primeira Guerra Mundial, Paul Bäumer e seus colegas veem a juventude ser triturada pelo artilharia.',
@@ -2165,7 +2165,7 @@ const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Record',
     year: 1963,
     pages: 266,
-    coverUrl: amz('850111457X'),
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication/v4/c3/bf/4c/c3bf4c08-e8b9-9682-e9d3-45728ba6a65c/9788501101525.jpg/600x900bb.jpg',
     genres: ['Espionagem', 'Guerra Fria', 'Suspense'],
     resumo:
       'Diante do Muro de Berlim, o veterano agente britânico Alec Leamas aceita uma última operação de desinformação na Alemanha Oriental, onde lealdade e traição deixam de ter fronteira.',

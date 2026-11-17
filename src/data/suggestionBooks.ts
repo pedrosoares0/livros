@@ -37,7 +37,7 @@ export const POPULAR_SUGGESTIONS_POOL: Partial<BookEvaluation>[] = [
     publisher: 'Aleph',
     year: 1951,
     pages: 240,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8576570661.01.LZZZZZZZ.jpg',
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication112/v4/e4/1f/c1/e41fc107-c9d5-3178-9038-25201bb9dfdb/1011450937.jpg/600x900bb.jpg',
     genres: ['Ficção Científica', 'Clássico'],
     resumo:
       'O matemático Hari Seldon prevê a queda inevitável do Império Galáctico e 30.000 anos de barbárie. Para encurtar essa era das trevas, ele cria a Fundação nas bordas da galáxia.',
@@ -49,7 +49,7 @@ export const POPULAR_SUGGESTIONS_POOL: Partial<BookEvaluation>[] = [
     publisher: 'Globo Livros',
     year: 1953,
     pages: 216,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8525052248.01.LZZZZZZZ.jpg',
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication116/v4/3d/c2/78/3dc2788d-d675-51b8-e89d-a4b33e94e654/Hum-Books-Red-Cover.jpg/600x900bb.jpg',
     genres: ['Distopia', 'Ficção Científica'],
     resumo:
       'Guy Montag é um bombeiro encarregado de queimar livros numa sociedade totalitária onde pensar é proibido e as pessoas vivem entorpecidas por telas de parede.',
@@ -73,7 +73,7 @@ export const POPULAR_SUGGESTIONS_POOL: Partial<BookEvaluation>[] = [
     publisher: 'Record',
     year: 1967,
     pages: 448,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8501012076.01.LZZZZZZZ.jpg',
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication123/v4/0e/e0/2c/0ee02c0f-c0cf-6f03-6014-aa3ede355b4a/1028714978.jpg/600x900bb.jpg',
     genres: ['Clássico', 'Realismo Mágico', 'Drama Familiar'],
     resumo:
       'A saga multigeracional da família Buendía na mítica cidade de Macondo, marcada por paixões obsessivas, guerras civis, presságios trágicos e uma solidão inescapável.',
@@ -85,7 +85,7 @@ export const POPULAR_SUGGESTIONS_POOL: Partial<BookEvaluation>[] = [
     publisher: 'Companhia das Letras',
     year: 1925,
     pages: 264,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8535907432.01.LZZZZZZZ.jpg',
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication116/v4/3b/c4/c2/3bc4c2c1-0a0e-cc06-43ac-f40f2cb401b3/9781619652873.jpg/600x900bb.jpg',
     genres: ['Clássico', 'Absurdo Existencial'],
     resumo:
       'Josef K. é detido numa manhã qualquer sem saber que crime cometeu. Um tribunal invisível e labiríntico o consome aos poucos em um pesadelo burocrático e opressivo.',
@@ -97,7 +97,7 @@ export const POPULAR_SUGGESTIONS_POOL: Partial<BookEvaluation>[] = [
     publisher: 'Biblioteca Azul',
     year: 1932,
     pages: 312,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8525056006.01.LZZZZZZZ.jpg',
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication124/v4/68/e6/50/68e65056-f4c4-9d5d-c0c1-47e4616ad74c/9788525056443.jpg/600x900bb.jpg',
     genres: ['Distopia', 'Ficção Científica', 'Clássico'],
     resumo:
       'Num futuro onde seres humanos são gerados em laboratório, divididos em castas biológicas e mantidos felizes pela droga Soma, um homem criado fora do sistema questiona o preço da servidão voluntária.',
@@ -229,7 +229,7 @@ export const POPULAR_SUGGESTIONS_POOL: Partial<BookEvaluation>[] = [
     publisher: 'Penguin-Companhia',
     year: 1899,
     pages: 208,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8582850352.01.LZZZZZZZ.jpg',
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication/v4/b8/a3/4f/b8a34fb3-cbd1-0b1f-6f08-ee18b755c604/Dom_Casmurro.jpg/600x900bb.jpg',
     genres: ['Clássico Brasileiro', 'Drama Psicológico'],
     resumo:
       'Bento Santiago narra, na velhice e sob o peso de um ciúme corrosivo, sua história de amor com Capitu e sua suspeita obsessiva de traição com seu melhor amigo Escobar.',
@@ -241,7 +241,7 @@ export const POPULAR_SUGGESTIONS_POOL: Partial<BookEvaluation>[] = [
     publisher: 'Penguin-Companhia',
     year: 1881,
     pages: 192,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8582850018.01.LZZZZZZZ.jpg',
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication113/v4/d3/64/5d/d3645d81-a71f-2395-2ee4-d44411e9b899/cover-8.png/600x900bb.jpg',
     genres: ['Clássico Brasileiro', 'Sátira Filosófica'],
     resumo:
       'Um defunto autor decide narrar sua vida de privilégios, vaidades e frustrações do além-túmulo, dissecando a sociedade com ironia demolidora e zero hipocrisia.',
@@ -301,7 +301,7 @@ export const POPULAR_SUGGESTIONS_POOL: Partial<BookEvaluation>[] = [
     publisher: 'Nova Fronteira',
     year: 1940,
     pages: 224,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8520932932.01.LZZZZZZZ.jpg',
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication124/v4/62/60/99/626099f3-cf05-4518-31dc-c3b7d91d945b/1026941755.jpg/600x900bb.jpg',
     genres: ['Clássico', 'Existencialismo', 'Alegoria'],
     resumo:
       'Designado para o isolado Forte Bastiani na fronteira de um deserto silencioso, o jovem tenente Giovanni Drogo consome anos de juventude aguardando uma invasão inimiga que dê sentido à própria existência.',
@@ -313,7 +313,7 @@ export const POPULAR_SUGGESTIONS_POOL: Partial<BookEvaluation>[] = [
     publisher: 'Record',
     year: 1947,
     pages: 288,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8501112518.01.LZZZZZZZ.jpg',
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication123/v4/84/bb/8e/84bb8e66-9d90-eee0-ce11-b01c16ba0929/1029242532.jpg/600x900bb.jpg',
     genres: ['Clássico', 'Existencialismo', 'Drama Humano'],
     resumo:
       'Quando ratos mortos anunciam uma epidemia implacável que fecha os portões da cidade argelina de Orã, o médico Bernard Rieux e outros moradores enfrentam o confinamento, o medo e o dever moral sem consolo.',
@@ -337,7 +337,7 @@ export const POPULAR_SUGGESTIONS_POOL: Partial<BookEvaluation>[] = [
     publisher: 'Editora 34',
     year: 1872,
     pages: 704,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8573263113.01.LZZZZZZZ.jpg',
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication211/v4/a8/de/b9/a8deb917-b8e8-1463-d346-f25979581f64/1065805911.jpg/600x900bb.jpg',
     genres: ['Clássico Russo', 'Drama Político', 'Psicológico'],
     resumo:
       'Em uma província russa agitada por células revolucionárias e pelo magnetismo sombrio de Nikolai Stavrógim, o fanatismo ideológico e a manipulação transformam ideias utópicas em conspiração e sangue.',
@@ -349,7 +349,7 @@ export const POPULAR_SUGGESTIONS_POOL: Partial<BookEvaluation>[] = [
     publisher: 'Editora 34',
     year: 1886,
     pages: 96,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8573263563.01.LZZZZZZZ.jpg',
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication116/v4/d0/7d/e7/d07de736-1694-fc62-de35-2c32dcf69e5d/1040820811.jpg/600x900bb.jpg',
     genres: ['Clássico Russo', 'Drama Existencial'],
     resumo:
       'Um juiz respeitado da alta burocracia russa adoece misteriosamente no auge da carreira e, diante da indiferença polida da família e dos colegas, é forçado a interrogar se viveu de modo autêntico.',
@@ -361,7 +361,7 @@ export const POPULAR_SUGGESTIONS_POOL: Partial<BookEvaluation>[] = [
     publisher: 'Companhia das Letras',
     year: 1944,
     pages: 176,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/853591112X.01.LZZZZZZZ.jpg',
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication62/v4/6a/13/e7/6a13e7f8-5000-c42f-0c96-b9466a571ea2/1016042572.jpg/600x900bb.jpg',
     genres: ['Contos', 'Filosófico', 'Clássico'],
     resumo:
       'Bibliotecas infinitas, loterias secretas, labirintos temporais e enciclopédias de mundos imaginários que começam a invadir o real compõem a obra-prima conceitual de Borges.',
@@ -373,7 +373,7 @@ export const POPULAR_SUGGESTIONS_POOL: Partial<BookEvaluation>[] = [
     publisher: 'Companhia das Letras',
     year: 1949,
     pages: 168,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/853591188X.01.LZZZZZZZ.jpg',
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication62/v4/b5/08/43/b5084381-890b-3b33-3e53-dabc774fc39f/1016042549.jpg/600x900bb.jpg',
     genres: ['Contos', 'Metafísica', 'Clássico'],
     resumo:
       'Dezessete narrativas que exploram a imortalidade, a memória implacável, espelhos, teologias heréticas e um pequeno ponto no porão de uma casa de Buenos Aires que contém todos os lugares do cosmos.',
@@ -385,7 +385,7 @@ export const POPULAR_SUGGESTIONS_POOL: Partial<BookEvaluation>[] = [
     publisher: 'Companhia das Letras',
     year: 1926,
     pages: 384,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8535900896.01.LZZZZZZZ.jpg',
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication122/v4/68/b6/71/68b671f6-f3f1-b1fe-64be-4fabb0981a77/39.png/600x900bb.jpg',
     genres: ['Clássico', 'Absurdo Existencial'],
     resumo:
       'O agrimensor K. chega a uma aldeia coberta de neve sob a jurisdição de um Castelo inacessível e tenta, em vão, obter autorização para exercer o trabalho para o qual afirma ter sido convocado.',
@@ -397,7 +397,7 @@ export const POPULAR_SUGGESTIONS_POOL: Partial<BookEvaluation>[] = [
     publisher: 'Aleph',
     year: 1974,
     pages: 392,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8576573768.01.LZZZZZZZ.jpg',
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication211/v4/9b/bc/4c/9bbc4c60-f39f-3ccb-2cb2-db0e144b65d6/1018951002.jpg/600x900bb.jpg',
     genres: ['Ficção Científica', 'Política', 'Filosófico'],
     resumo:
       'O físico Shevek deixa a lua árida e anarquista de Anarres rumo ao opulento planeta capitalista Urras, determinado a romper o isolamento entre os dois mundos com uma teoria revolucionária do tempo.',
@@ -409,7 +409,7 @@ export const POPULAR_SUGGESTIONS_POOL: Partial<BookEvaluation>[] = [
     publisher: 'Suma',
     year: 2010,
     pages: 688,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8556510760.01.LZZZZZZZ.jpg',
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication113/v4/af/be/63/afbe63bc-0e6b-82a7-76fe-393da009429c/1028840542.jpg/600x900bb.jpg',
     genres: ['Hard Sci-Fi', 'Escala Cósmica', 'Ficção Científica'],
     resumo:
       'Diante do equilíbrio frágil da dissuasão com Trisolaris, a engenheira aeroespacial Cheng Xin recebe a responsabilidade de guardar o destino da civilização humana através das eras do universo.',
@@ -421,7 +421,7 @@ export const POPULAR_SUGGESTIONS_POOL: Partial<BookEvaluation>[] = [
     publisher: 'Intrínseca',
     year: 2014,
     pages: 336,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8580576962.01.LZZZZZZZ.jpg',
+    coverUrl: 'https://covers.openlibrary.org/b/id/12391004-L.jpg',
     genres: ['Pós-Apocalíptico', 'Drama Humano'],
     resumo:
       'Vinte anos após uma gripe fulminante derrubar a civilização moderna, uma trupe itinerante de atores e músicos atravessa a região dos Grandes Lagos encenando Shakespeare sob o lema de que sobreviver é insuficiente.',
@@ -433,7 +433,7 @@ export const POPULAR_SUGGESTIONS_POOL: Partial<BookEvaluation>[] = [
     publisher: 'Aleph',
     year: 1985,
     pages: 352,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8576571668.01.LZZZZZZZ.jpg',
+    coverUrl: 'https://covers.openlibrary.org/b/id/12996033-L.jpg',
     genres: ['Ficção Científica', 'Estratégia Militar', 'Psicológico'],
     resumo:
       'Recrutado ainda criança para a Escola de Combate orbital, o prodígio Ender Wiggin é submetido a simulações táticas cada vez mais impiedosas pelos comandantes que preparam a defesa final da Terra.',
@@ -445,7 +445,7 @@ export const POPULAR_SUGGESTIONS_POOL: Partial<BookEvaluation>[] = [
     publisher: 'Aleph',
     year: 1992,
     pages: 560,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/6589132755.01.LZZZZZZZ.jpg',
+    coverUrl: 'https://covers.openlibrary.org/b/id/8200326-L.jpg',
     genres: ['Cyberpunk', 'Ficção Científica', 'Sátira'],
     resumo:
       'Em uma América fragmentada em cidades-estado corporativas, o hacker e espadachim Hiro Protagonist investiga uma misteriosa substância capaz de infectar simultaneamente o Metaverso e o cérebro humano.',
@@ -457,7 +457,7 @@ export const POPULAR_SUGGESTIONS_POOL: Partial<BookEvaluation>[] = [
     publisher: 'Bertrand Brasil',
     year: 2002,
     pages: 492,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8528622053.01.LZZZZZZZ.jpg',
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication128/v4/da/bd/7a/dabd7a2f-bcad-7eda-c36e-2a8ea640b7fd/9780345457707.jpg/600x900bb.jpg',
     genres: ['Cyberpunk', 'Noir', 'Investigação'],
     resumo:
       'Em um século XXV onde a consciência humana é armazenada em cartuchos corticais e os ricos trocam de corpo para viver para sempre, o ex-soldado Takeshi Kovacs é reativado para investigar o assassinato de um magnata.',
@@ -493,7 +493,7 @@ export const POPULAR_SUGGESTIONS_POOL: Partial<BookEvaluation>[] = [
     publisher: 'Companhia das Letras',
     year: 2004,
     pages: 336,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8535905057.01.LZZZZZZZ.jpg',
+    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8535930353.01.LZZZZZZZ.jpg',
     genres: ['Sátira Política', 'Distopia', 'Clássico'],
     resumo:
       'Quando mais de oitenta por cento da população de uma capital decide silenciosamente votar em branco nas eleições, o Estado declara sítio e inicia uma caçada policial contra os próprios cidadãos.',
@@ -505,7 +505,7 @@ export const POPULAR_SUGGESTIONS_POOL: Partial<BookEvaluation>[] = [
     publisher: 'Companhia das Letras',
     year: 2002,
     pages: 320,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/853590297X.01.LZZZZZZZ.jpg',
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication69/v4/59/ab/e7/59abe79d-f54f-60eb-4129-beaffc1f2129/1013933591.jpg/600x900bb.jpg',
     genres: ['Drama Psicológico', 'Suspense Existencial'],
     resumo:
       'Um pacato professor de história assiste por acaso a um filme e descobre um ator figurante que é sua cópia física absoluta em voz, rosto e cicatrizes, desencadeando uma obsessão por identidade.',
@@ -517,7 +517,7 @@ export const POPULAR_SUGGESTIONS_POOL: Partial<BookEvaluation>[] = [
     publisher: 'Record',
     year: 1927,
     pages: 256,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8501095516.01.LZZZZZZZ.jpg',
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication123/v4/5b/31/48/5b31486d-81ef-1820-acb2-e5354650d318/1031634767.jpg/600x900bb.jpg',
     genres: ['Clássico', 'Psicológico', 'Existencialismo'],
     resumo:
       'Atormentado pela sensação de pertencer metade à cultura burguesa e metade ao instinto selvagem de um lobo solitário, o intelectual Harry Haller é atraído aos salões noturnos e a um misterioso Teatro Mágico.',
@@ -529,7 +529,7 @@ export const POPULAR_SUGGESTIONS_POOL: Partial<BookEvaluation>[] = [
     publisher: 'Nova Fronteira',
     year: 1938,
     pages: 256,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8520926622.01.LZZZZZZZ.jpg',
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication211/v4/cd/3c/8a/cd3c8ad0-3cb4-67bb-c6ef-e005f18c82fa/1065211177.jpg/600x900bb.jpg',
     genres: ['Filosofia Existencial', 'Clássico', 'Psicológico'],
     resumo:
       'Isolado na cidade portuária de Bouville, o historiador Antoine Roquentin registra em seu diário o estranhamento progressivo diante dos objetos, do próprio corpo e da gratuidade nua da existência.',
@@ -541,7 +541,7 @@ export const POPULAR_SUGGESTIONS_POOL: Partial<BookEvaluation>[] = [
     publisher: 'Companhia das Letras',
     year: 1989,
     pages: 288,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8535927271.01.LZZZZZZZ.jpg',
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication123/v4/f2/eb/dd/f2ebdd71-4f42-47b9-b36d-11033d5c58e2/1029610902.jpg/600x900bb.jpg',
     genres: ['Drama', 'Memória', 'Clássico Contemporâneo'],
     resumo:
       'Após décadas de serviço impecável em Darlington Hall, o mordomo inglês Stevens faz uma viagem de carro pelo interior do país e confronta o custo humano de uma vida inteira de contenção emocional.',
@@ -553,7 +553,7 @@ export const POPULAR_SUGGESTIONS_POOL: Partial<BookEvaluation>[] = [
     publisher: 'LeYa',
     year: 1996,
     pages: 272,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8580444985.01.LZZZZZZZ.jpg',
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication221/v4/fc/68/07/fc680706-a62b-ad80-fb50-f049de88293f/1064657347.jpg/600x900bb.jpg',
     genres: ['Sátira Sombria', 'Thriller Psicológico'],
     resumo:
       'Um trabalhador insone e anestesiado pelo consumo moderno conhece o magnético Tyler Durden e juntos fundam um clube subterrâneo de combates corporais que logo escapa ao controle.',
@@ -565,7 +565,7 @@ export const POPULAR_SUGGESTIONS_POOL: Partial<BookEvaluation>[] = [
     publisher: 'Panini',
     year: 1988,
     pages: 304,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/856548422X.01.LZZZZZZZ.jpg',
+    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8583681406.01.LZZZZZZZ.jpg',
     genres: ['Graphic Novel', 'Distopia Política'],
     resumo:
       'Em uma Inglaterra submetida a um Estado fascista após uma guerra nuclear, um misterioso anarquista mascarado inicia uma campanha teatral e implacável para derrubar os pilares do regime.',
@@ -577,7 +577,7 @@ export const POPULAR_SUGGESTIONS_POOL: Partial<BookEvaluation>[] = [
     publisher: 'Suma',
     year: 1959,
     pages: 200,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8556510647.01.LZZZZZZZ.jpg',
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication128/v4/c0/9d/71/c09d7160-a151-3dae-8289-6236b3cab215/1024391656.jpg/600x900bb.jpg',
     genres: ['Terror Psicológico', 'Gótico', 'Clássico'],
     resumo:
       'Um investigador do oculto convida três desconhecidos para passar o verão na sinistra Mansão Hill, onde a arquitetura distorcida da casa passa a se alimentar da solidão da frágil Eleanor Vance.',

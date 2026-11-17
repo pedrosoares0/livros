@@ -27,6 +27,16 @@ const normalize = (text: string) =>
     .replace(/[\u0300-\u036f]/g, '')
     .trim();
 
+const getEvaluationTime = (book: BookEvaluation): number => {
+  if (book.createdAt) {
+    const parsed = Date.parse(book.createdAt);
+    if (Number.isFinite(parsed)) return parsed;
+  }
+  const idMatch = book.id.match(/^eval-(?:bulk-)?(\d{13})/);
+  if (idMatch) return Number(idMatch[1]);
+  return 0;
+};
+
 export const DiscoverView: React.FC<DiscoverViewProps> = React.memo(({
   books,
   onSelectBook,
@@ -117,8 +127,15 @@ export const DiscoverView: React.FC<DiscoverViewProps> = React.memo(({
     [books]
   );
 
-  // Apenas as avaliações reais do usuário (exclui catálogo inicial, que fica na Estante)
-  const userEvaluations = useMemo(() => books.filter(isUserEvaluation), [books]);
+  // Apenas as avaliações reais do usuário (exclui catálogo inicial, que fica na Estante),
+  // sempre ordenadas por data de avaliação da mais recente à mais antiga
+  const userEvaluations = useMemo(
+    () =>
+      books
+        .filter(isUserEvaluation)
+        .sort((a, b) => getEvaluationTime(b) - getEvaluationTime(a)),
+    [books]
+  );
 
   const cleanQuery = searchQuery.trim();
   const normalizedQuery = useMemo(() => (cleanQuery ? normalize(cleanQuery) : ''), [cleanQuery]);
@@ -135,9 +152,9 @@ export const DiscoverView: React.FC<DiscoverViewProps> = React.memo(({
       })
       .map(({ book }) => book)
       .sort((a, b) => {
-        const scoreA = getEffectiveScore(a, userRatings);
-        const scoreB = getEffectiveScore(b, userRatings);
-        return sortOrder === 'desc' ? scoreB - scoreA : scoreA - scoreB;
+        const timeA = getEvaluationTime(a);
+        const timeB = getEvaluationTime(b);
+        return sortOrder === 'desc' ? timeB - timeA : timeA - timeB;
       });
   }, [indexedBooks, normalizedQuery, selectedScoreFilters, sortOrder, userRatings]);
 
@@ -152,9 +169,9 @@ export const DiscoverView: React.FC<DiscoverViewProps> = React.memo(({
           return score >= 7;
         })
         .sort((a, b) => {
-          const scoreA = getEffectiveScore(a, userRatings);
-          const scoreB = getEffectiveScore(b, userRatings);
-          return sortOrder === 'desc' ? scoreB - scoreA : scoreA - scoreB;
+          const timeA = getEvaluationTime(a);
+          const timeB = getEvaluationTime(b);
+          return sortOrder === 'desc' ? timeB - timeA : timeA - timeB;
         }),
     [userEvaluations, selectedScoreFilters, sortOrder, userRatings]
   );
@@ -208,7 +225,11 @@ export const DiscoverView: React.FC<DiscoverViewProps> = React.memo(({
         type="button"
         onClick={() => setSortOrder((prev) => (prev === 'desc' ? 'asc' : 'desc'))}
         className="w-7 h-7 sm:w-7.5 sm:h-7.5 rounded-full bg-white border border-neutral-200/90 hover:border-neutral-300 text-[#1d1d1f] hover:bg-neutral-50 active:scale-95 transition-all shadow-3xs cursor-pointer select-none flex items-center justify-center shrink-0"
-        title={sortOrder === 'desc' ? 'Maior Nota (clique para Menor Nota)' : 'Menor Nota (clique para Maior Nota)'}
+        title={
+          sortOrder === 'desc'
+            ? 'Mais recentes primeiro (clique para Mais antigos)'
+            : 'Mais antigos primeiro (clique para Mais recentes)'
+        }
         aria-label="Alternar ordenação"
       >
         <ArrowUpDown className="w-3.5 h-3.5 text-[#1d1d1f]" />

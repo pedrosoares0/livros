@@ -1,6 +1,7 @@
 import { BookEvaluation, CriteriaScores, VereditoTipo } from '../types';
 import { buildReadingHistoryBlock } from './ratings';
 import { getCuratedCovers } from '../data/curatedCovers';
+import { fetchVerifiedBookCover } from './coverSearch';
 import { raceGemini, parseJsonLoose, RaceModel } from './geminiRace';
 import { resolveRuntimeConfig } from '../lib/utils';
 
@@ -361,12 +362,17 @@ Responda ESTRITAMENTE em JSON válido com estas exatas chaves:
   });
 
   const id = `eval-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
-  const curated = getCuratedCovers(parsed.title || bookTitle);
-  const coverUrl =
+  const finalTitle = parsed.title || bookTitle;
+  const finalAuthor = parsed.author || verifiedAuthor;
+  const curated = getCuratedCovers(finalTitle);
+  let coverUrl =
     extraContext?.coverUrl ||
     curated?.[0] ||
     catalogFacts?.coverUrl ||
-    `https://covers.openlibrary.org/b/isbn/9780451524935-L.jpg`;
+    '';
+  if (!coverUrl) {
+    coverUrl = await fetchVerifiedBookCover(finalTitle, finalAuthor);
+  }
 
   const pages =
     verifiedPages && verifiedPages > 30
@@ -477,42 +483,48 @@ Retorne ESTRITAMENTE um array JSON de objetos válidos:
     label: 'Gemini Lote',
   });
 
-  return parsedList.map((parsed, idx) => {
-    const curated = getCuratedCovers(parsed.title || booksToEvaluate[idx]);
-    return {
-      id: `eval-bulk-${Date.now()}-${idx}-${Math.random().toString(36).substring(2, 6)}`,
-      title: parsed.title || booksToEvaluate[idx],
-      author: parsed.author || 'Autor não informado',
-      originalTitle: parsed.originalTitle || undefined,
-      pages: parsed.pages && parsed.pages > 30 ? Math.round(parsed.pages) : 300,
-      coverUrl: curated?.[0] || `https://covers.openlibrary.org/b/isbn/9780451524935-L.jpg`,
-      genres: Array.isArray(parsed.genres) && parsed.genres.length > 0 ? parsed.genres : ['Ficção'],
-      resumo: parsed.resumo || '',
-      movieComparisons: Array.isArray(parsed.movieComparisons) ? parsed.movieComparisons.slice(0, 4) : [],
-      adaptacoes: Array.isArray(parsed.adaptacoes)
-        ? parsed.adaptacoes.join(', ') || 'Nenhuma adaptação conhecida'
-        : typeof parsed.adaptacoes === 'string' && parsed.adaptacoes.trim()
-        ? parsed.adaptacoes
-        : 'Nenhuma adaptação conhecida',
-      criteria: {
-        genericidade: Math.floor(Number(parsed.criteria?.genericidade ?? 3)),
-        infantilidade: Math.floor(Number(parsed.criteria?.infantilidade ?? 2)),
-        infantilidadeStatus: parsed.criteria?.infantilidadeStatus || 'ideal',
-        qualidadeTecnica: Math.floor(Number(parsed.criteria?.qualidadeTecnica) || 8),
-        worldbuilding: Math.floor(Number(parsed.criteria?.worldbuilding) || 8),
-        ritmo: Math.floor(Number(parsed.criteria?.ritmo) || 6),
-        ritmoDescricao: parsed.criteria?.ritmoDescricao || 'Ritmo moderado',
-        tomSombrio: Math.floor(Number(parsed.criteria?.tomSombrio) || 6),
-        impactoEmocional: Math.floor(Number(parsed.criteria?.impactoEmocional) || 6),
-      },
-      notaTecnica: Number.isFinite(Number(parsed.notaTecnica)) ? Math.floor(Number(parsed.notaTecnica)) : 8,
-      notaEncaixe: Number.isFinite(Number(parsed.notaEncaixe)) ? Math.floor(Number(parsed.notaEncaixe)) : 6,
-      veredito: parsed.veredito || 'Obra avaliada pelo perfil.',
-      vereditoTipo: parsed.vereditoTipo || 'ressalvas',
-      justificativaEncaixe: parsed.justificativaEncaixe || '',
-      createdAt: new Date().toISOString(),
-    };
-  });
+  return Promise.all(
+    parsedList.map(async (parsed, idx) => {
+      const itemTitle = parsed.title || booksToEvaluate[idx];
+      const itemAuthor = parsed.author || 'Autor não informado';
+      const curated = getCuratedCovers(itemTitle);
+      const coverUrl =
+        curated?.[0] || (await fetchVerifiedBookCover(itemTitle, itemAuthor));
+      return {
+        id: `eval-bulk-${Date.now()}-${idx}-${Math.random().toString(36).substring(2, 6)}`,
+        title: itemTitle,
+        author: itemAuthor,
+        originalTitle: parsed.originalTitle || undefined,
+        pages: parsed.pages && parsed.pages > 30 ? Math.round(parsed.pages) : 300,
+        coverUrl,
+        genres: Array.isArray(parsed.genres) && parsed.genres.length > 0 ? parsed.genres : ['Ficção'],
+        resumo: parsed.resumo || '',
+        movieComparisons: Array.isArray(parsed.movieComparisons) ? parsed.movieComparisons.slice(0, 4) : [],
+        adaptacoes: Array.isArray(parsed.adaptacoes)
+          ? parsed.adaptacoes.join(', ') || 'Nenhuma adaptação conhecida'
+          : typeof parsed.adaptacoes === 'string' && parsed.adaptacoes.trim()
+          ? parsed.adaptacoes
+          : 'Nenhuma adaptação conhecida',
+        criteria: {
+          genericidade: Math.floor(Number(parsed.criteria?.genericidade ?? 3)),
+          infantilidade: Math.floor(Number(parsed.criteria?.infantilidade ?? 2)),
+          infantilidadeStatus: parsed.criteria?.infantilidadeStatus || 'ideal',
+          qualidadeTecnica: Math.floor(Number(parsed.criteria?.qualidadeTecnica) || 8),
+          worldbuilding: Math.floor(Number(parsed.criteria?.worldbuilding) || 8),
+          ritmo: Math.floor(Number(parsed.criteria?.ritmo) || 6),
+          ritmoDescricao: parsed.criteria?.ritmoDescricao || 'Ritmo moderado',
+          tomSombrio: Math.floor(Number(parsed.criteria?.tomSombrio) || 6),
+          impactoEmocional: Math.floor(Number(parsed.criteria?.impactoEmocional) || 6),
+        },
+        notaTecnica: Number.isFinite(Number(parsed.notaTecnica)) ? Math.floor(Number(parsed.notaTecnica)) : 8,
+        notaEncaixe: Number.isFinite(Number(parsed.notaEncaixe)) ? Math.floor(Number(parsed.notaEncaixe)) : 6,
+        veredito: parsed.veredito || 'Obra avaliada pelo perfil.',
+        vereditoTipo: parsed.vereditoTipo || 'ressalvas',
+        justificativaEncaixe: parsed.justificativaEncaixe || '',
+        createdAt: new Date().toISOString(),
+      };
+    })
+  );
 }
 
 // Cache em memória para buscas instantâneas (0ms)
@@ -583,39 +595,47 @@ Responda ESTRITAMENTE em formato JSON (array de objetos compactos):
       label: 'Busca Gemini',
     });
 
-    const results: Partial<BookEvaluation>[] = rawItems.slice(0, 4).map((item, idx) => {
-      let coverUrl = '';
+    const results: Partial<BookEvaluation>[] = await Promise.all(
+      rawItems.slice(0, 4).map(async (item, idx) => {
+        const itemTitle = String(item.title || clean).trim();
+        const itemAuthor = String(item.author || 'Autor a verificar').trim();
+        let coverUrl = '';
 
-      const curated = getCuratedCovers(item.title);
-      if (curated && curated.length > 0) {
-        const pub = (item.publisher || '').toLowerCase();
-        if (pub.includes('antofagica') || pub.includes('antofágica')) {
-          coverUrl = curated[0] || '';
-        } else if (pub.includes('penguin') || pub.includes('companhia')) {
-          coverUrl = curated[1] || curated[0] || '';
-        } else if (pub.includes('principis')) {
-          coverUrl = curated[2] || curated[0] || '';
-        } else if (pub.includes('34')) {
-          coverUrl = curated[1] || curated[0] || '';
-        } else if (pub.includes('planeta') || pub.includes('minotauro')) {
-          coverUrl = curated[0] || '';
-        } else {
-          coverUrl = curated[idx % curated.length] || '';
+        const curated = getCuratedCovers(itemTitle);
+        if (curated && curated.length > 0) {
+          const pub = (item.publisher || '').toLowerCase();
+          if (pub.includes('antofagica') || pub.includes('antofágica')) {
+            coverUrl = curated[0] || '';
+          } else if (pub.includes('penguin') || pub.includes('companhia')) {
+            coverUrl = curated[1] || curated[0] || '';
+          } else if (pub.includes('principis')) {
+            coverUrl = curated[2] || curated[0] || '';
+          } else if (pub.includes('34')) {
+            coverUrl = curated[1] || curated[0] || '';
+          } else if (pub.includes('planeta') || pub.includes('minotauro')) {
+            coverUrl = curated[0] || '';
+          } else {
+            coverUrl = curated[idx % curated.length] || '';
+          }
         }
-      }
 
-      return {
-        id: `gem-search-${idx}-${Date.now()}`,
-        title: item.title || clean,
-        author: item.author || 'Autor a verificar',
-        publisher: item.publisher || undefined,
-        year: item.year ? Number(item.year) : undefined,
-        pages: item.pages && Number(item.pages) > 20 ? Math.round(Number(item.pages)) : undefined,
-        coverUrl: coverUrl || '',
-        genres: ['Literatura'],
-        resumo: '',
-      };
-    });
+        if (!coverUrl) {
+          coverUrl = await fetchVerifiedBookCover(itemTitle, itemAuthor, signal);
+        }
+
+        return {
+          id: `gem-search-${idx}-${Date.now()}`,
+          title: itemTitle,
+          author: itemAuthor,
+          publisher: item.publisher || undefined,
+          year: item.year ? Number(item.year) : undefined,
+          pages: item.pages && Number(item.pages) > 20 ? Math.round(Number(item.pages)) : undefined,
+          coverUrl,
+          genres: ['Literatura'],
+          resumo: '',
+        };
+      })
+    );
 
     if (results.length > 0) {
       searchMemoryCache.set(cacheKey, results);
@@ -691,10 +711,11 @@ Responda ESTRITAMENTE em JSON válido (array de 4 objetos):
         if (!title || !author) return null;
 
         const curated = getCuratedCovers(title);
-        const facts = curated?.[0]
-          ? null
-          : await fetchVerifiedCatalogFacts(title, author);
-        const coverUrl = curated?.[0] || facts?.coverUrl || '';
+        let coverUrl = curated?.[0] || '';
+        const facts = coverUrl ? null : await fetchVerifiedCatalogFacts(title, author);
+        if (!coverUrl) {
+          coverUrl = facts?.coverUrl || (await fetchVerifiedBookCover(title, author));
+        }
 
         return {
           id: `dyn-${character.id}-${Date.now()}-${idx}`,
