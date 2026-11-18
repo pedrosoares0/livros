@@ -261,7 +261,7 @@ ${book.resumo}
           stiffness: 320,
           mass: 0.85,
         }}
-        className="relative w-full max-w-lg md:max-w-4xl lg:max-w-[1160px] xl:max-w-[1280px] 2xl:max-w-[1360px] max-h-[92vh] sm:max-h-[88vh] md:max-h-[92vh] lg:max-h-[94vh] bg-[#ffffff] border border-black/[0.08] rounded-t-3xl sm:rounded-3xl shadow-[0_25px_65px_-15px_rgba(0,0,0,0.25)] flex flex-col overflow-hidden text-[#1d1d1f] z-20 will-change-transform"
+        className="relative w-full max-w-lg md:max-w-4xl lg:max-w-[1080px] xl:max-w-[1160px] max-h-[92vh] sm:max-h-[88vh] md:max-h-[88vh] lg:max-h-[89vh] bg-[#ffffff] border border-black/[0.08] rounded-t-3xl sm:rounded-3xl shadow-[0_25px_65px_-15px_rgba(0,0,0,0.25)] flex flex-col overflow-hidden text-[#1d1d1f] z-20 will-change-transform"
       >
         {/* Cover Change Success Alert */}
         <AnimatePresence>
@@ -305,12 +305,19 @@ ${book.resumo}
 
         {/* Scrollable Content: 12-Column Editorial Grid on Desktop, Single Column on Mobile */}
         <div className="overflow-y-auto px-5 sm:px-6 md:px-8 py-4 sm:py-5 md:pt-2 md:pb-5 hide-scrollbar flex-1">
-          <div className="flex flex-col md:grid md:grid-cols-12 md:gap-7 lg:gap-8 items-start">
+          <div className="flex flex-col md:grid md:grid-cols-12 md:gap-7 lg:gap-8 items-start md:items-stretch">
 
             {/* Left Column (Desktop Hero: Cover, Edition Tools & Metadata) */}
-            <div className="w-full md:col-span-4 lg:col-span-3 flex flex-col items-center md:items-start space-y-3.5 md:sticky md:top-0">
+            <div className="w-full md:col-span-4 lg:col-span-3">
+              <div
+                className={`w-full flex flex-col items-center space-y-3.5 md:sticky md:top-0 ${
+                  isCoverPickerOpen
+                    ? 'md:justify-start md:pt-2'
+                    : 'md:min-h-[450px] lg:min-h-[490px] md:justify-center'
+                }`}
+              >
               {/* Extra-Large Clean Cover */}
-              <div className="w-48 sm:w-56 md:w-full max-w-[260px] md:max-w-[245px] mx-auto md:mx-0">
+              <div className="w-48 sm:w-56 md:w-full max-w-[260px] md:max-w-[240px] mx-auto">
                 <BookCover
                   title={book.title}
                   author={book.author}
@@ -320,7 +327,7 @@ ${book.resumo}
               </div>
 
               {/* Cover Controls */}
-              <div className="w-full max-w-[260px] md:max-w-[245px] flex items-center justify-between gap-2 mx-auto md:mx-0">
+              <div className="w-full max-w-[260px] md:max-w-[240px] flex items-center justify-between gap-2 mx-auto">
                 <span className="px-2.5 py-1 bg-neutral-100 border border-neutral-200/90 rounded-lg text-[10px] font-score font-semibold text-[#86868b] inline-block">
                   {book.pages} págs
                 </span>
@@ -343,7 +350,7 @@ ${book.resumo}
                     animate={{ opacity: 1, height: 'auto' }}
                     exit={{ opacity: 0, height: 0 }}
                     transition={{ duration: 0.22, ease: [0.32, 0.72, 0, 1] }}
-                    className="w-full max-w-[260px] md:max-w-[245px] mx-auto md:mx-0 p-3 rounded-2xl bg-neutral-50/95 border border-neutral-200/90 space-y-2 shadow-xs overflow-hidden"
+                    className="w-full max-w-[260px] md:max-w-[240px] mx-auto p-3 rounded-2xl bg-neutral-50/95 border border-neutral-200/90 space-y-2 shadow-xs overflow-hidden"
                   >
                     <div className="flex items-center justify-between">
                       <span className="text-[10px] font-bold uppercase tracking-wider text-[#1d1d1f]">
@@ -442,6 +449,7 @@ ${book.resumo}
                   </motion.div>
                 )}
               </AnimatePresence>
+              </div>
             </div>
 
             {/* Right Column (Title, Scoreboard, Veredito, Premissa, Filmes, Critérios) */}
