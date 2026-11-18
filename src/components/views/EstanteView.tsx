@@ -332,7 +332,7 @@ export const EstanteView: React.FC<EstanteViewProps> = React.memo(({
           ref={pillsScrollRef}
           onMouseDown={handlePillsMouseDown}
           onDragStart={handlePillsDragStart}
-          className={`flex items-center gap-2.5 overflow-x-auto flex-nowrap py-2.5 px-1 hide-scrollbar select-none -mx-1 touch-pan-x ${
+          className={`flex items-center gap-2.5 overflow-x-auto flex-nowrap py-3.5 px-2 hide-scrollbar select-none -mx-2 touch-pan-x ${
             isDraggingPills ? 'cursor-grabbing' : 'md:cursor-grab'
           }`}
         >
@@ -348,12 +348,12 @@ export const EstanteView: React.FC<EstanteViewProps> = React.memo(({
                   if (shouldSuppressPillClick()) return;
                   handleSelectShelf(isActive ? 'all' : shelf.id);
                 }}
-                className={`h-11 sm:h-11.5 pl-2 sm:pl-2.5 pr-4.5 sm:pr-5 rounded-full flex items-center gap-2.5 sm:gap-3 shrink-0 transition-all duration-150 active:scale-95 ${
+                className={`h-11 sm:h-11.5 pl-2 sm:pl-2.5 pr-4.5 sm:pr-5 rounded-full flex items-center gap-2.5 sm:gap-3 shrink-0 transition-all duration-200 active:scale-95 ${
                   isDraggingPills ? 'cursor-grabbing' : 'cursor-pointer'
                 } ${
                   isActive
-                    ? 'bg-[#1d1d1f] text-white border border-[#1d1d1f] shadow-[0_4px_14px_rgba(0,0,0,0.2)]'
-                    : 'bg-white text-[#1d1d1f] hover:bg-neutral-50/90 border border-neutral-100/90 shadow-[0_2.5px_10px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_14px_rgba(0,0,0,0.12)]'
+                    ? 'bg-gradient-to-b from-[#4a4a50] via-[#3b3b40] to-[#2e2e33] hover:from-[#525258] hover:to-[#343439] text-white/95 border border-[#3e3e44] shadow-[0_8px_20px_rgba(0,0,0,0.22),0_2px_6px_rgba(0,0,0,0.14),inset_0_1px_0_rgba(255,255,255,0.22)]'
+                    : 'bg-gradient-to-b from-[#ffffff] via-[#f9f9fb] to-[#eff0f3] hover:from-[#ffffff] hover:to-[#e8eaef] text-[#1d1d1f] border border-neutral-200/85 hover:border-neutral-300/90 shadow-[0_6px_16px_rgba(0,0,0,0.09),0_2px_5px_rgba(0,0,0,0.06),inset_0_1px_0_rgba(255,255,255,0.95)] hover:shadow-[0_10px_22px_rgba(0,0,0,0.13),0_3px_7px_rgba(0,0,0,0.07),inset_0_1px_0_rgba(255,255,255,1)]'
                 }`}
               >
                 {/* Duas capas quadradas sobrepostas com cantos arredondados e borda branca */}
