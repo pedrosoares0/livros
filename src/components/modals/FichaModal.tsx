@@ -239,7 +239,7 @@ ${book.resumo}
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 md:p-3 lg:p-4 overflow-hidden">
       {/* Backdrop with smooth opacity fade */}
       <motion.div
         initial={{ opacity: 0 }}
@@ -261,7 +261,7 @@ ${book.resumo}
           stiffness: 320,
           mass: 0.85,
         }}
-        className="relative w-full max-w-lg md:max-w-4xl lg:max-w-5xl xl:max-w-[1100px] max-h-[92vh] sm:max-h-[88vh] md:max-h-[88vh] bg-[#ffffff] border border-black/[0.08] rounded-t-3xl sm:rounded-3xl shadow-[0_25px_65px_-15px_rgba(0,0,0,0.25)] flex flex-col overflow-hidden text-[#1d1d1f] z-20 will-change-transform"
+        className="relative w-full max-w-lg md:max-w-4xl lg:max-w-[1160px] xl:max-w-[1280px] 2xl:max-w-[1360px] max-h-[92vh] sm:max-h-[88vh] md:max-h-[92vh] lg:max-h-[94vh] bg-[#ffffff] border border-black/[0.08] rounded-t-3xl sm:rounded-3xl shadow-[0_25px_65px_-15px_rgba(0,0,0,0.25)] flex flex-col overflow-hidden text-[#1d1d1f] z-20 will-change-transform"
       >
         {/* Cover Change Success Alert */}
         <AnimatePresence>
@@ -280,7 +280,7 @@ ${book.resumo}
         </AnimatePresence>
 
         {/* Minimalist Top Action Bar */}
-        <div className="flex items-center justify-end px-6 pt-3.5 pb-2 bg-[#ffffff]/90 backdrop-blur-lg sticky top-0 z-20">
+        <div className="flex items-center justify-end px-6 pt-3.5 pb-2 md:pt-2.5 md:pb-1 bg-[#ffffff]/90 backdrop-blur-lg sticky top-0 z-20">
           <div className="flex items-center gap-1.5">
             <motion.button
               whileHover={{ scale: 1.08 }}
@@ -304,13 +304,13 @@ ${book.resumo}
         </div>
 
         {/* Scrollable Content: 12-Column Editorial Grid on Desktop, Single Column on Mobile */}
-        <div className="overflow-y-auto px-5 sm:px-6 md:px-8 py-4 sm:py-5 md:py-6 hide-scrollbar flex-1">
-          <div className="flex flex-col md:grid md:grid-cols-12 md:gap-8 items-start">
+        <div className="overflow-y-auto px-5 sm:px-6 md:px-8 py-4 sm:py-5 md:pt-2 md:pb-5 hide-scrollbar flex-1">
+          <div className="flex flex-col md:grid md:grid-cols-12 md:gap-7 lg:gap-8 items-start">
 
             {/* Left Column (Desktop Hero: Cover, Edition Tools & Metadata) */}
-            <div className="w-full md:col-span-4 lg:col-span-4 flex flex-col items-center md:items-start space-y-3.5 md:sticky md:top-0">
+            <div className="w-full md:col-span-4 lg:col-span-3 flex flex-col items-center md:items-start space-y-3.5 md:sticky md:top-0">
               {/* Extra-Large Clean Cover */}
-              <div className="w-48 sm:w-56 md:w-full max-w-[260px] mx-auto md:mx-0">
+              <div className="w-48 sm:w-56 md:w-full max-w-[260px] md:max-w-[245px] mx-auto md:mx-0">
                 <BookCover
                   title={book.title}
                   author={book.author}
@@ -320,7 +320,7 @@ ${book.resumo}
               </div>
 
               {/* Cover Controls */}
-              <div className="w-full max-w-[260px] flex items-center justify-between gap-2 mx-auto md:mx-0">
+              <div className="w-full max-w-[260px] md:max-w-[245px] flex items-center justify-between gap-2 mx-auto md:mx-0">
                 <span className="px-2.5 py-1 bg-neutral-100 border border-neutral-200/90 rounded-lg text-[10px] font-score font-semibold text-[#86868b] inline-block">
                   {book.pages} págs
                 </span>
@@ -343,7 +343,7 @@ ${book.resumo}
                     animate={{ opacity: 1, height: 'auto' }}
                     exit={{ opacity: 0, height: 0 }}
                     transition={{ duration: 0.22, ease: [0.32, 0.72, 0, 1] }}
-                    className="w-full max-w-[260px] mx-auto md:mx-0 p-3 rounded-2xl bg-neutral-50/95 border border-neutral-200/90 space-y-2 shadow-xs overflow-hidden"
+                    className="w-full max-w-[260px] md:max-w-[245px] mx-auto md:mx-0 p-3 rounded-2xl bg-neutral-50/95 border border-neutral-200/90 space-y-2 shadow-xs overflow-hidden"
                   >
                     <div className="flex items-center justify-between">
                       <span className="text-[10px] font-bold uppercase tracking-wider text-[#1d1d1f]">
@@ -445,10 +445,10 @@ ${book.resumo}
             </div>
 
             {/* Right Column (Title, Scoreboard, Veredito, Premissa, Filmes, Critérios) */}
-            <div className="w-full md:col-span-8 lg:col-span-8 space-y-4 md:space-y-5 min-w-0 mt-5 md:mt-0">
+            <div className="w-full md:col-span-8 lg:col-span-9 space-y-4 md:space-y-3.5 min-w-0 mt-5 md:mt-0">
 
               {/* Header: Tags, Title, Author */}
-              <div className="space-y-1.5 text-center sm:text-left">
+              <div className="space-y-1 text-center sm:text-left">
                 <div className="flex flex-wrap items-center justify-center sm:justify-start gap-1.5">
                   {book.genres.map((g, i) => (
                     <span key={i} className="px-2.5 py-0.5 rounded-full text-[10px] font-medium bg-neutral-100 border border-neutral-200/80 text-[#86868b]">
@@ -462,10 +462,10 @@ ${book.resumo}
                   )}
                 </div>
 
-                <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight text-[#1d1d1f] leading-tight">
+                <h2 className="text-xl sm:text-2xl md:text-[26px] font-extrabold tracking-tight text-[#1d1d1f] leading-tight">
                   {book.title}
                 </h2>
-                <p className="text-sm md:text-base font-semibold text-[#86868b]">
+                <p className="text-sm md:text-[15px] font-semibold text-[#86868b]">
                   {book.author}
                 </p>
               </div>
@@ -530,41 +530,50 @@ ${book.resumo}
                 </div>
               </div>
 
-              {/* Premissa & Clima */}
-              <div className="space-y-1.5">
-                <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#86868b]">
-                  <BookOpen className="w-3.5 h-3.5 text-[#1d1d1f]" />
-                  <span>Premissa & Clima</span>
+              {/* Premissa & Clima + Filmes com Atmosfera Equivalente (lado a lado no PC) */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-stretch">
+                {/* Premissa & Clima */}
+                <div
+                  className={`flex flex-col space-y-1.5 ${
+                    book.movieComparisons && book.movieComparisons.length > 0
+                      ? 'lg:col-span-7'
+                      : 'lg:col-span-12'
+                  }`}
+                >
+                  <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#86868b]">
+                    <BookOpen className="w-3.5 h-3.5 text-[#1d1d1f]" />
+                    <span>Premissa & Clima</span>
+                  </div>
+                  <p className="flex-1 text-xs sm:text-sm text-[#1d1d1f] leading-relaxed bg-neutral-50 p-3.5 rounded-xl border border-neutral-200/70">
+                    {book.resumo}
+                  </p>
                 </div>
-                <p className="text-xs sm:text-sm text-[#1d1d1f] leading-relaxed bg-neutral-50 p-3.5 rounded-xl border border-neutral-200/70">
-                  {book.resumo}
-                </p>
+
+                {/* Filmes com atmosfera equivalente */}
+                {book.movieComparisons && book.movieComparisons.length > 0 && (
+                  <div className="lg:col-span-5 p-3.5 rounded-2xl bg-neutral-50/90 border border-neutral-200/80 flex flex-col justify-between space-y-2.5">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-1.5 text-xs font-bold text-[#1d1d1f] min-w-0">
+                        <Film className="w-3.5 h-3.5 text-amber-700 shrink-0" />
+                        <span className="truncate">Filmes com Atmosfera Equivalente</span>
+                      </div>
+                      <span className="text-[10px] text-[#86868b] font-medium shrink-0">
+                        {Math.min(3, book.movieComparisons.length)} {Math.min(3, book.movieComparisons.length) === 1 ? 'indicação' : 'indicações'}
+                      </span>
+                    </div>
+
+                    {/* Single Row of up to 3 Movie Thumbnails */}
+                    <div className="grid grid-cols-3 gap-2">
+                      {book.movieComparisons.slice(0, 3).map((movie, i) => (
+                        <MovieThumb key={i} title={movie} />
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
-              {/* Filmes com atmosfera equivalente */}
-              {book.movieComparisons && book.movieComparisons.length > 0 && (
-                <div className="p-3.5 md:p-4 rounded-2xl bg-neutral-50/90 border border-neutral-200/80 space-y-2.5">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1.5 text-xs font-bold text-[#1d1d1f]">
-                      <Film className="w-3.5 h-3.5 text-amber-700" />
-                      <span>Filmes com Atmosfera Equivalente</span>
-                    </div>
-                    <span className="text-[10px] text-[#86868b] font-medium">
-                      {Math.min(3, book.movieComparisons.length)} {Math.min(3, book.movieComparisons.length) === 1 ? 'indicação' : 'indicações'}
-                    </span>
-                  </div>
-
-                  {/* Single Row of up to 3 Movie Thumbnails */}
-                  <div className="grid grid-cols-3 gap-2.5 md:gap-3">
-                    {book.movieComparisons.slice(0, 3).map((movie, i) => (
-                      <MovieThumb key={i} title={movie} />
-                    ))}
-                  </div>
-                </div>
-              )}
-
               {/* Critérios do Veredito — Telemetria Detalhada */}
-              <div className="space-y-2.5 pt-1">
+              <div className="space-y-2 pt-0.5">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#86868b]">
                     <Gauge className="w-3.5 h-3.5 text-[#1d1d1f]" />
@@ -575,16 +584,16 @@ ${book.resumo}
                   </span>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 md:gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
                   {criteriaList.map((crit, idx) => (
                     <div
                       key={idx}
-                      className="p-3.5 rounded-xl bg-neutral-50 hover:bg-neutral-100/70 border border-neutral-200/70 transition-all space-y-2.5 shadow-2xs hover:border-neutral-300"
+                      className="p-3.5 md:p-3 rounded-xl bg-neutral-50 hover:bg-neutral-100/70 border border-neutral-200/70 transition-all space-y-2 shadow-2xs hover:border-neutral-300"
                     >
                       <div className="flex items-center justify-between gap-1.5">
                         <div className="flex items-center gap-2 min-w-0">
                           {crit.icon}
-                          <span className="text-sm sm:text-[14px] font-bold text-[#1d1d1f] tracking-tight truncate">
+                          <span className="text-sm sm:text-[13.5px] font-bold text-[#1d1d1f] tracking-tight truncate">
                             {crit.label}
                           </span>
                         </div>
@@ -627,7 +636,7 @@ ${book.resumo}
         </div>
 
         {/* Footer Actions — Centered Action Bar */}
-        <div className="p-3.5 sm:p-4 md:px-8 border-t border-black/[0.06] bg-[#ffffff] flex items-center justify-center">
+        <div className="p-3.5 sm:p-4 md:py-3 md:px-8 border-t border-black/[0.06] bg-[#ffffff] flex items-center justify-center">
           <div className="flex items-center justify-center gap-2 flex-wrap sm:flex-nowrap">
             {/* 1. Avaliar Novo Livro — Botão padrão PearlButton (à esquerda) */}
             {onOpenEvaluate && (
