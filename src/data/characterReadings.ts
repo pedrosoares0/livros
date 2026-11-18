@@ -2314,6 +2314,54 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     resumo:
       'Sócrates investiga a justiça, o poder e a célebre Alegoria da Caverna, onde prisioneiros acorrentados tomam sombras projetadas na parede pela única realidade existente.',
   },
+  {
+    id: 'br-cassino-royale',
+    title: 'Cassino Royale',
+    author: 'Ian Fleming',
+    publisher: 'Alfaguara',
+    year: 1953,
+    pages: 216,
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication116/v4/17/2b/89/172b89a4-5ad2-2a48-3973-652695a484ac/1040082800.jpg/600x900bb.jpg',
+    genres: ['Espionagem', 'Thriller', 'Clássico'],
+    resumo:
+      'Enviado à mesa de bacará na França para levar o banqueiro soviético Le Chiffre à falência, o agente 007 descobre que a fronteira entre missão, sedução e tortura é letalmente estreita.',
+  },
+  {
+    id: 'br-espiao-sabia-demais',
+    title: 'O Espião que Sabia Demais',
+    author: 'John le Carré',
+    publisher: 'Record',
+    year: 1974,
+    pages: 416,
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication221/v4/b7/27/ac/b727ac83-2168-945e-39f4-ebb9616f2811/1057440685.jpg/600x900bb.jpg',
+    genres: ['Espionagem', 'Guerra Fria', 'Suspense'],
+    resumo:
+      'Afastado após um fiasco na Tchecoslováquia, George Smiley é convocado em sigilo para caçar um agente duplo soviético infiltrado na cúpula do serviço secreto britânico.',
+  },
+  {
+    id: 'br-dia-do-chacal',
+    title: 'O Dia do Chacal',
+    author: 'Frederick Forsyth',
+    publisher: 'Record',
+    year: 1971,
+    pages: 448,
+    coverUrl: 'https://covers.openlibrary.org/b/id/77394-L.jpg',
+    genres: ['Thriller', 'Espionagem', 'Suspense'],
+    resumo:
+      'Um assassino profissional frio e sem rastro é contratado para matar o presidente francês Charles de Gaulle, desencadeando uma caçada metódica contra o relógio.',
+  },
+  {
+    id: 'br-terceiro-homem',
+    title: 'O Terceiro Homem',
+    author: 'Graham Greene',
+    publisher: 'Globo',
+    year: 1950,
+    pages: 144,
+    coverUrl: 'https://covers.openlibrary.org/b/id/93349-L.jpg',
+    genres: ['Noir', 'Espionagem', 'Clássico'],
+    resumo:
+      'Na Viena ocupada e em ruínas do pós-guerra, um escritor chega para encontrar o velho amigo Harry Lime, mas descobre versões contraditórias sobre sua morte e o mercado negro da cidade.',
+  },
 ];
 
 const BOOKS_BY_ID = new Map<string, Partial<BookEvaluation>>(
@@ -3360,6 +3408,31 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-grande-gatsby',
       'br-cozinha-confidencial',
       'br-meridiano-sangue',
+    ],
+  },
+  {
+    id: 'james-bond',
+    name: 'James Bond',
+    source: '007',
+    imageUrl: 'https://i.pinimg.com/1200x/f1/07/9d/f1079d2a0198a5b353ac1ab0452bfffe.jpg',
+    thread: 'Agentes de terno impecável e cinismo letal jogando partidas mortais entre impérios e traições.',
+    bookIds: [
+      'br-cassino-royale',
+      'br-espiao-saiu-frio',
+      'br-espiao-sabia-demais',
+      'br-dia-do-chacal',
+      'br-terceiro-homem',
+      'br-um-jogador',
+      'br-conde-monte-cristo',
+      'br-o-principe',
+      'br-arte-da-guerra',
+      'br-carbono-alterado',
+      'br-grande-gatsby',
+      'br-homem-quinta-feira',
+      'br-expresso-oriente',
+      'br-e-nao-sobrou-nenhum',
+      'br-onde-os-velhos',
+      'br-meditacoes',
     ],
   },
 ];
