@@ -371,41 +371,17 @@ ${booksList}`;
                 </div>
               </div>
 
-              {/* Leve Resumo sobre o Personagem + Filósofos + Filmes Relacionados / Mesma Pegada (lado a lado no PC) */}
+              {/* Leve Resumo sobre o Personagem + Filmes Relacionados / Mesma Pegada (lado a lado no PC) */}
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-stretch">
-                {/* Sobre o Personagem + Filósofos & Pensadores */}
+                {/* Sobre o Personagem */}
                 <div className="flex flex-col space-y-1.5 lg:col-span-7">
                   <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#86868b]">
                     <User className="w-3.5 h-3.5 text-[#1d1d1f]" />
                     <span>Sobre o Personagem</span>
                   </div>
-                  <div className="flex-1 flex flex-col justify-between bg-neutral-50 p-3.5 rounded-xl border border-neutral-200/70 space-y-3">
-                    <p className="text-xs sm:text-sm text-[#1d1d1f] leading-relaxed">
-                      {meta.resumo}
-                    </p>
-
-                    {meta.thinkers && meta.thinkers.length > 0 && (
-                      <div className="pt-2.5 border-t border-neutral-200/80 space-y-1.5">
-                        <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-[#86868b]">
-                          <Feather className="w-3 h-3 text-[#1d1d1f]" />
-                          <span>Filósofos & Pensadores em Sintonia</span>
-                        </div>
-                        <div className="space-y-1.5">
-                          {meta.thinkers.map((thinker, idx) => (
-                            <div
-                              key={idx}
-                              className="text-[11px] sm:text-xs leading-snug text-[#515154]"
-                            >
-                              <span className="font-bold text-[#1d1d1f] bg-white px-2 py-0.5 rounded-md border border-neutral-200/90 shadow-3xs mr-1.5 inline-block">
-                                {thinker.name}
-                              </span>
-                              <span>{thinker.note}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
+                  <p className="flex-1 text-xs sm:text-sm text-[#1d1d1f] leading-relaxed bg-neutral-50 p-3.5 rounded-xl border border-neutral-200/70">
+                    {meta.resumo}
+                  </p>
                 </div>
 
                 {/* Filmes Relacionados ou com a Mesma Pegada */}
@@ -534,6 +510,32 @@ ${booksList}`;
                   </motion.div>
                 </AnimatePresence>
               </div>
+
+              {/* Pensadores em Sintonia — Seção discreta abaixo das indicações de livros */}
+              {meta.thinkers && meta.thinkers.length > 0 && (
+                <div className="space-y-2 pt-1">
+                  <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#86868b]">
+                    <Feather className="w-3.5 h-3.5 text-[#1d1d1f]" />
+                    <span>Pensadores em Sintonia</span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    {meta.thinkers.map((thinker, idx) => (
+                      <div
+                        key={idx}
+                        className="px-3.5 py-2.5 rounded-xl bg-neutral-50/80 border border-neutral-200/70 space-y-0.5"
+                      >
+                        <span className="block text-xs font-bold text-[#1d1d1f] tracking-tight">
+                          {thinker.name}
+                        </span>
+                        <p className="text-[11px] text-[#6e6e73] leading-snug">
+                          {thinker.note}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
