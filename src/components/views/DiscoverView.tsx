@@ -668,19 +668,22 @@ export const DiscoverView: React.FC<DiscoverViewProps> = React.memo(({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ type: 'spring', damping: 26, stiffness: 360, mass: 0.8 }}
-            className="fixed bottom-24 md:bottom-7 left-1/2 -translate-x-1/2 z-40 w-fit max-w-[95vw] pointer-events-auto"
+            className="fixed bottom-24 md:bottom-7 left-1/2 -translate-x-1/2 z-40 w-fit max-w-[94vw] pointer-events-auto"
           >
-            <div className="px-3.5 py-2.5 rounded-full bg-white/95 backdrop-blur-xl border border-neutral-200/90 shadow-[0_12px_36px_rgba(0,0,0,0.16),0_2px_8px_rgba(0,0,0,0.06)] flex items-center justify-between gap-3 sm:gap-5 select-none">
+            <div className="px-2.5 sm:px-3.5 py-2 sm:py-2.5 rounded-full bg-white/95 backdrop-blur-xl border border-neutral-200/90 shadow-[0_12px_36px_rgba(0,0,0,0.16),0_2px_8px_rgba(0,0,0,0.06)] flex items-center justify-between gap-1.5 sm:gap-4 select-none">
               {/* Left: Selection count & Select All toggle */}
-              <div className="flex items-center gap-2 shrink-0 pl-1">
+              <div className="flex items-center shrink-0">
                 <button
                   type="button"
                   onClick={handleToggleSelectAllVisible}
-                  className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-semibold text-[#1d1d1f] hover:bg-neutral-100 active:scale-95 transition-all cursor-pointer shrink-0 whitespace-nowrap"
+                  className="inline-flex items-center gap-1.5 px-2 sm:px-2.5 py-1.5 rounded-full text-xs font-semibold text-[#1d1d1f] hover:bg-neutral-100 active:scale-95 transition-all cursor-pointer shrink-0 whitespace-nowrap"
                   title={allVisibleSelected ? 'Desmarcar todos' : 'Selecionar todos os livros visíveis'}
                 >
                   <CheckSquare className="w-3.5 h-3.5 text-[#1d1d1f] shrink-0" />
-                  <span className="whitespace-nowrap">
+                  <span className="whitespace-nowrap sm:hidden">
+                    {selectedIds.size > 0 ? `${selectedIds.size}` : 'Todos'}
+                  </span>
+                  <span className="whitespace-nowrap hidden sm:inline">
                     {selectedIds.size > 0
                       ? `${selectedIds.size} ${selectedIds.size === 1 ? 'selecionado' : 'selecionados'}`
                       : 'Selecionar todos'}
@@ -694,10 +697,10 @@ export const DiscoverView: React.FC<DiscoverViewProps> = React.memo(({
                   <button
                     type="button"
                     onClick={handleOpenDuel}
-                    className="h-9 px-3.5 rounded-full text-xs font-semibold bg-neutral-100 hover:bg-neutral-200/80 text-[#1d1d1f] border border-neutral-200/90 active:scale-95 transition-all cursor-pointer flex items-center gap-1.5"
+                    className="h-8 sm:h-9 px-2.5 sm:px-3.5 rounded-full text-[11px] sm:text-xs font-semibold bg-neutral-100 hover:bg-neutral-200/80 text-[#1d1d1f] border border-neutral-200/90 active:scale-95 transition-all cursor-pointer flex items-center gap-1 sm:gap-1.5 whitespace-nowrap"
                     title="Comparar estes livros lado a lado"
                   >
-                    <Swords className="w-3.5 h-3.5 text-[#636366]" />
+                    <Swords className="w-3.5 h-3.5 text-[#636366] shrink-0" />
                     <span>Comparar</span>
                   </button>
                 )}
@@ -706,28 +709,29 @@ export const DiscoverView: React.FC<DiscoverViewProps> = React.memo(({
                   type="button"
                   disabled={selectedIds.size === 0}
                   onClick={handleBulkSave}
-                  className="h-9 px-3.5 rounded-full text-xs font-bold bg-[#1d1d1f] text-white hover:bg-black active:scale-95 transition-all cursor-pointer flex items-center gap-1.5 shadow-xs disabled:opacity-35 disabled:pointer-events-none"
+                  className="h-8 sm:h-9 px-2.5 sm:px-3.5 rounded-full text-[11px] sm:text-xs font-bold bg-[#1d1d1f] text-white hover:bg-black active:scale-95 transition-all cursor-pointer flex items-center gap-1 sm:gap-1.5 shadow-xs disabled:opacity-35 disabled:pointer-events-none whitespace-nowrap"
                   title={allSelectedAreSaved ? 'Remover selecionados dos salvos' : 'Salvar livros selecionados'}
                 >
-                  <Bookmark className={`w-3.5 h-3.5 ${allSelectedAreSaved ? 'fill-white' : ''}`} />
-                  <span>{allSelectedAreSaved ? 'Remover salvo' : 'Salvar'}</span>
+                  <Bookmark className={`w-3.5 h-3.5 shrink-0 ${allSelectedAreSaved ? 'fill-white' : ''}`} />
+                  <span className="sm:hidden">{allSelectedAreSaved ? 'Remover' : 'Salvar'}</span>
+                  <span className="hidden sm:inline">{allSelectedAreSaved ? 'Remover salvo' : 'Salvar'}</span>
                 </button>
 
                 <button
                   type="button"
                   disabled={selectedIds.size === 0}
                   onClick={handleBulkDelete}
-                  className="h-9 px-3.5 rounded-full text-xs font-bold bg-rose-600 text-white hover:bg-rose-700 active:scale-95 transition-all cursor-pointer flex items-center gap-1.5 shadow-xs disabled:opacity-35 disabled:pointer-events-none"
+                  className="h-8 sm:h-9 px-2.5 sm:px-3.5 rounded-full text-[11px] sm:text-xs font-bold bg-rose-600 text-white hover:bg-rose-700 active:scale-95 transition-all cursor-pointer flex items-center gap-1 sm:gap-1.5 shadow-xs disabled:opacity-35 disabled:pointer-events-none whitespace-nowrap"
                   title="Excluir livros e avaliações selecionados"
                 >
-                  <Trash2 className="w-3.5 h-3.5" />
-                  <span>Excluir</span>
+                  <Trash2 className="w-3.5 h-3.5 shrink-0" />
+                  <span className={canDuel ? 'hidden sm:inline' : ''}>Excluir</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={exitSelectionMode}
-                  className="w-9 h-9 rounded-full bg-neutral-100 hover:bg-neutral-200/80 text-[#636366] hover:text-[#1d1d1f] active:scale-95 transition-all cursor-pointer flex items-center justify-center"
+                  className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-neutral-100 hover:bg-neutral-200/80 text-[#636366] hover:text-[#1d1d1f] active:scale-95 transition-all cursor-pointer flex items-center justify-center shrink-0"
                   title="Sair da seleção"
                   aria-label="Cancelar seleção"
                 >

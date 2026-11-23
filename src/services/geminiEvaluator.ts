@@ -845,7 +845,9 @@ export function buildInstantDuelVerdict(books: BookEvaluation[]): BookDuelVerdic
   });
 
   const headline = runnerUp
-    ? `${winner.title} leva vantagem no duelo pelo encaixe superior (${Math.floor(winner.notaEncaixe)} vs. ${Math.floor(runnerUp.notaEncaixe)}) e maior peso dramático para o seu gosto.`
+    ? Math.floor(winner.notaEncaixe) > Math.floor(runnerUp.notaEncaixe)
+      ? `${winner.title} leva vantagem no duelo pelo encaixe superior (${Math.floor(winner.notaEncaixe)} vs. ${Math.floor(runnerUp.notaEncaixe)}) e maior peso dramático para o seu gosto.`
+      : `Mesmo empatados em Encaixe (${Math.floor(winner.notaEncaixe)}), ${winner.title} sai na frente pelo equilíbrio entre ritmo, extensão (${winner.pages} págs) e impacto dramático.`
     : winner.veredito || `Comece por ${winner.title}.`;
 
   const comparativo = runnerUp
