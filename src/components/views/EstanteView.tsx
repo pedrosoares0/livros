@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import { ArrowLeft, ArrowUpDown, Check, Bookmark, Trash2, CheckSquare, X } from 'lucide-react';
+import { ArrowLeft, ArrowUpDown, Check, Bookmark, Trash2, CheckSquare, X, Swords } from 'lucide-react';
 import { BookEvaluation, UserRatingsMap } from '../../types';
 import {
   CHARACTER_POOL,
@@ -22,6 +22,7 @@ interface EstanteViewProps {
   userRatings?: UserRatingsMap;
   onBulkToggleSave?: (bookIds: string[], willBeSaved: boolean) => void;
   onBulkDeleteBooks?: (bookIds: string[]) => void;
+  onOpenDuel?: (bookIds: string[]) => void;
 }
 
 type FilterOption =
@@ -94,6 +95,7 @@ export const EstanteView: React.FC<EstanteViewProps> = React.memo(({
   userRatings,
   onBulkToggleSave,
   onBulkDeleteBooks,
+  onOpenDuel,
 }) => {
   const [selectedFilter, setSelectedFilter] = useState<FilterOption>('all');
   const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
@@ -358,6 +360,14 @@ export const EstanteView: React.FC<EstanteViewProps> = React.memo(({
     exitSelectionMode();
   }, [selectedArray, onBulkDeleteBooks, exitSelectionMode]);
 
+  const canDuel = selectedIds.size >= 2 && selectedIds.size <= 3;
+
+  const handleOpenDuel = useCallback(() => {
+    if (!canDuel || !onOpenDuel) return;
+    onOpenDuel(selectedArray);
+    exitSelectionMode();
+  }, [canDuel, onOpenDuel, selectedArray, exitSelectionMode]);
+
   return (
     <div className="space-y-4 pb-12 md:pb-16">
       {/* Smart Filter Pills Row — sempre em linha única, arrastável para os lados no PC */}
@@ -550,6 +560,25 @@ export const EstanteView: React.FC<EstanteViewProps> = React.memo(({
 
               {isSelectionMode && (
                 <div className="hidden sm:flex items-center gap-1.5">
+                  {onOpenDuel && (
+                    <button
+                      type="button"
+                      disabled={!canDuel}
+                      onClick={handleOpenDuel}
+                      className="h-7 sm:h-7.5 px-3 rounded-full text-xs font-semibold transition-all active:scale-95 cursor-pointer select-none border flex items-center gap-1.5 justify-center bg-[#1d1d1f] text-white hover:bg-black border-[#1d1d1f] shadow-3xs disabled:opacity-35 disabled:pointer-events-none"
+                      title={
+                        canDuel
+                          ? 'Comparar livros selecionados no Duelo de Leitura'
+                          : 'Selecione 2 ou 3 livros para comparar no Duelo'
+                      }
+                    >
+                      <Swords className="w-3 h-3" />
+                      <span>
+                        Duelo{selectedIds.size >= 2 && selectedIds.size <= 3 ? ` (${selectedIds.size})` : ''}
+                      </span>
+                    </button>
+                  )}
+
                   <button
                     type="button"
                     disabled={selectedIds.size === 0}
@@ -688,13 +717,30 @@ export const EstanteView: React.FC<EstanteViewProps> = React.memo(({
                   </div>
 
                   <div className="flex items-center gap-1.5 shrink-0">
+                    {onOpenDuel && (
+                      <button
+                        type="button"
+                        disabled={!canDuel}
+                        onClick={handleOpenDuel}
+                        className="h-9 px-3.5 rounded-full text-xs font-bold bg-[#1d1d1f] text-white hover:bg-black active:scale-95 transition-all cursor-pointer flex items-center gap-1.5 shadow-xs disabled:opacity-30 disabled:pointer-events-none"
+                        title={
+                          canDuel
+                            ? 'Comparar livros selecionados no Duelo de Leitura'
+                            : 'Selecione 2 ou 3 livros para comparar no Duelo'
+                        }
+                      >
+                        <Swords className="w-3.5 h-3.5" />
+                        <span>Duelo</span>
+                      </button>
+                    )}
+
                     <button
                       type="button"
                       disabled={selectedIds.size === 0}
                       onClick={handleBulkSave}
-                      className="h-9 px-3.5 rounded-full text-xs font-bold bg-[#1d1d1f] text-white hover:bg-black active:scale-95 transition-all cursor-pointer flex items-center gap-1.5 shadow-xs disabled:opacity-35 disabled:pointer-events-none"
+                      className="h-9 px-3.5 rounded-full text-xs font-bold bg-neutral-100 text-[#1d1d1f] hover:bg-neutral-200/80 border border-neutral-200/90 active:scale-95 transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs disabled:opacity-35 disabled:pointer-events-none"
                     >
-                      <Bookmark className={`w-3.5 h-3.5 ${allSelectedAreSaved ? 'fill-white' : ''}`} />
+                      <Bookmark className={`w-3.5 h-3.5 ${allSelectedAreSaved ? 'fill-[#1d1d1f]' : ''}`} />
                       <span>{allSelectedAreSaved ? 'Remover salvo' : 'Salvar'}</span>
                     </button>
 

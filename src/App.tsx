@@ -9,6 +9,7 @@ import { CharacterModal } from './components/modals/CharacterModal';
 import { EvaluateModal } from './components/modals/EvaluateModal';
 import { ProfileModal } from './components/modals/ProfileModal';
 import { RateBookModal } from './components/modals/RateBookModal';
+import { DuelModal } from './components/modals/DuelModal';
 import { BottomNavBar } from './components/ui/BottomNavBar';
 import { PearlButton } from './components/ui/PearlButton';
 import { VereditoGlassIntro } from './components/ui/liquid-glass-logo-reveal';
@@ -49,6 +50,7 @@ export function App() {
   const [pendingBookToEvaluate, setPendingBookToEvaluate] =
     useState<Partial<BookEvaluation> | null>(null);
   const [ratingBook, setRatingBook] = useState<BookEvaluation | null>(null);
+  const [duelBooks, setDuelBooks] = useState<BookEvaluation[]>([]);
   const [isEvaluateOpen, setIsEvaluateOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [userRatings, setUserRatings] = useState<UserRatingsMap>(() => getLocalRatings());
@@ -365,6 +367,28 @@ export function App() {
   const closeCharacterModal = useCallback(() => setSelectedCharacter(null), []);
   const closeRating = useCallback(() => setRatingBook(null), []);
   const closeProfile = useCallback(() => setIsProfileOpen(false), []);
+  const closeDuel = useCallback(() => setDuelBooks([]), []);
+
+  const handleOpenDuelByIds = useCallback(
+    (bookIds: string[]) => {
+      const idSet = new Set(bookIds);
+      const selected = books.filter((b) => idSet.has(b.id)).slice(0, 3);
+      if (selected.length >= 2) {
+        setDuelBooks(selected);
+      }
+    },
+    [books]
+  );
+
+  const handleOpenDuelFromFicha = useCallback((book: BookEvaluation) => {
+    setSelectedBook(null);
+    setDuelBooks([book]);
+  }, []);
+
+  const handleSelectBookFromDuel = useCallback((book: BookEvaluation) => {
+    setDuelBooks([]);
+    setSelectedBook(book);
+  }, []);
   const openBookFromEvaluate = useCallback((book: BookEvaluation) => {
     setIsEvaluateOpen(false);
     setSelectedBook(book);
@@ -401,7 +425,8 @@ export function App() {
     !selectedCharacter &&
     !isEvaluateOpen &&
     !ratingBook &&
-    !isProfileOpen;
+    !isProfileOpen &&
+    duelBooks.length === 0;
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-start bg-[#f5f5f7] md:bg-white text-[#1d1d1f] antialiased w-full">
@@ -531,6 +556,7 @@ export function App() {
               savedBookIds={savedBookIds}
               onBulkToggleSave={handleBulkToggleSave}
               onBulkDeleteBooks={handleBulkDeleteBooks}
+              onOpenDuel={handleOpenDuelByIds}
               isActive={isDiscoverActive}
             />
           </div>
@@ -545,6 +571,7 @@ export function App() {
               userRatings={userRatings}
               onBulkToggleSave={handleBulkToggleSave}
               onBulkDeleteBooks={handleBulkDeleteBooks}
+              onOpenDuel={handleOpenDuelByIds}
             />
           </div>
         </main>
@@ -596,6 +623,24 @@ export function App() {
               userRating={selectedBook ? userRatings[selectedBook.id] : undefined}
               onOpenRateModal={() => setRatingBook(selectedBook)}
               onOpenEvaluate={openEvaluateFromFicha}
+              onOpenDuelWithBook={handleOpenDuelFromFicha}
+            />
+          )}
+        </AnimatePresence>
+
+        {/* Duelo de Livros ("Qual eu leio primeiro?") Modal */}
+        <AnimatePresence>
+          {duelBooks.length > 0 && (
+            <DuelModal
+              key="duel-modal"
+              books={duelBooks}
+              allBooks={books}
+              userRatings={userRatings}
+              savedBookIds={savedBookIds}
+              onClose={closeDuel}
+              onSelectBook={handleSelectBookFromDuel}
+              onToggleSave={handleToggleSave}
+              onChangeDuelBooks={setDuelBooks}
             />
           )}
         </AnimatePresence>

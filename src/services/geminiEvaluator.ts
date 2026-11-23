@@ -1,4 +1,4 @@
-import { BookEvaluation, CriteriaScores, VereditoTipo } from '../types';
+import { BookEvaluation, CriteriaScores, VereditoTipo, BookDuelVerdict } from '../types';
 import { buildReadingHistoryBlock } from './ratings';
 import { getCuratedCovers } from '../data/curatedCovers';
 import { fetchVerifiedBookCover } from './coverSearch';
@@ -738,5 +738,234 @@ Responda ESTRITAMENTE em JSON válido (array de 4 objetos):
   } catch (err) {
     console.warn('[replenishCharacterBooksWithGemini] Aviso:', err);
     return [];
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Duelo de Livros ("Qual eu leio primeiro?") — Desempate calibrado + Cache 0ms
+// ---------------------------------------------------------------------------
+const DUEL_CACHE_STORAGE_KEY = 'veredito_duel_cache_v1';
+const duelMemoryCache = new Map<string, BookDuelVerdict>();
+
+function getDuelCacheKey(books: BookEvaluation[]): string {
+  return books
+    .map((b) => `${b.id}:${Math.floor(b.notaEncaixe)}:${Math.floor(b.notaTecnica)}:${b.pages || 0}`)
+    .sort()
+    .join('|');
+}
+
+export function getCachedDuelVerdict(books: BookEvaluation[]): BookDuelVerdict | null {
+  if (books.length < 2) return null;
+  const key = getDuelCacheKey(books);
+  if (duelMemoryCache.has(key)) {
+    return duelMemoryCache.get(key)!;
+  }
+  try {
+    const raw = localStorage.getItem(DUEL_CACHE_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as Record<string, BookDuelVerdict>;
+    if (parsed && parsed[key]) {
+      duelMemoryCache.set(key, parsed[key]);
+      return parsed[key];
+    }
+  } catch {
+    // ignore storage errors
+  }
+  return null;
+}
+
+function saveCachedDuelVerdict(books: BookEvaluation[], verdict: BookDuelVerdict): void {
+  const key = getDuelCacheKey(books);
+  duelMemoryCache.set(key, verdict);
+  try {
+    const raw = localStorage.getItem(DUEL_CACHE_STORAGE_KEY);
+    const current: Record<string, BookDuelVerdict> = raw ? JSON.parse(raw) : {};
+    current[key] = verdict;
+    // Mantém os últimos 40 duelos no cache local
+    const keys = Object.keys(current);
+    if (keys.length > 40) {
+      delete current[keys[0]];
+    }
+    localStorage.setItem(DUEL_CACHE_STORAGE_KEY, JSON.stringify(current));
+  } catch {
+    // ignore storage errors
+  }
+}
+
+/**
+ * Gera uma análise instantânea (0ms) baseada na telemetria das obras enquanto a IA
+ * refina o texto personalizado ou caso o usuário esteja offline.
+ */
+export function buildInstantDuelVerdict(books: BookEvaluation[]): BookDuelVerdict {
+  const scored = books.map((b) => {
+    const c = b.criteria;
+    const concisenessBonus = b.pages > 0 && b.pages <= 180 ? 0.65 : b.pages <= 280 ? 0.3 : 0;
+    const composite =
+      b.notaEncaixe * 1.45 +
+      b.notaTecnica * 0.35 +
+      (c?.ritmo || 6) * 0.18 +
+      (c?.impactoEmocional || 6) * 0.2 +
+      (c?.tomSombrio || 6) * 0.12 +
+      concisenessBonus;
+    return { book: b, composite };
+  });
+
+  scored.sort((a, b) => b.composite - a.composite);
+  const winner = scored[0].book;
+  const runnerUp = scored[1]?.book;
+
+  const scenarios = books.map((b) => {
+    const c = b.criteria;
+    if (b.pages > 0 && b.pages <= 170 && (c?.ritmo ?? 6) >= 7) {
+      return {
+        bookId: b.id,
+        label: 'Tiro curto & impacto direto',
+        reason: `Ideal para fechar em poucas horas (${b.pages} págs) com ritmo firme e sem gordura.`,
+      };
+    }
+    if ((c?.tomSombrio ?? 6) >= 8 && (c?.impactoEmocional ?? 6) >= 8) {
+      return {
+        bookId: b.id,
+        label: 'Mergulho sombrio & visceral',
+        reason: `Priorize quando quiser peso dramático máximo (Tom Sombrio ${Math.floor(c.tomSombrio)} e Impacto ${Math.floor(c.impactoEmocional)}).`,
+      };
+    }
+    if ((c?.worldbuilding ?? 6) >= 8 || (10 - (c?.genericidade ?? 3)) >= 8) {
+      return {
+        bookId: b.id,
+        label: 'Imersão & conceito fora da curva',
+        reason: `Escolha quando buscar construção de mundo densa e originalidade acima da média.`,
+      };
+    }
+    if ((c?.ritmo ?? 6) >= 8) {
+      return {
+        bookId: b.id,
+        label: 'Leitura ágil & magnética',
+        reason: `Melhor pedida para engatar rápido na narrativa sem resistência inicial.`,
+      };
+    }
+    return {
+      bookId: b.id,
+      label: 'Leitura cadenciada & reflexiva',
+      reason: `Guarde para um momento com mais calma, pedindo atenção à atmosfera e à prosa.`,
+    };
+  });
+
+  const headline = runnerUp
+    ? `Comece por "${winner.title}" pelo melhor equilíbrio entre encaixe (${Math.floor(winner.notaEncaixe)}), ritmo e densidade para o seu perfil.`
+    : `Comece por "${winner.title}".`;
+
+  const comparativo = runnerUp
+    ? `"${winner.title}" (${winner.pages} págs, Encaixe ${Math.floor(winner.notaEncaixe)}) leva vantagem imediata contra "${runnerUp.title}" (${runnerUp.pages} págs, Encaixe ${Math.floor(runnerUp.notaEncaixe)}) na relação entre impacto dramático e fôlego de leitura.`
+    : winner.justificativaEncaixe;
+
+  return {
+    winnerId: winner.id,
+    headline,
+    comparativo,
+    scenarios,
+  };
+}
+
+export async function analyzeBookDuelWithGemini(
+  books: BookEvaluation[],
+  signal?: AbortSignal
+): Promise<BookDuelVerdict> {
+  const cached = getCachedDuelVerdict(books);
+  if (cached) return cached;
+
+  const fallback = buildInstantDuelVerdict(books);
+  const historyBlock = buildReadingHistoryBlock();
+
+  const contendersBlock = books
+    .map((b, idx) => {
+      const c = b.criteria;
+      const orig = Math.floor(10 - (c?.genericidade ?? 3));
+      return `${idx + 1}. ID: "${b.id}" | Título: "${b.title}" (${b.author})
+   - Páginas: ${b.pages} | Nota de Encaixe: ${Math.floor(b.notaEncaixe)}/10 | Nota Técnica: ${Math.floor(b.notaTecnica)}/10 | Veredito: ${b.vereditoTipo.toUpperCase()}
+   - Critérios: Originalidade ${orig}, Técnica ${Math.floor(c.qualidadeTecnica)}, Worldbuilding ${Math.floor(c.worldbuilding)}, Ritmo ${Math.floor(c.ritmo)} (${c.ritmoDescricao}), Tom Sombrio ${Math.floor(c.tomSombrio)}, Impacto Emocional ${Math.floor(c.impactoEmocional)}
+   - Resumo/Clima: ${b.resumo}`;
+    })
+    .join('\n\n');
+
+  const prompt = `${USER_PROFILE_PROMPT}
+${historyBlock}
+
+O leitor está em dúvida entre estas ${books.length} obras da estante dele e abriu um DUELO DE LEITURA ("Qual eu leio primeiro?"):
+
+${contendersBlock}
+
+Compare as obras com rigor cirúrgico para o perfil deste leitor (que valoriza concisão sem gordura, peso existencial/trágico, ritmo firme e rejeita prolixidade).
+Determine:
+1. "winnerId": o ID exato ("${books.map((b) => b.id).join('" ou "')}") da obra que ele deve ler PRIMEIRO hoje.
+2. "headline": 1 frase direta, incisiva e sem spoilers cravando qual ler primeiro e o motivo central da vitória.
+3. "comparativo": 2 a 3 linhas contrastando diretamente o fôlego (páginas/ritmo), a densidade dramática e a diferença de clima entre elas.
+4. "scenarios": para CADA obra do duelo, um rótulo curto de ocasião ("label", máx 4 palavras, ex: "Tiro curto de domingo", "Imersão noturna e pesada", "Conceito sci-fi implacável") e 1 frase direta ("reason") dizendo em que momento/humor escolher aquela obra.
+
+Responda ESTRITAMENTE em JSON válido:
+{
+  "winnerId": "${books[0].id}",
+  "headline": "Frase direta de decisão",
+  "comparativo": "Contraste objetivo de 2 a 3 linhas entre as obras",
+  "scenarios": [
+    ${books
+      .map(
+        (b) => `{ "bookId": "${b.id}", "label": "Ocasião curta", "reason": "Quando escolher esta obra em 1 frase sem spoilers" }`
+      )
+      .join(',\n    ')}
+  ]
+}`;
+
+  try {
+    const { value: parsed } = await raceGemini<BookDuelVerdict>({
+      apiKey: GEMINI_API_KEY,
+      prompt,
+      initial: SEARCH_INITIAL_MODELS,
+      backups: EVAL_INITIAL_MODELS,
+      parse: (text) => {
+        const obj = parseJsonLoose<BookDuelVerdict>(text);
+        if (!obj || typeof obj !== 'object' || !obj.headline || !obj.comparativo) {
+          throw new Error('JSON de duelo inválido.');
+        }
+        const validIds = new Set(books.map((b) => b.id));
+        const winnerId = validIds.has(obj.winnerId) ? obj.winnerId : fallback.winnerId;
+        const scenarios = books.map((b) => {
+          const found = Array.isArray(obj.scenarios)
+            ? obj.scenarios.find((s) => s.bookId === b.id)
+            : null;
+          const fb = fallback.scenarios.find((s) => s.bookId === b.id)!;
+          return {
+            bookId: b.id,
+            label: found?.label?.trim() || fb.label,
+            reason: found?.reason?.trim() || fb.reason,
+          };
+        });
+        return {
+          winnerId,
+          headline: String(obj.headline).trim(),
+          comparativo: String(obj.comparativo).trim(),
+          scenarios,
+        };
+      },
+      baseGenerationConfig: {
+        responseMimeType: 'application/json',
+        temperature: 0.25,
+        maxOutputTokens: 750,
+      },
+      preferWindowMs: 0,
+      hedgeAfterMs: 2200,
+      perRequestTimeoutMs: 8500,
+      overallTimeoutMs: 11000,
+      signal,
+      label: 'Gemini Duelo',
+    });
+
+    saveCachedDuelVerdict(books, parsed);
+    return parsed;
+  } catch (err: any) {
+    if (err?.name !== 'AbortError') {
+      console.warn('[analyzeBookDuelWithGemini] Usando telemetria instantânea:', err);
+    }
+    return fallback;
   }
 }

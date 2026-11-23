@@ -53,3 +53,16 @@ export interface UserRating {
 }
 
 export type UserRatingsMap = Record<string, UserRating>;
+
+export interface BookDuelScenario {
+  bookId: string;
+  label: string; // Ex: "Tiro curto de fim de semana" | "Imersão sombria e densa"
+  reason: string; // 1 frase direta de quando priorizar este livro
+}
+
+export interface BookDuelVerdict {
+  winnerId: string;
+  headline: string; // Frase curta e direta de quem vence o duelo e qual ler primeiro
+  comparativo: string; // 2 a 3 linhas contrastando ritmo, peso dramático e investimento de tempo
+  scenarios: BookDuelScenario[];
+}

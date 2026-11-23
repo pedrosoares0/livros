@@ -4,7 +4,7 @@ import {
   X, Film, BookOpen, AlertTriangle, CheckCircle2,
   XCircle, Share2, Bookmark, Gauge,
   Feather, Compass, Zap, Moon, HeartHandshake,
-  Trash2, Image as ImageIcon, Check
+  Trash2, Image as ImageIcon, Check, Swords
 } from 'lucide-react';
 import { BookEvaluation, UserRating } from '../../types';
 import { BookCover } from '../BookCover';
@@ -27,6 +27,7 @@ interface FichaModalProps {
   userRating?: UserRating | null;
   onOpenRateModal?: () => void;
   onOpenEvaluate?: () => void;
+  onOpenDuelWithBook?: (book: BookEvaluation) => void;
 }
 
 export const FichaModal: React.FC<FichaModalProps> = ({
@@ -39,6 +40,7 @@ export const FichaModal: React.FC<FichaModalProps> = ({
   userRating,
   onOpenRateModal,
   onOpenEvaluate,
+  onOpenDuelWithBook,
 }) => {
   const [isCoverPickerOpen, setIsCoverPickerOpen] = useState(false);
   const [isLoadingCovers, setIsLoadingCovers] = useState(false);
@@ -689,6 +691,20 @@ ${book.resumo}
                 aria-label={isSaved ? "Salvo na sua estante" : "Salvar livro"}
               >
                 <Bookmark className={`w-3.5 h-3.5 ${isSaved ? 'fill-white text-white' : 'text-[#1d1d1f]'}`} />
+              </AceternityButton>
+            )}
+
+            {/* 3.5. Duelo Button — Comparar este livro com outro da estante */}
+            {onOpenDuelWithBook && (
+              <AceternityButton
+                variant="secondary"
+                size="md"
+                onClick={() => onOpenDuelWithBook(book)}
+                className="shrink-0 px-3.5"
+                title="Colocar este livro em um Duelo de Leitura"
+                aria-label="Duelo de Leitura"
+              >
+                <Swords className="w-3.5 h-3.5 text-[#1d1d1f]" />
               </AceternityButton>
             )}
 
