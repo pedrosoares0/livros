@@ -2,23 +2,16 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   X,
-  Swords,
-  Crown,
   BookOpen,
-  Compass,
+  CheckCircle2,
+  Share2,
+  Gauge,
   Feather,
+  Compass,
   Zap,
   Moon,
   HeartHandshake,
-  Clock,
-  Share2,
-  Bookmark,
   ArrowUpRight,
-  Plus,
-  CheckCircle2,
-  Sparkles,
-  AlertTriangle,
-  XCircle,
 } from 'lucide-react';
 import { BookEvaluation, BookDuelVerdict, UserRatingsMap } from '../../types';
 import {
@@ -29,7 +22,6 @@ import {
 import { getEffectiveScore } from '../../services/ratings';
 import { BookCover } from '../BookCover';
 import { ScoreBadge, getScoreTone } from '../ui/ScoreBadge';
-import { CopyButton } from '../ui/CopyButton';
 
 interface DuelModalProps {
   books: BookEvaluation[];
@@ -42,31 +34,13 @@ interface DuelModalProps {
   onChangeDuelBooks?: (nextBooks: BookEvaluation[]) => void;
 }
 
-/**
- * Estima o tempo de leitura em horas considerando páginas e cadência (ritmo) da obra.
- */
-function estimateReadingHours(pages: number, ritmoScore: number): string {
-  const safePages = pages && pages > 20 ? pages : 240;
-  // Ritmo 8-10: ~42 págs/h | Ritmo 5-7: ~34 págs/h | Ritmo 0-4: ~26 págs/h
-  const pagesPerHour = ritmoScore >= 8 ? 42 : ritmoScore >= 5 ? 34 : 27;
-  const hours = safePages / pagesPerHour;
-  if (hours < 1.5) return '~1h de leitura';
-  return `~${Math.round(hours)}h de leitura`;
-}
-
 export const DuelModal: React.FC<DuelModalProps> = ({
   books,
-  allBooks = [],
   userRatings,
-  savedBookIds,
   onClose,
   onSelectBook,
-  onToggleSave,
-  onChangeDuelBooks,
 }) => {
   const [aiVerdictMap, setAiVerdictMap] = useState<Record<string, BookDuelVerdict>>({});
-  const [isAddThirdOpen, setIsAddThirdOpen] = useState(false);
-  const [addSearchQuery, setAddSearchQuery] = useState('');
   const [copiedAlert, setCopiedAlert] = useState(false);
 
   const booksKey = useMemo(
@@ -86,7 +60,6 @@ export const DuelModal: React.FC<DuelModalProps> = ({
 
   const isRefiningWithAi = books.length >= 2 && !cachedOrAiVerdict;
 
-  // Dispara análise comparativa do Gemini se ainda não estiver em cache
   useEffect(() => {
     if (books.length < 2 || cachedOrAiVerdict) return;
 
@@ -98,28 +71,24 @@ export const DuelModal: React.FC<DuelModalProps> = ({
         }
       })
       .catch(() => {
-        // Fallback determinístico já está ativo
+        // Fallback determinístico permanece ativo
       });
 
     return () => controller.abort();
   }, [books, booksKey, cachedOrAiVerdict]);
 
-  // Fechar com tecla Escape
+  // Keyboard Escape listener for seamless dismissal
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        if (isAddThirdOpen) {
-          setIsAddThirdOpen(false);
-        } else {
-          onClose();
-        }
+        onClose();
       }
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [onClose, isAddThirdOpen]);
+  }, [onClose]);
 
-  // Travar scroll do body enquanto o modal está aberto
+  // Lock body scroll while modal is active
   useEffect(() => {
     const originalOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
@@ -133,141 +102,72 @@ export const DuelModal: React.FC<DuelModalProps> = ({
     [books, verdict]
   );
 
-  // Candidatos disponíveis para adicionar ao duelo (oponente ou 3º livro)
-  const availableCandidateBooks = useMemo(() => {
-    const currentIds = new Set(books.map((b) => b.id));
-    const q = addSearchQuery
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .trim();
+  if (books.length < 2 || !verdict) return null;
 
-    return allBooks
-      .filter((b) => !currentIds.has(b.id))
-      .filter((b) => {
-        if (!q) return true;
-        const blob = `${b.title} ${b.author}`
-          .toLowerCase()
-          .normalize('NFD')
-          .replace(/[\u0300-\u036f]/g, '');
-        return blob.includes(q);
-      })
-      .sort((a, b) => {
-        const aSaved = savedBookIds?.has(a.id) || a.isSaved ? 1 : 0;
-        const bSaved = savedBookIds?.has(b.id) || b.isSaved ? 1 : 0;
-        if (bSaved !== aSaved) return bSaved - aSaved;
-        return getEffectiveScore(b, userRatings) - getEffectiveScore(a, userRatings);
-      })
-      .slice(0, 16);
-  }, [allBooks, books, addSearchQuery, savedBookIds, userRatings]);
-
-  if (books.length === 0) return null;
-
-  const handleRemoveBookFromDuel = (bookId: string) => {
-    if (books.length <= 1 || !onChangeDuelBooks) return;
-    onChangeDuelBooks(books.filter((b) => b.id !== bookId));
-  };
-
-  const handleAddBookToDuel = (newBook: BookEvaluation) => {
-    if (books.length >= 3 || !onChangeDuelBooks) return;
-    onChangeDuelBooks([...books, newBook]);
-    setIsAddThirdOpen(false);
-    setAddSearchQuery('');
-  };
-
-  const criteriaRows = [
+  const criteriaList = [
     {
       id: 'originalidade',
       label: 'Originalidade',
-      icon: <Compass className="w-3.5 h-3.5 text-[#1d1d1f] stroke-[2.25]" />,
+      icon: <Compass className="w-4 h-4 text-black stroke-[2.25]" />,
       getValue: (b: BookEvaluation) => Math.floor(10 - (b.criteria?.genericidade ?? 3)),
     },
     {
       id: 'qualidadeTecnica',
       label: 'Qualidade Técnica',
-      icon: <Feather className="w-3.5 h-3.5 text-[#1d1d1f] stroke-[2.25]" />,
+      icon: <Feather className="w-4 h-4 text-black stroke-[2.25]" />,
       getValue: (b: BookEvaluation) => Math.floor(b.criteria?.qualidadeTecnica ?? 8),
     },
     {
       id: 'worldbuilding',
       label: 'Worldbuilding',
-      icon: <BookOpen className="w-3.5 h-3.5 text-[#1d1d1f] stroke-[2.25]" />,
+      icon: <BookOpen className="w-4 h-4 text-black stroke-[2.25]" />,
       getValue: (b: BookEvaluation) => Math.floor(b.criteria?.worldbuilding ?? 8),
     },
     {
       id: 'ritmo',
       label: 'Ritmo / Pacing',
-      icon: <Zap className="w-3.5 h-3.5 text-[#1d1d1f] stroke-[2.25]" />,
+      icon: <Zap className="w-4 h-4 text-black stroke-[2.25]" />,
       getValue: (b: BookEvaluation) => Math.floor(b.criteria?.ritmo ?? 6),
     },
     {
       id: 'tomSombrio',
       label: 'Tom Sombrio',
-      icon: <Moon className="w-3.5 h-3.5 text-[#1d1d1f] stroke-[2.25]" />,
+      icon: <Moon className="w-4 h-4 text-black stroke-[2.25]" />,
       getValue: (b: BookEvaluation) => Math.floor(b.criteria?.tomSombrio ?? 6),
     },
     {
       id: 'impactoEmocional',
       label: 'Impacto Emocional',
-      icon: <HeartHandshake className="w-3.5 h-3.5 text-[#1d1d1f] stroke-[2.25]" />,
+      icon: <HeartHandshake className="w-4 h-4 text-black stroke-[2.25]" />,
       getValue: (b: BookEvaluation) => Math.floor(b.criteria?.impactoEmocional ?? 6),
     },
   ];
 
   const generateDuelText = () => {
-    if (!verdict) return '';
-    const header = `⚔️ VEREDITO — Duelo de Leitura (${books.map((b) => b.title).join(' vs. ')})`;
-    const winnerLine = `🏆 Escolha #1 para Ler Agora: ${winnerBook?.title} (${winnerBook?.author})`;
-    const headlineLine = `💡 Veredito: "${verdict.headline}"`;
-    const compLine = `\n📊 Comparativo:\n${verdict.comparativo}`;
+    const header = `📋 VEREDITO — Comparativo de Leitura\n📖 ${books.map((b) => b.title).join(' vs. ')}`;
+    const winnerLine = `💡 Recomendado para começar: ${winnerBook?.title} (${winnerBook?.author})`;
+    const headlineLine = `"${verdict.headline}"`;
+    const compLine = `\n📝 Análise Comparativa:\n${verdict.comparativo}`;
     const scenariosLines = books
       .map((b) => {
         const sc = verdict.scenarios.find((s) => s.bookId === b.id);
         const eff = Math.floor(getEffectiveScore(b, userRatings));
-        return `• ${b.title} (${b.pages} págs · Encaixe ${eff}/10 · Técnica ${Math.floor(b.notaTecnica)}/10)\n  ↳ ${sc ? `${sc.label}: ${sc.reason}` : b.veredito}`;
+        return `• ${b.title} (${b.pages} págs · Encaixe ${eff} · Técnica ${Math.floor(b.notaTecnica)}): ${sc ? `${sc.label} — ${sc.reason}` : b.veredito}`;
       })
       .join('\n');
 
-    return `${header}\n${winnerLine}\n${headlineLine}${compLine}\n\n🎯 Quando escolher cada obra:\n${scenariosLines}`;
+    return `${header}\n${winnerLine}\n${headlineLine}${compLine}\n\n${scenariosLines}`;
   };
 
-  const handleCopyDuel = async () => {
+  const copyDuelToClipboard = async () => {
     await navigator.clipboard.writeText(generateDuelText());
     setCopiedAlert(true);
     setTimeout(() => setCopiedAlert(false), 2600);
   };
 
-  const renderVereditoPill = (book: BookEvaluation) => {
-    if (book.vereditoTipo === 'leia') {
-      return (
-        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/12 text-emerald-800 border border-emerald-500/25 text-[10px] font-bold">
-          <CheckCircle2 className="w-2.5 h-2.5 text-emerald-600" />
-          LEIA
-        </span>
-      );
-    }
-    if (book.vereditoTipo === 'ressalvas') {
-      return (
-        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-900 border border-amber-500/30 text-[10px] font-bold">
-          <AlertTriangle className="w-2.5 h-2.5 text-amber-600" />
-          RESSALVAS
-        </span>
-      );
-    }
-    return (
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-rose-500/12 text-rose-800 border border-rose-500/25 text-[10px] font-bold">
-        <XCircle className="w-2.5 h-2.5 text-rose-600" />
-        EVITE
-      </span>
-    );
-  };
-
-  // Menor número de páginas vence no quesito "Tiro Mais Curto"
-  const minPages = Math.min(...books.map((b) => b.pages || 9999));
-
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 md:p-3 lg:p-4 overflow-hidden">
-      {/* Backdrop */}
+      {/* Backdrop with smooth opacity fade */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -277,7 +177,7 @@ export const DuelModal: React.FC<DuelModalProps> = ({
         className="absolute inset-0 bg-black/45 backdrop-blur-sm z-10 cursor-pointer"
       />
 
-      {/* Modal Container */}
+      {/* Modal Container — Exact same shell & proportions as FichaModal and CharacterModal */}
       <motion.div
         initial={{ opacity: 0, scale: 0.94, y: 24 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -288,67 +188,32 @@ export const DuelModal: React.FC<DuelModalProps> = ({
           stiffness: 320,
           mass: 0.85,
         }}
-        className="relative w-full max-w-lg md:max-w-4xl lg:max-w-[1080px] xl:max-w-[1160px] max-h-[92vh] sm:max-h-[89vh] bg-[#ffffff] border border-black/[0.08] rounded-t-3xl sm:rounded-3xl shadow-[0_25px_65px_-15px_rgba(0,0,0,0.25)] flex flex-col overflow-hidden text-[#1d1d1f] z-20 will-change-transform"
+        className="relative w-full max-w-lg md:max-w-4xl lg:max-w-[1080px] xl:max-w-[1160px] max-h-[92vh] sm:max-h-[88vh] md:max-h-[88vh] lg:max-h-[89vh] bg-[#ffffff] border border-black/[0.08] rounded-t-3xl sm:rounded-3xl shadow-[0_25px_65px_-15px_rgba(0,0,0,0.25)] flex flex-col overflow-hidden text-[#1d1d1f] z-20 will-change-transform"
       >
-        {/* Toast de Cópia */}
+        {/* Copy Confirmation Toast */}
         <AnimatePresence>
           {copiedAlert && (
             <motion.div
-              initial={{ opacity: 0, y: -18, scale: 0.94 }}
+              initial={{ opacity: 0, y: -20, scale: 0.94 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -12, scale: 0.94 }}
               transition={{ type: 'spring', damping: 25, stiffness: 420 }}
               className="absolute top-3 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full bg-[#1d1d1f] text-white shadow-xl flex items-center gap-2 text-xs font-semibold border border-white/10 pointer-events-none select-none"
             >
               <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-              <span>Duelo copiado para a área de transferência!</span>
+              <span>Comparativo copiado!</span>
             </motion.div>
           )}
         </AnimatePresence>
 
-        {/* Sticky Top Header Bar */}
-        <div className="flex items-center justify-between px-5 sm:px-7 pt-4 pb-3 border-b border-black/[0.06] bg-[#ffffff]/90 backdrop-blur-lg sticky top-0 z-20 select-none">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-8 h-8 rounded-full bg-[#1d1d1f] text-white flex items-center justify-center shadow-xs shrink-0">
-              <Swords className="w-4 h-4" />
-            </div>
-            <div className="min-w-0">
-              <div className="flex items-center gap-2">
-                <h2 className="text-sm sm:text-base font-extrabold tracking-tight text-[#1d1d1f] truncate">
-                  Duelo de Leitura
-                </h2>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-neutral-100 border border-neutral-200/80 text-[#636366]">
-                  {books.length} obras
-                </span>
-              </div>
-              <p className="text-[11px] text-[#86868b] truncate hidden sm:block">
-                Comparativo direto de ritmo, densidade dramática e encaixe para decidir qual ler primeiro
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-1.5 shrink-0">
-            {books.length === 2 && onChangeDuelBooks && allBooks.length > 2 && (
-              <button
-                type="button"
-                onClick={() => setIsAddThirdOpen((prev) => !prev)}
-                className={`h-8 px-3 rounded-full text-xs font-semibold transition-all active:scale-95 cursor-pointer flex items-center gap-1.5 border ${
-                  isAddThirdOpen
-                    ? 'bg-[#1d1d1f] text-white border-[#1d1d1f]'
-                    : 'bg-neutral-100 hover:bg-neutral-200/80 text-[#1d1d1f] border-neutral-200/90'
-                }`}
-                title="Adicionar um 3º livro a este duelo"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">3º Livro</span>
-              </button>
-            )}
-
+        {/* Minimalist Top Action Bar — identical to FichaModal & CharacterModal */}
+        <div className="flex items-center justify-end px-6 pt-3.5 pb-2 md:pt-2.5 md:pb-1 bg-[#ffffff]/90 backdrop-blur-lg sticky top-0 z-20">
+          <div className="flex items-center gap-1.5">
             <motion.button
               whileHover={{ scale: 1.08 }}
               whileTap={{ scale: 0.92 }}
-              onClick={handleCopyDuel}
-              title="Copiar Duelo"
+              onClick={copyDuelToClipboard}
+              title="Copiar Comparativo"
               className="p-2 rounded-full hover:bg-neutral-100 text-[#86868b] hover:text-[#1d1d1f] transition-colors cursor-pointer"
             >
               <Share2 className="w-4 h-4" />
@@ -365,368 +230,290 @@ export const DuelModal: React.FC<DuelModalProps> = ({
           </div>
         </div>
 
-        {/* Drawer opcional para adicionar um oponente (quando há 1 livro) ou 3º livro ao duelo */}
-        <AnimatePresence>
-          {(books.length === 1 || (isAddThirdOpen && books.length === 2)) && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.22, ease: [0.32, 0.72, 0, 1] }}
-              className="border-b border-neutral-200/80 bg-neutral-50/95 px-5 sm:px-7 py-3.5 overflow-hidden"
-            >
-              <div className="flex items-center justify-between gap-3 mb-2.5 flex-wrap">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-[#1d1d1f]">
-                  {books.length === 1
-                    ? `Escolha um livro da sua estante para duelar com "${books[0].title}"`
-                    : 'Escolha um 3º livro da sua estante para entrar no duelo'}
-                </span>
-                <input
-                  type="text"
-                  value={addSearchQuery}
-                  onChange={(e) => setAddSearchQuery(e.target.value)}
-                  placeholder="Filtrar por título ou autor..."
-                  className="px-3 py-1 text-xs rounded-full bg-white border border-neutral-200/90 text-[#1d1d1f] placeholder-[#86868b] focus:outline-none focus:border-black w-48 sm:w-60"
-                />
-              </div>
-              <div className="flex items-center gap-2.5 overflow-x-auto pb-1 hide-scrollbar">
-                {availableCandidateBooks.map((candidate) => (
-                  <button
-                    key={candidate.id}
-                    type="button"
-                    onClick={() => handleAddBookToDuel(candidate)}
-                    className="flex items-center gap-2.5 p-2 rounded-xl bg-white hover:bg-neutral-100 border border-neutral-200/80 hover:border-neutral-300 shrink-0 max-w-[220px] text-left transition-all active:scale-95 cursor-pointer shadow-2xs"
-                  >
-                    <div className="w-8 shrink-0">
-                      <BookCover
-                        title={candidate.title}
-                        author={candidate.author}
-                        coverUrl={candidate.coverUrl}
-                      />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-xs font-bold text-[#1d1d1f] truncate">
-                        {candidate.title}
-                      </p>
-                      <p className="text-[10px] text-[#86868b] truncate">
-                        Encaixe {Math.floor(getEffectiveScore(candidate, userRatings))} • {candidate.pages} págs
-                      </p>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Scrollable Content */}
-        <div className="overflow-y-auto px-4 sm:px-6 md:px-8 py-4 sm:py-6 space-y-6 hide-scrollbar flex-1">
-          {/* 1. Veredito de Desempate Banner (exibido quando há 2 ou 3 livros) */}
-          {verdict && books.length >= 2 && (
-            <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-[#1d1d1f] via-[#242428] to-[#151517] text-white shadow-[0_14px_34px_-10px_rgba(0,0,0,0.28)] border border-white/10 space-y-3">
-              <div className="flex items-center justify-between gap-2 flex-wrap">
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-400/15 border border-emerald-400/30 text-emerald-300 text-[11px] font-bold tracking-tight">
-                  <Crown className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                  <span>Leia Primeiro: {winnerBook?.title}</span>
-                </div>
-
-                {isRefiningWithAi ? (
-                  <span className="inline-flex items-center gap-1.5 text-[11px] text-neutral-300 font-medium">
-                    <Sparkles className="w-3 h-3 text-amber-300 animate-pulse" />
-                    <span className="step-text-shimmer !text-neutral-200">
-                      Calibrando desempate fino...
-                    </span>
-                  </span>
-                ) : (
-                  <span className="text-[10px] font-semibold uppercase tracking-wider text-neutral-400">
-                    Desempate Calibrado para o seu Perfil
-                  </span>
-                )}
-              </div>
-
-              <div className="space-y-1.5">
-                <p className="text-sm sm:text-base md:text-[17px] font-bold text-white leading-snug tracking-tight">
-                  "{verdict.headline}"
-                </p>
-                <p className="text-xs sm:text-[13px] text-neutral-300 leading-relaxed">
-                  {verdict.comparativo}
-                </p>
-              </div>
-            </div>
-          )}
-
-          {/* 2. Arena Lado a Lado (2 ou 3 Colunas) */}
-          <div
-            className={`grid grid-cols-1 ${
-              books.length === 3 ? 'md:grid-cols-3' : 'sm:grid-cols-2'
-            } gap-3.5 sm:gap-4 items-stretch`}
-          >
-            {books.map((book) => {
-              const isWinner = books.length >= 2 && book.id === winnerBook?.id;
-              const effectiveScore = getEffectiveScore(book, userRatings);
-              const isUserRated = Boolean(userRatings?.[book.id]);
-              const isSaved = Boolean(savedBookIds?.has(book.id) || book.isSaved);
-              const scenario = verdict?.scenarios.find((s) => s.bookId === book.id);
-              const readingTime = estimateReadingHours(book.pages, book.criteria?.ritmo ?? 6);
-              const isShortest = books.length >= 2 && book.pages > 0 && book.pages === minPages;
-
-              return (
+        {/* Scrollable Content: 12-Column Editorial Grid on Desktop, Single Column on Mobile */}
+        <div className="overflow-y-auto px-5 sm:px-6 md:px-8 py-4 sm:py-5 md:pt-2 md:pb-6 hide-scrollbar flex-1">
+          <div className="flex flex-col md:grid md:grid-cols-12 md:gap-7 lg:gap-8 items-start md:items-stretch">
+            {/* Left Column (Desktop Hero: Large 3D Book Covers Side by Side) */}
+            <div className="w-full md:col-span-5 lg:col-span-4">
+              <div className="w-full flex flex-col justify-center space-y-4 md:sticky md:top-0 md:min-h-[450px] lg:min-h-[480px]">
                 <div
-                  key={book.id}
-                  className={`relative rounded-2xl p-4 sm:p-4.5 flex flex-col justify-between gap-4 transition-all duration-200 ${
-                    isWinner
-                      ? 'bg-gradient-to-b from-neutral-50/95 to-white border-2 border-[#1d1d1f] shadow-[0_12px_30px_-10px_rgba(0,0,0,0.14)]'
-                      : 'bg-neutral-50/75 hover:bg-neutral-50 border border-neutral-200/85 shadow-2xs'
-                  }`}
+                  className={`grid ${
+                    books.length === 3 ? 'grid-cols-3 gap-2.5' : 'grid-cols-2 gap-4'
+                  } items-start w-full max-w-md mx-auto`}
                 >
-                  {/* Top Badge Row: Winner Crown or Contender Tag + Optional Remove button (when >= 2 books) */}
-                  <div className="flex items-center justify-between gap-2">
-                    {isWinner ? (
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#1d1d1f] text-white text-[10px] font-bold tracking-wide uppercase shadow-2xs">
-                        <Crown className="w-3 h-3 text-amber-300 fill-amber-300" />
-                        <span>Escolha #1</span>
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-neutral-200/75 text-[#636366] text-[10px] font-bold uppercase tracking-wide">
-                        {books.length === 1 ? 'Desafiante #1' : 'Alternativa'}
-                      </span>
-                    )}
+                  {books.map((book) => {
+                    const isWinner = book.id === winnerBook?.id;
+                    const effectiveScore = getEffectiveScore(book, userRatings);
+                    const isUserRated = Boolean(userRatings?.[book.id]);
 
-                    <div className="flex items-center gap-1.5">
-                      {renderVereditoPill(book)}
-                      {books.length >= 2 && onChangeDuelBooks && (
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveBookFromDuel(book.id)}
-                          className="p-1 rounded-full hover:bg-neutral-200/80 text-[#86868b] hover:text-[#1d1d1f] transition-colors cursor-pointer"
-                          title="Remover deste duelo"
-                          aria-label="Remover deste duelo"
-                        >
-                          <X className="w-3.5 h-3.5" />
-                        </button>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Book Cover + Core Metadata */}
-                  <div className="flex items-start gap-3.5">
-                    <div
-                      onClick={() => onSelectBook(book)}
-                      className="w-20 sm:w-22 shrink-0 cursor-pointer transition-transform duration-200 hover:-translate-y-1"
-                      title="Abrir ficha completa"
-                    >
-                      <BookCover
-                        title={book.title}
-                        author={book.author}
-                        coverUrl={book.coverUrl}
-                        userRating={userRatings?.[book.id]?.rating}
-                      />
-                    </div>
-
-                    <div className="flex-1 min-w-0 space-y-2">
-                      <div>
-                        <h3
-                          onClick={() => onSelectBook(book)}
-                          className="text-sm sm:text-[15px] font-extrabold text-[#1d1d1f] hover:text-black cursor-pointer line-clamp-2 leading-snug tracking-tight"
-                        >
-                          {book.title}
-                        </h3>
-                        <p className="text-xs text-[#86868b] truncate font-medium">
-                          {book.author}
-                        </p>
-                      </div>
-
-                      {/* Pages & Estimated Reading Time */}
-                      <div className="flex flex-wrap items-center gap-1.5">
-                        <span
-                          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-score font-semibold border ${
-                            isShortest
-                              ? 'bg-emerald-50 text-emerald-900 border-emerald-200/90'
-                              : 'bg-white text-[#636366] border-neutral-200/80'
-                          }`}
-                        >
-                          <Clock className="w-2.5 h-2.5" />
-                          <span>{book.pages} págs</span>
-                        </span>
-                        <span className="text-[10px] text-[#86868b] font-medium">
-                          {readingTime}
-                        </span>
-                      </div>
-
-                      {/* Dual Scores Mini Deck */}
-                      <div className="flex items-center gap-3 pt-0.5">
-                        <div className="flex items-center gap-1.5">
-                          <ScoreBadge
-                            score={effectiveScore}
-                            size="sm"
-                            isUserRating={isUserRated}
-                          />
-                          <div className="leading-none">
-                            <span className="block text-[9px] font-bold uppercase tracking-wider text-[#86868b]">
-                              {isUserRated ? 'Sua Nota' : 'Encaixe'}
-                            </span>
-                          </div>
-                        </div>
-
-                        <div className="w-[1px] h-5 bg-neutral-200" />
-
-                        <div className="flex items-center gap-1.5">
-                          <ScoreBadge score={book.notaTecnica} size="sm" />
-                          <div className="leading-none">
-                            <span className="block text-[9px] font-bold uppercase tracking-wider text-[#86868b]">
-                              Técnica
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Scenario Box: "Quando escolher este" */}
-                  {scenario && (
-                    <div className="p-3 rounded-xl bg-white border border-neutral-200/80 space-y-1 shadow-3xs">
-                      <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#1d1d1f] block">
-                        🎯 {scenario.label}
-                      </span>
-                      <p className="text-xs text-[#515154] leading-relaxed">
-                        {scenario.reason}
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Card Footer Actions */}
-                  <div className="flex items-center gap-2 pt-1 border-t border-neutral-200/60">
-                    <button
-                      type="button"
-                      onClick={() => onSelectBook(book)}
-                      className="flex-1 h-8 px-3 rounded-xl bg-[#1d1d1f] hover:bg-black text-white text-xs font-bold transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-1.5 shadow-2xs"
-                    >
-                      <span>Abrir Ficha</span>
-                      <ArrowUpRight className="w-3.5 h-3.5" />
-                    </button>
-
-                    {onToggleSave && (
-                      <button
-                        type="button"
-                        onClick={() => onToggleSave(book)}
-                        className={`h-8 px-3 rounded-xl text-xs font-semibold transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-1.5 border ${
-                          isSaved
-                            ? 'bg-neutral-900 text-white border-neutral-800'
-                            : 'bg-white hover:bg-neutral-100 text-[#1d1d1f] border-neutral-200/90'
-                        }`}
-                        title={isSaved ? 'Salvo na estante' : 'Salvar na estante'}
+                    return (
+                      <div
+                        key={book.id}
+                        onClick={() => onSelectBook(book)}
+                        className="flex flex-col cursor-pointer group select-none"
+                        title={`Abrir ficha de ${book.title}`}
                       >
-                        <Bookmark className={`w-3.5 h-3.5 ${isSaved ? 'fill-white' : ''}`} />
-                      </button>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* 3. Comparativo Critério a Critério (Telemetria Lado a Lado) */}
-          <div className="space-y-3 pt-1">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#86868b]">
-                Telemetria Lado a Lado (6 Critérios)
-              </span>
-              <span className="text-[10px] font-score font-semibold text-[#86868b]">
-                Destaque para a maior nota em cada eixo
-              </span>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {criteriaRows.map((row) => {
-                const values = books.map((b) => row.getValue(b));
-                const maxVal = Math.max(...values);
-
-                return (
-                  <div
-                    key={row.id}
-                    className="p-3.5 rounded-2xl bg-neutral-50/90 border border-neutral-200/80 space-y-2.5 shadow-2xs"
-                  >
-                    <div className="flex items-center gap-2">
-                      {row.icon}
-                      <span className="text-xs sm:text-[13px] font-bold text-[#1d1d1f] tracking-tight">
-                        {row.label}
-                      </span>
-                    </div>
-
-                    <div className="space-y-2">
-                      {books.map((b) => {
-                        const val = row.getValue(b);
-                        const isLeader = val === maxVal;
-                        const tone = getScoreTone(val);
-
-                        return (
-                          <div key={`${row.id}-${b.id}`} className="space-y-1">
-                            <div className="flex items-center justify-between text-xs gap-2">
-                              <span
-                                className={`truncate ${
-                                  isLeader
-                                    ? 'font-bold text-[#1d1d1f]'
-                                    : 'font-medium text-[#86868b]'
-                                }`}
-                              >
-                                {b.title}
-                              </span>
-                              <span
-                                className={`font-score text-xs shrink-0 ${
-                                  isLeader
-                                    ? 'font-black text-[#1d1d1f]'
-                                    : 'font-semibold text-[#86868b]'
-                                }`}
-                              >
-                                {val}/10
-                              </span>
-                            </div>
-
-                            <div className="w-full h-2.5 rounded-full overflow-hidden bg-neutral-200/90 shadow-[inset_0_1px_2px_rgba(0,0,0,0.14)] p-[1px]">
-                              <div
-                                className={`h-full rounded-full transition-all duration-300 ${
-                                  !isLeader
-                                    ? 'bg-neutral-400/75'
-                                    : tone === 'green'
-                                      ? 'bg-gradient-to-r from-emerald-500 to-emerald-600'
-                                      : tone === 'yellow'
-                                        ? 'bg-gradient-to-r from-amber-400 to-amber-500'
-                                        : 'bg-gradient-to-r from-rose-500 to-rose-600'
-                                }`}
-                                style={{
-                                  width: `${Math.min(100, Math.max(8, val * 10))}%`,
-                                }}
+                        <div className="relative w-full mb-2.5">
+                          {/* Soft ambient cover glow behind the recommended book (same technique as EvaluateModal) */}
+                          {isWinner && book.coverUrl && (
+                            <div
+                              aria-hidden="true"
+                              className="absolute -inset-1.5 rounded-2xl overflow-hidden pointer-events-none -z-10 opacity-55"
+                              style={{
+                                transform: 'translate3d(0, 8px, 0) scale(1.02)',
+                                filter: 'blur(16px) saturate(1.3)',
+                              }}
+                            >
+                              <img
+                                src={book.coverUrl}
+                                alt=""
+                                className="w-full h-full object-cover"
+                                loading="eager"
+                                decoding="async"
+                                referrerPolicy="no-referrer"
                               />
                             </div>
+                          )}
+
+                          <div
+                            className={`transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                              isWinner
+                                ? '-translate-y-1 scale-[1.02]'
+                                : 'opacity-80 group-hover:opacity-100 group-hover:-translate-y-1'
+                            }`}
+                          >
+                            <BookCover
+                              title={book.title}
+                              author={book.author}
+                              coverUrl={book.coverUrl}
+                              notaEncaixe={book.notaEncaixe}
+                              userRating={userRatings?.[book.id]?.rating}
+                            />
                           </div>
-                        );
-                      })}
-                    </div>
+                        </div>
+
+                        {/* Clean Book Metadata under Cover */}
+                        <div className="space-y-1 px-0.5">
+                          <h4 className="text-xs sm:text-[13px] font-bold text-[#1d1d1f] truncate group-hover:text-black leading-snug tracking-tight">
+                            {book.title}
+                          </h4>
+                          <p className="text-[11px] text-[#86868b] truncate">
+                            {book.author}
+                          </p>
+
+                          <div className="flex items-center gap-1.5 pt-0.5 flex-wrap">
+                            <span className="px-2 py-0.5 bg-neutral-100 border border-neutral-200/90 rounded-md text-[10px] font-score font-semibold text-[#86868b]">
+                              {book.pages} págs
+                            </span>
+                            <span className="text-[10px] font-score font-semibold text-[#86868b]">
+                              • {isUserRated ? 'Nota' : 'Encaixe'} {Math.floor(effectiveScore)}
+                            </span>
+                          </div>
+
+                          {/* Minimalist active indicator bar underneath winner (from EvaluateModal) */}
+                          <div className="h-2 w-full flex items-center justify-start pt-1">
+                            {isWinner && (
+                              <div className="w-6 h-[2.5px] rounded-full bg-[#1d1d1f]" />
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column (Editorial Header, Veredito Banner, Contrast Cards, 6 Telemetry Tracks) */}
+            <div className="w-full md:col-span-7 lg:col-span-8 space-y-4 md:space-y-3.5 min-w-0 mt-5 md:mt-0">
+              {/* Header: Tags, Confrontation Title, Subtitle */}
+              <div className="space-y-1 text-center sm:text-left">
+                <div className="flex flex-wrap items-center justify-center sm:justify-start gap-1.5">
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-medium bg-neutral-100 border border-neutral-200/80 text-[#86868b]">
+                    Comparativo de Leitura
+                  </span>
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] text-[#86868b] bg-neutral-100 border border-neutral-200/80 font-score font-semibold">
+                    {books.map((b) => `${b.pages} págs`).join(' vs. ')}
+                  </span>
+                </div>
+
+                <h2 className="text-xl sm:text-2xl md:text-[25px] font-extrabold tracking-tight text-[#1d1d1f] leading-tight">
+                  {books.map((b) => b.title).join(' vs. ')}
+                </h2>
+                <p className="text-xs sm:text-sm font-semibold text-[#86868b]">
+                  {books.map((b) => b.author).join(' • ')}
+                </p>
+              </div>
+
+              {/* Veredito Direto Banner — Exact same light editorial card as FichaModal */}
+              <div className="p-3.5 md:p-4 rounded-2xl bg-gradient-to-br from-neutral-50 to-neutral-100/70 border border-neutral-200/90 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+                <div className="space-y-1 flex-1 min-w-0">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#86868b] block">
+                    {isRefiningWithAi ? 'Calibrando Veredito Comparativo...' : 'Veredito Comparativo'}
+                  </span>
+                  <p className="text-sm md:text-[15px] font-semibold text-[#1d1d1f] italic leading-snug">
+                    "{verdict.headline}"
+                  </p>
+                </div>
+
+                <div className="shrink-0 self-start sm:self-center">
+                  <button
+                    type="button"
+                    onClick={() => winnerBook && onSelectBook(winnerBook)}
+                    className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-xs border border-emerald-400 transition-colors cursor-pointer active:scale-95"
+                    title={`Abrir ficha de ${winnerBook?.title}`}
+                  >
+                    <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                    <span className="truncate max-w-[180px]">
+                      COMECE POR {winnerBook?.title.toUpperCase()}
+                    </span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Análise de Contraste + Quando Escolher Cada Obra */}
+              <div className="space-y-2.5">
+                <p className="text-xs sm:text-sm text-[#1d1d1f] leading-relaxed bg-neutral-50 p-3.5 rounded-xl border border-neutral-200/70">
+                  {verdict.comparativo}
+                </p>
+
+                <div
+                  className={`grid grid-cols-1 ${
+                    books.length === 3 ? 'sm:grid-cols-3' : 'sm:grid-cols-2'
+                  } gap-2.5`}
+                >
+                  {books.map((book) => {
+                    const scenario = verdict.scenarios.find((s) => s.bookId === book.id);
+                    const eff = getEffectiveScore(book, userRatings);
+                    const isUserRated = Boolean(userRatings?.[book.id]);
+
+                    return (
+                      <div
+                        key={`scenario-${book.id}`}
+                        onClick={() => onSelectBook(book)}
+                        className="p-3 rounded-xl bg-neutral-50/90 hover:bg-neutral-100/80 border border-neutral-200/75 hover:border-neutral-300 transition-all cursor-pointer group space-y-1.5"
+                      >
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="min-w-0">
+                            <span className="block text-xs font-bold text-[#1d1d1f] truncate group-hover:text-black">
+                              {book.title}
+                            </span>
+                            {scenario && (
+                              <span className="block text-[10px] font-semibold text-[#86868b] truncate">
+                                {scenario.label}
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            <ScoreBadge
+                              score={eff}
+                              size="sm"
+                              isUserRating={isUserRated}
+                            />
+                            <ArrowUpRight className="w-3.5 h-3.5 text-[#86868b] group-hover:text-[#1d1d1f] transition-colors" />
+                          </div>
+                        </div>
+
+                        {scenario && (
+                          <p className="text-[11px] text-[#515154] leading-snug line-clamp-2">
+                            {scenario.reason}
+                          </p>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Critérios do Veredito — Telemetria Comparativa (Mesma grade 3x2 e barras 3D da FichaModal) */}
+              <div className="space-y-2 pt-0.5">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#86868b]">
+                    <Gauge className="w-3.5 h-3.5 text-[#1d1d1f]" />
+                    <span>Critérios do Veredito</span>
                   </div>
-                );
-              })}
+                  <span className="text-[10px] text-[#86868b] font-score font-semibold">
+                    Telemetria Comparada
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                  {criteriaList.map((crit) => {
+                    const scores = books.map((b) => crit.getValue(b));
+                    const maxScore = Math.max(...scores);
+
+                    return (
+                      <div
+                        key={crit.id}
+                        className="p-3.5 md:p-3 rounded-xl bg-neutral-50 hover:bg-neutral-100/70 border border-neutral-200/70 transition-all space-y-2.5 shadow-2xs hover:border-neutral-300"
+                      >
+                        <div className="flex items-center gap-2 min-w-0">
+                          {crit.icon}
+                          <span className="text-sm sm:text-[13.5px] font-bold text-[#1d1d1f] tracking-tight truncate">
+                            {crit.label}
+                          </span>
+                        </div>
+
+                        <div className="space-y-2">
+                          {books.map((book) => {
+                            const val = crit.getValue(book);
+                            const isLeader = val === maxScore;
+                            const tone = getScoreTone(val);
+
+                            return (
+                              <div key={`${crit.id}-${book.id}`} className="space-y-1">
+                                <div className="flex items-center justify-between text-[11px] gap-1.5">
+                                  <span
+                                    className={`truncate ${
+                                      isLeader
+                                        ? 'font-bold text-[#1d1d1f]'
+                                        : 'font-medium text-[#86868b]'
+                                    }`}
+                                  >
+                                    {book.title}
+                                  </span>
+                                  <span
+                                    className={`font-score shrink-0 ${
+                                      isLeader
+                                        ? 'font-extrabold text-[#1d1d1f]'
+                                        : 'font-semibold text-[#86868b]'
+                                    }`}
+                                  >
+                                    {val}
+                                  </span>
+                                </div>
+
+                                {/* 3D Tactile Progress Track matching FichaModal */}
+                                <div className="w-full h-2.5 rounded-full overflow-hidden bg-neutral-200/90 shadow-[inset_0_1.5px_2.5px_rgba(0,0,0,0.18),0_1px_1px_rgba(255,255,255,0.8)] border border-neutral-300/40 p-[1.5px]">
+                                  <div
+                                    className={`h-full rounded-full transition-all duration-300 relative overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.22),inset_0_1px_1px_rgba(255,255,255,0.7),inset_0_-1px_1px_rgba(0,0,0,0.25)] ${
+                                      !isLeader
+                                        ? 'bg-gradient-to-b from-neutral-400 to-neutral-500 opacity-60'
+                                        : tone === 'green'
+                                          ? 'bg-gradient-to-b from-emerald-400 via-emerald-500 to-emerald-600'
+                                          : tone === 'yellow'
+                                            ? 'bg-gradient-to-b from-amber-300 via-amber-400 to-amber-500'
+                                            : 'bg-gradient-to-b from-rose-400 via-rose-500 to-rose-600'
+                                    }`}
+                                    style={{
+                                      width: `${Math.min(100, Math.max(8, Math.floor(val) * 10))}%`,
+                                    }}
+                                  >
+                                    <div className="absolute inset-x-0 top-0 h-[45%] bg-gradient-to-b from-white/55 to-transparent rounded-t-full pointer-events-none" />
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-
-        {/* Footer */}
-        <div className="p-3.5 sm:px-7 border-t border-black/[0.06] bg-[#ffffff] flex items-center justify-between gap-3">
-          <CopyButton
-            variant="secondary"
-            size="md"
-            text={generateDuelText}
-            idleLabel="Copiar comparativo"
-            doneLabel="Copiado!"
-          />
-
-          <button
-            type="button"
-            onClick={() => winnerBook && onSelectBook(winnerBook)}
-            className="h-10 px-5 rounded-xl bg-[#1d1d1f] hover:bg-black text-white text-xs font-bold transition-all active:scale-95 cursor-pointer flex items-center gap-2 shadow-xs"
-          >
-            <Crown className="w-3.5 h-3.5 text-amber-300" />
-            <span>Ver Ficha de "{winnerBook?.title}"</span>
-          </button>
         </div>
       </motion.div>
     </div>

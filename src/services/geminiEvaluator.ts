@@ -814,49 +814,38 @@ export function buildInstantDuelVerdict(books: BookEvaluation[]): BookDuelVerdic
   const winner = scored[0].book;
   const runnerUp = scored[1]?.book;
 
+  // Garante rótulos e motivos distintos para cada obra usando seus dados reais da ficha
+  const minPages = Math.min(...books.map((b) => b.pages || 9999));
+  const maxDark = Math.max(...books.map((b) => b.criteria?.tomSombrio ?? 0));
+  const maxTech = Math.max(...books.map((b) => b.criteria?.qualidadeTecnica ?? 0));
+  const usedLabels = new Set<string>();
+
   const scenarios = books.map((b) => {
     const c = b.criteria;
-    if (b.pages > 0 && b.pages <= 170 && (c?.ritmo ?? 6) >= 7) {
-      return {
-        bookId: b.id,
-        label: 'Tiro curto & impacto direto',
-        reason: `Ideal para fechar em poucas horas (${b.pages} págs) com ritmo firme e sem gordura.`,
-      };
+    let label = b.genres?.[0] ? `${b.genres[0]} • ${b.pages} págs` : `${b.pages} páginas`;
+
+    if (b.pages === minPages && books.some((other) => other.id !== b.id && other.pages > b.pages + 30)) {
+      label = `Leitura mais enxuta (${b.pages} págs)`;
+    } else if ((c?.tomSombrio ?? 0) === maxDark && (c?.tomSombrio ?? 0) >= 8 && !usedLabels.has('Tom mais sombrio & denso')) {
+      label = 'Tom mais sombrio & denso';
+    } else if ((c?.qualidadeTecnica ?? 0) === maxTech && !usedLabels.has('Primor técnico & prosa')) {
+      label = 'Primor técnico & prosa';
+    } else if ((c?.ritmo ?? 0) >= 8 && !usedLabels.has('Cadência mais ágil')) {
+      label = 'Cadência mais ágil';
     }
-    if ((c?.tomSombrio ?? 6) >= 8 && (c?.impactoEmocional ?? 6) >= 8) {
-      return {
-        bookId: b.id,
-        label: 'Mergulho sombrio & visceral',
-        reason: `Priorize quando quiser peso dramático máximo (Tom Sombrio ${Math.floor(c.tomSombrio)} e Impacto ${Math.floor(c.impactoEmocional)}).`,
-      };
-    }
-    if ((c?.worldbuilding ?? 6) >= 8 || (10 - (c?.genericidade ?? 3)) >= 8) {
-      return {
-        bookId: b.id,
-        label: 'Imersão & conceito fora da curva',
-        reason: `Escolha quando buscar construção de mundo densa e originalidade acima da média.`,
-      };
-    }
-    if ((c?.ritmo ?? 6) >= 8) {
-      return {
-        bookId: b.id,
-        label: 'Leitura ágil & magnética',
-        reason: `Melhor pedida para engatar rápido na narrativa sem resistência inicial.`,
-      };
-    }
+    usedLabels.add(label);
+
     return {
       bookId: b.id,
-      label: 'Leitura cadenciada & reflexiva',
-      reason: `Guarde para um momento com mais calma, pedindo atenção à atmosfera e à prosa.`,
+      label,
+      reason: b.veredito || b.criteria?.ritmoDescricao || b.justificativaEncaixe,
     };
   });
 
-  const headline = runnerUp
-    ? `Comece por "${winner.title}" pelo melhor equilíbrio entre encaixe (${Math.floor(winner.notaEncaixe)}), ritmo e densidade para o seu perfil.`
-    : `Comece por "${winner.title}".`;
+  const headline = winner.veredito || `Comece por ${winner.title}.`;
 
   const comparativo = runnerUp
-    ? `"${winner.title}" (${winner.pages} págs, Encaixe ${Math.floor(winner.notaEncaixe)}) leva vantagem imediata contra "${runnerUp.title}" (${runnerUp.pages} págs, Encaixe ${Math.floor(runnerUp.notaEncaixe)}) na relação entre impacto dramático e fôlego de leitura.`
+    ? `${winner.title} (${winner.pages} págs, Encaixe ${Math.floor(winner.notaEncaixe)}) sai na frente de ${runnerUp.title} (${runnerUp.pages} págs, Encaixe ${Math.floor(runnerUp.notaEncaixe)}). ${winner.justificativaEncaixe}`
     : winner.justificativaEncaixe;
 
   return {

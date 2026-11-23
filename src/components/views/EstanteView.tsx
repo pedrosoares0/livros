@@ -560,22 +560,15 @@ export const EstanteView: React.FC<EstanteViewProps> = React.memo(({
 
               {isSelectionMode && (
                 <div className="hidden sm:flex items-center gap-1.5">
-                  {onOpenDuel && (
+                  {onOpenDuel && canDuel && (
                     <button
                       type="button"
-                      disabled={!canDuel}
                       onClick={handleOpenDuel}
-                      className="h-7 sm:h-7.5 px-3 rounded-full text-xs font-semibold transition-all active:scale-95 cursor-pointer select-none border flex items-center gap-1.5 justify-center bg-[#1d1d1f] text-white hover:bg-black border-[#1d1d1f] shadow-3xs disabled:opacity-35 disabled:pointer-events-none"
-                      title={
-                        canDuel
-                          ? 'Comparar livros selecionados no Duelo de Leitura'
-                          : 'Selecione 2 ou 3 livros para comparar no Duelo'
-                      }
+                      className="h-7 sm:h-7.5 px-3 rounded-full text-xs font-semibold transition-all active:scale-95 cursor-pointer select-none border flex items-center gap-1.5 justify-center bg-white text-[#1d1d1f] hover:bg-neutral-50 border-neutral-200/90 hover:border-neutral-300 shadow-3xs"
+                      title="Comparar livros selecionados lado a lado"
                     >
-                      <Swords className="w-3 h-3" />
-                      <span>
-                        Duelo{selectedIds.size >= 2 && selectedIds.size <= 3 ? ` (${selectedIds.size})` : ''}
-                      </span>
+                      <Swords className="w-3 h-3 text-[#636366]" />
+                      <span>Comparar ({selectedIds.size})</span>
                     </button>
                   )}
 
@@ -717,20 +710,15 @@ export const EstanteView: React.FC<EstanteViewProps> = React.memo(({
                   </div>
 
                   <div className="flex items-center gap-1.5 shrink-0">
-                    {onOpenDuel && (
+                    {onOpenDuel && canDuel && (
                       <button
                         type="button"
-                        disabled={!canDuel}
                         onClick={handleOpenDuel}
-                        className="h-9 px-3.5 rounded-full text-xs font-bold bg-[#1d1d1f] text-white hover:bg-black active:scale-95 transition-all cursor-pointer flex items-center gap-1.5 shadow-xs disabled:opacity-30 disabled:pointer-events-none"
-                        title={
-                          canDuel
-                            ? 'Comparar livros selecionados no Duelo de Leitura'
-                            : 'Selecione 2 ou 3 livros para comparar no Duelo'
-                        }
+                        className="h-9 px-3.5 rounded-full text-xs font-semibold bg-neutral-100 hover:bg-neutral-200/80 text-[#1d1d1f] border border-neutral-200/90 active:scale-95 transition-all cursor-pointer flex items-center gap-1.5"
+                        title="Comparar estes livros lado a lado"
                       >
-                        <Swords className="w-3.5 h-3.5" />
-                        <span>Duelo</span>
+                        <Swords className="w-3.5 h-3.5 text-[#636366]" />
+                        <span>Comparar</span>
                       </button>
                     )}
 
@@ -738,9 +726,9 @@ export const EstanteView: React.FC<EstanteViewProps> = React.memo(({
                       type="button"
                       disabled={selectedIds.size === 0}
                       onClick={handleBulkSave}
-                      className="h-9 px-3.5 rounded-full text-xs font-bold bg-neutral-100 text-[#1d1d1f] hover:bg-neutral-200/80 border border-neutral-200/90 active:scale-95 transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs disabled:opacity-35 disabled:pointer-events-none"
+                      className="h-9 px-3.5 rounded-full text-xs font-bold bg-[#1d1d1f] text-white hover:bg-black active:scale-95 transition-all cursor-pointer flex items-center gap-1.5 shadow-xs disabled:opacity-35 disabled:pointer-events-none"
                     >
-                      <Bookmark className={`w-3.5 h-3.5 ${allSelectedAreSaved ? 'fill-[#1d1d1f]' : ''}`} />
+                      <Bookmark className={`w-3.5 h-3.5 ${allSelectedAreSaved ? 'fill-white' : ''}`} />
                       <span>{allSelectedAreSaved ? 'Remover salvo' : 'Salvar'}</span>
                     </button>
 

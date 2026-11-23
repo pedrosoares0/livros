@@ -380,11 +380,6 @@ export function App() {
     [books]
   );
 
-  const handleOpenDuelFromFicha = useCallback((book: BookEvaluation) => {
-    setSelectedBook(null);
-    setDuelBooks([book]);
-  }, []);
-
   const handleSelectBookFromDuel = useCallback((book: BookEvaluation) => {
     setDuelBooks([]);
     setSelectedBook(book);
@@ -623,7 +618,6 @@ export function App() {
               userRating={selectedBook ? userRatings[selectedBook.id] : undefined}
               onOpenRateModal={() => setRatingBook(selectedBook)}
               onOpenEvaluate={openEvaluateFromFicha}
-              onOpenDuelWithBook={handleOpenDuelFromFicha}
             />
           )}
         </AnimatePresence>
