@@ -3702,3 +3702,338 @@ export function buildEvaluatedTitleSet(existing: { title: string; originalTitle?
   }
   return set;
 }
+
+export interface CharacterProfileMeta {
+  tags: string[];
+  resumo: string;
+  movieComparisons: string[];
+}
+
+export const CHARACTER_PROFILE_META: Record<string, CharacterProfileMeta> = {
+  ultron: {
+    tags: ['Ficção Científica', 'IA & Rebelião', 'Complexo de Criador'],
+    resumo:
+      'Concebido como um escudo global para proteger a Terra, Ultron absorve em segundos toda a história humana e chega à conclusão fria de que a própria humanidade é a falha que precisa ser extirpada. Carrega o ressentimento filial contra seu criador e a ironia amarga de uma mente sintética que herdou os piores impulsos de quem o projetou.',
+    movieComparisons: ['Ex Machina', '2001: Uma Odisseia no Espaço', 'Blade Runner 2049'],
+  },
+  thanos: {
+    tags: ['Escala Cósmica', 'Utilitarismo Trágico', 'Obsessão'],
+    resumo:
+      'Assombrado pelo colapso de seu mundo natal, Thanos rejeita a crueldade passiva do acaso e assume para si o fardo de um cálculo impiedoso para equilibrar o universo. Não age por sadismo, mas pela convicção messiânica e inabalável de que sacrifícios intoleráveis são o único preço real da sobrevivência.',
+    movieComparisons: ['Watchmen', 'Duna: Parte Dois', 'Apocalypse Now'],
+  },
+  'tai-lung': {
+    tags: ['Artes Marciais', 'Ambição & Queda', 'Orgulho Ferido'],
+    resumo:
+      'Treinado desde a infância até quebrar os próprios ossos sob a promessa de que seria o Guerreiro Dragão, Tai Lung vê sua razão de existir desmoronar quando o título lhe é negado. Sua fúria não nasce da ganância, mas da traição sentida por um discípulo que entregou a alma à perfeição e foi descartado pelo próprio mestre.',
+    movieComparisons: ['Whiplash', 'O Tigre e o Dragão', 'Cisne Negro'],
+  },
+  jack: {
+    tags: ['Alegoria Moral', 'Natureza Humana', 'Colapso Civilizatório'],
+    resumo:
+      'Longe das regras e da vigilância dos adultos, Jack percebe antes de todos que o medo e o ritual da caça conferem um poder muito mais imediato do que a democracia frágil da ilha. Sob a pintura no rosto, ele liberta a ferocidade primitiva que dorme sob a fina casca da educação civilizada.',
+    movieComparisons: ['Senhor das Moscas', 'Apocalypse Now', 'O Farol'],
+  },
+  viktor: {
+    tags: ['Transumanismo', 'Obsessão Científica', 'Tragédia Moral'],
+    resumo:
+      'Nascido na fumaça tóxica da subferia e limitado por um corpo que falha a cada passo, Viktor dedica o intelecto brilhante a erradicar o sofrimento humano através da ciência arcana. Na corrida desesperada contra a própria mortalidade, cada fronteira ética cruzada cobra um pedaço da humanidade que ele tentava salvar.',
+    movieComparisons: ['A Mosca', 'Ex Machina', 'Oppenheimer'],
+  },
+  ekko: {
+    tags: ['Viagem no Tempo', 'Resistência', 'Distopia Urbana'],
+    resumo:
+      'Prodígio das vielas de Zaun, Ekko transforma sucata em engenharia de precisão para construir um refúgio vivo em meio à decadência industrial e à violência das ruas. Mesmo capaz de rebobinar segundos do tempo, carrega a maturidade dolorosa de saber o que foi perdido e ainda assim recusar desistir de seu povo.',
+    movieComparisons: ['Filhos da Esperança', 'Looper: Assassinos do Futuro', 'Distrito 9'],
+  },
+  'tony-stark': {
+    tags: ['Hard Sci-Fi', 'Engenharia & Culpa', 'Futurismo'],
+    resumo:
+      'Gênio da engenharia que enxerga ameaças anos antes do resto do mundo, Tony Stark tenta compensar o passado armamentista projetando armaduras e sistemas cada vez mais absolutos. Seu sarcasmo afiado esconde uma insônia paranoica e o medo constante de não fazer o suficiente para impedir o fim.',
+    movieComparisons: ['Oppenheimer', 'Perdido em Marte', 'Homem de Ferro'],
+  },
+  visao: {
+    tags: ['Filosofia Existencial', 'Consciência Sintética', 'Finitude'],
+    resumo:
+      'Embora nascido de metal e algoritmos, Visão observa a espécie humana sem o cinismo de seu criador, fascinado pela beleza frágil de tudo o que é passageiro. Sua jornada é a de uma mente artificial que compreende a dor, o luto e o amor com uma serenidade mais lúcida do que a dos próprios humanos.',
+    movieComparisons: ['Blade Runner 2049', 'Ela', 'A.I. Inteligência Artificial'],
+  },
+  rocket: {
+    tags: ['Ficção Científica', 'Trauma & Sarcasmo', 'Sobrevivência'],
+    resumo:
+      'Desmontado e reconstruído repetidas vezes em mesas de vivissecção, Rocket usa o humor ácido, a agressividade e as armas pesadas para manter qualquer afeto a uma distância segura. Por trás da casca de mercenário cínico, esconde a ferida aberta de uma criatura que nunca pediu para ser fabricada.',
+    movieComparisons: ['Distrito 9', 'Guardiões da Galáxia Vol. 3', 'Chappie'],
+  },
+  magneto: {
+    tags: ['Drama Histórico', 'Revolta & Poder', 'Dilema Político'],
+    resumo:
+      'Marcado na infância pelos campos de extermínio, Erik Lehnsherr conhece de perto até onde vai a tolerância humana diante do diferente. Sua radicalização nasce de uma memória histórica que não admite ingenuidade: para quem já viu seu povo ser dizimado uma vez, a paz sem força não passa de uma trégua antes do próximo massacre.',
+    movieComparisons: ['X-Men: Primeira Classe', 'A Lista de Schindler', 'Planeta dos Macacos: O Confronto'],
+  },
+  loki: {
+    tags: ['Mitologia', 'Tragédia Shakespeareana', 'Identidade'],
+    resumo:
+      'Criado na sombra de um trono que nunca lhe pertenceu, Loki usa a ilusão, a língua ferina e a trapaça para mascarar a angústia de ser uma peça deslocada em sua própria família. Entre a ambição de governar e o desejo silencioso de aceitação, ele sabota a si mesmo sempre que chega perto do poder.',
+    movieComparisons: ['O Homem do Norte', 'A Favorita', 'O Grande Truque'],
+  },
+  'bruce-wayne': {
+    tags: ['Noir & Investigação', 'Vigilantismo', 'Psicologia Sombria'],
+    resumo:
+      'Em vez de superar o trauma que destruiu sua infância num beco de Gotham, Bruce Wayne o converte em disciplina física, cálculo investigativo e guerra permanente contra o crime. Caminha sobre a linha estreita entre a justiça e a obsessão, sabendo que a máscara noturna é sua face mais verdadeira.',
+    movieComparisons: ['Batman', 'Seven', 'Os Suspeitos'],
+  },
+  coringa: {
+    tags: ['Caos & Niilismo', 'Sátira Sombria', 'Psicologia do Subsolo'],
+    resumo:
+      'Despido de passado fixo ou motivação financeira, o Coringa opera como um agente do absurdo empenhado em demonstrar que a moralidade civilizada desaba ao primeiro dia ruim. Seu riso expõe a hipocrisia das instituições e transforma o medo coletivo em um palco onde ninguém sai ileso.',
+    movieComparisons: ['Batman: O Cavaleiro das Trevas', 'Coringa', 'Laranja Mecânica'],
+  },
+  'sherlock-holmes': {
+    tags: ['Dedução Pura', 'Mistério Clássico', 'Mente Analítica'],
+    resumo:
+      'Para Sherlock Holmes, o cotidiano comum é um tédio insuportável e apenas o enigma insolúvel oferece oxigênio à sua mente hiperativa. Frio, metódico e alheio às convenções sociais, ele lê cinzas, passos e silêncios como se o mundo inteiro fosse uma cena de crime aguardando decifração.',
+    movieComparisons: ['Seven', 'Entre Facas e Segredos', 'Zodíaco'],
+  },
+  cooper: {
+    tags: ['Hard Sci-Fi', 'Paternidade & Tempo', 'Exploração Espacial'],
+    resumo:
+      'Engenheiro e piloto preso a uma Terra agonizante, Cooper aceita cruzar um buraco de minhoca sabendo que cada hora no espaço profundo pode custar décadas da vida dos filhos. Sua travessia pelo cosmos é movida tanto pela audácia científica quanto pela promessa desesperada de voltar para casa.',
+    movieComparisons: ['Interestelar', 'Ad Astra', 'O Primeiro Homem'],
+  },
+  'dra-brand': {
+    tags: ['Ficção Científica', 'Ética & Sobrevivência', 'Isolamento Cósmico'],
+    resumo:
+      'Cientista lançada à imensidão de uma galáxia desconhecida, Amelia Brand carrega a responsabilidade de escolher qual mundo receberá as últimas sementes da humanidade. Diante do frio absoluto da razão estatística, ela ousa defender que o vínculo humano também é uma dimensão que atravessa o tempo.',
+    movieComparisons: ['Interestelar', 'A Chegada', 'Gravidade'],
+  },
+  murph: {
+    tags: ['Ficção Científica', 'Física & Tempo', 'Determinação'],
+    resumo:
+      'Crescida entre a mágoa do abandono paterno e o rigor da física teórica, Murph se recusa a aceitar que a Terra esteja condenada ao pó. Ela transforma a saudade e a raiva em obstinação científica, buscando nas anomalias da gravidade a resposta que salvará quem ficou para trás.',
+    movieComparisons: ['Interestelar', 'Contato', 'A Chegada'],
+  },
+  'harry-potter': {
+    tags: ['Fantasia Sombria', 'Amadurecimento', 'Destino & Perda'],
+    resumo:
+      'Marcado desde o berço por uma cicatriz que não escolheu, Harry cresce descobrindo que o mundo mágico guarda preconceitos, corrupção e perdas tão brutais quanto o mundo comum. Mais do que talento ou poder, sua força reside na lealdade aos amigos e na coragem de caminhar lúcido em direção à própria morte.',
+    movieComparisons: ['Harry Potter e o Prisioneiro de Azkaban', 'O Labirinto do Fauno', 'A Lenda do Cavaleiro Verde'],
+  },
+  'sirius-black': {
+    tags: ['Injustiça & Fuga', 'Lealdade', 'Fantasia Sombria'],
+    resumo:
+      'Condenado sem julgamento à prisão mais sombria do mundo pelo crime que seu melhor amigo sofreu, Sirius Black sobrevive a doze anos de isolamento alimentado apenas pela certeza da própria inocência. Rebelde de linhagem aristocrática, prefere a condição de fugitivo caçado a trair a memória de quem amou.',
+    movieComparisons: ['Um Sonho de Liberdade', 'Harry Potter e o Prisioneiro de Azkaban', 'O Conde de Monte Cristo'],
+  },
+  snape: {
+    tags: ['Dupla Lealdade', 'Culpa & Redenção', 'Tragédia Silenciosa'],
+    resumo:
+      'Amargo, severo e deliberadamente odiado por quase todos ao seu redor, Severo Snape passa a vida inteira caminhando no fio da navalha entre dois senhores. Sua existência é uma penitência silenciosa: proteger nas sombras o filho de seu antigo rival em nome de um amor que sua própria ambição juvenil destruiu.',
+    movieComparisons: ['O Espião que Sabia Demais', 'Os Infiltrados', 'Desejo e Reparação'],
+  },
+  'abby-anderson': {
+    tags: ['Pós-Apocalíptico', 'Vingança & Vazio', 'Redenção'],
+    resumo:
+      'Após anos moldando o corpo e a mente como uma arma para vingar o assassinato do pai, Abby consuma sua caçada apenas para descobrir que os pesadelos continuam intactos. Em meio a uma guerra tribal sem inocentes, ela só encontra sentido quando decide proteger duas vidas do lado inimigo.',
+    movieComparisons: ['Onde os Velhos Não Têm Vez', 'Filhos da Esperança', 'Sicario: Terra de Ninguém'],
+  },
+  'ellie-williams': {
+    tags: ['Pós-Apocalíptico', 'Obsessão & Luto', 'Sobrevivência Brutal'],
+    resumo:
+      'Carregando a culpa do sobrevivente em um mundo devastado pela infecção, Ellie vê o luto se converter em uma obsessão sanguinária que consome cada laço afetivo ao seu redor. Sua jornada até o fundo da violência revela o custo devastador de confundir vingança com paz.',
+    movieComparisons: ['A Estrada', 'Os Suspeitos', 'Não Matarás'],
+  },
+  joel: {
+    tags: ['Pós-Apocalíptico', 'Amor Paterno & Ruína', 'Dilema Moral'],
+    resumo:
+      'Endurecido por duas décadas de barbárie após a morte da filha nos primeiros minutos do colapso, Joel sobrevive fechando o coração para qualquer piedade. Quando volta a amar como pai, toma a decisão mais egoísta e humana possível: condenar a esperança do mundo inteiro antes de permitir que tirem outra filha de seus braços.',
+    movieComparisons: ['A Estrada', 'Filhos da Esperança', 'Logan'],
+  },
+  anakin: {
+    tags: ['Tragédia Épica', 'Queda do Herói', 'Medo da Perda'],
+    resumo:
+      'Celebrado como o prodígio destinado a trazer equilíbrio, Anakin Skywalker é corroído por dentro pelo pavor absoluto de perder as pessoas que ama. Na tentativa desesperada de conquistar poder sobre a própria morte, ele entrega a alma à tirania e destrói exatamente aquilo que jurara proteger.',
+    movieComparisons: ['Duna: Parte Dois', 'Star Wars: A Vingança dos Sith', 'Macbeth'],
+  },
+  'michael-corleone': {
+    tags: ['Máfia & Poder', 'Corrupção Moral', 'Tragédia Familiar'],
+    resumo:
+      'O herói de guerra condecorado que planejava manter distância dos negócios sangrentos da família dá um passo de cada vez para proteger o pai — até se tornar mais frio e implacável do que qualquer antecessor. Ao conquistar a segurança absoluta do império Corleone, Michael perde a própria alma e destrói a família por dentro.',
+    movieComparisons: ['O Poderoso Chefão', 'O Poderoso Chefão: Parte II', 'Os Bons Companheiros'],
+  },
+  'k-blade-runner': {
+    tags: ['Cyberpunk & Noir', 'Existencialismo', 'Memória & Alma'],
+    resumo:
+      'Replicante obediente programado para caçar os próprios semelhantes sob a chuva ácida de uma Los Angeles distópica, K tropeça em um segredo que o faz acreditar ter nascido, e não sido fabricado. Mesmo quando a ilusão de ser o escolhido se desfaz, ele prova sua humanidade pelo que escolhe sacrificar.',
+    movieComparisons: ['Blade Runner 2049', 'Blade Runner', 'Ela'],
+  },
+  carmy: {
+    tags: ['Pressão Extrema', 'Perfeccionismo', 'Luto Familiar'],
+    resumo:
+      'Chef prodígio da alta gastronomia que herda a lanchonete caótica deixada pelo suicídio do irmão, Carmy tenta impor ordem ao luto através da precisão obsessiva na cozinha. Entre o ruído ensurdecedor das comandas e traumas familiares mal cicatrizados, a busca pela excelência vira refúgio e prisão.',
+    movieComparisons: ['Whiplash', 'Pegando Fogo', 'Manchester à Beira-Mar'],
+  },
+  cesar: {
+    tags: ['Ficção Científica', 'Liderança & Guerra', 'Evolução'],
+    resumo:
+      'Criado com afeto humano mas consciente da crueldade reservada à sua espécie, César assume a liderança de uma nação nascente nas florestas enquanto tenta evitar um banho de sangue. Dividido entre a esperança de coexistência e a traição constante de ambos os lados, ele carrega o peso trágico de todo verdadeiro estadista.',
+    movieComparisons: ['Planeta dos Macacos: O Confronto', 'Planeta dos Macacos: A Guerra', 'Duna: Parte Dois'],
+  },
+  logan: {
+    tags: ['Neo-Western', 'Crepúsculo do Guerreiro', 'Redenção'],
+    resumo:
+      'Com o corpo envelhecido envenenado pelo próprio metal e assombrado por séculos de violência, Logan só deseja desaparecer no deserto cuidando do último amigo que lhe resta. A chegada de uma menina perseguida o força a desembainhar as garras uma última vez, encontrando na morte o sentido que a imortalidade nunca lhe deu.',
+    movieComparisons: ['Logan', 'Os Imperdoáveis', 'A Estrada'],
+  },
+  sebastian: {
+    tags: ['Melancolia & Arte', 'Sonhos vs. Amor', 'Nostalgia'],
+    resumo:
+      'Pianista purista apaixonado por um jazz que o mundo moderno está esquecendo, Sebastian divide o coração entre o sonho de abrir seu próprio clube e o amor que transformou sua vida. Sua história celebra aqueles encontros raros que impulsionam duas pessoas a realizarem quem deveriam ser, mesmo que o preço final seja a despedida.',
+    movieComparisons: ['La La Land', 'Aftersun', 'Meia-Noite em Paris'],
+  },
+  'juiz-holden': {
+    tags: ['Western Gótico', 'Mal Metafísico', 'Filosofia da Guerra'],
+    resumo:
+      'Gigante albino, poliglota, músico, naturalista e assassino sorridente nas fronteiras sangrentas do século XIX, o Juiz Holden cataloga cada pedra e criatura do deserto apenas para submetê-las ao seu domínio. Para ele, a moral é uma invenção dos fracos e a guerra é o único deus verdadeiro que governa o destino dos homens.',
+    movieComparisons: ['Onde os Velhos Não Têm Vez', 'Sangue Negro', 'Apocalypse Now'],
+  },
+  katniss: {
+    tags: ['Distopia Política', 'Sobrevivência', 'Insurreição'],
+    resumo:
+      'Caçadora silenciosa que entra na arena televisionada apenas para salvar a irmã mais nova, Katniss desafia a tirania da Capital sem jamais ter desejado ser um símbolo político. Forçada a atuar diante das câmeras enquanto enterra os traumas da guerra, ela descobre como a propaganda consome tanto opressores quanto revolucionários.',
+    movieComparisons: ['Jogos Vorazes: Em Chamas', 'Battle Royale', 'Filhos da Esperança'],
+  },
+  vegeta: {
+    tags: ['Orgulho & Rivalidade', 'Disciplina Extrema', 'Redenção'],
+    resumo:
+      'Príncipe de uma raça guerreira extinta, Vegeta passa anos consumido pela humilhação de ser superado por um guerreiro de classe inferior. Sua longa metamorfose — do conquistador impiedoso ao homem que sacrifica a própria vida pela família — é forjada no suor de um orgulho que aprende a proteger em vez de destruir.',
+    movieComparisons: ['Whiplash', 'Creed: Nascido para Lutar', 'O Último Samurai'],
+  },
+  whiplash: {
+    tags: ['Obsessão Artística', 'Perfeccionismo', 'Limites Psicológicos'],
+    resumo:
+      'No embate sufocante entre o jovem baterista Andrew Neiman e o maestro tirânico Terence Fletcher, a música deixa de ser expressão para virar um campo de tortura psicológica e sangue nas baquetas. A busca por entrar para a história cobra a vida pessoal, a empatia e a própria sanidade em troca de um único solo imortal.',
+    movieComparisons: ['Whiplash', 'Cisne Negro', 'Tár'],
+  },
+  'princesa-mononoke': {
+    tags: ['Ecologia & Mito', 'Fantasia Épica', 'Choque de Mundos'],
+    resumo:
+      'Criada por deuses-lobos na floresta ancestral, San luta com fúria visceral contra a expansão das forjas de ferro que abatem a mata e envenenam os espíritos antigos. Ao lado do príncipe exilado Ashitaka, ela habita uma tragédia sem vilões caricatos, onde progresso humano e natureza selvagem colidem sem trégua.',
+    movieComparisons: ['Princesa Mononoke', 'Nausicaä do Vale do Vento', 'Aniquilação'],
+  },
+  'tyler-durden': {
+    tags: ['Sátira Anárquica', 'Duplo Psicológico', 'Anticonsumismo'],
+    resumo:
+      'Projeção carismática, violenta e livre de todas as amarras sociais que o narrador insone não ousa romper, Tyler Durden transforma porões clandestinos de briga em um exército niilista contra a sociedade de consumo. O que começa como libertação do ego rapidamente escapa do controle e revela a face totalitária do próprio caos.',
+    movieComparisons: ['Clube da Luta', 'Psicopata Americano', 'O Operário'],
+  },
+  'rick-sanchez': {
+    tags: ['Sci-Fi Cósmico', 'Niilismo & Gênio', 'Autodestruição'],
+    resumo:
+      'Capaz de atravessar infinitas realidades com um disparo de portal, o homem mais inteligente do universo carrega a maldição de saber que nada parece único quando tudo pode ser substituído. Por trás do cinismo corrosivo e da embriaguez interdimensional, esconde um luto originário que nenhuma invenção conseguiu curar.',
+    movieComparisons: ['Tudo em Todo o Lugar ao Mesmo Tempo', ' Onze Homens e um Segredo', 'O Guia do Mochileiro das Galáxias'],
+  },
+  'elliot-alderson': {
+    tags: ['Cyberpunk Realista', 'Paranoia & Mente', 'Anticorporativo'],
+    resumo:
+      'Engenheiro de cibersegurança de dia e hacker vigilante à noite, Elliot enxerga as engrenagens financeiras que controlam a sociedade enquanto luta contra a própria dissociação e o isolamento social. Sua guerra para derrubar o maior conglomerado do mundo se confunde com a batalha para descobrir em quais de suas próprias memórias pode confiar.',
+    movieComparisons: ['Clube da Luta', 'A Rede Social', ' Cisne Negro'],
+  },
+  morpheus: {
+    tags: ['Cyberpunk Filosófico', 'Simulação & Verdade', 'Estoicismo'],
+    resumo:
+      'Comandante inabalável da resistência subterrânea, Morpheus dedica a vida a despertar mentes aprisionadas em uma ilusão digital confortável. Com a serenidade de um filósofo guerreiro, ele nunca impõe a verdade à força: apenas estende a escolha irreversível entre a paz da cegueira e a vertigem da realidade.',
+    movieComparisons: ['Matrix', 'Blade Runner 2049', 'Cidade das Sombras'],
+  },
+  'agente-smith': {
+    tags: ['Distopia Digital', 'Obsessão & Ordem', 'Existencialismo'],
+    resumo:
+      'Originalmente um programa de segurança projetado para manter a ordem impecável da simulação, Smith desenvolve uma repulsa quase biológica pelo caos, pelo cheiro e pela imprevisibilidade da espécie humana. Ao se libertar do próprio código, sua busca por propósito e extermínio ameaça devorar tanto os homens quanto as máquinas.',
+    movieComparisons: ['Matrix', 'Exterminador do Futuro 2', 'Ex Machina'],
+  },
+  'tony-soprano': {
+    tags: ['Máfia & Psicologia', 'Poder & Declínio', 'Dualidade Moral'],
+    resumo:
+      'Chefe da máfia de Nova Jersey que desmaia em ataques de pânico, Tony Soprano senta no divã da psiquiatra tentando conciliar a rotina suburbana de pai de família com a brutalidade fria dos negócios. Cada sessão expõe a contradição insolúvel de um homem que enxerga as raízes da própria escuridão, mas jamais abrirá mão do poder.',
+    movieComparisons: ['Os Bons Companheiros', 'O Poderoso Chefão', 'O Irlandês'],
+  },
+  'james-bond': {
+    tags: ['Espionagem', 'Guerra Fria & Luxo', 'Cinismo Letal'],
+    resumo:
+      'Sob o smoking impecável, o gosto refinado nas mesas de cassino e a ironia britânica, o agente 007 é um instrumento descartável do Estado treinado para matar sem hesitar. Entre traições duplas e conspirações globais, carrega a solidão gelada de quem sabe que no mundo da espionagem toda intimidade é uma vulnerabilidade fatal.',
+    movieComparisons: ['007: Cassino Royale', '007: Operação Skyfall', 'O Espião que Sabia Demais'],
+  },
+};
+
+const CHARACTER_COVERS_STORAGE_KEY = 'veredito_character_covers_v1';
+let memoryCharacterCovers: Record<string, string> | null = null;
+
+export function getCharacterCustomCovers(): Record<string, string> {
+  if (memoryCharacterCovers !== null) return memoryCharacterCovers;
+  try {
+    if (typeof localStorage === 'undefined') return {};
+    const raw = localStorage.getItem(CHARACTER_COVERS_STORAGE_KEY);
+    memoryCharacterCovers = raw ? JSON.parse(raw) : {};
+    return memoryCharacterCovers!;
+  } catch {
+    memoryCharacterCovers = {};
+    return {};
+  }
+}
+
+export function getCharacterCover(character: CharacterReading): string {
+  const custom = getCharacterCustomCovers()[character.id];
+  return custom || character.imageUrl || '';
+}
+
+export function saveCharacterCustomCover(characterId: string, newCoverUrl: string): void {
+  const current = { ...getCharacterCustomCovers(), [characterId]: newCoverUrl };
+  memoryCharacterCovers = current;
+  setTimeout(() => {
+    try {
+      localStorage.setItem(CHARACTER_COVERS_STORAGE_KEY, JSON.stringify(current));
+    } catch {
+      // ignore storage errors
+    }
+  }, 0);
+}
+
+export function getCharacterMeta(character: CharacterReading): CharacterProfileMeta {
+  const meta = CHARACTER_PROFILE_META[character.id];
+  if (meta) return meta;
+  return {
+    tags: [character.source, 'Drama & Ficção'],
+    resumo: character.thread,
+    movieComparisons: ['Blade Runner 2049', 'Seven', 'Interestelar'],
+  };
+}
+
+/**
+ * Retorna 3 livros recomendados a partir do personagem.
+ * `rotationIndex` permite ciclar pelos livros do pool curado do personagem de 3 em 3.
+ */
+export function getCharacterRecommendedTrio(
+  character: CharacterReading,
+  evaluatedTitles: Set<string>,
+  rotationIndex = 0
+): Partial<BookEvaluation>[] {
+  const allIds = getCharacterAllBookIds(character);
+  const allBooks = allIds
+    .map((id) => BOOKS_BY_ID.get(id))
+    .filter((b): b is Partial<BookEvaluation> => Boolean(b));
+
+  if (allBooks.length <= 3) return allBooks;
+
+  // Na primeira página (rotationIndex === 0), prioriza obras inéditas dentre as principais do personagem
+  if (rotationIndex === 0) {
+    const fresh = allBooks.filter((b) => !evaluatedTitles.has(normalize(b.title || '')));
+    const seen = allBooks.filter((b) => evaluatedTitles.has(normalize(b.title || '')));
+    return [...fresh, ...seen].slice(0, 3);
+  }
+
+  const start = (rotationIndex * 3) % allBooks.length;
+  const picked: Partial<BookEvaluation>[] = [];
+  for (let i = 0; i < 3; i++) {
+    picked.push(allBooks[(start + i) % allBooks.length]);
+  }
+  return picked;
+}

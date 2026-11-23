@@ -1,15 +1,23 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import { BookOpen, ArrowLeft, ArrowUpDown, Check, Bookmark, Trash2, CheckSquare, X } from 'lucide-react';
+import { ArrowLeft, ArrowUpDown, Check, Bookmark, Trash2, CheckSquare, X } from 'lucide-react';
 import { BookEvaluation, UserRatingsMap } from '../../types';
+import {
+  CHARACTER_POOL,
+  CharacterReading,
+  getCharacterCover,
+} from '../../data/characterReadings';
 import { getEffectiveScore } from '../../services/ratings';
 import { useHorizontalDragScroll } from '../../hooks/useHorizontalDragScroll';
 import { BookShelf } from '../BookShelf';
+import { CharacterShelf } from '../CharacterShelf';
 import { BookCover } from '../BookCover';
 
 interface EstanteViewProps {
   books: BookEvaluation[];
   onSelectBook: (book: BookEvaluation) => void;
+  onSelectCharacter: (character: CharacterReading) => void;
+  characterCustomCovers?: Record<string, string>;
   savedBookIds?: Set<string>;
   userRatings?: UserRatingsMap;
   onBulkToggleSave?: (bookIds: string[], willBeSaved: boolean) => void;
@@ -20,6 +28,7 @@ type FilterOption =
   | 'all'
   | 'lidos'
   | 'salvos'
+  | 'personagens'
   | 'ouro-puro'
   | 'clima-pesado'
   | 'sem-enrolacao'
@@ -32,6 +41,7 @@ interface ShelfDefinition {
   title: string;
   chipLabel: string;
   books: BookEvaluation[];
+  characters?: CharacterReading[];
   covers?: string[];
 }
 
@@ -78,6 +88,8 @@ const PREFERRED_REPRESENTATIVES: Record<string, string[]> = {
 export const EstanteView: React.FC<EstanteViewProps> = React.memo(({
   books,
   onSelectBook,
+  onSelectCharacter,
+  characterCustomCovers,
   savedBookIds,
   userRatings,
   onBulkToggleSave,
@@ -214,9 +226,28 @@ export const EstanteView: React.FC<EstanteViewProps> = React.memo(({
       buckets[balanced[0].id].push(b);
     }
 
+    const charCover1 =
+      characterCustomCovers?.['viktor'] ||
+      CHARACTER_POOL.find((c) => c.id === 'viktor')?.imageUrl ||
+      CHARACTER_POOL[0]?.imageUrl ||
+      '';
+    const charCover2 =
+      characterCustomCovers?.['tyler-durden'] ||
+      CHARACTER_POOL.find((c) => c.id === 'tyler-durden')?.imageUrl ||
+      CHARACTER_POOL[1]?.imageUrl ||
+      '';
+
     return [
       ...(lidosBooks.length > 0 ? [{ id: 'lidos' as FilterOption, title: 'Lidos', chipLabel: 'Lidos', books: lidosBooks }] : []),
       ...(orderedSavedBooks.length > 0 ? [{ id: 'salvos' as FilterOption, title: 'Salvos', chipLabel: 'Salvos', books: orderedSavedBooks }] : []),
+      {
+        id: 'personagens' as FilterOption,
+        title: 'Personagens',
+        chipLabel: 'Personagens',
+        books: [],
+        characters: CHARACTER_POOL,
+        covers: [charCover1, charCover2].filter(Boolean),
+      },
       ...(buckets['ouro-puro'].length > 0 ? [{ id: 'ouro-puro' as FilterOption, title: 'Ouro Puro', chipLabel: 'Ouro Puro', books: buckets['ouro-puro'] }] : []),
       ...(buckets['clima-pesado'].length > 0 ? [{ id: 'clima-pesado' as FilterOption, title: 'Clima Pesado & Sombrio', chipLabel: 'Clima Pesado', books: buckets['clima-pesado'] }] : []),
       ...(buckets['sem-enrolacao'].length > 0 ? [{ id: 'sem-enrolacao' as FilterOption, title: 'Ritmo Forte & Sem Enrolação', chipLabel: 'Sem Enrolação', books: buckets['sem-enrolacao'] }] : []),
@@ -224,13 +255,16 @@ export const EstanteView: React.FC<EstanteViewProps> = React.memo(({
       ...(buckets['boas-apostas'].length > 0 ? [{ id: 'boas-apostas' as FilterOption, title: 'Boas Apostas & Ressalvas', chipLabel: 'Boas Apostas', books: buckets['boas-apostas'] }] : []),
       ...(buckets['passar-longe'].length > 0 ? [{ id: 'passar-longe' as FilterOption, title: 'Melhor Passar Longe', chipLabel: 'Passar Longe', books: buckets['passar-longe'] }] : []),
     ];
-  }, [books, savedBooks, userRatings]);
+  }, [books, savedBooks, userRatings, characterCustomCovers]);
 
   // Atribuição de duas capas representativas para cada filtro, sem repetição entre eles
   const shelvesWithCovers = useMemo(() => {
     const usedCoverUrls = new Set<string>();
 
     return allShelves.map((shelf) => {
+      if (shelf.covers && shelf.covers.length > 0) {
+        return shelf;
+      }
       const selectedCovers: string[] = [];
       const preferredIds = PREFERRED_REPRESENTATIVES[shelf.id] || [];
 
@@ -364,8 +398,9 @@ export const EstanteView: React.FC<EstanteViewProps> = React.memo(({
                         src={cover1}
                         alt=""
                         draggable={false}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover object-top"
                         loading="lazy"
+                        referrerPolicy="no-referrer"
                       />
                     </div>
                   )}
@@ -375,8 +410,9 @@ export const EstanteView: React.FC<EstanteViewProps> = React.memo(({
                         src={cover2}
                         alt=""
                         draggable={false}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover object-top"
                         loading="lazy"
+                        referrerPolicy="no-referrer"
                       />
                     </div>
                   )}
@@ -392,40 +428,90 @@ export const EstanteView: React.FC<EstanteViewProps> = React.memo(({
         </div>
       </div>
 
-      {/* Empty State when no books exist in DB */}
-      {books.length === 0 && (
-        <div className="py-20 text-center px-6 space-y-3">
-          <div className="w-12 h-12 mx-auto rounded-2xl bg-neutral-100 flex items-center justify-center text-[#86868b]">
-            <BookOpen className="w-6 h-6 stroke-[1.75]" />
-          </div>
-          <p className="text-sm font-semibold text-[#1d1d1f]">
-            Sua estante está vazia
-          </p>
-          <p className="text-xs text-[#86868b] max-w-xs mx-auto">
-            Avalie ou salve livros no Veredito para que suas prateleiras sejam organizadas automaticamente e sincronizadas com o banco.
-          </p>
-        </div>
-      )}
-
       {/* View All Shelves (Horizontal Carousels with Clickable Titles) - 2 columns on PC, single column on mobile */}
       {selectedFilter === 'all' && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 xl:gap-12 items-start pt-2 md:pt-4">
           {allShelves.map((shelf) => (
             <div key={shelf.id} className="min-w-0 w-full overflow-hidden">
-              <BookShelf
-                title={shelf.title}
-                books={shelf.books}
-                onSelectBook={onSelectBook}
-                onTitleClick={() => handleSelectShelf(shelf.id)}
-                userRatings={userRatings}
-              />
+              {shelf.id === 'personagens' && shelf.characters ? (
+                <CharacterShelf
+                  title={shelf.title}
+                  characters={shelf.characters}
+                  onSelectCharacter={onSelectCharacter}
+                  onTitleClick={() => handleSelectShelf(shelf.id)}
+                  customCovers={characterCustomCovers}
+                />
+              ) : (
+                <BookShelf
+                  title={shelf.title}
+                  books={shelf.books}
+                  onSelectBook={onSelectBook}
+                  onTitleClick={() => handleSelectShelf(shelf.id)}
+                  userRatings={userRatings}
+                />
+              )}
             </div>
           ))}
         </div>
       )}
 
-      {/* Single Shelf Opened as List/Grid View */}
-      {selectedFilter !== 'all' && activeShelf && (
+      {/* Single Character Shelf Opened as List/Grid View */}
+      {selectedFilter === 'personagens' && activeShelf && activeShelf.characters && (
+        <div className="space-y-6 pt-1 pb-24 md:pb-16">
+          <div className="flex items-center justify-between gap-2 flex-wrap">
+            <button
+              onClick={() => handleSelectShelf('all')}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-neutral-200/90 hover:border-neutral-300 text-xs font-semibold text-[#1d1d1f] hover:bg-neutral-50 active:scale-95 transition-all shadow-2xs cursor-pointer select-none"
+            >
+              <ArrowLeft className="w-3.5 h-3.5 text-[#86868b]" />
+              <span>Prateleiras</span>
+            </button>
+
+            <span className="text-xs font-semibold text-[#86868b] ml-1">
+              {activeShelf.characters.length}{' '}
+              {activeShelf.characters.length === 1 ? 'personagem' : 'personagens'}
+            </span>
+          </div>
+
+          <div>
+            <h2 className="text-lg sm:text-xl font-bold tracking-tight text-[#1d1d1f] font-sans">
+              {activeShelf.title}
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-7 2xl:grid-cols-8 gap-x-4 sm:gap-x-5 md:gap-x-6 lg:gap-x-6 xl:gap-x-7 gap-y-9 sm:gap-y-10 md:gap-y-12 lg:gap-y-14 xl:gap-y-16">
+            {activeShelf.characters.map((char) => {
+              const coverUrl = characterCustomCovers?.[char.id] || getCharacterCover(char);
+              return (
+                <div
+                  key={char.id}
+                  onClick={() => onSelectCharacter(char)}
+                  className="flex flex-col cursor-pointer group active:scale-[0.98] transition-transform duration-200 select-none"
+                >
+                  <div className="relative w-full mb-3 transition-all duration-200 group-hover:-translate-y-1.5">
+                    <BookCover
+                      title={char.name}
+                      author={char.source}
+                      coverUrl={coverUrl}
+                    />
+                  </div>
+                  <div className="space-y-0.5 px-0.5">
+                    <h4 className="text-xs sm:text-[13px] font-semibold text-[#1d1d1f] truncate group-hover:text-black leading-snug tracking-tight">
+                      {char.name}
+                    </h4>
+                    <p className="text-[11px] text-[#86868b] truncate font-normal">
+                      {char.source}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Single Book Shelf Opened as List/Grid View */}
+      {selectedFilter !== 'all' && selectedFilter !== 'personagens' && activeShelf && (
         <div className="space-y-6 pt-1 pb-24 md:pb-16">
           {/* Shelf Navigation and Controls Header */}
           <div className="flex items-center justify-between gap-2 flex-wrap">

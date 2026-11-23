@@ -63,10 +63,6 @@ const CURATED_POSTERS: Record<string, string> = {
   'o poderoso chefão': 'https://image.tmdb.org/t/p/w500/oJagOzBu9Rdd9FuSpCHGFUDha9d.jpg',
   'apocalypse now': 'https://image.tmdb.org/t/p/w500/gQB8Y5RCMkv2zwzFHbUJX3kAhvA.jpg',
   'chernobyl': 'https://image.tmdb.org/t/p/w500/hlLXt2tOPT6RRnjiUmoxyG1LTFi.jpg',
-  'aftersun': 'https://image.tmdb.org/t/p/w500/s67mZ9rLwz3fG3zY3gEwE30U3bW.jpg',
-  'manchester à beira-mar': 'https://image.tmdb.org/t/p/w500/g4b9P2zE55L14W8k3N1l2f4k5hZ.jpg',
-  'o farol': 'https://image.tmdb.org/t/p/w500/3U6F0G4Qd0G4aT9Tj7jB8bB7d7h.jpg',
-  'o labirinto do fauno': 'https://image.tmdb.org/t/p/w500/hQ7o1r5jLwD4K2jY8c7L3k5hF3.jpg',
 };
 
 // Normalize title for caching and matching

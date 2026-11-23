@@ -5,12 +5,20 @@ import { BookEvaluation, UserRatingsMap, UserRating } from './types';
 import { DiscoverView } from './components/views/DiscoverView';
 import { EstanteView } from './components/views/EstanteView';
 import { FichaModal } from './components/modals/FichaModal';
+import { CharacterModal } from './components/modals/CharacterModal';
 import { EvaluateModal } from './components/modals/EvaluateModal';
 import { ProfileModal } from './components/modals/ProfileModal';
 import { RateBookModal } from './components/modals/RateBookModal';
 import { BottomNavBar } from './components/ui/BottomNavBar';
 import { PearlButton } from './components/ui/PearlButton';
 import { VereditoGlassIntro } from './components/ui/liquid-glass-logo-reveal';
+import {
+  CHARACTER_POOL,
+  CharacterReading,
+  getCharacterCustomCovers,
+  saveCharacterCustomCover,
+  getCharacterCover,
+} from './data/characterReadings';
 import {
   fetchEvaluations,
   saveEvaluation,
@@ -34,6 +42,12 @@ export function App() {
   const [books, setBooks] = useState<BookEvaluation[]>(() => getLocalEvaluations());
   const [activeTab, setActiveTab] = useState<'discover' | 'shelves'>('discover');
   const [selectedBook, setSelectedBook] = useState<BookEvaluation | null>(null);
+  const [selectedCharacter, setSelectedCharacter] = useState<CharacterReading | null>(null);
+  const [characterCustomCovers, setCharacterCustomCovers] = useState<Record<string, string>>(() =>
+    getCharacterCustomCovers()
+  );
+  const [pendingBookToEvaluate, setPendingBookToEvaluate] =
+    useState<Partial<BookEvaluation> | null>(null);
   const [ratingBook, setRatingBook] = useState<BookEvaluation | null>(null);
   const [isEvaluateOpen, setIsEvaluateOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -67,6 +81,12 @@ export function App() {
         setUserRatings(loadedRatings);
       }
     });
+
+    // Pré-aquece as capas da estante de personagens em background sem competir com o carregamento inicial
+    prefetchBookCovers(
+      CHARACTER_POOL.map((c) => getCharacterCover(c)),
+      false
+    );
 
     return () => {
       isMounted = false;
@@ -337,8 +357,12 @@ export function App() {
 
   // Callbacks estáveis: preservam o React.memo das views (evita re-render de todas as capas)
   const openEvaluate = useCallback(() => setIsEvaluateOpen(true), []);
-  const closeEvaluate = useCallback(() => setIsEvaluateOpen(false), []);
+  const closeEvaluate = useCallback(() => {
+    setIsEvaluateOpen(false);
+    setPendingBookToEvaluate(null);
+  }, []);
   const closeFicha = useCallback(() => setSelectedBook(null), []);
+  const closeCharacterModal = useCallback(() => setSelectedCharacter(null), []);
   const closeRating = useCallback(() => setRatingBook(null), []);
   const closeProfile = useCallback(() => setIsProfileOpen(false), []);
   const openBookFromEvaluate = useCallback((book: BookEvaluation) => {
@@ -349,12 +373,32 @@ export function App() {
     setSelectedBook(null);
     setIsEvaluateOpen(true);
   }, []);
+  const handleSelectEvaluatedBookFromCharacter = useCallback((book: BookEvaluation) => {
+    setSelectedCharacter(null);
+    setSelectedBook(book);
+  }, []);
+  const handleEvaluateRecommendedBookFromCharacter = useCallback(
+    (rawBook: Partial<BookEvaluation>) => {
+      setSelectedCharacter(null);
+      setPendingBookToEvaluate(rawBook);
+      setIsEvaluateOpen(true);
+    },
+    []
+  );
+  const handleClearPendingBook = useCallback(() => {
+    setPendingBookToEvaluate(null);
+  }, []);
+  const handleUpdateCharacterCover = useCallback((characterId: string, newCoverUrl: string) => {
+    saveCharacterCustomCover(characterId, newCoverUrl);
+    setCharacterCustomCovers((prev) => ({ ...prev, [characterId]: newCoverUrl }));
+  }, []);
 
   // Shelves display only real books synchronized with the Supabase database
   const allShelfBooks = books;
   const isDiscoverActive =
     activeTab === 'discover' &&
     !selectedBook &&
+    !selectedCharacter &&
     !isEvaluateOpen &&
     !ratingBook &&
     !isProfileOpen;
@@ -366,7 +410,7 @@ export function App() {
 
       {/* Mobile-first frame on phone, seamless edge-to-edge canvas on desktop */}
       <div className="w-full max-w-md sm:max-w-xl md:max-w-none min-h-screen flex flex-col bg-white border-x border-neutral-200/80 md:border-none shadow-[0_0_40px_rgba(0,0,0,0.04)] md:shadow-none relative pb-24 md:pb-20">
-        
+
         {/* Mobile Header */}
         <header className="px-6 pt-7 pb-2 text-center select-none md:hidden">
           <img
@@ -410,14 +454,12 @@ export function App() {
                   />
                 )}
                 <span
-                  className={`relative z-10 flex items-center gap-2 transition-colors duration-200 ${
-                    activeTab === 'discover' ? 'text-[#1d1d1f]' : 'text-[#86868b] hover:text-[#1d1d1f]'
-                  }`}
+                  className={`relative z-10 flex items-center gap-2 transition-colors duration-200 ${activeTab === 'discover' ? 'text-[#1d1d1f]' : 'text-[#86868b] hover:text-[#1d1d1f]'
+                    }`}
                 >
                   <svg
-                    className={`w-4 h-4 transition-colors duration-200 ${
-                      activeTab === 'discover' ? 'text-[#000000]' : 'text-[#86868b]'
-                    }`}
+                    className={`w-4 h-4 transition-colors duration-200 ${activeTab === 'discover' ? 'text-[#000000]' : 'text-[#86868b]'
+                      }`}
                     viewBox="0 0 24 24"
                     fill="currentColor"
                   >
@@ -439,14 +481,12 @@ export function App() {
                   />
                 )}
                 <span
-                  className={`relative z-10 flex items-center gap-2 transition-colors duration-200 ${
-                    activeTab === 'shelves' ? 'text-[#1d1d1f]' : 'text-[#86868b] hover:text-[#1d1d1f]'
-                  }`}
+                  className={`relative z-10 flex items-center gap-2 transition-colors duration-200 ${activeTab === 'shelves' ? 'text-[#1d1d1f]' : 'text-[#86868b] hover:text-[#1d1d1f]'
+                    }`}
                 >
                   <svg
-                    className={`w-4 h-4 transition-colors duration-200 ${
-                      activeTab === 'shelves' ? 'text-[#000000]' : 'text-[#86868b]'
-                    }`}
+                    className={`w-4 h-4 transition-colors duration-200 ${activeTab === 'shelves' ? 'text-[#000000]' : 'text-[#86868b]'
+                      }`}
                     viewBox="0 0 24 24"
                     fill="currentColor"
                   >
@@ -499,6 +539,8 @@ export function App() {
             <EstanteView
               books={allShelfBooks}
               onSelectBook={setSelectedBook}
+              onSelectCharacter={setSelectedCharacter}
+              characterCustomCovers={characterCustomCovers}
               savedBookIds={savedBookIds}
               userRatings={userRatings}
               onBulkToggleSave={handleBulkToggleSave}
@@ -573,6 +615,23 @@ export function App() {
           )}
         </AnimatePresence>
 
+        {/* Ficha de Personagem Modal */}
+        <AnimatePresence>
+          {selectedCharacter && (
+            <CharacterModal
+              key={selectedCharacter.id}
+              character={selectedCharacter}
+              onClose={closeCharacterModal}
+              existingBooks={books}
+              userRatings={userRatings}
+              onSelectEvaluatedBook={handleSelectEvaluatedBookFromCharacter}
+              onEvaluateRecommendedBook={handleEvaluateRecommendedBookFromCharacter}
+              customCoverUrl={characterCustomCovers[selectedCharacter.id]}
+              onUpdateCharacterCover={handleUpdateCharacterCover}
+            />
+          )}
+        </AnimatePresence>
+
         {/* Evaluator Engine Search & Bulk Modal */}
         <AnimatePresence>
           {isEvaluateOpen && (
@@ -583,6 +642,8 @@ export function App() {
               onBulkEvaluated={handleBulkEvaluated}
               existingBooks={books}
               onOpenBook={openBookFromEvaluate}
+              initialBookToEvaluate={pendingBookToEvaluate}
+              onClearInitialBook={handleClearPendingBook}
             />
           )}
         </AnimatePresence>

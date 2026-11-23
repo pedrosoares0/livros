@@ -108,6 +108,7 @@ export const BookCover: React.FC<BookCoverProps> = React.memo(({
               }`}
               loading="lazy"
               decoding="async"
+              referrerPolicy="no-referrer"
             />
           ) : (
             <div className="w-full h-full flex flex-col bg-[#fafafa]">

@@ -20,6 +20,8 @@ interface EvaluateModalProps {
   onBulkEvaluated?: (books: BookEvaluation[]) => void;
   existingBooks?: BookEvaluation[];
   onOpenBook?: (book: BookEvaluation) => void;
+  initialBookToEvaluate?: Partial<BookEvaluation> | null;
+  onClearInitialBook?: () => void;
 }
 
 const EVALUATION_STAGES = [
@@ -260,6 +262,8 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
   onBookEvaluated,
   existingBooks = [],
   onOpenBook,
+  initialBookToEvaluate,
+  onClearInitialBook,
 }) => {
   const [query, setQuery] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -401,6 +405,17 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
       document.body.style.overflow = originalOverflow;
     };
   }, []);
+
+  // Auto-evaluate when opened with a recommended book from CharacterModal
+  const triggeredInitialRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!isOpen || !initialBookToEvaluate || !initialBookToEvaluate.title) return;
+    const key = initialBookToEvaluate.id || initialBookToEvaluate.title;
+    if (triggeredInitialRef.current === key) return;
+    triggeredInitialRef.current = key;
+    onClearInitialBook?.();
+    handleRequestEvaluation(initialBookToEvaluate);
+  });
 
   if (!isOpen) return null;
 
