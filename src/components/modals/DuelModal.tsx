@@ -34,7 +34,7 @@ interface DuelModalProps {
   onChangeDuelBooks?: (nextBooks: BookEvaluation[]) => void;
 }
 
-const INTRO_DURATION_MS = 1050;
+const INTRO_DURATION_MS = 2000;
 
 export const DuelModal: React.FC<DuelModalProps> = ({
   books,
@@ -50,7 +50,7 @@ export const DuelModal: React.FC<DuelModalProps> = ({
     [books]
   );
 
-  // Controla o estágio de loading/introdução de ~1 segundo antes de revelar o comparativo
+  // Controla o estágio de loading/introdução de 2 segundos antes de revelar o comparativo
   const [settledKey, setSettledKey] = useState<string>('');
   const isIntroLoading = settledKey !== booksKey;
 
@@ -198,7 +198,7 @@ export const DuelModal: React.FC<DuelModalProps> = ({
         className="absolute inset-0 bg-black/45 backdrop-blur-sm z-10 cursor-pointer"
       />
 
-      {/* Modal Container — Transiciona suavemente de tamanho entre o loading de 1s e a ficha comparativa */}
+      {/* Modal Container — Transiciona suavemente de tamanho entre o loading de 2s e a ficha comparativa */}
       <motion.div
         initial={{ opacity: 0, scale: 0.94, y: 24 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -216,7 +216,7 @@ export const DuelModal: React.FC<DuelModalProps> = ({
         } max-h-[92vh] sm:max-h-[88vh] bg-[#ffffff] border border-black/[0.08] rounded-t-3xl sm:rounded-3xl shadow-[0_25px_65px_-15px_rgba(0,0,0,0.25)] flex flex-col overflow-hidden text-[#1d1d1f] z-20 will-change-transform transition-[max-width] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]`}
       >
         {/* iOS Handle Indicator on mobile */}
-        <div className="w-10 h-1 bg-neutral-300 rounded-full mx-auto mt-2.5 sm:hidden shrink-0" />
+        <div className="w-10 h-1 bg-neutral-300 rounded-full mx-auto mt-2 sm:hidden shrink-0" />
 
         {/* Copy Confirmation Toast */}
         <AnimatePresence>
@@ -234,49 +234,47 @@ export const DuelModal: React.FC<DuelModalProps> = ({
           )}
         </AnimatePresence>
 
-        {/* Minimalist Top Action Bar */}
-        <div className="flex items-center justify-end px-6 pt-2.5 pb-1 md:pt-2.5 md:pb-1 bg-[#ffffff]/90 backdrop-blur-lg sticky top-0 z-20">
-          <div className="flex items-center gap-1.5">
-            {!isIntroLoading && (
-              <motion.button
-                initial={{ opacity: 0, scale: 0.85 }}
-                animate={{ opacity: 1, scale: 1 }}
-                whileHover={{ scale: 1.08 }}
-                whileTap={{ scale: 0.92 }}
-                onClick={copyDuelToClipboard}
-                title="Copiar Comparativo"
-                className="p-2 rounded-full hover:bg-neutral-100 text-[#86868b] hover:text-[#1d1d1f] transition-colors cursor-pointer"
-              >
-                <Share2 className="w-4 h-4" />
-              </motion.button>
-            )}
+        {/* Floating Corner Controls — sem barra branca larga para nunca cortar a sombra superior da capa */}
+        <div className="absolute top-2.5 right-3.5 sm:top-3 sm:right-5 z-30 flex items-center gap-1">
+          {!isIntroLoading && (
             <motion.button
+              initial={{ opacity: 0, scale: 0.85 }}
+              animate={{ opacity: 1, scale: 1 }}
               whileHover={{ scale: 1.08 }}
               whileTap={{ scale: 0.92 }}
-              onClick={onClose}
-              aria-label="Fechar"
-              className="p-2 rounded-full hover:bg-neutral-100 text-[#86868b] hover:text-[#1d1d1f] transition-colors cursor-pointer"
+              onClick={copyDuelToClipboard}
+              title="Copiar Comparativo"
+              className="p-2 rounded-full bg-white/80 backdrop-blur-md hover:bg-neutral-100 text-[#86868b] hover:text-[#1d1d1f] transition-colors cursor-pointer"
             >
-              <X className="w-5 h-5" />
+              <Share2 className="w-4 h-4" />
             </motion.button>
-          </div>
+          )}
+          <motion.button
+            whileHover={{ scale: 1.08 }}
+            whileTap={{ scale: 0.92 }}
+            onClick={onClose}
+            aria-label="Fechar"
+            className="p-2 rounded-full bg-white/80 backdrop-blur-md hover:bg-neutral-100 text-[#86868b] hover:text-[#1d1d1f] transition-colors cursor-pointer"
+          >
+            <X className="w-5 h-5" />
+          </motion.button>
         </div>
 
-        {/* Main Content with 1-Second Editorial Intro Stage */}
-        <div className="overflow-y-auto px-5 sm:px-6 md:px-8 py-3 sm:py-4 md:pt-1 md:pb-6 hide-scrollbar flex-1">
+        {/* Main Content with 2-Second Editorial Intro Stage & Generous Top Headroom for Cover Glow */}
+        <div className="overflow-y-auto px-5 sm:px-6 md:px-8 pt-6 pb-5 sm:pt-7 sm:pb-6 md:pt-7 md:pb-7 hide-scrollbar flex-1">
           <AnimatePresence mode="wait" initial={false}>
             {isIntroLoading ? (
-              /* Estágio de Loading de 1 Segundo — Sofisticado, estilo Apple/EvaluateModal */
+              /* Estágio de Loading de 2 Segundos — Sofisticado, estilo Apple/EvaluateModal */
               <motion.div
                 key="duel-intro-loading"
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.97, filter: 'blur(3px)' }}
                 transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
-                className="py-8 sm:py-10 flex flex-col items-center justify-center text-center space-y-6 select-none"
+                className="py-7 sm:py-9 flex flex-col items-center justify-center text-center space-y-6 select-none"
               >
-                {/* Capas lado a lado parelhas durante a calibragem de 1s */}
-                <div className="flex items-center justify-center gap-4 sm:gap-6">
+                {/* Capas lado a lado parelhas durante a calibragem de 2s */}
+                <div className="flex items-center justify-center gap-5 sm:gap-7 pt-2">
                   {books.map((book, idx) => (
                     <motion.div
                       key={`intro-${book.id}`}
@@ -294,16 +292,16 @@ export const DuelModal: React.FC<DuelModalProps> = ({
                         type: 'spring',
                         stiffness: 320,
                         damping: 26,
-                        delay: idx * 0.06,
+                        delay: idx * 0.07,
                       }}
                       className="relative w-24 sm:w-28 md:w-32"
                     >
                       {book.coverUrl && (
                         <div
                           aria-hidden="true"
-                          className="absolute -inset-1.5 rounded-2xl overflow-hidden pointer-events-none -z-10 opacity-45"
+                          className="absolute -inset-2 rounded-2xl overflow-hidden pointer-events-none -z-10 opacity-45"
                           style={{
-                            transform: 'translate3d(0, 8px, 0)',
+                            transform: 'translate3d(0, 6px, 0)',
                             filter: 'blur(16px) saturate(1.25)',
                           }}
                         >
@@ -328,7 +326,7 @@ export const DuelModal: React.FC<DuelModalProps> = ({
                   ))}
                 </div>
 
-                {/* Tipografia Shimmer Minimalista + Barra Hairline de 1s */}
+                {/* Tipografia Shimmer Minimalista + Barra Hairline de 2s */}
                 <div className="space-y-2.5 flex flex-col items-center">
                   <p className="text-base sm:text-lg font-semibold tracking-[-0.02em] step-text-shimmer">
                     Cruzando telemetria e perfil
@@ -340,7 +338,7 @@ export const DuelModal: React.FC<DuelModalProps> = ({
                   <div className="w-36 sm:w-44 h-[2px] rounded-full bg-black/[0.07] overflow-hidden mt-1">
                     <motion.div
                       className="h-full bg-[#1d1d1f] rounded-full origin-left"
-                      initial={{ scaleX: 0.1 }}
+                      initial={{ scaleX: 0.08 }}
                       animate={{ scaleX: 1 }}
                       transition={{
                         duration: INTRO_DURATION_MS / 1000,
@@ -362,25 +360,24 @@ export const DuelModal: React.FC<DuelModalProps> = ({
                 {/* Left Area: Side-by-side row on Mobile (< md), Single Vertical Column on Desktop (md:) */}
                 <div className="w-full md:col-span-4 lg:col-span-3">
                   <div
-                    className={`w-full py-1 ${
+                    className={`w-full pt-3 pb-1 ${
                       books.length === 3
                         ? 'grid grid-cols-3 gap-2.5 items-center'
                         : 'grid grid-cols-2 gap-4 items-center'
-                    } md:flex md:flex-col md:items-center md:justify-center md:space-y-4`}
+                    } md:flex md:flex-col md:items-center md:justify-center md:space-y-5`}
                   >
                     {orderedBooks.map((book, idx) => {
                       const isWinner = book.id === winnerBook?.id;
                       const effectiveScore = getEffectiveScore(book, userRatings);
                       const isUserRated = Boolean(userRatings?.[book.id]);
 
-                      // Mobile: lado a lado ocupando a coluna do grid; Desktop: larguras diferenciadas na coluna única
                       const coverWidthClass = isWinner
                         ? books.length === 3
                           ? 'w-full max-w-[105px] sm:max-w-[125px] md:w-32'
-                          : 'w-full max-w-[138px] sm:max-w-[155px] md:w-38'
+                          : 'w-full max-w-[136px] sm:max-w-[152px] md:w-38'
                         : books.length === 3
-                          ? 'w-full max-w-[92px] sm:max-w-[110px] md:w-22'
-                          : 'w-full max-w-[116px] sm:max-w-[132px] md:w-28';
+                          ? 'w-full max-w-[90px] sm:max-w-[108px] md:w-22'
+                          : 'w-full max-w-[114px] sm:max-w-[130px] md:w-28';
 
                       return (
                         <motion.div
@@ -410,18 +407,18 @@ export const DuelModal: React.FC<DuelModalProps> = ({
                           }`}
                           title={`Abrir ficha de ${book.title}`}
                         >
-                          <div className={`relative ${coverWidthClass} mx-auto mb-2`}>
-                            {/* Soft ambient cover glow behind the winning book */}
+                          <div className={`relative ${coverWidthClass} mx-auto mb-2.5`}>
+                            {/* Soft ambient cover glow behind the winning book — centralizado para nunca cortar no topo */}
                             {isWinner && book.coverUrl && (
                               <motion.div
                                 aria-hidden="true"
                                 initial={{ opacity: 0, scale: 0.9 }}
-                                animate={{ opacity: 0.6, scale: 1.05 }}
+                                animate={{ opacity: 0.58, scale: 1.04 }}
                                 transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-                                className="absolute -inset-2 rounded-2xl overflow-hidden pointer-events-none -z-10"
+                                className="absolute -inset-2.5 rounded-2xl overflow-hidden pointer-events-none -z-10"
                                 style={{
-                                  transform: 'translate3d(0, 8px, 0)',
-                                  filter: 'blur(18px) saturate(1.35)',
+                                  transform: 'translate3d(0, 4px, 0)',
+                                  filter: 'blur(16px) saturate(1.35)',
                                 }}
                               >
                                 <img
@@ -487,7 +484,7 @@ export const DuelModal: React.FC<DuelModalProps> = ({
                     </h2>
                   </motion.div>
 
-                  {/* 2. Veredito Comparativo Banner + Tactile Black CTA Pill */}
+                  {/* 2. Veredito Comparativo Banner + Botão na Cor da Capa do Livro Vencedor (100% GPU, 0ms CPU) */}
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -507,13 +504,31 @@ export const DuelModal: React.FC<DuelModalProps> = ({
                       <button
                         type="button"
                         onClick={() => winnerBook && onSelectBook(winnerBook)}
-                        className="group/cta inline-flex items-center gap-2 pl-3.5 pr-2.5 py-1.5 rounded-full bg-gradient-to-b from-[#2e2e33] via-[#1d1d1f] to-[#121214] hover:from-[#3a3a40] hover:to-[#1d1d1f] text-white font-bold text-[11px] tracking-tight border border-black/80 shadow-[0_6px_16px_rgba(0,0,0,0.18),0_1px_3px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.22)] transition-all cursor-pointer active:scale-95 select-none"
+                        className="group/cta relative isolate inline-flex items-center gap-2 pl-3.5 pr-2.5 py-1.5 rounded-full bg-[#1d1d1f] text-white font-bold text-[11px] tracking-tight border border-black/25 shadow-[0_6px_16px_rgba(0,0,0,0.18),0_1px_3px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.28)] overflow-hidden transition-transform cursor-pointer active:scale-95 select-none"
                         title={`Abrir ficha de ${winnerBook?.title}`}
                       >
-                        <span className="truncate max-w-[190px]">
+                        {/* Camada GPU que extrai a paleta cromática da capa do livro vencedor sem custo de canvas/JS */}
+                        {winnerBook?.coverUrl && (
+                          <img
+                            src={winnerBook.coverUrl}
+                            alt=""
+                            aria-hidden="true"
+                            loading="eager"
+                            decoding="async"
+                            referrerPolicy="no-referrer"
+                            className="absolute inset-0 w-full h-full object-cover scale-[2.4] blur-xl saturate-[2.1] brightness-[0.58] contrast-[1.15] pointer-events-none -z-10 transition-transform duration-300 group-hover/cta:scale-[2.6] group-hover/cta:brightness-[0.65]"
+                          />
+                        )}
+                        {/* Véu de contraste e reflexo vítreo superior para garantir leitura perfeita em qualquer capa */}
+                        <span
+                          aria-hidden="true"
+                          className="absolute inset-0 bg-gradient-to-b from-white/12 via-black/22 to-black/45 pointer-events-none -z-10"
+                        />
+
+                        <span className="relative z-10 truncate max-w-[190px] drop-shadow-[0_1px_1.5px_rgba(0,0,0,0.45)]">
                           Comece por {winnerBook?.title}
                         </span>
-                        <span className="w-4.5 h-4.5 rounded-full bg-white/15 group-hover/cta:bg-white/25 flex items-center justify-center transition-colors">
+                        <span className="relative z-10 w-4.5 h-4.5 rounded-full bg-white/20 group-hover/cta:bg-white/30 flex items-center justify-center transition-colors backdrop-blur-2xs">
                           <ArrowUpRight className="w-3 h-3 text-white stroke-[2.5]" />
                         </span>
                       </button>
