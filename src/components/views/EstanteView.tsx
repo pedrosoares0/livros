@@ -227,13 +227,13 @@ export const EstanteView: React.FC<EstanteViewProps> = React.memo(({
     }
 
     const charCover1 =
-      characterCustomCovers?.['viktor'] ||
-      CHARACTER_POOL.find((c) => c.id === 'viktor')?.imageUrl ||
+      characterCustomCovers?.['tony-stark'] ||
+      CHARACTER_POOL.find((c) => c.id === 'tony-stark')?.imageUrl ||
       CHARACTER_POOL[0]?.imageUrl ||
       '';
     const charCover2 =
-      characterCustomCovers?.['tyler-durden'] ||
-      CHARACTER_POOL.find((c) => c.id === 'tyler-durden')?.imageUrl ||
+      characterCustomCovers?.['cooper'] ||
+      CHARACTER_POOL.find((c) => c.id === 'cooper')?.imageUrl ||
       CHARACTER_POOL[1]?.imageUrl ||
       '';
 

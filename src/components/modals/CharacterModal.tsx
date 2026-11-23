@@ -10,6 +10,7 @@ import {
   Image as ImageIcon,
   RefreshCw,
   ArrowUpRight,
+  Feather,
 } from 'lucide-react';
 import { BookEvaluation, UserRatingsMap } from '../../types';
 import {
@@ -22,8 +23,6 @@ import {
 import { prefetchBookCovers } from '../../services/imagePrefetch';
 import { BookCover } from '../BookCover';
 import { MovieThumb } from '../MovieThumb';
-import { CopyButton } from '../ui/CopyButton';
-import { PearlButton } from '../ui/PearlButton';
 
 interface CharacterModalProps {
   character: CharacterReading | null;
@@ -153,12 +152,18 @@ export const CharacterModal: React.FC<CharacterModalProps> = ({
     const booksList = recommendedBooks
       .map((b, i) => `${i + 1}. ${b.title} (${b.author})`)
       .join('\n');
+    const thinkersList = meta.thinkers
+      .map((t) => `• ${t.name}: ${t.note}`)
+      .join('\n');
     return `🎭 VEREDITO — Ficha de Personagem
 👤 Personagem: ${character.name} (${character.source})
 💡 Fio Dramático: "${character.thread}"
 
 📝 Sobre o Personagem:
 ${meta.resumo}
+
+🏛️ Filósofos & Pensadores:
+${thinkersList}
 
 🎬 Filmes na Mesma Pegada: ${meta.movieComparisons.slice(0, 3).join(' • ')}
 
@@ -366,17 +371,41 @@ ${booksList}`;
                 </div>
               </div>
 
-              {/* Leve Resumo sobre o Personagem + Filmes Relacionados / Mesma Pegada (lado a lado no PC) */}
+              {/* Leve Resumo sobre o Personagem + Filósofos + Filmes Relacionados / Mesma Pegada (lado a lado no PC) */}
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-stretch">
-                {/* Sobre o Personagem */}
+                {/* Sobre o Personagem + Filósofos & Pensadores */}
                 <div className="flex flex-col space-y-1.5 lg:col-span-7">
                   <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#86868b]">
                     <User className="w-3.5 h-3.5 text-[#1d1d1f]" />
                     <span>Sobre o Personagem</span>
                   </div>
-                  <p className="flex-1 text-xs sm:text-sm text-[#1d1d1f] leading-relaxed bg-neutral-50 p-3.5 rounded-xl border border-neutral-200/70">
-                    {meta.resumo}
-                  </p>
+                  <div className="flex-1 flex flex-col justify-between bg-neutral-50 p-3.5 rounded-xl border border-neutral-200/70 space-y-3">
+                    <p className="text-xs sm:text-sm text-[#1d1d1f] leading-relaxed">
+                      {meta.resumo}
+                    </p>
+
+                    {meta.thinkers && meta.thinkers.length > 0 && (
+                      <div className="pt-2.5 border-t border-neutral-200/80 space-y-1.5">
+                        <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-[#86868b]">
+                          <Feather className="w-3 h-3 text-[#1d1d1f]" />
+                          <span>Filósofos & Pensadores em Sintonia</span>
+                        </div>
+                        <div className="space-y-1.5">
+                          {meta.thinkers.map((thinker, idx) => (
+                            <div
+                              key={idx}
+                              className="text-[11px] sm:text-xs leading-snug text-[#515154]"
+                            >
+                              <span className="font-bold text-[#1d1d1f] bg-white px-2 py-0.5 rounded-md border border-neutral-200/90 shadow-3xs mr-1.5 inline-block">
+                                {thinker.name}
+                              </span>
+                              <span>{thinker.note}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 {/* Filmes Relacionados ou com a Mesma Pegada */}
@@ -506,28 +535,6 @@ ${booksList}`;
                 </AnimatePresence>
               </div>
             </div>
-          </div>
-        </div>
-
-        {/* Footer Actions — Centered Action Bar matching FichaModal */}
-        <div className="p-3.5 sm:p-4 md:py-3 md:px-8 border-t border-black/[0.06] bg-[#ffffff] flex items-center justify-center">
-          <div className="flex items-center justify-center gap-2 flex-wrap sm:flex-nowrap">
-            <PearlButton
-              size="nav-rect"
-              label="Trocar livros"
-              onClick={handleRotateBooks}
-              title="Sortear outros 3 livros recomendados deste personagem"
-              className="shrink-0"
-            />
-
-            <CopyButton
-              variant="secondary"
-              size="md"
-              text={generateCharacterFichaText}
-              showLabel={false}
-              aria-label="Copiar ficha do personagem"
-              className="shrink-0 px-3.5"
-            />
           </div>
         </div>
       </motion.div>

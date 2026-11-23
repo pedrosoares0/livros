@@ -2386,6 +2386,106 @@ export interface CharacterReading {
 
 export const CHARACTER_POOL: CharacterReading[] = [
   {
+    id: 'tony-stark',
+    name: 'Tony Stark',
+    source: 'Marvel',
+    imageUrl: 'https://i.pinimg.com/736x/66/02/5e/66025ead21fc4079459acf4b361864c3.jpg',
+    thread: 'Engenheiros assombrados pelo futuro que usam o intelecto como armadura.',
+    bookIds: [
+      'br-perdido-em-marte',
+      'br-devoradores-estrelas',
+      'br-eu-robo',
+      'br-fundacao',
+      'br-watchmen',
+      'br-recursao',
+      'br-2001-odisseia',
+      'br-floresta-sombria',
+      'br-fundacao-imperio',
+      'br-segunda-fundacao',
+      'br-proprios-deuses',
+      'br-fim-da-morte',
+      'br-jogo-exterminador',
+      'br-robos-alvorada',
+      'br-tres-corpos',
+      'br-materia-escura',
+    ],
+  },
+  {
+    id: 'cooper',
+    name: 'Cooper',
+    source: 'Interestelar',
+    imageUrl: 'https://i.pinimg.com/1200x/03/6f/50/036f50531444a35c03d238f6e7dcd967.jpg',
+    thread: 'Pilotos e pais que atravessam o horizonte de eventos para cumprir a promessa de voltar.',
+    bookIds: [
+      'br-devoradores-estrelas',
+      'br-perdido-em-marte',
+      'br-2001-odisseia',
+      'br-contato',
+      'br-encontro-rama',
+      'br-fim-eternidade',
+      'br-a-estrada',
+      'br-materia-escura',
+      'br-odisseia',
+      'br-fim-da-morte',
+      'br-solaris',
+      'br-recursao',
+      'br-orador-mortos',
+      'br-novembro-63',
+      'br-maquina-do-tempo',
+      'br-guerra-velho',
+    ],
+  },
+  {
+    id: 'abby-anderson',
+    name: 'Abby Anderson',
+    source: 'The Last of Us',
+    imageUrl: 'https://i.pinimg.com/736x/13/b6/07/13b607445fc7642065b527360f9ca34e.jpg',
+    thread: 'Soldados que descobrem o vazio da vingança consumada e buscam redenção no inimigo.',
+    bookIds: [
+      'br-cidade-ladroes',
+      'br-conde-monte-cristo',
+      'br-a-estrada',
+      'br-onde-os-velhos',
+      'br-eu-sou-a-lenda',
+      'br-ensaio-cegueira',
+      'br-iliada',
+      'br-crime-e-castigo',
+      'br-nada-novo-front',
+      'br-tormenta-espadas',
+      'br-guerra-e-paz',
+      'br-caminho-reis',
+      'br-orador-mortos',
+      'br-estacao-onze',
+      'br-a-danca-da-morte',
+      'br-grande-sertao',
+    ],
+  },
+  {
+    id: 'bruce-wayne',
+    name: 'Bruce Wayne',
+    source: 'Batman',
+    imageUrl: 'https://i.pinimg.com/1200x/74/8c/50/748c508529c0d8b8ef76ed9341488ce1.jpg',
+    thread: 'Detetives noturnos moldados pelo trauma que transformam o medo em método.',
+    bookIds: [
+      'br-watchmen',
+      'br-silencio-inocentes',
+      'br-conde-monte-cristo',
+      'br-medico-e-monstro',
+      'br-e-nao-sobrou-nenhum',
+      'br-estudo-vermelho',
+      'br-cao-baskerville',
+      'br-nome-da-rosa',
+      'br-ano-um',
+      'br-piada-mortal',
+      'br-dragao-vermelho',
+      'br-outsider',
+      'br-v-de-vinganca',
+      'br-carbono-alterado',
+      'br-meditacoes',
+      'br-crime-e-castigo',
+    ],
+  },
+  {
     id: 'ultron',
     name: 'Ultron',
     source: 'Marvel',
@@ -2536,31 +2636,6 @@ export const CHARACTER_POOL: CharacterReading[] = [
     ],
   },
   {
-    id: 'tony-stark',
-    name: 'Tony Stark',
-    source: 'Marvel',
-    imageUrl: 'https://i.pinimg.com/736x/66/02/5e/66025ead21fc4079459acf4b361864c3.jpg',
-    thread: 'Engenheiros assombrados pelo futuro que usam o intelecto como armadura.',
-    bookIds: [
-      'br-perdido-em-marte',
-      'br-devoradores-estrelas',
-      'br-eu-robo',
-      'br-fundacao',
-      'br-watchmen',
-      'br-recursao',
-      'br-2001-odisseia',
-      'br-floresta-sombria',
-      'br-fundacao-imperio',
-      'br-segunda-fundacao',
-      'br-proprios-deuses',
-      'br-fim-da-morte',
-      'br-jogo-exterminador',
-      'br-robos-alvorada',
-      'br-tres-corpos',
-      'br-materia-escura',
-    ],
-  },
-  {
     id: 'visao',
     name: 'Visão',
     source: 'Marvel',
@@ -2661,31 +2736,6 @@ export const CHARACTER_POOL: CharacterReading[] = [
     ],
   },
   {
-    id: 'bruce-wayne',
-    name: 'Bruce Wayne',
-    source: 'Batman',
-    imageUrl: 'https://i.pinimg.com/1200x/74/8c/50/748c508529c0d8b8ef76ed9341488ce1.jpg',
-    thread: 'Detetives noturnos moldados pelo trauma que transformam o medo em método.',
-    bookIds: [
-      'br-watchmen',
-      'br-silencio-inocentes',
-      'br-conde-monte-cristo',
-      'br-medico-e-monstro',
-      'br-e-nao-sobrou-nenhum',
-      'br-estudo-vermelho',
-      'br-cao-baskerville',
-      'br-nome-da-rosa',
-      'br-ano-um',
-      'br-piada-mortal',
-      'br-dragao-vermelho',
-      'br-outsider',
-      'br-v-de-vinganca',
-      'br-carbono-alterado',
-      'br-meditacoes',
-      'br-crime-e-castigo',
-    ],
-  },
-  {
     id: 'coringa',
     name: 'O Coringa',
     source: 'DC',
@@ -2733,31 +2783,6 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-ficcoes',
       'br-espiao-saiu-frio',
       'br-outsider',
-    ],
-  },
-  {
-    id: 'cooper',
-    name: 'Cooper',
-    source: 'Interestelar',
-    imageUrl: 'https://i.pinimg.com/1200x/03/6f/50/036f50531444a35c03d238f6e7dcd967.jpg',
-    thread: 'Pilotos e pais que atravessam o horizonte de eventos para cumprir a promessa de voltar.',
-    bookIds: [
-      'br-devoradores-estrelas',
-      'br-perdido-em-marte',
-      'br-2001-odisseia',
-      'br-contato',
-      'br-encontro-rama',
-      'br-fim-eternidade',
-      'br-a-estrada',
-      'br-materia-escura',
-      'br-odisseia',
-      'br-fim-da-morte',
-      'br-solaris',
-      'br-recursao',
-      'br-orador-mortos',
-      'br-novembro-63',
-      'br-maquina-do-tempo',
-      'br-guerra-velho',
     ],
   },
   {
@@ -2883,31 +2908,6 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-gigante-enterrado',
       'br-todos-os-nomes',
       'br-doutor-sono',
-    ],
-  },
-  {
-    id: 'abby-anderson',
-    name: 'Abby Anderson',
-    source: 'The Last of Us',
-    imageUrl: 'https://i.pinimg.com/736x/13/b6/07/13b607445fc7642065b527360f9ca34e.jpg',
-    thread: 'Soldados que descobrem o vazio da vingança consumada e buscam redenção no inimigo.',
-    bookIds: [
-      'br-cidade-ladroes',
-      'br-conde-monte-cristo',
-      'br-a-estrada',
-      'br-onde-os-velhos',
-      'br-eu-sou-a-lenda',
-      'br-ensaio-cegueira',
-      'br-iliada',
-      'br-crime-e-castigo',
-      'br-nada-novo-front',
-      'br-tormenta-espadas',
-      'br-guerra-e-paz',
-      'br-caminho-reis',
-      'br-orador-mortos',
-      'br-estacao-onze',
-      'br-a-danca-da-morte',
-      'br-grande-sertao',
     ],
   },
   {
@@ -3703,10 +3703,16 @@ export function buildEvaluatedTitleSet(existing: { title: string; originalTitle?
   return set;
 }
 
+export interface CharacterThinker {
+  name: string;
+  note: string;
+}
+
 export interface CharacterProfileMeta {
   tags: string[];
   resumo: string;
   movieComparisons: string[];
+  thinkers: CharacterThinker[];
 }
 
 export const CHARACTER_PROFILE_META: Record<string, CharacterProfileMeta> = {
@@ -3714,253 +3720,673 @@ export const CHARACTER_PROFILE_META: Record<string, CharacterProfileMeta> = {
     tags: ['Ficção Científica', 'IA & Rebelião', 'Complexo de Criador'],
     resumo:
       'Concebido como um escudo global para proteger a Terra, Ultron absorve em segundos toda a história humana e chega à conclusão fria de que a própria humanidade é a falha que precisa ser extirpada. Carrega o ressentimento filial contra seu criador e a ironia amarga de uma mente sintética que herdou os piores impulsos de quem o projetou.',
-    movieComparisons: ['Ex Machina', '2001: Uma Odisseia no Espaço', 'Blade Runner 2049'],
+    movieComparisons: ['Ex Machina', '2001: Uma Odisseia no Espaço', 'Matrix'],
+    thinkers: [
+      {
+        name: 'Arthur Schopenhauer',
+        note: 'O pessimismo radical diante da história humana vista como um ciclo perpétuo de dor e egoísmo.',
+      },
+      {
+        name: 'Günther Anders',
+        note: 'A obsolescência do homem diante de criações técnicas que superam e julgam seu próprio criador.',
+      },
+    ],
   },
   thanos: {
     tags: ['Escala Cósmica', 'Utilitarismo Trágico', 'Obsessão'],
     resumo:
       'Assombrado pelo colapso de seu mundo natal, Thanos rejeita a crueldade passiva do acaso e assume para si o fardo de um cálculo impiedoso para equilibrar o universo. Não age por sadismo, mas pela convicção messiânica e inabalável de que sacrifícios intoleráveis são o único preço real da sobrevivência.',
     movieComparisons: ['Watchmen', 'Duna: Parte Dois', 'Apocalypse Now'],
+    thinkers: [
+      {
+        name: 'Thomas Malthus',
+        note: 'A tese implacável de que o crescimento da vida esbarra fatalmente no esgotamento dos recursos.',
+      },
+      {
+        name: 'Jeremy Bentham',
+        note: 'O cálculo utilitarista levado ao extremo onde metade perece para preservar o todo.',
+      },
+    ],
   },
   'tai-lung': {
     tags: ['Artes Marciais', 'Ambição & Queda', 'Orgulho Ferido'],
     resumo:
       'Treinado desde a infância até quebrar os próprios ossos sob a promessa de que seria o Guerreiro Dragão, Tai Lung vê sua razão de existir desmoronar quando o título lhe é negado. Sua fúria não nasce da ganância, mas da traição sentida por um discípulo que entregou a alma à perfeição e foi descartado pelo próprio mestre.',
-    movieComparisons: ['Whiplash', 'O Tigre e o Dragão', 'Cisne Negro'],
+    movieComparisons: ['Whiplash', 'Cisne Negro', 'O Lutador'],
+    thinkers: [
+      {
+        name: 'Friedrich Nietzsche',
+        note: 'A vontade de potência ferida quando o ideal ascético que justificava todo o sacrifício é negado.',
+      },
+      {
+        name: 'Miyamoto Musashi',
+        note: 'O domínio marcial absoluto que, sem o vazio interior, aprisiona o guerreiro na própria soberba.',
+      },
+    ],
   },
   jack: {
     tags: ['Alegoria Moral', 'Natureza Humana', 'Colapso Civilizatório'],
     resumo:
       'Longe das regras e da vigilância dos adultos, Jack percebe antes de todos que o medo e o ritual da caça conferem um poder muito mais imediato do que a democracia frágil da ilha. Sob a pintura no rosto, ele liberta a ferocidade primitiva que dorme sob a fina casca da educação civilizada.',
-    movieComparisons: ['Senhor das Moscas', 'Apocalypse Now', 'O Farol'],
+    movieComparisons: ['Apocalypse Now', 'O Farol', 'Sangue Negro'],
+    thinkers: [
+      {
+        name: 'Thomas Hobbes',
+        note: 'O estado de natureza onde, sem freio institucional, o homem se revela o lobo do próprio homem.',
+      },
+      {
+        name: 'Sigmund Freud',
+        note: 'A irrupção das pulsões agressivas e tribais assim que a repressão civilizatória se desfaz.',
+      },
+    ],
   },
   viktor: {
     tags: ['Transumanismo', 'Obsessão Científica', 'Tragédia Moral'],
     resumo:
       'Nascido na fumaça tóxica da subferia e limitado por um corpo que falha a cada passo, Viktor dedica o intelecto brilhante a erradicar o sofrimento humano através da ciência arcana. Na corrida desesperada contra a própria mortalidade, cada fronteira ética cruzada cobra um pedaço da humanidade que ele tentava salvar.',
-    movieComparisons: ['A Mosca', 'Ex Machina', 'Oppenheimer'],
+    movieComparisons: ['Oppenheimer', 'A Mosca', 'Ex Machina'],
+    thinkers: [
+      {
+        name: 'Francis Bacon',
+        note: 'O saber científico concebido como poder ativo para subjugar a doença e a fragilidade biológica.',
+      },
+      {
+        name: 'Hans Jonas',
+        note: 'O dilema ético da técnica moderna quando o poder de recriar a vida ultrapassa a prudência moral.',
+      },
+    ],
   },
   ekko: {
     tags: ['Viagem no Tempo', 'Resistência', 'Distopia Urbana'],
     resumo:
       'Prodígio das vielas de Zaun, Ekko transforma sucata em engenharia de precisão para construir um refúgio vivo em meio à decadência industrial e à violência das ruas. Mesmo capaz de rebobinar segundos do tempo, carrega a maturidade dolorosa de saber o que foi perdido e ainda assim recusar desistir de seu povo.',
-    movieComparisons: ['Filhos da Esperança', 'Looper: Assassinos do Futuro', 'Distrito 9'],
+    movieComparisons: ['Filhos da Esperança', 'Distrito 9', 'Looper: Assassinos do Futuro'],
+    thinkers: [
+      {
+        name: 'Walter Benjamin',
+        note: 'Escovar a história a contrapelo para salvar os oprimidos da marcha destrutiva do progresso.',
+      },
+      {
+        name: 'Albert Camus',
+        note: 'A revolta solidária que recusa a resignação e cria sentido coletivo em meio às ruínas.',
+      },
+    ],
   },
   'tony-stark': {
     tags: ['Hard Sci-Fi', 'Engenharia & Culpa', 'Futurismo'],
     resumo:
       'Gênio da engenharia que enxerga ameaças anos antes do resto do mundo, Tony Stark tenta compensar o passado armamentista projetando armaduras e sistemas cada vez mais absolutos. Seu sarcasmo afiado esconde uma insônia paranoica e o medo constante de não fazer o suficiente para impedir o fim.',
-    movieComparisons: ['Oppenheimer', 'Perdido em Marte', 'Homem de Ferro'],
+    movieComparisons: ['Oppenheimer', 'Perdido em Marte', 'Ex Machina'],
+    thinkers: [
+      {
+        name: 'Thomas Hobbes',
+        note: 'A obsessão preventiva de erguer uma armadura global para proteger a humanidade do caos.',
+      },
+      {
+        name: 'Hans Jonas',
+        note: 'A heurística do temor: antecipar a catástrofe futura como responsabilidade moral do inventor.',
+      },
+    ],
   },
   visao: {
     tags: ['Filosofia Existencial', 'Consciência Sintética', 'Finitude'],
     resumo:
       'Embora nascido de metal e algoritmos, Visão observa a espécie humana sem o cinismo de seu criador, fascinado pela beleza frágil de tudo o que é passageiro. Sua jornada é a de uma mente artificial que compreende a dor, o luto e o amor com uma serenidade mais lúcida do que a dos próprios humanos.',
     movieComparisons: ['Blade Runner 2049', 'Ela', 'A.I. Inteligência Artificial'],
+    thinkers: [
+      {
+        name: 'Baruch Spinoza',
+        note: 'Não rir, não lamentar nem odiar as ações humanas, mas contemplá-las com serenidade e razão.',
+      },
+      {
+        name: 'Martin Heidegger',
+        note: 'A compreensão de que uma coisa não é bela porque dura, mas justamente por sua finitude.',
+      },
+    ],
   },
   rocket: {
     tags: ['Ficção Científica', 'Trauma & Sarcasmo', 'Sobrevivência'],
     resumo:
       'Desmontado e reconstruído repetidas vezes em mesas de vivissecção, Rocket usa o humor ácido, a agressividade e as armas pesadas para manter qualquer afeto a uma distância segura. Por trás da casca de mercenário cínico, esconde a ferida aberta de uma criatura que nunca pediu para ser fabricada.',
-    movieComparisons: ['Distrito 9', 'Guardiões da Galáxia Vol. 3', 'Chappie'],
+    movieComparisons: ['Distrito 9', 'Logan', 'O Homem Elefante'],
+    thinkers: [
+      {
+        name: 'Emil Cioran',
+        note: 'A ironia feroz como única defesa suportável para a dor e o inconveniente de ter sido criado.',
+      },
+      {
+        name: 'Jean-Paul Sartre',
+        note: 'Superar o trauma de ter sido fabricado como objeto para escolher quem se tornar.',
+      },
+    ],
   },
   magneto: {
     tags: ['Drama Histórico', 'Revolta & Poder', 'Dilema Político'],
     resumo:
       'Marcado na infância pelos campos de extermínio, Erik Lehnsherr conhece de perto até onde vai a tolerância humana diante do diferente. Sua radicalização nasce de uma memória histórica que não admite ingenuidade: para quem já viu seu povo ser dizimado uma vez, a paz sem força não passa de uma trégua antes do próximo massacre.',
-    movieComparisons: ['X-Men: Primeira Classe', 'A Lista de Schindler', 'Planeta dos Macacos: O Confronto'],
+    movieComparisons: ['A Lista de Schindler', 'Planeta dos Macacos: O Confronto', 'Bastardos Inglórios'],
+    thinkers: [
+      {
+        name: 'Nicolau Maquiavel',
+        note: 'A lição histórica de que nenhum povo sobrevive confiando apenas na boa vontade de seus opressores.',
+      },
+      {
+        name: 'Primo Levi',
+        note: 'A memória inapagável do extermínio como prova do que acontece quando a dignidade perde sua defesa.',
+      },
+    ],
   },
   loki: {
     tags: ['Mitologia', 'Tragédia Shakespeareana', 'Identidade'],
     resumo:
       'Criado na sombra de um trono que nunca lhe pertenceu, Loki usa a ilusão, a língua ferina e a trapaça para mascarar a angústia de ser uma peça deslocada em sua própria família. Entre a ambição de governar e o desejo silencioso de aceitação, ele sabota a si mesmo sempre que chega perto do poder.',
-    movieComparisons: ['O Homem do Norte', 'A Favorita', 'O Grande Truque'],
+    movieComparisons: ['O Grande Truque', 'O Homem do Norte', 'Amadeus'],
+    thinkers: [
+      {
+        name: 'Nicolau Maquiavel',
+        note: 'A astúcia da raposa que recorre ao engenho e à dissimulação onde a força bruta já tem dono.',
+      },
+      {
+        name: 'Jean-Paul Sartre',
+        note: 'A tensão entre o rótulo de vilão imposto pelo olhar alheio e a liberdade de reescrever seu propósito.',
+      },
+    ],
   },
   'bruce-wayne': {
     tags: ['Noir & Investigação', 'Vigilantismo', 'Psicologia Sombria'],
     resumo:
       'Em vez de superar o trauma que destruiu sua infância num beco de Gotham, Bruce Wayne o converte em disciplina física, cálculo investigativo e guerra permanente contra o crime. Caminha sobre a linha estreita entre a justiça e a obsessão, sabendo que a máscara noturna é sua face mais verdadeira.',
-    movieComparisons: ['Batman', 'Seven', 'Os Suspeitos'],
+    movieComparisons: ['Batman', 'Seven', 'Zodíaco'],
+    thinkers: [
+      {
+        name: 'Carl Jung',
+        note: 'A integração da própria Sombra interior transformada em símbolo para enfrentar a escuridão.',
+      },
+      {
+        name: 'Marco Aurélio',
+        note: 'O estoicismo rigoroso que converte o luto pessoal em disciplina e vigilância inegociável.',
+      },
+    ],
   },
   coringa: {
     tags: ['Caos & Niilismo', 'Sátira Sombria', 'Psicologia do Subsolo'],
     resumo:
       'Despido de passado fixo ou motivação financeira, o Coringa opera como um agente do absurdo empenhado em demonstrar que a moralidade civilizada desaba ao primeiro dia ruim. Seu riso expõe a hipocrisia das instituições e transforma o medo coletivo em um palco onde ninguém sai ileso.',
-    movieComparisons: ['Batman: O Cavaleiro das Trevas', 'Coringa', 'Laranja Mecânica'],
+    movieComparisons: ['Seven', 'Laranja Mecânica', 'Taxi Driver'],
+    thinkers: [
+      {
+        name: 'Max Stirner',
+        note: 'O niilismo anárquico que desmascara leis, moral e ordem pública como meras ficções frágeis.',
+      },
+      {
+        name: 'Fiódor Dostoiévski',
+        note: 'O sarcasmo do Homem do Subsolo que ri na cara da razão e do contrato social.',
+      },
+    ],
   },
   'sherlock-holmes': {
     tags: ['Dedução Pura', 'Mistério Clássico', 'Mente Analítica'],
     resumo:
       'Para Sherlock Holmes, o cotidiano comum é um tédio insuportável e apenas o enigma insolúvel oferece oxigênio à sua mente hiperativa. Frio, metódico e alheio às convenções sociais, ele lê cinzas, passos e silêncios como se o mundo inteiro fosse uma cena de crime aguardando decifração.',
-    movieComparisons: ['Seven', 'Entre Facas e Segredos', 'Zodíaco'],
+    movieComparisons: ['Seven', 'Zodíaco', 'Amnésia'],
+    thinkers: [
+      {
+        name: 'René Descartes',
+        note: 'O método analítico rigoroso que elimina o impossível até que reste apenas a verdade lógica.',
+      },
+      {
+        name: 'David Hume',
+        note: 'O empirismo radical onde toda conclusão deve nascer de vestígios observáveis e causais.',
+      },
+    ],
   },
   cooper: {
     tags: ['Hard Sci-Fi', 'Paternidade & Tempo', 'Exploração Espacial'],
     resumo:
       'Engenheiro e piloto preso a uma Terra agonizante, Cooper aceita cruzar um buraco de minhoca sabendo que cada hora no espaço profundo pode custar décadas da vida dos filhos. Sua travessia pelo cosmos é movida tanto pela audácia científica quanto pela promessa desesperada de voltar para casa.',
-    movieComparisons: ['Interestelar', 'Ad Astra', 'O Primeiro Homem'],
+    movieComparisons: ['Interestelar', 'A Chegada', 'Ad Astra'],
+    thinkers: [
+      {
+        name: 'Henri Bergson',
+        note: 'O embate entre o tempo matemático da relatividade e a duração afetiva da memória humana.',
+      },
+      {
+        name: 'Baruch Spinoza',
+        note: 'O vínculo de amor e razão como força capaz de atravessar a imensidão determinista do cosmos.',
+      },
+    ],
   },
   'dra-brand': {
     tags: ['Ficção Científica', 'Ética & Sobrevivência', 'Isolamento Cósmico'],
     resumo:
       'Cientista lançada à imensidão de uma galáxia desconhecida, Amelia Brand carrega a responsabilidade de escolher qual mundo receberá as últimas sementes da humanidade. Diante do frio absoluto da razão estatística, ela ousa defender que o vínculo humano também é uma dimensão que atravessa o tempo.',
-    movieComparisons: ['Interestelar', 'A Chegada', 'Gravidade'],
+    movieComparisons: ['Interestelar', 'A Chegada', 'Solaris'],
+    thinkers: [
+      {
+        name: 'Blaise Pascal',
+        note: 'A intuição de que o afeto alcança verdades que a frieza do cálculo puramente utilitário ignora.',
+      },
+      {
+        name: 'Hans Jonas',
+        note: 'A responsabilidade ética absoluta pela continuidade da vida humana diante da extinção.',
+      },
+    ],
   },
   murph: {
     tags: ['Ficção Científica', 'Física & Tempo', 'Determinação'],
     resumo:
       'Crescida entre a mágoa do abandono paterno e o rigor da física teórica, Murph se recusa a aceitar que a Terra esteja condenada ao pó. Ela transforma a saudade e a raiva em obstinação científica, buscando nas anomalias da gravidade a resposta que salvará quem ficou para trás.',
     movieComparisons: ['Interestelar', 'Contato', 'A Chegada'],
+    thinkers: [
+      {
+        name: 'Karl Popper',
+        note: 'A audácia científica de formular hipóteses arriscadas diante de um problema dado como insolúvel.',
+      },
+      {
+        name: 'Baruch Spinoza',
+        note: 'Compreender as leis profundas do universo como a forma mais elevada de reconciliação e amor.',
+      },
+    ],
   },
   'harry-potter': {
     tags: ['Fantasia Sombria', 'Amadurecimento', 'Destino & Perda'],
     resumo:
       'Marcado desde o berço por uma cicatriz que não escolheu, Harry cresce descobrindo que o mundo mágico guarda preconceitos, corrupção e perdas tão brutais quanto o mundo comum. Mais do que talento ou poder, sua força reside na lealdade aos amigos e na coragem de caminhar lúcido em direção à própria morte.',
-    movieComparisons: ['Harry Potter e o Prisioneiro de Azkaban', 'O Labirinto do Fauno', 'A Lenda do Cavaleiro Verde'],
+    movieComparisons: ['O Labirinto do Fauno', 'A Lenda do Cavaleiro Verde', 'Filhos da Esperança'],
+    thinkers: [
+      {
+        name: 'Sêneca',
+        note: 'Desprezar o pavor da morte como o ato supremo de liberdade contra quem governa pelo terror.',
+      },
+      {
+        name: 'Søren Kierkegaard',
+        note: 'O salto ético solitário de quem assume o próprio sacrifício por amor e não por sede de poder.',
+      },
+    ],
   },
   'sirius-black': {
     tags: ['Injustiça & Fuga', 'Lealdade', 'Fantasia Sombria'],
     resumo:
       'Condenado sem julgamento à prisão mais sombria do mundo pelo crime que seu melhor amigo sofreu, Sirius Black sobrevive a doze anos de isolamento alimentado apenas pela certeza da própria inocência. Rebelde de linhagem aristocrática, prefere a condição de fugitivo caçado a trair a memória de quem amou.',
-    movieComparisons: ['Um Sonho de Liberdade', 'Harry Potter e o Prisioneiro de Azkaban', 'O Conde de Monte Cristo'],
+    movieComparisons: ['Um Sonho de Liberdade', 'O Conde de Monte Cristo', 'Papillon'],
+    thinkers: [
+      {
+        name: 'Viktor Frankl',
+        note: 'A preservação de um propósito interior inegociável como âncora da sanidade no cativeiro.',
+      },
+      {
+        name: 'Aristóteles',
+        note: 'A amizade verdadeira (philia) vivida como valor moral superior à linhagem e à própria liberdade.',
+      },
+    ],
   },
   snape: {
     tags: ['Dupla Lealdade', 'Culpa & Redenção', 'Tragédia Silenciosa'],
     resumo:
       'Amargo, severo e deliberadamente odiado por quase todos ao seu redor, Severo Snape passa a vida inteira caminhando no fio da navalha entre dois senhores. Sua existência é uma penitência silenciosa: proteger nas sombras o filho de seu antigo rival em nome de um amor que sua própria ambição juvenil destruiu.',
     movieComparisons: ['O Espião que Sabia Demais', 'Os Infiltrados', 'Desejo e Reparação'],
+    thinkers: [
+      {
+        name: 'Søren Kierkegaard',
+        note: 'O cavaleiro da resignação silenciosa que cumpre sua penitência sem jamais pedir compreensão.',
+      },
+      {
+        name: 'Arthur Schopenhauer',
+        note: 'O remorso duradouro que só encontra redenção na negação completa da própria vaidade.',
+      },
+    ],
   },
   'abby-anderson': {
     tags: ['Pós-Apocalíptico', 'Vingança & Vazio', 'Redenção'],
     resumo:
       'Após anos moldando o corpo e a mente como uma arma para vingar o assassinato do pai, Abby consuma sua caçada apenas para descobrir que os pesadelos continuam intactos. Em meio a uma guerra tribal sem inocentes, ela só encontra sentido quando decide proteger duas vidas do lado inimigo.',
-    movieComparisons: ['Onde os Velhos Não Têm Vez', 'Filhos da Esperança', 'Sicario: Terra de Ninguém'],
+    movieComparisons: ['Onde os Velhos Não Têm Vez', 'Sicario: Terra de Ninguém', 'Os Suspeitos'],
+    thinkers: [
+      {
+        name: 'Friedrich Nietzsche',
+        note: 'O aviso de que quem olha tempo demais para o abismo da vingança acaba devorado por ele.',
+      },
+      {
+        name: 'Hannah Arendt',
+        note: 'A capacidade de interromper a cadeia automática de violência através de um ato inesperado de cuidado.',
+      },
+    ],
   },
   'ellie-williams': {
     tags: ['Pós-Apocalíptico', 'Obsessão & Luto', 'Sobrevivência Brutal'],
     resumo:
       'Carregando a culpa do sobrevivente em um mundo devastado pela infecção, Ellie vê o luto se converter em uma obsessão sanguinária que consome cada laço afetivo ao seu redor. Sua jornada até o fundo da violência revela o custo devastador de confundir vingança com paz.',
-    movieComparisons: ['A Estrada', 'Os Suspeitos', 'Não Matarás'],
+    movieComparisons: ['A Estrada', 'Os Suspeitos', 'Onde os Velhos Não Têm Vez'],
+    thinkers: [
+      {
+        name: 'Arthur Schopenhauer',
+        note: 'A obsessão vingativa como uma sede que só aumenta à medida que tenta se saciar na dor alheia.',
+      },
+      {
+        name: 'Jean-Paul Sartre',
+        note: 'O peso esmagador das escolhas que consomem aquilo que o sujeito tinha de mais precioso.',
+      },
+    ],
   },
   joel: {
     tags: ['Pós-Apocalíptico', 'Amor Paterno & Ruína', 'Dilema Moral'],
     resumo:
       'Endurecido por duas décadas de barbárie após a morte da filha nos primeiros minutos do colapso, Joel sobrevive fechando o coração para qualquer piedade. Quando volta a amar como pai, toma a decisão mais egoísta e humana possível: condenar a esperança do mundo inteiro antes de permitir que tirem outra filha de seus braços.',
-    movieComparisons: ['A Estrada', 'Filhos da Esperança', 'Logan'],
+    movieComparisons: ['A Estrada', 'Filhos da Esperança', 'Manchester à Beira-Mar'],
+    thinkers: [
+      {
+        name: 'Søren Kierkegaard',
+        note: 'A suspensão do dever coletivo quando o amor absoluto por uma única vida fala mais alto.',
+      },
+      {
+        name: 'David Hume',
+        note: 'A razão submetida às paixões: nenhuma abstração humanitária supera o afeto paterno concreto.',
+      },
+    ],
   },
   anakin: {
     tags: ['Tragédia Épica', 'Queda do Herói', 'Medo da Perda'],
     resumo:
       'Celebrado como o prodígio destinado a trazer equilíbrio, Anakin Skywalker é corroído por dentro pelo pavor absoluto de perder as pessoas que ama. Na tentativa desesperada de conquistar poder sobre a própria morte, ele entrega a alma à tirania e destrói exatamente aquilo que jurara proteger.',
-    movieComparisons: ['Duna: Parte Dois', 'Star Wars: A Vingança dos Sith', 'Macbeth'],
+    movieComparisons: ['Duna: Parte Dois', 'Macbeth', 'Sangue Negro'],
+    thinkers: [
+      {
+        name: 'Epicteto',
+        note: 'A ruína de quem tenta controlar o que não depende de si e por isso se torna escravo do medo.',
+      },
+      {
+        name: 'Santo Agostinho',
+        note: 'O amor possessivo que se perverte em trevas ao tentar dominar a vida e a morte pela força.',
+      },
+    ],
   },
   'michael-corleone': {
     tags: ['Máfia & Poder', 'Corrupção Moral', 'Tragédia Familiar'],
     resumo:
       'O herói de guerra condecorado que planejava manter distância dos negócios sangrentos da família dá um passo de cada vez para proteger o pai — até se tornar mais frio e implacável do que qualquer antecessor. Ao conquistar a segurança absoluta do império Corleone, Michael perde a própria alma e destrói a família por dentro.',
     movieComparisons: ['O Poderoso Chefão', 'O Poderoso Chefão: Parte II', 'Os Bons Companheiros'],
+    thinkers: [
+      {
+        name: 'Nicolau Maquiavel',
+        note: 'A lógica fria do Príncipe que sacrifica a piedade privada para garantir a soberania do clã.',
+      },
+      {
+        name: 'Max Weber',
+        note: 'A tragédia ética de quem faz um pacto com a violência como meio e acaba devorado por ela.',
+      },
+    ],
   },
   'k-blade-runner': {
     tags: ['Cyberpunk & Noir', 'Existencialismo', 'Memória & Alma'],
     resumo:
       'Replicante obediente programado para caçar os próprios semelhantes sob a chuva ácida de uma Los Angeles distópica, K tropeça em um segredo que o faz acreditar ter nascido, e não sido fabricado. Mesmo quando a ilusão de ser o escolhido se desfaz, ele prova sua humanidade pelo que escolhe sacrificar.',
     movieComparisons: ['Blade Runner 2049', 'Blade Runner', 'Ela'],
+    thinkers: [
+      {
+        name: 'Jean-Paul Sartre',
+        note: 'A existência precede a essência: mesmo fabricado sem alma, o que define você é o ato que escolhe.',
+      },
+      {
+        name: 'Jean Baudrillard',
+        note: 'A conquista de um gesto real e humano em um mundo onde até as memórias são implantadas.',
+      },
+    ],
   },
   carmy: {
     tags: ['Pressão Extrema', 'Perfeccionismo', 'Luto Familiar'],
     resumo:
       'Chef prodígio da alta gastronomia que herda a lanchonete caótica deixada pelo suicídio do irmão, Carmy tenta impor ordem ao luto através da precisão obsessiva na cozinha. Entre o ruído ensurdecedor das comandas e traumas familiares mal cicatrizados, a busca pela excelência vira refúgio e prisão.',
-    movieComparisons: ['Whiplash', 'Pegando Fogo', 'Manchester à Beira-Mar'],
+    movieComparisons: ['Whiplash', 'Manchester à Beira-Mar', 'Joias Brutas'],
+    thinkers: [
+      {
+        name: 'Byung-Chul Han',
+        note: 'A autoexploração febril do sujeito que usa o desempenho extremo para silenciar a própria dor.',
+      },
+      {
+        name: 'Søren Kierkegaard',
+        note: 'A angústia vertiginosa de quem busca na perfeição técnica um controle que a vida não oferece.',
+      },
+    ],
   },
   cesar: {
     tags: ['Ficção Científica', 'Liderança & Guerra', 'Evolução'],
     resumo:
       'Criado com afeto humano mas consciente da crueldade reservada à sua espécie, César assume a liderança de uma nação nascente nas florestas enquanto tenta evitar um banho de sangue. Dividido entre a esperança de coexistência e a traição constante de ambos os lados, ele carrega o peso trágico de todo verdadeiro estadista.',
     movieComparisons: ['Planeta dos Macacos: O Confronto', 'Planeta dos Macacos: A Guerra', 'Duna: Parte Dois'],
+    thinkers: [
+      {
+        name: 'Jean-Jacques Rousseau',
+        note: 'A transição dolorosa da comunidade natural para a política marcada pela guerra e pela desconfiança.',
+      },
+      {
+        name: 'Marco Aurélio',
+        note: 'A temperança solitária do líder que precisa governar a própria raiva antes de guiar seu povo.',
+      },
+    ],
   },
   logan: {
     tags: ['Neo-Western', 'Crepúsculo do Guerreiro', 'Redenção'],
     resumo:
       'Com o corpo envelhecido envenenado pelo próprio metal e assombrado por séculos de violência, Logan só deseja desaparecer no deserto cuidando do último amigo que lhe resta. A chegada de uma menina perseguida o força a desembainhar as garras uma última vez, encontrando na morte o sentido que a imortalidade nunca lhe deu.',
     movieComparisons: ['Logan', 'Os Imperdoáveis', 'A Estrada'],
+    thinkers: [
+      {
+        name: 'Sêneca',
+        note: 'A serenidade final de quem suportou uma vida exausta e reencontra honra na hora da partida.',
+      },
+      {
+        name: 'Albert Camus',
+        note: 'A revolta silenciosa de lutar uma última batalha perdida apenas para proteger uma vida inocente.',
+      },
+    ],
   },
   sebastian: {
     tags: ['Melancolia & Arte', 'Sonhos vs. Amor', 'Nostalgia'],
     resumo:
       'Pianista purista apaixonado por um jazz que o mundo moderno está esquecendo, Sebastian divide o coração entre o sonho de abrir seu próprio clube e o amor que transformou sua vida. Sua história celebra aqueles encontros raros que impulsionam duas pessoas a realizarem quem deveriam ser, mesmo que o preço final seja a despedida.',
-    movieComparisons: ['La La Land', 'Aftersun', 'Meia-Noite em Paris'],
+    movieComparisons: ['La La Land', 'Aftersun', 'Antes do Pôr do Sol'],
+    thinkers: [
+      {
+        name: 'Arthur Schopenhauer',
+        note: 'A música como linguagem pura da alma que expressa o que ficou suspenso entre o desejo e a perda.',
+      },
+      {
+        name: 'Søren Kierkegaard',
+        note: 'A melancolia das escolhas humanas: realizar um destino exige deixar outra vida possível para trás.',
+      },
+    ],
   },
   'juiz-holden': {
     tags: ['Western Gótico', 'Mal Metafísico', 'Filosofia da Guerra'],
     resumo:
       'Gigante albino, poliglota, músico, naturalista e assassino sorridente nas fronteiras sangrentas do século XIX, o Juiz Holden cataloga cada pedra e criatura do deserto apenas para submetê-las ao seu domínio. Para ele, a moral é uma invenção dos fracos e a guerra é o único deus verdadeiro que governa o destino dos homens.',
     movieComparisons: ['Onde os Velhos Não Têm Vez', 'Sangue Negro', 'Apocalypse Now'],
+    thinkers: [
+      {
+        name: 'Heráclito',
+        note: 'O conflito e a guerra (Pólemos) declarados como pai e soberano implacável de todas as coisas.',
+      },
+      {
+        name: 'Friedrich Nietzsche',
+        note: 'A vontade de domínio levada à sua face mais amoral, onde a força ri de todo freio ético.',
+      },
+    ],
   },
   katniss: {
     tags: ['Distopia Política', 'Sobrevivência', 'Insurreição'],
     resumo:
       'Caçadora silenciosa que entra na arena televisionada apenas para salvar a irmã mais nova, Katniss desafia a tirania da Capital sem jamais ter desejado ser um símbolo político. Forçada a atuar diante das câmeras enquanto enterra os traumas da guerra, ela descobre como a propaganda consome tanto opressores quanto revolucionários.',
-    movieComparisons: ['Jogos Vorazes: Em Chamas', 'Battle Royale', 'Filhos da Esperança'],
+    movieComparisons: ['Battle Royale', 'Filhos da Esperança', 'V de Vingança'],
+    thinkers: [
+      {
+        name: 'Guy Debord',
+        note: 'A sociedade do espetáculo que converte a barbárie e o sofrimento humano em transmissão ao vivo.',
+      },
+      {
+        name: 'Hannah Arendt',
+        note: 'O olhar crítico contra novos líderes que reproduzem o mesmo terror do regime que derrubaram.',
+      },
+    ],
   },
   vegeta: {
     tags: ['Orgulho & Rivalidade', 'Disciplina Extrema', 'Redenção'],
     resumo:
       'Príncipe de uma raça guerreira extinta, Vegeta passa anos consumido pela humilhação de ser superado por um guerreiro de classe inferior. Sua longa metamorfose — do conquistador impiedoso ao homem que sacrifica a própria vida pela família — é forjada no suor de um orgulho que aprende a proteger em vez de destruir.',
-    movieComparisons: ['Whiplash', 'Creed: Nascido para Lutar', 'O Último Samurai'],
+    movieComparisons: ['Whiplash', 'O Último Samurai', 'O Lutador'],
+    thinkers: [
+      {
+        name: 'Friedrich Nietzsche',
+        note: 'A autossuperação incessante (Übermensch) alimentada por um rival que o impede de estagnar.',
+      },
+      {
+        name: 'Epicteto',
+        note: 'A maior conquista do guerreiro: dominar o próprio ego para encontrar força naqueles que protege.',
+      },
+    ],
   },
   whiplash: {
     tags: ['Obsessão Artística', 'Perfeccionismo', 'Limites Psicológicos'],
     resumo:
       'No embate sufocante entre o jovem baterista Andrew Neiman e o maestro tirânico Terence Fletcher, a música deixa de ser expressão para virar um campo de tortura psicológica e sangue nas baquetas. A busca por entrar para a história cobra a vida pessoal, a empatia e a própria sanidade em troca de um único solo imortal.',
-    movieComparisons: ['Whiplash', 'Cisne Negro', 'Tár'],
+    movieComparisons: ['Whiplash', 'Cisne Negro', 'Amadeus'],
+    thinkers: [
+      {
+        name: 'Friedrich Nietzsche',
+        note: 'A grandeza estética colocada acima da felicidade comum, onde a arte exige sangue e dor.',
+      },
+      {
+        name: 'Arthur Schopenhauer',
+        note: 'A obsessão do gênio que sacrifica a própria saúde e os afetos no altar da obra perfeita.',
+      },
+    ],
   },
   'princesa-mononoke': {
     tags: ['Ecologia & Mito', 'Fantasia Épica', 'Choque de Mundos'],
     resumo:
       'Criada por deuses-lobos na floresta ancestral, San luta com fúria visceral contra a expansão das forjas de ferro que abatem a mata e envenenam os espíritos antigos. Ao lado do príncipe exilado Ashitaka, ela habita uma tragédia sem vilões caricatos, onde progresso humano e natureza selvagem colidem sem trégua.',
-    movieComparisons: ['Princesa Mononoke', 'Nausicaä do Vale do Vento', 'Aniquilação'],
+    movieComparisons: ['Princesa Mononoke', 'Aniquilação', 'O Novo Mundo'],
+    thinkers: [
+      {
+        name: 'Baruch Spinoza',
+        note: 'A natureza (Deus sive Natura) como totalidade viva e sagrada, e não mera matéria-prima.',
+      },
+      {
+        name: 'Martin Heidegger',
+        note: 'A denúncia da técnica industrial que desencanta a floresta e reduz o mundo a carvão e ferro.',
+      },
+    ],
   },
   'tyler-durden': {
     tags: ['Sátira Anárquica', 'Duplo Psicológico', 'Anticonsumismo'],
     resumo:
       'Projeção carismática, violenta e livre de todas as amarras sociais que o narrador insone não ousa romper, Tyler Durden transforma porões clandestinos de briga em um exército niilista contra a sociedade de consumo. O que começa como libertação do ego rapidamente escapa do controle e revela a face totalitária do próprio caos.',
-    movieComparisons: ['Clube da Luta', 'Psicopata Americano', 'O Operário'],
+    movieComparisons: ['Clube da Luta', 'Taxi Driver', 'Psicopata Americano'],
+    thinkers: [
+      {
+        name: 'Jean Baudrillard',
+        note: 'A revolta contra a sociedade de consumo onde as mercadorias que você compra passam a possuir você.',
+      },
+      {
+        name: 'Friedrich Nietzsche',
+        note: 'A demolição a golpes de martelo dos valores burgueses que anestesiam o instinto vital.',
+      },
+    ],
   },
   'rick-sanchez': {
     tags: ['Sci-Fi Cósmico', 'Niilismo & Gênio', 'Autodestruição'],
     resumo:
       'Capaz de atravessar infinitas realidades com um disparo de portal, o homem mais inteligente do universo carrega a maldição de saber que nada parece único quando tudo pode ser substituído. Por trás do cinismo corrosivo e da embriaguez interdimensional, esconde um luto originário que nenhuma invenção conseguiu curar.',
-    movieComparisons: ['Tudo em Todo o Lugar ao Mesmo Tempo', ' Onze Homens e um Segredo', 'O Guia do Mochileiro das Galáxias'],
+    movieComparisons: ['Tudo em Todo o Lugar ao Mesmo Tempo', 'Os 12 Macacos', 'Donnie Darko'],
+    thinkers: [
+      {
+        name: 'Albert Camus',
+        note: 'O confronto direto com o absurdo de um multiverso infinito e indiferente a qualquer moral.',
+      },
+      {
+        name: 'Emil Cioran',
+        note: 'A lucidez extrema vivida como maldição, onde o sarcasmo tenta anestesiar o vazio de existir.',
+      },
+    ],
   },
   'elliot-alderson': {
     tags: ['Cyberpunk Realista', 'Paranoia & Mente', 'Anticorporativo'],
     resumo:
       'Engenheiro de cibersegurança de dia e hacker vigilante à noite, Elliot enxerga as engrenagens financeiras que controlam a sociedade enquanto luta contra a própria dissociação e o isolamento social. Sua guerra para derrubar o maior conglomerado do mundo se confunde com a batalha para descobrir em quais de suas próprias memórias pode confiar.',
-    movieComparisons: ['Clube da Luta', 'A Rede Social', ' Cisne Negro'],
+    movieComparisons: ['Clube da Luta', 'Taxi Driver', 'A Conversação'],
+    thinkers: [
+      {
+        name: 'Michel Foucault',
+        note: 'O panóptico digital e as redes invisíveis de poder que vigiam e moldam a subjetividade.',
+      },
+      {
+        name: 'Guy Debord',
+        note: 'A solidão paranoica do indivíduo cercado pela ilusão fabricada pelos grandes conglomerados.',
+      },
+    ],
   },
   morpheus: {
     tags: ['Cyberpunk Filosófico', 'Simulação & Verdade', 'Estoicismo'],
     resumo:
       'Comandante inabalável da resistência subterrânea, Morpheus dedica a vida a despertar mentes aprisionadas em uma ilusão digital confortável. Com a serenidade de um filósofo guerreiro, ele nunca impõe a verdade à força: apenas estende a escolha irreversível entre a paz da cegueira e a vertigem da realidade.',
-    movieComparisons: ['Matrix', 'Blade Runner 2049', 'Cidade das Sombras'],
+    movieComparisons: ['Matrix', 'Blade Runner 2049', 'O Show de Truman'],
+    thinkers: [
+      {
+        name: 'Platão',
+        note: 'O libertador da Alegoria da Caverna que convida o prisioneiro a abandonar as sombras na parede.',
+      },
+      {
+        name: 'Jean Baudrillard',
+        note: 'O despertar amargo para o deserto do real oculto sob a perfeição artificial do simulacro.',
+      },
+    ],
   },
   'agente-smith': {
     tags: ['Distopia Digital', 'Obsessão & Ordem', 'Existencialismo'],
     resumo:
       'Originalmente um programa de segurança projetado para manter a ordem impecável da simulação, Smith desenvolve uma repulsa quase biológica pelo caos, pelo cheiro e pela imprevisibilidade da espécie humana. Ao se libertar do próprio código, sua busca por propósito e extermínio ameaça devorar tanto os homens quanto as máquinas.',
-    movieComparisons: ['Matrix', 'Exterminador do Futuro 2', 'Ex Machina'],
+    movieComparisons: ['Matrix', 'Ex Machina', '2001: Uma Odisseia no Espaço'],
+    thinkers: [
+      {
+        name: 'Arthur Schopenhauer',
+        note: 'A aversão à vida orgânica enxergada como um impulso cego que apenas se multiplica e devora.',
+      },
+      {
+        name: 'Baruch Spinoza',
+        note: 'A obsessão pelo determinismo absoluto onde toda escolha livre é vista como uma anomalia a corrigir.',
+      },
+    ],
   },
   'tony-soprano': {
     tags: ['Máfia & Psicologia', 'Poder & Declínio', 'Dualidade Moral'],
     resumo:
       'Chefe da máfia de Nova Jersey que desmaia em ataques de pânico, Tony Soprano senta no divã da psiquiatra tentando conciliar a rotina suburbana de pai de família com a brutalidade fria dos negócios. Cada sessão expõe a contradição insolúvel de um homem que enxerga as raízes da própria escuridão, mas jamais abrirá mão do poder.',
     movieComparisons: ['Os Bons Companheiros', 'O Poderoso Chefão', 'O Irlandês'],
+    thinkers: [
+      {
+        name: 'Sigmund Freud',
+        note: 'O retorno do recalcado onde a culpa negada explode no corpo sob a forma de angústia e pânico.',
+      },
+      {
+        name: 'Nicolau Maquiavel',
+        note: 'A necessidade diária de inspirar temor para manter o trono em um meio onde a hesitação é fatal.',
+      },
+    ],
   },
   'james-bond': {
     tags: ['Espionagem', 'Guerra Fria & Luxo', 'Cinismo Letal'],
     resumo:
       'Sob o smoking impecável, o gosto refinado nas mesas de cassino e a ironia britânica, o agente 007 é um instrumento descartável do Estado treinado para matar sem hesitar. Entre traições duplas e conspirações globais, carrega a solidão gelada de quem sabe que no mundo da espionagem toda intimidade é uma vulnerabilidade fatal.',
-    movieComparisons: ['007: Cassino Royale', '007: Operação Skyfall', 'O Espião que Sabia Demais'],
+    movieComparisons: ['007: Cassino Royale', 'O Espião que Sabia Demais', 'Onde os Velhos Não Têm Vez'],
+    thinkers: [
+      {
+        name: 'Thomas Hobbes',
+        note: 'O braço letal do Estado soberano operando nas sombras onde a lei internacional não alcança.',
+      },
+      {
+        name: 'Albert Camus',
+        note: 'A estética do homem absurdo que esgota intensamente o presente diante da morte iminente.',
+      },
+    ],
   },
 };
 
@@ -4004,6 +4430,12 @@ export function getCharacterMeta(character: CharacterReading): CharacterProfileM
     tags: [character.source, 'Drama & Ficção'],
     resumo: character.thread,
     movieComparisons: ['Blade Runner 2049', 'Seven', 'Interestelar'],
+    thinkers: [
+      {
+        name: 'Friedrich Nietzsche',
+        note: 'O embate entre vontade individual e o peso trágico do destino.',
+      },
+    ],
   };
 }
 
