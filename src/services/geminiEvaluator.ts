@@ -838,11 +838,15 @@ export function buildInstantDuelVerdict(books: BookEvaluation[]): BookDuelVerdic
     return {
       bookId: b.id,
       label,
-      reason: b.veredito || b.criteria?.ritmoDescricao || b.justificativaEncaixe,
+      reason: b.criteria?.ritmoDescricao
+        ? `${b.criteria.ritmoDescricao}. ${b.veredito}`
+        : b.veredito,
     };
   });
 
-  const headline = winner.veredito || `Comece por ${winner.title}.`;
+  const headline = runnerUp
+    ? `${winner.title} leva vantagem no duelo pelo encaixe superior (${Math.floor(winner.notaEncaixe)} vs. ${Math.floor(runnerUp.notaEncaixe)}) e maior peso dramático para o seu gosto.`
+    : winner.veredito || `Comece por ${winner.title}.`;
 
   const comparativo = runnerUp
     ? `${winner.title} (${winner.pages} págs, Encaixe ${Math.floor(winner.notaEncaixe)}) sai na frente de ${runnerUp.title} (${runnerUp.pages} págs, Encaixe ${Math.floor(runnerUp.notaEncaixe)}). ${winner.justificativaEncaixe}`

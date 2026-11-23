@@ -21,7 +21,7 @@ import {
 } from '../../services/geminiEvaluator';
 import { getEffectiveScore } from '../../services/ratings';
 import { BookCover } from '../BookCover';
-import { ScoreBadge, getScoreTone } from '../ui/ScoreBadge';
+import { getScoreTone } from '../ui/ScoreBadge';
 
 interface DuelModalProps {
   books: BookEvaluation[];
@@ -147,7 +147,6 @@ export const DuelModal: React.FC<DuelModalProps> = ({
     const header = `📋 VEREDITO — Comparativo de Leitura\n📖 ${books.map((b) => b.title).join(' vs. ')}`;
     const winnerLine = `💡 Recomendado para começar: ${winnerBook?.title} (${winnerBook?.author})`;
     const headlineLine = `"${verdict.headline}"`;
-    const compLine = `\n📝 Análise Comparativa:\n${verdict.comparativo}`;
     const scenariosLines = books
       .map((b) => {
         const sc = verdict.scenarios.find((s) => s.bookId === b.id);
@@ -156,7 +155,7 @@ export const DuelModal: React.FC<DuelModalProps> = ({
       })
       .join('\n');
 
-    return `${header}\n${winnerLine}\n${headlineLine}${compLine}\n\n${scenariosLines}`;
+    return `${header}\n${winnerLine}\n${headlineLine}\n\n${scenariosLines}`;
   };
 
   const copyDuelToClipboard = async () => {
@@ -167,7 +166,7 @@ export const DuelModal: React.FC<DuelModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 md:p-3 lg:p-4 overflow-hidden">
-      {/* Backdrop with smooth opacity fade */}
+      {/* Backdrop */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -177,7 +176,7 @@ export const DuelModal: React.FC<DuelModalProps> = ({
         className="absolute inset-0 bg-black/45 backdrop-blur-sm z-10 cursor-pointer"
       />
 
-      {/* Modal Container — Exact same shell & proportions as FichaModal and CharacterModal */}
+      {/* Modal Container — Same proportions as FichaModal */}
       <motion.div
         initial={{ opacity: 0, scale: 0.94, y: 24 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -188,7 +187,7 @@ export const DuelModal: React.FC<DuelModalProps> = ({
           stiffness: 320,
           mass: 0.85,
         }}
-        className="relative w-full max-w-lg md:max-w-4xl lg:max-w-[1080px] xl:max-w-[1160px] max-h-[92vh] sm:max-h-[88vh] md:max-h-[88vh] lg:max-h-[89vh] bg-[#ffffff] border border-black/[0.08] rounded-t-3xl sm:rounded-3xl shadow-[0_25px_65px_-15px_rgba(0,0,0,0.25)] flex flex-col overflow-hidden text-[#1d1d1f] z-20 will-change-transform"
+        className="relative w-full max-w-lg md:max-w-4xl lg:max-w-[1060px] xl:max-w-[1120px] max-h-[92vh] sm:max-h-[88vh] bg-[#ffffff] border border-black/[0.08] rounded-t-3xl sm:rounded-3xl shadow-[0_25px_65px_-15px_rgba(0,0,0,0.25)] flex flex-col overflow-hidden text-[#1d1d1f] z-20 will-change-transform"
       >
         {/* Copy Confirmation Toast */}
         <AnimatePresence>
@@ -206,8 +205,8 @@ export const DuelModal: React.FC<DuelModalProps> = ({
           )}
         </AnimatePresence>
 
-        {/* Minimalist Top Action Bar — identical to FichaModal & CharacterModal */}
-        <div className="flex items-center justify-end px-6 pt-3.5 pb-2 md:pt-2.5 md:pb-1 bg-[#ffffff]/90 backdrop-blur-lg sticky top-0 z-20">
+        {/* Minimalist Top Action Bar */}
+        <div className="flex items-center justify-end px-6 pt-3.5 pb-1.5 md:pt-2.5 md:pb-1 bg-[#ffffff]/90 backdrop-blur-lg sticky top-0 z-20">
           <div className="flex items-center gap-1.5">
             <motion.button
               whileHover={{ scale: 1.08 }}
@@ -230,16 +229,16 @@ export const DuelModal: React.FC<DuelModalProps> = ({
           </div>
         </div>
 
-        {/* Scrollable Content: 12-Column Editorial Grid on Desktop, Single Column on Mobile */}
-        <div className="overflow-y-auto px-5 sm:px-6 md:px-8 py-4 sm:py-5 md:pt-2 md:pb-6 hide-scrollbar flex-1">
-          <div className="flex flex-col md:grid md:grid-cols-12 md:gap-7 lg:gap-8 items-start md:items-stretch">
-            {/* Left Column (Desktop Hero: Large 3D Book Covers Side by Side) */}
+        {/* Content: 12-Column Editorial Grid on Desktop */}
+        <div className="overflow-y-auto px-5 sm:px-6 md:px-8 py-3 sm:py-4 md:pt-1 md:pb-6 hide-scrollbar flex-1">
+          <div className="flex flex-col md:grid md:grid-cols-12 md:gap-7 lg:gap-8 items-center">
+            {/* Left Column: Visual Cover Arena (Winner Scaled Up + Lit, Other Dimmed + Scaled Down) */}
             <div className="w-full md:col-span-5 lg:col-span-4">
-              <div className="w-full flex flex-col justify-center space-y-4 md:sticky md:top-0 md:min-h-[450px] lg:min-h-[480px]">
+              <div className="w-full flex flex-col justify-center py-2">
                 <div
                   className={`grid ${
-                    books.length === 3 ? 'grid-cols-3 gap-2.5' : 'grid-cols-2 gap-4'
-                  } items-start w-full max-w-md mx-auto`}
+                    books.length === 3 ? 'grid-cols-3 gap-3' : 'grid-cols-2 gap-5'
+                  } items-center w-full max-w-md mx-auto px-1`}
                 >
                   {books.map((book) => {
                     const isWinner = book.id === winnerBook?.id;
@@ -253,15 +252,15 @@ export const DuelModal: React.FC<DuelModalProps> = ({
                         className="flex flex-col cursor-pointer group select-none"
                         title={`Abrir ficha de ${book.title}`}
                       >
-                        <div className="relative w-full mb-2.5">
-                          {/* Soft ambient cover glow behind the recommended book (same technique as EvaluateModal) */}
+                        <div className="relative w-full mb-3">
+                          {/* Soft ambient cover glow behind the winning book */}
                           {isWinner && book.coverUrl && (
                             <div
                               aria-hidden="true"
-                              className="absolute -inset-1.5 rounded-2xl overflow-hidden pointer-events-none -z-10 opacity-55"
+                              className="absolute -inset-2 rounded-2xl overflow-hidden pointer-events-none -z-10 opacity-65"
                               style={{
-                                transform: 'translate3d(0, 8px, 0) scale(1.02)',
-                                filter: 'blur(16px) saturate(1.3)',
+                                transform: 'translate3d(0, 10px, 0) scale(1.05)',
+                                filter: 'blur(18px) saturate(1.4)',
                               }}
                             >
                               <img
@@ -278,8 +277,8 @@ export const DuelModal: React.FC<DuelModalProps> = ({
                           <div
                             className={`transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
                               isWinner
-                                ? '-translate-y-1 scale-[1.02]'
-                                : 'opacity-80 group-hover:opacity-100 group-hover:-translate-y-1'
+                                ? '-translate-y-1.5 scale-[1.05]'
+                                : 'opacity-45 saturate-[0.55] scale-[0.91] translate-y-1 group-hover:opacity-85 group-hover:saturate-100 group-hover:scale-[0.95]'
                             }`}
                           >
                             <BookCover
@@ -292,9 +291,17 @@ export const DuelModal: React.FC<DuelModalProps> = ({
                           </div>
                         </div>
 
-                        {/* Clean Book Metadata under Cover */}
-                        <div className="space-y-1 px-0.5">
-                          <h4 className="text-xs sm:text-[13px] font-bold text-[#1d1d1f] truncate group-hover:text-black leading-snug tracking-tight">
+                        {/* Metadata under Cover */}
+                        <div
+                          className={`space-y-0.5 px-0.5 transition-opacity duration-300 ${
+                            isWinner ? 'opacity-100' : 'opacity-50 group-hover:opacity-90'
+                          }`}
+                        >
+                          <h4
+                            className={`text-xs sm:text-[13px] truncate leading-snug tracking-tight ${
+                              isWinner ? 'font-bold text-[#1d1d1f]' : 'font-semibold text-[#1d1d1f]'
+                            }`}
+                          >
                             {book.title}
                           </h4>
                           <p className="text-[11px] text-[#86868b] truncate">
@@ -310,7 +317,7 @@ export const DuelModal: React.FC<DuelModalProps> = ({
                             </span>
                           </div>
 
-                          {/* Minimalist active indicator bar underneath winner (from EvaluateModal) */}
+                          {/* Minimalist indicator bar underneath winner */}
                           <div className="h-2 w-full flex items-center justify-start pt-1">
                             {isWinner && (
                               <div className="w-6 h-[2.5px] rounded-full bg-[#1d1d1f]" />
@@ -324,9 +331,9 @@ export const DuelModal: React.FC<DuelModalProps> = ({
               </div>
             </div>
 
-            {/* Right Column (Editorial Header, Veredito Banner, Contrast Cards, 6 Telemetry Tracks) */}
-            <div className="w-full md:col-span-7 lg:col-span-8 space-y-4 md:space-y-3.5 min-w-0 mt-5 md:mt-0">
-              {/* Header: Tags, Confrontation Title, Subtitle */}
+            {/* Right Column: Clean, Enxuto Editorial Comparison (Header + Verdict Banner + 2 Scenario Pills + 6 Criteria) */}
+            <div className="w-full md:col-span-7 lg:col-span-8 space-y-3.5 min-w-0 mt-4 md:mt-0">
+              {/* Header */}
               <div className="space-y-1 text-center sm:text-left">
                 <div className="flex flex-wrap items-center justify-center sm:justify-start gap-1.5">
                   <span className="px-2.5 py-0.5 rounded-full text-[10px] font-medium bg-neutral-100 border border-neutral-200/80 text-[#86868b]">
@@ -337,21 +344,18 @@ export const DuelModal: React.FC<DuelModalProps> = ({
                   </span>
                 </div>
 
-                <h2 className="text-xl sm:text-2xl md:text-[25px] font-extrabold tracking-tight text-[#1d1d1f] leading-tight">
+                <h2 className="text-xl sm:text-2xl md:text-[24px] font-extrabold tracking-tight text-[#1d1d1f] leading-tight">
                   {books.map((b) => b.title).join(' vs. ')}
                 </h2>
-                <p className="text-xs sm:text-sm font-semibold text-[#86868b]">
-                  {books.map((b) => b.author).join(' • ')}
-                </p>
               </div>
 
-              {/* Veredito Direto Banner — Exact same light editorial card as FichaModal */}
-              <div className="p-3.5 md:p-4 rounded-2xl bg-gradient-to-br from-neutral-50 to-neutral-100/70 border border-neutral-200/90 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+              {/* Veredito Comparativo Banner + Tactile Black CTA Pill */}
+              <div className="p-3.5 md:p-4 rounded-2xl bg-gradient-to-br from-neutral-50 to-neutral-100/70 border border-neutral-200/90 flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 shadow-xs">
                 <div className="space-y-1 flex-1 min-w-0">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-[#86868b] block">
                     {isRefiningWithAi ? 'Calibrando Veredito Comparativo...' : 'Veredito Comparativo'}
                   </span>
-                  <p className="text-sm md:text-[15px] font-semibold text-[#1d1d1f] italic leading-snug">
+                  <p className="text-xs sm:text-sm font-semibold text-[#1d1d1f] italic leading-relaxed">
                     "{verdict.headline}"
                   </p>
                 </div>
@@ -360,73 +364,64 @@ export const DuelModal: React.FC<DuelModalProps> = ({
                   <button
                     type="button"
                     onClick={() => winnerBook && onSelectBook(winnerBook)}
-                    className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-xs border border-emerald-400 transition-colors cursor-pointer active:scale-95"
+                    className="group/cta inline-flex items-center gap-2 pl-3.5 pr-3 py-1.5 rounded-full bg-gradient-to-b from-[#2e2e33] via-[#1d1d1f] to-[#121214] hover:from-[#3a3a40] hover:to-[#1d1d1f] text-white font-bold text-[11px] tracking-tight border border-black/80 shadow-[0_6px_16px_rgba(0,0,0,0.18),0_1px_3px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.22)] transition-all cursor-pointer active:scale-95 select-none"
                     title={`Abrir ficha de ${winnerBook?.title}`}
                   >
-                    <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
                     <span className="truncate max-w-[180px]">
-                      COMECE POR {winnerBook?.title.toUpperCase()}
+                      Comece por {winnerBook?.title}
+                    </span>
+                    <span className="w-4.5 h-4.5 rounded-full bg-white/15 group-hover/cta:bg-white/25 flex items-center justify-center transition-colors">
+                      <ArrowUpRight className="w-3 h-3 text-white stroke-[2.5]" />
                     </span>
                   </button>
                 </div>
               </div>
 
-              {/* Análise de Contraste + Quando Escolher Cada Obra */}
-              <div className="space-y-2.5">
-                <p className="text-xs sm:text-sm text-[#1d1d1f] leading-relaxed bg-neutral-50 p-3.5 rounded-xl border border-neutral-200/70">
-                  {verdict.comparativo}
-                </p>
+              {/* Compact Side-by-Side Occasion Cards (1 linha enxuta para cada obra) */}
+              <div
+                className={`grid grid-cols-1 ${
+                  books.length === 3 ? 'sm:grid-cols-3' : 'sm:grid-cols-2'
+                } gap-2.5`}
+              >
+                {books.map((book) => {
+                  const scenario = verdict.scenarios.find((s) => s.bookId === book.id);
+                  const isWinner = book.id === winnerBook?.id;
 
-                <div
-                  className={`grid grid-cols-1 ${
-                    books.length === 3 ? 'sm:grid-cols-3' : 'sm:grid-cols-2'
-                  } gap-2.5`}
-                >
-                  {books.map((book) => {
-                    const scenario = verdict.scenarios.find((s) => s.bookId === book.id);
-                    const eff = getEffectiveScore(book, userRatings);
-                    const isUserRated = Boolean(userRatings?.[book.id]);
-
-                    return (
-                      <div
-                        key={`scenario-${book.id}`}
-                        onClick={() => onSelectBook(book)}
-                        className="p-3 rounded-xl bg-neutral-50/90 hover:bg-neutral-100/80 border border-neutral-200/75 hover:border-neutral-300 transition-all cursor-pointer group space-y-1.5"
-                      >
-                        <div className="flex items-center justify-between gap-2">
-                          <div className="min-w-0">
-                            <span className="block text-xs font-bold text-[#1d1d1f] truncate group-hover:text-black">
-                              {book.title}
-                            </span>
-                            {scenario && (
-                              <span className="block text-[10px] font-semibold text-[#86868b] truncate">
-                                {scenario.label}
-                              </span>
-                            )}
-                          </div>
-
-                          <div className="flex items-center gap-1.5 shrink-0">
-                            <ScoreBadge
-                              score={eff}
-                              size="sm"
-                              isUserRating={isUserRated}
-                            />
-                            <ArrowUpRight className="w-3.5 h-3.5 text-[#86868b] group-hover:text-[#1d1d1f] transition-colors" />
-                          </div>
+                  return (
+                    <div
+                      key={`scenario-${book.id}`}
+                      onClick={() => onSelectBook(book)}
+                      className="px-3.5 py-2.5 rounded-xl bg-neutral-50/90 hover:bg-neutral-100/80 border border-neutral-200/75 hover:border-neutral-300 transition-all cursor-pointer group space-y-1"
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-1.5 min-w-0">
+                          <span
+                            className={`w-1.5 h-1.5 rounded-full shrink-0 ${
+                              isWinner ? 'bg-[#1d1d1f]' : 'bg-neutral-300'
+                            }`}
+                          />
+                          <span className="text-xs font-bold text-[#1d1d1f] truncate group-hover:text-black">
+                            {book.title}
+                          </span>
                         </div>
-
                         {scenario && (
-                          <p className="text-[11px] text-[#515154] leading-snug line-clamp-2">
-                            {scenario.reason}
-                          </p>
+                          <span className="text-[10px] font-semibold text-[#86868b] truncate shrink-0">
+                            {scenario.label}
+                          </span>
                         )}
                       </div>
-                    );
-                  })}
-                </div>
+
+                      {scenario && (
+                        <p className="text-[11px] text-[#636366] leading-snug line-clamp-2">
+                          {scenario.reason}
+                        </p>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
 
-              {/* Critérios do Veredito — Telemetria Comparativa (Mesma grade 3x2 e barras 3D da FichaModal) */}
+              {/* Critérios do Veredito — Telemetria Comparada (Grade 3x2 completa visível sem corte) */}
               <div className="space-y-2 pt-0.5">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#86868b]">
@@ -446,23 +441,23 @@ export const DuelModal: React.FC<DuelModalProps> = ({
                     return (
                       <div
                         key={crit.id}
-                        className="p-3.5 md:p-3 rounded-xl bg-neutral-50 hover:bg-neutral-100/70 border border-neutral-200/70 transition-all space-y-2.5 shadow-2xs hover:border-neutral-300"
+                        className="p-3 rounded-xl bg-neutral-50 hover:bg-neutral-100/70 border border-neutral-200/70 transition-all space-y-2 shadow-2xs hover:border-neutral-300"
                       >
                         <div className="flex items-center gap-2 min-w-0">
                           {crit.icon}
-                          <span className="text-sm sm:text-[13.5px] font-bold text-[#1d1d1f] tracking-tight truncate">
+                          <span className="text-[13px] font-bold text-[#1d1d1f] tracking-tight truncate">
                             {crit.label}
                           </span>
                         </div>
 
-                        <div className="space-y-2">
+                        <div className="space-y-1.5">
                           {books.map((book) => {
                             const val = crit.getValue(book);
                             const isLeader = val === maxScore;
                             const tone = getScoreTone(val);
 
                             return (
-                              <div key={`${crit.id}-${book.id}`} className="space-y-1">
+                              <div key={`${crit.id}-${book.id}`} className="space-y-0.5">
                                 <div className="flex items-center justify-between text-[11px] gap-1.5">
                                   <span
                                     className={`truncate ${
@@ -485,11 +480,11 @@ export const DuelModal: React.FC<DuelModalProps> = ({
                                 </div>
 
                                 {/* 3D Tactile Progress Track matching FichaModal */}
-                                <div className="w-full h-2.5 rounded-full overflow-hidden bg-neutral-200/90 shadow-[inset_0_1.5px_2.5px_rgba(0,0,0,0.18),0_1px_1px_rgba(255,255,255,0.8)] border border-neutral-300/40 p-[1.5px]">
+                                <div className="w-full h-2 rounded-full overflow-hidden bg-neutral-200/90 shadow-[inset_0_1px_2px_rgba(0,0,0,0.16),0_1px_1px_rgba(255,255,255,0.8)] border border-neutral-300/40 p-[1px]">
                                   <div
-                                    className={`h-full rounded-full transition-all duration-300 relative overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.22),inset_0_1px_1px_rgba(255,255,255,0.7),inset_0_-1px_1px_rgba(0,0,0,0.25)] ${
+                                    className={`h-full rounded-full transition-all duration-300 relative overflow-hidden shadow-[0_1px_2px_rgba(0,0,0,0.2),inset_0_1px_1px_rgba(255,255,255,0.7)] ${
                                       !isLeader
-                                        ? 'bg-gradient-to-b from-neutral-400 to-neutral-500 opacity-60'
+                                        ? 'bg-gradient-to-b from-neutral-400 to-neutral-500 opacity-55'
                                         : tone === 'green'
                                           ? 'bg-gradient-to-b from-emerald-400 via-emerald-500 to-emerald-600'
                                           : tone === 'yellow'

@@ -691,17 +691,17 @@ export const EstanteView: React.FC<EstanteViewProps> = React.memo(({
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 20, scale: 0.95 }}
                 transition={{ type: 'spring', damping: 26, stiffness: 360, mass: 0.8 }}
-                className="fixed bottom-24 md:bottom-7 left-1/2 -translate-x-1/2 z-40 w-[94%] max-w-lg pointer-events-auto"
+                className="fixed bottom-24 md:bottom-7 left-1/2 -translate-x-1/2 z-40 w-fit max-w-[95vw] pointer-events-auto"
               >
-                <div className="px-3.5 py-2.5 rounded-full bg-white/95 backdrop-blur-xl border border-neutral-200/90 shadow-[0_12px_36px_rgba(0,0,0,0.16),0_2px_8px_rgba(0,0,0,0.06)] flex items-center justify-between gap-2 select-none">
-                  <div className="flex items-center gap-2 min-w-0 pl-1">
+                <div className="px-3.5 py-2.5 rounded-full bg-white/95 backdrop-blur-xl border border-neutral-200/90 shadow-[0_12px_36px_rgba(0,0,0,0.16),0_2px_8px_rgba(0,0,0,0.06)] flex items-center justify-between gap-3 sm:gap-5 select-none">
+                  <div className="flex items-center gap-2 shrink-0 pl-1">
                     <button
                       type="button"
                       onClick={handleToggleSelectAllShelf}
-                      className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-semibold text-[#1d1d1f] hover:bg-neutral-100 active:scale-95 transition-all cursor-pointer shrink-0"
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-semibold text-[#1d1d1f] hover:bg-neutral-100 active:scale-95 transition-all cursor-pointer shrink-0 whitespace-nowrap"
                     >
-                      <CheckSquare className="w-3.5 h-3.5 text-[#1d1d1f]" />
-                      <span className="truncate">
+                      <CheckSquare className="w-3.5 h-3.5 text-[#1d1d1f] shrink-0" />
+                      <span className="whitespace-nowrap">
                         {selectedIds.size > 0
                           ? `${selectedIds.size} ${selectedIds.size === 1 ? 'selecionado' : 'selecionados'}`
                           : 'Selecionar todos'}
