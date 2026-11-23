@@ -36,6 +36,127 @@ interface DuelModalProps {
 
 const INTRO_DURATION_MS = 2000;
 
+// Cache em memória (0ms) da cor dominante vibrante de cada capa
+const coverColorCache = new Map<string, { bg: string; border: string; shadow: string }>();
+
+function rgbToHsl(r: number, g: number, b: number): [number, number, number] {
+  const rn = r / 255;
+  const gn = g / 255;
+  const bn = b / 255;
+  const max = Math.max(rn, gn, bn);
+  const min = Math.min(rn, gn, bn);
+  let h = 0;
+  let s = 0;
+  const l = (max + min) / 2;
+
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch (max) {
+      case rn:
+        h = (gn - bn) / d + (gn < bn ? 6 : 0);
+        break;
+      case gn:
+        h = (bn - rn) / d + 2;
+        break;
+      case bn:
+        h = (rn - gn) / d + 4;
+        break;
+    }
+    h /= 6;
+  }
+  return [Math.round(h * 360), Math.round(s * 100), Math.round(l * 100)];
+}
+
+/**
+ * Extrai a cor mais vibrante da capa em um micro-canvas 12x16 (< 0.1ms) e cacheia por URL.
+ */
+function extractVibrantCoverTheme(
+  coverUrl: string
+): Promise<{ bg: string; border: string; shadow: string } | null> {
+  if (!coverUrl) return Promise.resolve(null);
+  if (coverColorCache.has(coverUrl)) {
+    return Promise.resolve(coverColorCache.get(coverUrl)!);
+  }
+
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      try {
+        const canvas = document.createElement('canvas');
+        const w = 12;
+        const h = 16;
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          resolve(null);
+          return;
+        }
+        ctx.drawImage(img, 0, 0, w, h);
+        const data = ctx.getImageData(0, 0, w, h).data;
+
+        let bestH = 0;
+        let bestS = 0;
+        let bestL = 35;
+        let bestScore = -1;
+
+        for (let i = 0; i < data.length; i += 4) {
+          const r = data[i];
+          const g = data[i + 1];
+          const b = data[i + 2];
+          const a = data[i + 3];
+          if (a < 180) continue;
+
+          const [hue, sat, light] = rgbToHsl(r, g, b);
+          // Ignora pixels quase brancos ou quase pretos
+          if (light < 12 || light > 88) continue;
+
+          // Prioriza saturação alta e luminosidade intermediária (cores vivas da capa)
+          const midLightBonus = 1 - Math.abs(light - 50) / 50;
+          const score = sat * 1.6 + midLightBonus * 35;
+          if (score > bestScore) {
+            bestScore = score;
+            bestH = hue;
+            bestS = sat;
+            bestL = light;
+          }
+        }
+
+        if (bestScore < 18 || bestS < 12) {
+          // Capa monocromática / P&B
+          const fallbackMono = {
+            bg: 'linear-gradient(180deg, hsl(240, 6%, 26%) 0%, hsl(240, 7%, 15%) 100%)',
+            border: 'hsla(0, 0%, 100%, 0.22)',
+            shadow: '0 8px 20px -4px rgba(0, 0, 0, 0.32)',
+          };
+          coverColorCache.set(coverUrl, fallbackMono);
+          resolve(fallbackMono);
+          return;
+        }
+
+        // Calibra para um tom vivo, visível e com contraste perfeito para texto branco
+        const finalS = Math.min(88, Math.max(58, bestS + 14));
+        const finalLTop = Math.min(48, Math.max(38, bestL));
+        const finalLBottom = Math.max(26, finalLTop - 11);
+
+        const theme = {
+          bg: `linear-gradient(180deg, hsl(${bestH}, ${finalS}%, ${finalLTop}%) 0%, hsl(${bestH}, ${finalS}%, ${finalLBottom}%) 100%)`,
+          border: `hsl(${bestH}, ${finalS}%, ${Math.min(62, finalLTop + 14)}%)`,
+          shadow: `0 8px 22px -4px hsla(${bestH}, ${finalS}%, ${finalLBottom}%, 0.52), 0 2px 6px -1px hsla(${bestH}, ${finalS}%, 20%, 0.28)`,
+        };
+        coverColorCache.set(coverUrl, theme);
+        resolve(theme);
+      } catch {
+        resolve(null);
+      }
+    };
+    img.onerror = () => resolve(null);
+    img.src = coverUrl;
+  });
+}
+
 export const DuelModal: React.FC<DuelModalProps> = ({
   books,
   userRatings,
@@ -44,6 +165,9 @@ export const DuelModal: React.FC<DuelModalProps> = ({
 }) => {
   const [aiVerdictMap, setAiVerdictMap] = useState<Record<string, BookDuelVerdict>>({});
   const [copiedAlert, setCopiedAlert] = useState(false);
+  const [extractedThemes, setExtractedThemes] = useState<
+    Record<string, { bg: string; border: string; shadow: string }>
+  >({});
 
   const booksKey = useMemo(
     () => books.map((b) => b.id).sort().join('|'),
@@ -60,6 +184,24 @@ export const DuelModal: React.FC<DuelModalProps> = ({
     }, INTRO_DURATION_MS);
     return () => clearTimeout(timer);
   }, [booksKey]);
+
+  // Pré-calcula a cor vibrante das capas durante o loading de 2s
+  useEffect(() => {
+    let isMounted = true;
+    for (const b of books) {
+      if (!b.coverUrl) continue;
+      extractVibrantCoverTheme(b.coverUrl).then((theme) => {
+        if (isMounted && theme) {
+          setExtractedThemes((prev) =>
+            prev[b.coverUrl] ? prev : { ...prev, [b.coverUrl]: theme }
+          );
+        }
+      });
+    }
+    return () => {
+      isMounted = false;
+    };
+  }, [books]);
 
   const cachedOrAiVerdict = useMemo(() => {
     if (books.length < 2) return null;
@@ -125,6 +267,10 @@ export const DuelModal: React.FC<DuelModalProps> = ({
   }, [books, winnerBook]);
 
   if (books.length < 2 || !verdict) return null;
+
+  const winnerCoverTheme = winnerBook?.coverUrl
+    ? extractedThemes[winnerBook.coverUrl] || coverColorCache.get(winnerBook.coverUrl)
+    : undefined;
 
   const criteriaList = [
     {
@@ -264,7 +410,7 @@ export const DuelModal: React.FC<DuelModalProps> = ({
         <div className="overflow-y-auto px-5 sm:px-6 md:px-8 pt-6 pb-5 sm:pt-7 sm:pb-6 md:pt-7 md:pb-7 hide-scrollbar flex-1">
           <AnimatePresence mode="wait" initial={false}>
             {isIntroLoading ? (
-              /* Estágio de Loading de 2 Segundos — Sofisticado, estilo Apple/EvaluateModal */
+              /* Estágio de Loading de 2 Segundos — Apenas as capas, os títulos e a barra minimalista */
               <motion.div
                 key="duel-intro-loading"
                 initial={{ opacity: 0, y: 8 }}
@@ -273,7 +419,7 @@ export const DuelModal: React.FC<DuelModalProps> = ({
                 transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
                 className="py-7 sm:py-9 flex flex-col items-center justify-center text-center space-y-6 select-none"
               >
-                {/* Capas lado a lado parelhas durante a calibragem de 2s */}
+                {/* Capas lado a lado parelhas durante os 2s */}
                 <div className="flex items-center justify-center gap-5 sm:gap-7 pt-2">
                   {books.map((book, idx) => (
                     <motion.div
@@ -326,16 +472,13 @@ export const DuelModal: React.FC<DuelModalProps> = ({
                   ))}
                 </div>
 
-                {/* Tipografia Shimmer Minimalista + Barra Hairline de 2s */}
-                <div className="space-y-2.5 flex flex-col items-center">
-                  <p className="text-base sm:text-lg font-semibold tracking-[-0.02em] step-text-shimmer">
-                    Cruzando telemetria e perfil
-                  </p>
-                  <p className="text-xs text-[#86868b] max-w-xs">
+                {/* Apenas os títulos com shimmer + Barra Hairline de 2s */}
+                <div className="space-y-3 flex flex-col items-center px-3">
+                  <p className="text-sm sm:text-base font-bold tracking-[-0.02em] step-text-shimmer max-w-sm leading-snug">
                     {books.map((b) => b.title).join(' vs. ')}
                   </p>
 
-                  <div className="w-36 sm:w-44 h-[2px] rounded-full bg-black/[0.07] overflow-hidden mt-1">
+                  <div className="w-36 sm:w-44 h-[2px] rounded-full bg-black/[0.07] overflow-hidden">
                     <motion.div
                       className="h-full bg-[#1d1d1f] rounded-full origin-left"
                       initial={{ scaleX: 0.08 }}
@@ -408,7 +551,7 @@ export const DuelModal: React.FC<DuelModalProps> = ({
                           title={`Abrir ficha de ${book.title}`}
                         >
                           <div className={`relative ${coverWidthClass} mx-auto mb-2.5`}>
-                            {/* Soft ambient cover glow behind the winning book — centralizado para nunca cortar no topo */}
+                            {/* Soft ambient cover glow behind the winning book */}
                             {isWinner && book.coverUrl && (
                               <motion.div
                                 aria-hidden="true"
@@ -484,7 +627,7 @@ export const DuelModal: React.FC<DuelModalProps> = ({
                     </h2>
                   </motion.div>
 
-                  {/* 2. Veredito Comparativo Banner + Botão na Cor da Capa do Livro Vencedor (100% GPU, 0ms CPU) */}
+                  {/* 2. Veredito Comparativo Banner + Botão na Cor Vibrante da Capa do Livro Vencedor */}
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -504,11 +647,20 @@ export const DuelModal: React.FC<DuelModalProps> = ({
                       <button
                         type="button"
                         onClick={() => winnerBook && onSelectBook(winnerBook)}
-                        className="group/cta relative isolate inline-flex items-center gap-2 pl-3.5 pr-2.5 py-1.5 rounded-full bg-[#1d1d1f] text-white font-bold text-[11px] tracking-tight border border-black/25 shadow-[0_6px_16px_rgba(0,0,0,0.18),0_1px_3px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.28)] overflow-hidden transition-transform cursor-pointer active:scale-95 select-none"
+                        style={
+                          winnerCoverTheme
+                            ? {
+                                background: winnerCoverTheme.bg,
+                                borderColor: winnerCoverTheme.border,
+                                boxShadow: `${winnerCoverTheme.shadow}, inset 0 1px 0 rgba(255,255,255,0.32)`,
+                              }
+                            : undefined
+                        }
+                        className="group/cta relative isolate inline-flex items-center gap-2 pl-3.5 pr-2.5 py-1.5 rounded-full bg-[#1d1d1f] text-white font-bold text-[11px] tracking-tight border border-white/20 shadow-[0_6px_16px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.28)] overflow-hidden transition-all duration-200 cursor-pointer hover:brightness-110 active:scale-95 select-none"
                         title={`Abrir ficha de ${winnerBook?.title}`}
                       >
-                        {/* Camada GPU que extrai a paleta cromática da capa do livro vencedor sem custo de canvas/JS */}
-                        {winnerBook?.coverUrl && (
+                        {/* Fallback/Reforço GPU caso o host da imagem bloqueie leitura de canvas por CORS */}
+                        {!winnerCoverTheme && winnerBook?.coverUrl && (
                           <img
                             src={winnerBook.coverUrl}
                             alt=""
@@ -516,19 +668,18 @@ export const DuelModal: React.FC<DuelModalProps> = ({
                             loading="eager"
                             decoding="async"
                             referrerPolicy="no-referrer"
-                            className="absolute inset-0 w-full h-full object-cover scale-[2.4] blur-xl saturate-[2.1] brightness-[0.58] contrast-[1.15] pointer-events-none -z-10 transition-transform duration-300 group-hover/cta:scale-[2.6] group-hover/cta:brightness-[0.65]"
+                            className="absolute inset-0 w-full h-full object-cover scale-[2.2] blur-lg saturate-[2.8] brightness-[0.82] contrast-[1.2] pointer-events-none -z-10 transition-transform duration-300 group-hover/cta:scale-[2.4]"
                           />
                         )}
-                        {/* Véu de contraste e reflexo vítreo superior para garantir leitura perfeita em qualquer capa */}
                         <span
                           aria-hidden="true"
-                          className="absolute inset-0 bg-gradient-to-b from-white/12 via-black/22 to-black/45 pointer-events-none -z-10"
+                          className="absolute inset-0 bg-gradient-to-b from-white/18 via-transparent to-black/22 pointer-events-none -z-10"
                         />
 
-                        <span className="relative z-10 truncate max-w-[190px] drop-shadow-[0_1px_1.5px_rgba(0,0,0,0.45)]">
+                        <span className="relative z-10 truncate max-w-[190px] drop-shadow-[0_1px_2px_rgba(0,0,0,0.45)]">
                           Comece por {winnerBook?.title}
                         </span>
-                        <span className="relative z-10 w-4.5 h-4.5 rounded-full bg-white/20 group-hover/cta:bg-white/30 flex items-center justify-center transition-colors backdrop-blur-2xs">
+                        <span className="relative z-10 w-4.5 h-4.5 rounded-full bg-white/22 group-hover/cta:bg-white/32 flex items-center justify-center transition-colors backdrop-blur-2xs">
                           <ArrowUpRight className="w-3 h-3 text-white stroke-[2.5]" />
                         </span>
                       </button>
