@@ -70,15 +70,6 @@ export const CharacterModal: React.FC<CharacterModalProps> = ({
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [onClose]);
 
-  // Lock body scroll while modal is active for native app feel
-  useEffect(() => {
-    const originalOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = originalOverflow;
-    };
-  }, []);
-
   const evaluatedSet = useMemo(() => buildEvaluatedTitleSet(existingBooks), [existingBooks]);
 
   const recommendedBooks = useMemo(() => {
@@ -246,11 +237,10 @@ ${booksList}`;
             {/* Left Column (Desktop Hero: 3D Character Portrait & Cover Tools) */}
             <div className="w-full md:col-span-4 lg:col-span-3">
               <div
-                className={`w-full flex flex-col items-center space-y-3.5 md:sticky md:top-0 ${
-                  isCoverPickerOpen
+                className={`w-full flex flex-col items-center space-y-3.5 md:sticky md:top-0 ${isCoverPickerOpen
                     ? 'md:justify-start md:pt-2'
                     : 'md:min-h-[430px] lg:min-h-[460px] md:justify-center'
-                }`}
+                  }`}
               >
                 {/* Extra-Large Clean 3D Portrait Cover */}
                 <div className="w-48 sm:w-56 md:w-full max-w-[260px] md:max-w-[240px] mx-auto">

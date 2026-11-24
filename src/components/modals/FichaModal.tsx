@@ -125,15 +125,6 @@ export const FichaModal: React.FC<FichaModalProps> = ({
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [onClose]);
 
-  // Lock body scroll while modal is active for native app feel
-  useEffect(() => {
-    const originalOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = originalOverflow;
-    };
-  }, []);
-
   if (!book) return null;
 
   // Derived inverted metrics for unified 0-10 intuitive scale (higher = better fit)

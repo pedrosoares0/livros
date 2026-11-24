@@ -243,15 +243,6 @@ export const DuelModal: React.FC<DuelModalProps> = ({
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [onClose]);
 
-  // Lock body scroll while modal is active
-  useEffect(() => {
-    const originalOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = originalOverflow;
-    };
-  }, []);
-
   const winnerBook = useMemo(
     () => (verdict ? books.find((b) => b.id === verdict.winnerId) || books[0] : books[0]),
     [books, verdict]

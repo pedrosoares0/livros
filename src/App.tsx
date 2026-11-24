@@ -414,14 +414,28 @@ export function App() {
 
   // Shelves display only real books synchronized with the Supabase database
   const allShelfBooks = books;
-  const isDiscoverActive =
-    activeTab === 'discover' &&
-    !selectedBook &&
-    !selectedCharacter &&
-    !isEvaluateOpen &&
-    !ratingBook &&
-    !isProfileOpen &&
-    duelBooks.length === 0;
+  const isAnyModalOpen = Boolean(
+    selectedBook ||
+      selectedCharacter ||
+      isEvaluateOpen ||
+      ratingBook ||
+      isProfileOpen ||
+      duelBooks.length > 0
+  );
+  const isDiscoverActive = activeTab === 'discover' && !isAnyModalOpen;
+
+  // Controle centralizado de scroll do body: evita race condition do AnimatePresence
+  // quando um modal abre enquanto outro ainda está executando animação de saída.
+  useEffect(() => {
+    if (isAnyModalOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isAnyModalOpen]);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-start bg-[#f5f5f7] md:bg-white text-[#1d1d1f] antialiased w-full">

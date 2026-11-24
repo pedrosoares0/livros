@@ -397,15 +397,6 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [onClose, isLoading]);
 
-  // Lock body scroll while modal is active for native app feel
-  useEffect(() => {
-    const originalOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = originalOverflow;
-    };
-  }, []);
-
   // Auto-evaluate when opened with a recommended book from CharacterModal
   const triggeredInitialRef = useRef<string | null>(null);
   useEffect(() => {
