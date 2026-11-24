@@ -661,7 +661,8 @@ export async function replenishCharacterBooksWithGemini(
 O leitor esgotou quase todas as indicações do personagem "${character.name}" (${character.source}).
 Fio dramático do personagem: "${character.thread}"
 
-Indique 4 OBRAS LITERÁRIAS REAIS (romances, novelas, clássicos, ficção científica, distopias ou graphic novels adultas consagradas e publicadas no Brasil) que compartilhem visceralmente esse mesmo núcleo dramático e psicológico.
+Indique 4 OBRAS LITERÁRIAS REAIS (priorizando ficção científica / sci-fi conceitual e filosófica, distopias, novelas enxutas, clássicos enxutos ou graphic novels adultas consagradas e publicadas no Brasil) que compartilhem visceralmente esse mesmo núcleo dramático e psicológico.
+PROIBIDO indicar calhamaços de 460+ páginas (indique APENAS obras enxutas e densas entre 90 e 420 páginas).
 PROIBIDO repetir qualquer uma destas obras já listadas ou avaliadas: [${excludedSample}].
 PROIBIDO indicar livros infantis, autoajuda ou romances água-com-açúcar.
 No campo "resumo", escreva 2 linhas sutis focando apenas o ponto de partida e a atmosfera, SEM spoilers ou revelações explícitas da trama.
@@ -734,7 +735,7 @@ Responda ESTRITAMENTE em JSON válido (array de 4 objetos):
       })
     );
 
-    return enriched.filter((b): b is Partial<BookEvaluation> => Boolean(b));
+    return enriched.filter((b): b is Partial<BookEvaluation> => Boolean(b) && (b!.pages || 280) < 460);
   } catch (err) {
     console.warn('[replenishCharacterBooksWithGemini] Aviso:', err);
     return [];

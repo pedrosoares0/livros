@@ -53,7 +53,7 @@ const FINISH_HOLD_MS = 260;
 
 // Persistência das 4 sugestões e 4 personagens ativos (troca sob demanda pelo botão)
 const SUGGESTIONS_STORAGE_KEY = 'veredito_modal_suggestions_v2';
-const CHARACTERS_STORAGE_KEY = 'veredito_modal_characters_v7';
+const CHARACTERS_STORAGE_KEY = 'veredito_modal_characters_v8';
 
 import { POPULAR_SUGGESTIONS_POOL } from '../../data/suggestionBooks';
 import {
