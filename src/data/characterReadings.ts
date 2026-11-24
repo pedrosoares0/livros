@@ -2362,6 +2362,30 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     resumo:
       'Na Viena ocupada e em ruínas do pós-guerra, um escritor chega para encontrar o velho amigo Harry Lime, mas descobre versões contraditórias sobre sua morte e o mercado negro da cidade.',
   },
+  {
+    id: 'br-rei-amarelo',
+    title: 'O Rei de Amarelo',
+    author: 'Robert W. Chambers',
+    publisher: 'Intrínseca',
+    year: 1895,
+    pages: 336,
+    coverUrl: amz('8580575915'),
+    genres: ['Horror Cósmico', 'Weird Fiction', 'Clássico'],
+    resumo:
+      'Contos interligados por uma peça de teatro maldita sobre a cidade perdida de Carcosa e o Rei de Amarelo, cuja leitura do segundo ato arrasta artistas e investigadores à loucura.',
+  },
+  {
+    id: 'br-cumes-desespero',
+    title: 'Nos Cumes do Desespero',
+    author: 'Emil Cioran',
+    publisher: 'Hedra',
+    year: 1934,
+    pages: 160,
+    coverUrl: amz('8577152723'),
+    genres: ['Filosofia', 'Pessimismo', 'Ensaio'],
+    resumo:
+      'Escrito durante meses de insônia febril aos vinte e dois anos, o livro inaugural de Cioran disseca a lucidez extrema, a agonia da consciência e o absurdo irremediável de ter nascido.',
+  },
 ];
 
 const BOOKS_BY_ID = new Map<string, Partial<BookEvaluation>>(
@@ -3435,6 +3459,31 @@ export const CHARACTER_POOL: CharacterReading[] = [
       'br-meditacoes',
     ],
   },
+  {
+    id: 'rust-cohle',
+    name: 'Rust Cohle',
+    source: 'True Detective',
+    imageUrl: 'https://i.pinimg.com/736x/0b/c5/54/0bc55428d3b3eefcd9e8325f7e022408.jpg',
+    thread: 'Detetives niilistas que enxergam a consciência humana como um erro trágico enquanto caçam monstros nos pântanos.',
+    bookIds: [
+      'br-rei-amarelo',
+      'br-silencio-inocentes',
+      'br-memorias-subsolo',
+      'br-onde-os-velhos',
+      'br-coracao-trevas',
+      'br-cumes-desespero',
+      'br-dragao-vermelho',
+      'br-2666',
+      'br-meridiano-sangue',
+      'br-nome-da-rosa',
+      'br-o-estrangeiro',
+      'br-assim-falou-zaratustra',
+      'br-mito-sisifo',
+      'br-lugares-escuros',
+      'br-objetos-cortantes',
+      'br-outsider',
+    ],
+  },
 ];
 
 const normalize = (text: string) =>
@@ -4385,6 +4434,22 @@ export const CHARACTER_PROFILE_META: Record<string, CharacterProfileMeta> = {
       {
         name: 'Albert Camus',
         note: 'A estética do homem absurdo que esgota intensamente o presente diante da morte iminente.',
+      },
+    ],
+  },
+  'rust-cohle': {
+    tags: ['Southern Gothic & Noir', 'Pessimismo Filosófico', 'Investigação Obsessiva'],
+    resumo:
+      'Devastado pela morte da filha e por anos infiltrado no narcotráfico, o detetive Rustin Spencer Cohle enxerga a consciência humana como um passo em falso da evolução e o tempo como um círculo plano onde a dor se repete eternamente. Mesmo pregando o mais frio niilismo nos pântanos da Louisiana, é o único investigador incapaz de fechar os olhos diante das vítimas esquecidas.',
+    movieComparisons: ['Seven', 'Zodíaco', 'Os Suspeitos'],
+    thinkers: [
+      {
+        name: 'Arthur Schopenhauer',
+        note: 'A consciência humana encarada como um erro trágico da natureza que apenas ilumina o sofrimento de existir.',
+      },
+      {
+        name: 'Friedrich Nietzsche',
+        note: 'A doutrina do Eterno Retorno ("o tempo é um círculo plano") onde cada crime e cada dor se repetem para sempre.',
       },
     ],
   },

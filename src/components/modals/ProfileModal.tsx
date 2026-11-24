@@ -30,7 +30,8 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) =
     'Harry Potter, Sirius Black & Snape', 'Joel, Abby & Ellie (TLOU)',
     'Carmy & Richie (The Bear)', 'K (Blade Runner 2049)', 'César (Planeta dos Macacos)',
     'Michael Corleone', 'Juiz Holden', 'Katniss Everdeen', 'Sebastian (La La Land)',
-    'Tai Lung', 'Jack (Senhor das Moscas)', 'Vegeta', 'Logan', 'Princesa Mononoke'
+    'Tai Lung', 'Jack (Senhor das Moscas)', 'Vegeta', 'Logan', 'Princesa Mononoke',
+    'Rust Cohle (True Detective)'
   ];
 
   return (
