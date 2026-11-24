@@ -31,7 +31,8 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) =
     'Carmy & Richie (The Bear)', 'K (Blade Runner 2049)', 'César (Planeta dos Macacos)',
     'Michael Corleone', 'Juiz Holden', 'Katniss Everdeen', 'Sebastian (La La Land)',
     'Tai Lung', 'Jack (Senhor das Moscas)', 'Vegeta', 'Logan', 'Princesa Mononoke',
-    'Rust Cohle (True Detective)'
+    'Rust Cohle (True Detective)', 'Rorschach (Watchmen)', 'Hannibal Lecter',
+    'Zima Blue (Love, Death & Robots)', 'Odisseu (A Odisseia)', 'Hamnet'
   ];
 
   return (
