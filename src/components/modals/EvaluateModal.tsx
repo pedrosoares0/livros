@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Search, X, BookOpen, AlertTriangle, Check, Loader2, RefreshCw } from 'lucide-react';
 import confetti from 'canvas-confetti';
@@ -293,6 +293,26 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
   const searchSeqRef = useRef(0);
   const contentScrollRef = useRef<HTMLDivElement | null>(null);
 
+  const evaluatedSet = useMemo(
+    () => buildEvaluatedTitleSet(existingBooks),
+    [existingBooks]
+  );
+
+  const activeCharacter = useMemo(
+    () => characterRotation.characters.find((c) => c.id === selectedCharacterId) || null,
+    [characterRotation.characters, selectedCharacterId]
+  );
+
+  const activeCharacterBooks = useMemo(() => {
+    if (!activeCharacter) return [];
+    return getCharacterBooks(
+      activeCharacter,
+      evaluatedSet,
+      4,
+      characterRotation.booksByCharId[activeCharacter.id]
+    );
+  }, [activeCharacter, evaluatedSet, characterRotation.booksByCharId]);
+
   useEffect(() => {
     const current = getOrRotateSuggestions(existingBooks);
     const currentCharRot = getOrRotateCharacters(existingBooks);
@@ -377,10 +397,9 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
     setCharactersSpinCount((prev) => prev + 1);
     setSelectedCharacterId(null);
     const nextCharRot = getOrRotateCharacters(existingBooks, true);
-    const evalSet = buildEvaluatedTitleSet(existingBooks);
     setCharacterRotation(nextCharRot);
     const charCoverUrls = nextCharRot.characters.flatMap((c) =>
-      getCharacterBooks(c, evalSet, 4, nextCharRot.booksByCharId[c.id]).map((b) => b.coverUrl)
+      getCharacterBooks(c, evaluatedSet, 4, nextCharRot.booksByCharId[c.id]).map((b) => b.coverUrl)
     );
     const charPortraitUrls = nextCharRot.characters.map((c) => c.imageUrl);
     prefetchBookCovers([...charPortraitUrls, ...charCoverUrls], true);
@@ -1085,27 +1104,216 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                           </button>
                         </div>
 
-                        <AnimatePresence mode="wait" initial={false}>
+                        <motion.div
+                          key={popularSuggestions.map((b) => b.id || b.title).join('|')}
+                          initial={{ opacity: 0, y: 4 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.14, ease: [0.22, 1, 0.36, 1] }}
+                          className="grid grid-cols-4 gap-3 pt-0.5"
+                        >
+                          {popularSuggestions.map((book) => (
+                            <button
+                              key={book.id || book.title}
+                              type="button"
+                              onClick={() => handleRequestEvaluation(book)}
+                              className="flex flex-col text-left cursor-pointer group active:scale-[0.97] transition-transform duration-150 select-none w-full"
+                            >
+                              <div className="w-full mb-1.5 transition-transform duration-150 group-hover:-translate-y-1">
+                                <BookCover
+                                  title={book.title || 'Livro'}
+                                  author={book.author || ''}
+                                  coverUrl={book.coverUrl}
+                                  enable3d={false}
+                                  eager
+                                />
+                              </div>
+                              <div className="space-y-0.5 px-0.5 w-full">
+                                <h4 className="text-[11px] sm:text-xs font-semibold text-[#1d1d1f] truncate group-hover:text-black leading-snug tracking-tight">
+                                  {book.title}
+                                </h4>
+                                <p className="text-[10px] text-[#86868b] truncate font-normal">
+                                  {book.author}
+                                </p>
+                              </div>
+                            </button>
+                          ))}
+                        </motion.div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  {/* Row 2: Books by Favorite Characters (4 character covers + rotating book sets) */}
+                  <div
+                    className={`space-y-2 ${
+                      selectedCharacterId ? 'pt-0.5' : 'pt-2 border-t border-neutral-200/70'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-[#86868b]">
+                        Livros de Acordo com Personagens
+                      </span>
+                      <button
+                        type="button"
+                        onClick={handleSwapCharacters}
+                        aria-label="Trocar personagens"
+                        title="Trocar personagens"
+                        className="p-1 -mr-1 rounded-full text-[#86868b] hover:text-[#1d1d1f] hover:bg-neutral-100 active:bg-neutral-200/70 active:scale-90 transition-all cursor-pointer"
+                      >
+                        <RefreshCw
+                          className="w-3.5 h-3.5 transition-transform duration-300 ease-out"
+                          style={{ transform: `rotate(${charactersSpinCount * 180}deg)` }}
+                        />
+                      </button>
+                    </div>
+
+                    <motion.div
+                      key={characterRotation.characters.map((c) => c.id).join('|')}
+                      initial={{ opacity: 0, y: 4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.14, ease: [0.22, 1, 0.36, 1] }}
+                      className="grid grid-cols-4 gap-3 pt-0.5"
+                    >
+                      {characterRotation.characters.map((char) => {
+                        const hasSelection = Boolean(activeCharacter);
+                        const isSelected = activeCharacter?.id === char.id;
+                        const isDimmed = hasSelection && !isSelected;
+
+                        return (
+                          <button
+                            key={char.id}
+                            type="button"
+                            onClick={() =>
+                              setSelectedCharacterId((prev) =>
+                                prev === char.id ? null : char.id
+                              )
+                            }
+                            className="relative flex flex-col text-left cursor-pointer group active:scale-[0.97] transition-transform duration-150 ease-out select-none"
+                          >
+                            <div className="relative w-full mb-1.5">
+                              <div
+                                className={`relative w-full aspect-[2/3] rounded-xl overflow-hidden bg-neutral-100 transition-[transform,opacity,box-shadow] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                                  isSelected
+                                    ? '-translate-y-1.5 scale-[1.03] shadow-[0_14px_26px_-6px_rgba(0,0,0,0.32),0_4px_10px_-2px_rgba(0,0,0,0.14)] ring-1 ring-black/15'
+                                    : isDimmed
+                                    ? 'opacity-45 scale-[0.96] border border-black/[0.06] shadow-2xs group-hover:opacity-85 group-hover:scale-[0.99]'
+                                    : 'border border-black/[0.08] shadow-[0_4px_12px_rgba(0,0,0,0.08)] group-hover:-translate-y-1'
+                                }`}
+                              >
+                                {char.imageUrl ? (
+                                  <img
+                                    src={char.imageUrl}
+                                    alt={char.name}
+                                    className={`w-full h-full object-cover object-top transition-transform duration-200 ease-out ${
+                                      isSelected ? 'scale-[1.04]' : 'group-hover:scale-[1.02]'
+                                    }`}
+                                    loading="eager"
+                                    decoding="async"
+                                    referrerPolicy="no-referrer"
+                                  />
+                                ) : (
+                                  <div className="w-full h-full flex items-center justify-center bg-neutral-200 text-[#1d1d1f] font-bold text-sm">
+                                    {char.name.slice(0, 2).toUpperCase()}
+                                  </div>
+                                )}
+                                <div
+                                  className={`absolute inset-0 rounded-xl pointer-events-none transition-opacity duration-200 ${
+                                    isSelected
+                                      ? 'ring-1 ring-inset ring-white/35 bg-gradient-to-t from-black/20 via-transparent to-white/10'
+                                      : 'ring-1 ring-inset ring-black/[0.06]'
+                                  }`}
+                                />
+                              </div>
+                            </div>
+
+                            <div
+                              className={`space-y-0.5 px-0.5 w-full transition-opacity duration-200 ${
+                                isDimmed ? 'opacity-45 group-hover:opacity-85' : 'opacity-100'
+                              }`}
+                            >
+                              <h4
+                                className={`text-[11px] sm:text-xs truncate leading-snug tracking-tight transition-colors ${
+                                  isSelected
+                                    ? 'text-[#1d1d1f] font-bold'
+                                    : 'text-[#1d1d1f] font-semibold group-hover:text-black'
+                                }`}
+                              >
+                                {char.name}
+                              </h4>
+                              <p className="text-[10px] text-[#86868b] truncate font-normal">
+                                {char.source}
+                              </p>
+                            </div>
+
+                            {/* Lightweight CSS indicator pill below the active character */}
+                            <div className="h-2 w-full flex items-center justify-start px-0.5 mt-0.5">
+                              <div
+                                className={`w-5 h-[2.5px] rounded-full bg-[#1d1d1f] transition-[opacity,transform] duration-200 origin-left ${
+                                  isSelected ? 'opacity-100 scale-x-100' : 'opacity-0 scale-x-0'
+                                }`}
+                              />
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </motion.div>
+
+                    {/* Inline 4-Book Shelf for Selected Character (instant swap without exit wait) */}
+                    <AnimatePresence initial={false}>
+                      {activeCharacter && activeCharacterBooks.length > 0 && (
+                        <motion.div
+                          key="character-books-shelf"
+                          initial={{ opacity: 0, y: 6 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -4 }}
+                          transition={{ duration: 0.16, ease: [0.22, 1, 0.36, 1] }}
+                          className="p-3 rounded-2xl bg-neutral-50 border border-neutral-200/80 space-y-2"
+                        >
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                <span className="text-xs font-bold text-[#1d1d1f]">
+                                  {activeCharacter.name}
+                                </span>
+                                <span className="text-[10px] text-[#86868b]">
+                                  • {activeCharacter.source}
+                                </span>
+                              </div>
+                              <p className="text-[11px] text-[#6e6e73] leading-snug mt-0.5">
+                                {activeCharacter.thread}
+                              </p>
+                            </div>
+
+                            <button
+                              type="button"
+                              onClick={() => setSelectedCharacterId(null)}
+                              aria-label="Fechar seleção de personagem"
+                              className="p-1 rounded-full text-[#86868b] hover:text-[#1d1d1f] hover:bg-neutral-200/70 transition-colors cursor-pointer shrink-0"
+                            >
+                              <X className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+
                           <motion.div
-                            key={popularSuggestions.map((b) => b.id || b.title).join('|')}
-                            initial={{ opacity: 0, y: 4, scale: 0.985, filter: 'blur(2px)' }}
-                            animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
-                            exit={{ opacity: 0, y: -4, scale: 0.985, filter: 'blur(2px)' }}
-                            transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+                            key={activeCharacter.id}
+                            initial={{ opacity: 0, y: 3 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.14, ease: [0.22, 1, 0.36, 1] }}
                             className="grid grid-cols-4 gap-3 pt-0.5"
                           >
-                            {popularSuggestions.map((book) => (
+                            {activeCharacterBooks.map((book) => (
                               <button
-                                key={book.id || book.title}
+                                key={`${activeCharacter.id}-${book.id || book.title}`}
                                 type="button"
                                 onClick={() => handleRequestEvaluation(book)}
-                                className="flex flex-col text-left cursor-pointer group active:scale-[0.97] transition-transform duration-200 select-none w-full"
+                                className="flex flex-col text-left cursor-pointer group active:scale-[0.97] transition-transform duration-150 select-none w-full"
                               >
-                                <div className="w-full mb-1.5 transition-transform duration-200 group-hover:-translate-y-1">
+                                <div className="w-full mb-1.5 transition-transform duration-150 group-hover:-translate-y-1">
                                   <BookCover
                                     title={book.title || 'Livro'}
                                     author={book.author || ''}
                                     coverUrl={book.coverUrl}
+                                    enable3d={false}
+                                    eager
                                   />
                                 </div>
                                 <div className="space-y-0.5 px-0.5 w-full">
@@ -1119,239 +1327,10 @@ export const EvaluateModal: React.FC<EvaluateModalProps> = ({
                               </button>
                             ))}
                           </motion.div>
-                        </AnimatePresence>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-
-                  {/* Row 2: Books by Favorite Characters (4 character covers + rotating book sets) */}
-                  {(() => {
-                    const evaluatedSet = buildEvaluatedTitleSet(existingBooks);
-                    const { characters: characterSuggestions, booksByCharId } = characterRotation;
-                    const activeCharacter =
-                      characterSuggestions.find((c) => c.id === selectedCharacterId) || null;
-                    const activeCharacterBooks = activeCharacter
-                      ? getCharacterBooks(
-                          activeCharacter,
-                          evaluatedSet,
-                          4,
-                          booksByCharId[activeCharacter.id]
-                        )
-                      : [];
-
-                    return (
-                      <div
-                        className={`space-y-2 ${
-                          selectedCharacterId ? 'pt-0.5' : 'pt-2 border-t border-neutral-200/70'
-                        }`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-[#86868b]">
-                            Livros de Acordo com Personagens
-                          </span>
-                          <button
-                            type="button"
-                            onClick={handleSwapCharacters}
-                            aria-label="Trocar personagens"
-                            title="Trocar personagens"
-                            className="p-1 -mr-1 rounded-full text-[#86868b] hover:text-[#1d1d1f] hover:bg-neutral-100 active:bg-neutral-200/70 active:scale-90 transition-all cursor-pointer"
-                          >
-                            <RefreshCw
-                              className="w-3.5 h-3.5 transition-transform duration-300 ease-out"
-                              style={{ transform: `rotate(${charactersSpinCount * 180}deg)` }}
-                            />
-                          </button>
-                        </div>
-
-                        <AnimatePresence mode="wait" initial={false}>
-                          <motion.div
-                            key={characterSuggestions.map((c) => c.id).join('|')}
-                            initial={{ opacity: 0, y: 4, scale: 0.985, filter: 'blur(2px)' }}
-                            animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
-                            exit={{ opacity: 0, y: -4, scale: 0.985, filter: 'blur(2px)' }}
-                            transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
-                            className="grid grid-cols-4 gap-3 pt-0.5"
-                          >
-                            {characterSuggestions.map((char) => {
-                              const hasSelection = Boolean(activeCharacter);
-                              const isSelected = activeCharacter?.id === char.id;
-                              const isDimmed = hasSelection && !isSelected;
-
-                              return (
-                                <button
-                                  key={char.id}
-                                  type="button"
-                                  onClick={() =>
-                                    setSelectedCharacterId((prev) =>
-                                      prev === char.id ? null : char.id
-                                    )
-                                  }
-                                  className="relative flex flex-col text-left cursor-pointer group active:scale-[0.97] transition-all duration-300 ease-out select-none"
-                                >
-                                  <div className="relative w-full mb-1.5">
-                                    {/* Ambient Color Glow behind the selected character portrait */}
-                                    {isSelected && char.imageUrl && (
-                                      <div
-                                        aria-hidden="true"
-                                        className="absolute -inset-1 rounded-xl overflow-hidden pointer-events-none -z-10 opacity-65"
-                                        style={{
-                                          transform: 'translate3d(0, 6px, 0) scale(1.03)',
-                                          filter: 'blur(14px) saturate(1.4)',
-                                        }}
-                                      >
-                                        <img
-                                          src={char.imageUrl}
-                                          alt=""
-                                          className="w-full h-full object-cover object-top"
-                                          loading="eager"
-                                          decoding="async"
-                                          referrerPolicy="no-referrer"
-                                        />
-                                      </div>
-                                    )}
-
-                                    <div
-                                      className={`relative w-full aspect-[2/3] rounded-xl overflow-hidden bg-neutral-100 transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-                                        isSelected
-                                          ? '-translate-y-1.5 scale-[1.03] shadow-[0_14px_28px_-6px_rgba(0,0,0,0.32),0_4px_10px_-2px_rgba(0,0,0,0.14)] ring-1 ring-black/10'
-                                          : isDimmed
-                                          ? 'opacity-45 saturate-[0.55] scale-[0.96] border border-black/[0.06] shadow-2xs group-hover:opacity-85 group-hover:saturate-100 group-hover:scale-[0.99]'
-                                          : 'border border-black/[0.08] shadow-[0_4px_12px_rgba(0,0,0,0.08)] group-hover:-translate-y-1'
-                                      }`}
-                                    >
-                                      {char.imageUrl ? (
-                                        <img
-                                          src={char.imageUrl}
-                                          alt={char.name}
-                                          className={`w-full h-full object-cover object-top transition-transform duration-500 ease-out ${
-                                            isSelected ? 'scale-[1.04]' : 'group-hover:scale-[1.02]'
-                                          }`}
-                                          loading="eager"
-                                          decoding="async"
-                                          referrerPolicy="no-referrer"
-                                        />
-                                      ) : (
-                                        <div className="w-full h-full flex items-center justify-center bg-neutral-200 text-[#1d1d1f] font-bold text-sm">
-                                          {char.name.slice(0, 2).toUpperCase()}
-                                        </div>
-                                      )}
-                                      <div
-                                        className={`absolute inset-0 rounded-xl pointer-events-none transition-opacity duration-300 ${
-                                          isSelected
-                                            ? 'ring-1 ring-inset ring-white/35 bg-gradient-to-t from-black/20 via-transparent to-white/10'
-                                            : 'ring-1 ring-inset ring-black/[0.06]'
-                                        }`}
-                                      />
-                                    </div>
-                                  </div>
-
-                                  <div
-                                    className={`space-y-0.5 px-0.5 w-full transition-opacity duration-300 ${
-                                      isDimmed ? 'opacity-45 group-hover:opacity-85' : 'opacity-100'
-                                    }`}
-                                  >
-                                    <h4
-                                      className={`text-[11px] sm:text-xs truncate leading-snug tracking-tight transition-colors ${
-                                        isSelected
-                                          ? 'text-[#1d1d1f] font-bold'
-                                          : 'text-[#1d1d1f] font-semibold group-hover:text-black'
-                                      }`}
-                                    >
-                                      {char.name}
-                                    </h4>
-                                    <p className="text-[10px] text-[#86868b] truncate font-normal">
-                                      {char.source}
-                                    </p>
-                                  </div>
-
-                                  {/* Shared spring indicator pill below the active character */}
-                                  <div className="h-2 w-full flex items-center justify-start px-0.5 mt-0.5">
-                                    {isSelected && (
-                                      <motion.div
-                                        layoutId="active-character-indicator"
-                                        transition={{
-                                          type: 'spring',
-                                          stiffness: 420,
-                                          damping: 32,
-                                        }}
-                                        className="w-5 h-[2.5px] rounded-full bg-[#1d1d1f]"
-                                      />
-                                    )}
-                                  </div>
-                                </button>
-                              );
-                            })}
-                          </motion.div>
-                        </AnimatePresence>
-
-                        {/* Inline 4-Book Shelf for Selected Character */}
-                        <AnimatePresence mode="wait" initial={false}>
-                          {activeCharacter && activeCharacterBooks.length > 0 && (
-                            <motion.div
-                              key={activeCharacter.id}
-                              initial={{ opacity: 0, y: 6 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              exit={{ opacity: 0, y: -4 }}
-                              transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-                              className="p-3 rounded-2xl bg-neutral-50 border border-neutral-200/80 space-y-2"
-                            >
-                              <div className="flex items-start justify-between gap-2">
-                                <div className="min-w-0">
-                                  <div className="flex items-center gap-1.5 flex-wrap">
-                                    <span className="text-xs font-bold text-[#1d1d1f]">
-                                      {activeCharacter.name}
-                                    </span>
-                                    <span className="text-[10px] text-[#86868b]">
-                                      • {activeCharacter.source}
-                                    </span>
-                                  </div>
-                                  <p className="text-[11px] text-[#6e6e73] leading-snug mt-0.5">
-                                    {activeCharacter.thread}
-                                  </p>
-                                </div>
-
-                                <button
-                                  type="button"
-                                  onClick={() => setSelectedCharacterId(null)}
-                                  aria-label="Fechar seleção de personagem"
-                                  className="p-1 rounded-full text-[#86868b] hover:text-[#1d1d1f] hover:bg-neutral-200/70 transition-colors cursor-pointer shrink-0"
-                                >
-                                  <X className="w-3.5 h-3.5" />
-                                </button>
-                              </div>
-
-                              <div className="grid grid-cols-4 gap-3 pt-0.5">
-                                {activeCharacterBooks.map((book) => (
-                                  <button
-                                    key={`${activeCharacter.id}-${book.id || book.title}`}
-                                    type="button"
-                                    onClick={() => handleRequestEvaluation(book)}
-                                    className="flex flex-col text-left cursor-pointer group active:scale-[0.97] transition-transform duration-200 select-none w-full"
-                                  >
-                                    <div className="w-full mb-1.5 transition-transform duration-200 group-hover:-translate-y-1">
-                                      <BookCover
-                                        title={book.title || 'Livro'}
-                                        author={book.author || ''}
-                                        coverUrl={book.coverUrl}
-                                      />
-                                    </div>
-                                    <div className="space-y-0.5 px-0.5 w-full">
-                                      <h4 className="text-[11px] sm:text-xs font-semibold text-[#1d1d1f] truncate group-hover:text-black leading-snug tracking-tight">
-                                        {book.title}
-                                      </h4>
-                                      <p className="text-[10px] text-[#86868b] truncate font-normal">
-                                        {book.author}
-                                      </p>
-                                    </div>
-                                  </button>
-                                ))}
-                              </div>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                      </div>
-                    );
-                  })()}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
                 </div>
               )}
             </div>

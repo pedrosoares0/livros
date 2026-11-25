@@ -1,9 +1,9 @@
 import { markCoverLoaded } from '../components/BookCover';
 
 /**
- * Non-blocking, gentle image prefetching service
- * Prefetches covers in small batches when browser is idle to avoid
- * saturating network bandwidth and choking Open Library API.
+ * Non-blocking image prefetching service.
+ * Immediate batches use higher concurrency (HTTP/2 multiplexed CDNs) so switching
+ * characters or swapping suggestions renders covers from memory cache with zero delay.
  */
 
 const prefetchedUrls = new Set<string>();
@@ -11,18 +11,23 @@ const prefetchedUrls = new Set<string>();
 export function prefetchBookCovers(coverUrls: (string | undefined)[], immediate = false) {
   if (typeof window === 'undefined') return;
 
+  const limit = immediate ? 32 : 64;
   const queue = coverUrls
     .filter((url): url is string => Boolean(url && !prefetchedUrls.has(url)))
-    .slice(0, 20);
+    .slice(0, limit);
 
   if (queue.length === 0) return;
 
+  const batchSize = immediate ? 8 : 4;
+
   const processBatch = () => {
-    const batch = queue.splice(0, 3);
+    const batch = queue.splice(0, batchSize);
     for (const url of batch) {
+      if (prefetchedUrls.has(url)) continue;
       prefetchedUrls.add(url);
       const img = new Image();
       img.decoding = 'async';
+      img.referrerPolicy = 'no-referrer';
       img.onload = () => {
         if (img.naturalWidth > 1 && img.naturalHeight > 1) {
           markCoverLoaded(url);
@@ -32,10 +37,12 @@ export function prefetchBookCovers(coverUrls: (string | undefined)[], immediate 
     }
 
     if (queue.length > 0) {
-      if ('requestIdleCallback' in window) {
+      if (immediate) {
+        setTimeout(processBatch, 60);
+      } else if ('requestIdleCallback' in window) {
         (window as any).requestIdleCallback(processBatch, { timeout: 1000 });
       } else {
-        setTimeout(processBatch, 200);
+        setTimeout(processBatch, 180);
       }
     }
   };
@@ -49,7 +56,7 @@ export function prefetchBookCovers(coverUrls: (string | undefined)[], immediate 
     if ('requestIdleCallback' in window) {
       (window as any).requestIdleCallback(processBatch, { timeout: 1500 });
     } else {
-      setTimeout(processBatch, 250);
+      setTimeout(processBatch, 200);
     }
-  }, 600);
+  }, 400);
 }

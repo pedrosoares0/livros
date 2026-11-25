@@ -9,6 +9,7 @@ interface BookCoverProps {
   userRating?: number;
   className?: string;
   enable3d?: boolean;
+  eager?: boolean;
 }
 
 const COVER_PALETTES = [
@@ -41,6 +42,7 @@ export const BookCover: React.FC<BookCoverProps> = React.memo(({
   userRating,
   className = '',
   enable3d = true,
+  eager = false,
 }) => {
   const [failedUrl, setFailedUrl] = useState<string | null>(() =>
     coverUrl && failedCoverUrls.has(coverUrl) ? coverUrl : null
@@ -106,7 +108,7 @@ export const BookCover: React.FC<BookCoverProps> = React.memo(({
               className={`w-full h-full object-cover select-none pointer-events-none transition-opacity duration-150 ${
                 isLoaded ? 'opacity-100' : 'opacity-0'
               }`}
-              loading="lazy"
+              loading={eager ? 'eager' : 'lazy'}
               decoding="async"
               referrerPolicy="no-referrer"
             />

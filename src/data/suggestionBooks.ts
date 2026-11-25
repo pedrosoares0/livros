@@ -133,7 +133,7 @@ export const POPULAR_SUGGESTIONS_POOL: Partial<BookEvaluation>[] = [
     publisher: 'Aleph',
     year: 1977,
     pages: 304,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8576572524.01.LZZZZZZZ.jpg',
+    coverUrl: 'https://covers.openlibrary.org/b/id/911131-L.jpg',
     genres: ['Ficção Científica', 'Distopia Policial', 'Paranoia'],
     resumo:
       'Em uma Califórnia vigiada por scanners holográficos, o agente infiltrado Bob Arctor consome a Substância M para manter seu disfarce até que seu cérebro se divide em dois e ele recebe a ordem de espionar a si mesmo.',
@@ -169,7 +169,7 @@ export const POPULAR_SUGGESTIONS_POOL: Partial<BookEvaluation>[] = [
     publisher: 'Intrínseca',
     year: 2016,
     pages: 352,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/655560655X.01.LZZZZZZZ.jpg',
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication221/v4/59/ac/ce/59acce38-ac94-e3cd-cdcb-6d93b2a06d41/9788551001233.jpg/600x900bb.jpg',
     genres: ['Ficção Científica', 'Thriller'],
     resumo:
       'Jason Dessen é sequestrado e acorda em uma realidade alternativa onde nunca se casou e se tornou um físico genial que construiu uma caixa capaz de atravessar o multiverso.',
@@ -193,7 +193,7 @@ export const POPULAR_SUGGESTIONS_POOL: Partial<BookEvaluation>[] = [
     publisher: 'Aleph',
     year: 1970,
     pages: 256,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8576574349.01.LZZZZZZZ.jpg',
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication211/v4/00/83/cf/0083cfff-a4c9-281f-e681-1d9c8c332639/1058611540.jpg/600x900bb.jpg',
     genres: ['Hard Sci-Fi', 'Relatividade', 'Exploração Espacial'],
     resumo:
       'Quando o sistema de desaceleração da nave interestelar Leonora Christine é danificado, a tripulação precisa manter os motores ativos para sobreviver à radiação, acelerando perto da velocidade da luz enquanto bilhões de anos passam lá fora.',
@@ -325,7 +325,7 @@ export const POPULAR_SUGGESTIONS_POOL: Partial<BookEvaluation>[] = [
     publisher: 'Aleph',
     year: 1956,
     pages: 288,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8576572605.01.LZZZZZZZ.jpg',
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication126/v4/34/20/54/34205451-5a26-0133-4777-ed160c1d1840/1035137817.jpg/600x900bb.jpg',
     genres: ['Ficção Científica', 'Futuro Distante', 'Filosófico'],
     resumo:
       'Um bilhão de anos no futuro, a humanidade vive trancada na cidade perfeita e imortal de Diaspar, programada pelo medo para nunca olhar para o céu — até nascer Alvin, o único habitante que deseja atravessar as muralhas.',
@@ -337,7 +337,7 @@ export const POPULAR_SUGGESTIONS_POOL: Partial<BookEvaluation>[] = [
     publisher: 'Aleph',
     year: 1974,
     pages: 272,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8576572060.01.LZZZZZZZ.jpg',
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication124/v4/e3/eb/d6/e3ebd617-9dde-7724-1683-97d2b43370b9/1011451281.jpg/600x900bb.jpg',
     genres: ['Ficção Científica', 'Distopia Policial', 'Identidade'],
     resumo:
       'Astro televisivo geneticamente aprimorado, Jason Taverner desperta em um quarto de hotel barato e descobre que todos os seus documentos e registros desapareceram num estado policial onde não existir no banco de dados equivale à prisão.',
@@ -409,7 +409,7 @@ export const POPULAR_SUGGESTIONS_POOL: Partial<BookEvaluation>[] = [
     publisher: 'Aleph',
     year: 1987,
     pages: 392,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8576574365.01.LZZZZZZZ.jpg',
+    coverUrl: 'https://covers.openlibrary.org/b/id/14566116-L.jpg',
     genres: ['Ficção Científica', 'Suspense Psicológico', 'Primeiro Contato'],
     resumo:
       'A trezentos metros de profundidade no Pacífico, uma equipe de cientistas desce a uma estação submarina para investigar uma espaçonave intacta sob o coral há três séculos — e encontra em seu interior uma esfera perfeita que manifesta os medos humanos.',
@@ -445,7 +445,7 @@ export const POPULAR_SUGGESTIONS_POOL: Partial<BookEvaluation>[] = [
     publisher: 'Aleph',
     year: 1986,
     pages: 272,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8576573032.01.LZZZZZZZ.jpg',
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication122/v4/a8/02/1f/a8021f1a-9055-b039-36e4-86382fb716ca/9781473217454.jpg/600x900bb.jpg',
     genres: ['Cyberpunk', 'Ficção Científica', 'Contos'],
     resumo:
       'Dez contos afiados que fundaram a estética cyberpunk — incluindo Johnny Mnemonic — onde contrabandistas de dados neurais, mercenários de rua e inteligências artificiais colidem nas sombras corporativas.',
@@ -457,7 +457,7 @@ export const POPULAR_SUGGESTIONS_POOL: Partial<BookEvaluation>[] = [
     publisher: 'Aleph',
     year: 1959,
     pages: 256,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8576573156.01.LZZZZZZZ.jpg',
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication128/v4/06/aa/3e/06aa3ec2-1b28-68c8-d9ec-c765b6f3155c/1024792333.jpg/600x900bb.jpg',
     genres: ['Ficção Científica', 'Realidade Simulada', 'Paranoia'],
     resumo:
       'Em uma pacata cidade americana de 1959, Ragle Gumm ganha a vida resolvendo um concurso de jornal diário — até objetos se dissolverem no ar e ele descobrir que a cidade inteira foi fabricada em torno de sua mente.',
@@ -469,7 +469,7 @@ export const POPULAR_SUGGESTIONS_POOL: Partial<BookEvaluation>[] = [
     publisher: 'Biblioteca Azul',
     year: 1950,
     pages: 296,
-    coverUrl: 'https://images-na.ssl-images-amazon.com/images/P/8525056502.01.LZZZZZZZ.jpg',
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication123/v4/fa/ad/b0/faadb066-346e-7033-bf5d-39d202d3bc02/9788445000960.jpg/600x900bb.jpg',
     genres: ['Ficção Científica', 'Colonização Espacial', 'Clássico'],
     resumo:
       'Fugindo de uma Terra à beira da guerra atômica, ondas de colonos humanos desembarcam em Marte e levam consigo a ganância, a solidão e as próprias ruínas para as cidades de cristal de uma civilização marciana extinta.',

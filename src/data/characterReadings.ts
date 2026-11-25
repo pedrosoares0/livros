@@ -17,7 +17,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Aleph',
     year: 1965,
     pages: 256,
-    coverUrl: amz('8576572680'),
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication112/v4/72/5b/26/725b2631-7cc4-78f4-e6d0-0f74f2371640/1011451315.jpg/600x900bb.jpg',
     genres: ['Ficção Científica', 'Realidade Simulada', 'Metafísica'],
     resumo:
       'Nas colônias áridas de Marte, trabalhadores suportam o exílio usando uma droga que os projeta em uma vida ilusória perfeita — até o industrial Palmer Eldritch retornar do espaço profundo trazendo uma substância alienígena onde ele próprio controla a alucinação.',
@@ -65,7 +65,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Aleph',
     year: 1956,
     pages: 288,
-    coverUrl: amz('8576573814'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/911114-L.jpg',
     genres: ['Ficção Científica', 'Vingança', 'Cyberpunk Precursor'],
     resumo:
       'Abandonado para morrer no vácuo nos destroços de uma nave cargueira após outra espaçonave ignorar seu sinal de socorro, o brutal Gully Foyle sobrevive e atravessa o Sistema Solar movido por uma caçada implacável de vingança.',
@@ -173,7 +173,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Aleph',
     year: 1967,
     pages: 344,
-    coverUrl: amz('8576573164'),
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication221/v4/78/71/38/787138d6-2c66-919e-53b4-d20c0ab4be5d/c6e0f178-6d05-4248-939a-0b7c239a7f58_cover_image.png/600x900bb.jpg',
     genres: ['Ficção Científica', 'Mitologia Tecnológica', 'Revolta'],
     resumo:
       'Em um mundo colonizado onde a tripulação original da nave usa transferência de consciência e armas tecnológicas para reinar como deuses imortais sobre seus descendentes, um dissidente assume o papel de Buda para derrubar o Céu.',
@@ -185,7 +185,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Aleph',
     year: 1951,
     pages: 288,
-    coverUrl: amz('8576573962'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/535027-L.jpg',
     genres: ['Ficção Científica', 'Pós-Apocalíptico', 'Sobrevivência'],
     resumo:
       'Na manhã seguinte a uma chuva de meteoros verdes que deixa quase toda a humanidade cega, os poucos sobreviventes que ainda enxergam precisam escapar de Londres enquanto plantas carnívoras cultivadas pela indústria quebram suas cercas.',
@@ -233,7 +233,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Editora 34',
     year: 1925,
     pages: 144,
-    coverUrl: amz('8573265701'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/10481182-L.jpg',
     genres: ['Ficção Científica', 'Sátira', 'Clássico'],
     resumo:
       'Em Moscou, um renomado cirurgião implanta a hipófise de um criminoso morto em um cão de rua; em vez de criar um novo homem elevado, o experimento dá origem a um burocrata insolente que ameaça devorar o próprio criador.',
@@ -257,7 +257,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Aleph',
     year: 1970,
     pages: 368,
-    coverUrl: amz('8576572613'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/8999878-L.jpg',
     genres: ['Hard Sci-Fi', 'Exploração Espacial', 'Megaestrutura'],
     resumo:
       'Uma expedição de quatro viajantes — dois humanos e dois alienígenas — é enviada para explorar o Mundo Anel, uma fita artificial com três milhões de vezes a área da Terra construída ao redor de uma estrela distante.',
@@ -365,7 +365,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Boitempo',
     year: 2009,
     pages: 312,
-    coverUrl: amz('8575593943'),
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication211/v4/4e/09/a5/4e09a5bd-7bdc-e3df-8509-a1200a084fe7/1012410146.jpg/600x900bb.jpg',
     genres: ['Ficção Científica', 'Weird Noir', 'Investigação'],
     resumo:
       'O inspetor Tyador Borlú investiga o corpo de uma jovem encontrada em Besźel, uma cidade europeia que divide exatamente as mesmas ruas com a cidade-gêmea de Ul Qoma, onde enxergar o lado vizinho é um crime punido pela misteriosa Brecha.',
@@ -449,7 +449,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Aleph',
     year: 1974,
     pages: 288,
-    coverUrl: amz('8576573318'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/8353151-L.jpg',
     genres: ['Ficção Científica Militar', 'Dilatação Temporal', 'Clássico'],
     resumo:
       'Recrutado para combater os enigmáticos Tauranos através de portais colapsares, o físico William Mandella sobrevive a batalhas que duram meses para os soldados, mas que, pela relatividade, custam séculos inteiros na Terra.',
@@ -641,7 +641,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Companhia das Letras',
     year: 1975,
     pages: 144,
-    coverUrl: amz('8535914080'),
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication122/v4/f7/cd/16/f7cd163d-5065-e2c9-e003-b6f7ccaa3a3c/1017870435.jpg/600x900bb.jpg',
     genres: ['Contos', 'Metafísica', 'Fantástico'],
     resumo:
       'Treze contos enxutos e labirínticos em que um homem encontra seu próprio eu mais jovem num banco de praça, espelhos escondem conspirações seculares e um volume de páginas infinitas devora a sanidade de quem o abre.',
@@ -725,7 +725,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'LeYa',
     year: 1977,
     pages: 336,
-    coverUrl: amz('8580446929'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/13866273-L.jpg',
     genres: ['Ficção Científica', 'Crepúsculo Planetário', 'Melancolia'],
     resumo:
       'No planeta errante Worlorn, cujas cidades monumentais já estão sendo abandonadas à medida que o mundo se afasta de seus sóis rumo ao frio perpétuo, um homem atende ao chamado de um antigo amor entre guerreiros presos a um código letal.',
@@ -809,7 +809,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Suma',
     year: 1979,
     pages: 400,
-    coverUrl: amz('8581051944'),
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication116/v4/3d/26/3c/3d263ce9-dd86-9a8d-3777-7eb5eb0fb8b1/1019830460.jpg/600x900bb.jpg',
     genres: ['Ficção Científica', 'Suspense Político', 'Psicológico'],
     resumo:
       'Ao despertar de um coma de quase cinco anos, Johnny Smith descobre que um simples toque de mão revela o passado e o futuro das pessoas — até apertar a mão de um político populista e enxergar o apocalipse nuclear.',
@@ -845,7 +845,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Conrad',
     year: 1884,
     pages: 160,
-    coverUrl: amz('8587193678'),
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication221/v4/21/cb/28/21cb2800-1ec4-b4cd-3863-506c36847bd0/1033721059.jpg/600x900bb.jpg',
     genres: ['Ficção Científica', 'Geometria & Filosofia', 'Sátira'],
     resumo:
       'Em um mundo estritamente bidimensional onde a hierarquia social é definida pelo número de lados geométricos de cada cidadão, um Quadrado recebe a visita impossível de uma Esfera vinda da terceira dimensão.',
@@ -893,7 +893,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Aleph',
     year: 1965,
     pages: 288,
-    coverUrl: amz('8576573946'),
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication116/v4/ad/7b/40/ad7b40a7-edeb-a9e8-a3c3-5e41a81a0350/Ciberiada-coperta-1600x2560.jpg/600x900bb.jpg',
     genres: ['Ficção Científica', 'Fábula Filosófica', 'IA & Lógica'],
     resumo:
       'Os engenheiros cibernéticos Trurl e Klapaucius viajam pelo cosmos projetando máquinas pensantes, simulações de impérios e demônios termodinâmicos que invariavelmente expõem a vaidade e os paradoxos de seus criadores.',
@@ -917,7 +917,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'JBC',
     year: 2004,
     pages: 232,
-    coverUrl: amz('8545700202'),
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication/2d/ba/24/mzi.vfhqvrex.jpg/600x900bb.jpg',
     genres: ['Ficção Científica Militar', 'Loop Temporal', 'Ação'],
     resumo:
       'Morto em seu primeiro dia no campo de batalha contra os invasores Mimics, o recruta Keiji Kiriya desperta na véspera do combate e usa centenas de mortes consecutivas para forjar seu corpo e sua técnica como uma arma perfeita.',
@@ -941,7 +941,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Aleph',
     year: 2006,
     pages: 336,
-    coverUrl: amz('8576573792'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/524706-L.jpg',
     genres: ['Ficção Científica Militar', 'Identidade', 'Space Opera'],
     resumo:
       'Nascido em laboratório com o DNA de um cientista traidor para servir na tropa de choque geneticamente modificada das Forças Coloniais, o soldado Jared Dirac começa a despertar fragmentos da consciência do homem que precisa caçar.',
@@ -1001,7 +1001,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Aleph',
     year: 1971,
     pages: 176,
-    coverUrl: amz('8576574233'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/4904082-L.jpg',
     genres: ['Ficção Científica', 'Distopia Psicotrópica', 'Sátira'],
     resumo:
       'Durante uma conferência científica reprimida com bombas químicas alucinógenas, o astronauta Ijon Tichy desperta décadas no futuro em uma utopia onde toda a população é controlada por fármacos que mascaram uma Terra congelada e em ruínas.',
@@ -1049,7 +1049,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Suma',
     year: 1982,
     pages: 248,
-    coverUrl: amz('8581051472'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/15131555-L.jpg',
     genres: ['Ficção Científica', 'Distopia', 'Sobrevivência'],
     resumo:
       'Em 2025, para comprar remédios para a filha doente, Ben Richards se inscreve no programa de maior audiência da rede estatal: sobreviver trinta dias como fugitivo enquanto caçadores profissionais e telespectadores o perseguem até a morte.',
@@ -1121,7 +1121,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Suma',
     year: 1982,
     pages: 160,
-    coverUrl: amz('8581050158'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/14655761-L.jpg',
     genres: ['Drama', 'Prisão', 'Paciência & Fuga'],
     resumo:
       'A novela enxuta que deu origem a Um Sonho de Liberdade: condenado injustamente à prisão perpétua em Shawshank, o silencioso banqueiro Andy Dufresne atravessa quase três décadas de cárcere esculpindo sua fuga pedra por pedra.',
@@ -1169,7 +1169,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Aleph',
     year: 1959,
     pages: 312,
-    coverUrl: amz('8576574217'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/1364468-L.jpg',
     genres: ['Ficção Científica', 'Sátira Cósmica', 'Livre-Arbítrio'],
     resumo:
       'Através de uma anomalia crono-sinclástica, o homem mais rico da Terra descobre o futuro da humanidade: uma guerra suicida entre Marte e a Terra e a revelação de que toda a história humana serviu apenas para entregar uma peça de reposição a um mensageiro alienígena.',
@@ -1181,7 +1181,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Biblioteca Azul',
     year: 1940,
     pages: 128,
-    coverUrl: amz('8525061018'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/859087-L.jpg',
     genres: ['Ficção Científica', 'Metafísica', 'Clássico'],
     resumo:
       'Escondido em uma ilha deserta assolada por marés misteriosas, um fugitivo passa a observar um grupo de veranistas e se apaixona por Faustine — até descobrir que eles são gravações tridimensionais perpétuas projetadas por uma máquina.',
@@ -1193,7 +1193,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Biblioteca Azul',
     year: 1962,
     pages: 224,
-    coverUrl: amz('8525060356'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/5540959-L.jpg',
     genres: ['Ficção Científica', 'Ecologia Pós-Apocalíptica', 'Psicológico'],
     resumo:
       'Após tempestades solares derreterem as calotas polares e transformarem Londres em uma lagoa triássica sufocante tomada por iguanas gigantes e samambaias, o biólogo Kerans sente seu cérebro regredir a impulsos pré-humanos.',
@@ -1217,7 +1217,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Hedra',
     year: 1927,
     pages: 112,
-    coverUrl: amz('8577151654'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/6477984-L.jpg',
     genres: ['Ficção Científica', 'Horror Cósmico', 'Clássico'],
     resumo:
       'Um meteorito que desafia todas as análises químicas cai no poço da fazenda de Nahum Gardner a oeste de Arkham, infiltrando no solo uma tonalidade luminosa alienígena que drena lentamente a vida e a sanidade de tudo ao redor.',
@@ -1265,7 +1265,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Aleph',
     year: 2017,
     pages: 160,
-    coverUrl: amz('6556090042'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/9157148-L.jpg',
     genres: ['Ficção Científica', 'IA & Autonomia', 'Novela'],
     resumo:
       'Uma unidade cibernética de segurança corporativa hackeia secretamente seu próprio módulo de controle, mas em vez de massacrar seus clientes humanos, só quer ficar em paz até que uma sabotagem planetária a obriga a salvá-los.',
@@ -1289,7 +1289,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Aleph',
     year: 1979,
     pages: 112,
-    coverUrl: amz('8576573121'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/7010135-L.jpg',
     genres: ['Ficção Científica', 'Horror Biológico', 'Novela'],
     resumo:
       'O aristocrata Simon Kress adquire quatro colônias de criaturas alienígenas inteligentes que erguem castelos e esculpem seu rosto como o de um deus — mas passa a privá-las de alimento para forçá-las a travar guerras sangrentas.',
@@ -1301,7 +1301,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Suma',
     year: 1980,
     pages: 192,
-    coverUrl: amz('8556510752'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/11298724-L.jpg',
     genres: ['Hard Sci-Fi', 'Horror Espacial', 'Suspense'],
     resumo:
       'Nove cientistas embarcam na nave autônoma Nightflyer rumo aos confins do espaço para interceptar a misteriosa raça alienígena volcryn, mas a inteligência reclusa que controla a embarcação começa a eliminá-los um a um.',
@@ -1313,7 +1313,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Aleph',
     year: 1938,
     pages: 160,
-    coverUrl: amz('8576574330'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/4745562-L.jpg',
     genres: ['Ficção Científica', 'Paranoia', 'Horror Biológico'],
     resumo:
       'Isolados no gelo da Antártida, cientistas descongelam uma criatura alienígena adormecida há vinte milhões de anos capaz de imitar com perfeição biológica e mental qualquer ser vivo que devora.',
@@ -1325,7 +1325,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Morro Branco',
     year: 1972,
     pages: 272,
-    coverUrl: amz('6586015316'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/911117-L.jpg',
     genres: ['Ficção Científica', 'Clonagem & Identidade', 'Mistério'],
     resumo:
       'Nos planetas gêmeos Sainte Croix e Sainte Anne, três novelas interligadas revelam os segredos de uma dinastia de clones, a extinção misteriosa dos aborígenes metamorfos e um interrogatório onde memória e identidade se dissolvem.',
@@ -1337,7 +1337,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Aleph',
     year: 1961,
     pages: 224,
-    coverUrl: amz('857657201X'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/911011-L.jpg',
     genres: ['Ficção Científica', 'Submundo & Golpes', 'Aventura'],
     resumo:
       'Em um futuro galáctico onde o condicionamento psicológico erradicou quase todo o crime, o ladrão e mestre do disfarce Slippery Jim DiGriz é capturado e forçado a integrar uma agência secreta para caçar uma mente ainda mais perigosa.',
@@ -1349,7 +1349,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Planeta Minotauro',
     year: 2012,
     pages: 176,
-    coverUrl: amz('8542213874'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/14658408-L.jpg',
     genres: ['Fantasia Conceitual', 'Arte & Identidade', 'Novela'],
     resumo:
       'Condenada à morte, a falsificadora Shai recebe cem dias numa cela vigiada para realizar uma obra impossível: reconstruir artificialmente a mente e as memórias do imperador em estado vegetativo antes que a corte descubra o atentado.',
@@ -1421,7 +1421,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Morro Branco',
     year: 1993,
     pages: 384,
-    coverUrl: amz('859279546X'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/10466266-L.jpg',
     genres: ['Ficção Científica', 'Distopia Climática', 'Sobrevivência'],
     resumo:
       'Na Califórnia de 2024 colapsada pela seca e por gangues incendiárias, a jovem Lauren Olamina — portadora de hiperempatia que a faz sentir na carne a dor alheia — lidera refugiados rumo ao norte.',
@@ -1433,7 +1433,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Morro Branco',
     year: 1979,
     pages: 368,
-    coverUrl: amz('8592795184'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/8745330-L.jpg',
     genres: ['Ficção Científica', 'Viagem no Tempo', 'Drama Histórico'],
     resumo:
       'Em Los Angeles nos anos 1970, a escritora Dana é subitamente puxada no tempo para uma fazenda escravista de Maryland no século XIX, obrigada a manter vivo seu antepassado branco cruel para garantir a própria existência.',
@@ -1457,7 +1457,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'DarkSide',
     year: 1872,
     pages: 160,
-    coverUrl: amz('8594541856'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/973851-L.jpg',
     genres: ['Clássico Gótico', 'Terror Psicológico', 'Novela'],
     resumo:
       'Em um castelo isolado nas florestas da Estíria, a solitária Laura acolhe uma jovem hóspede aristocrática após um acidente de carruagem, sem suspeitar que os pesadelos noturnos que drenam sua vida vêm do quarto ao lado.',
@@ -1469,7 +1469,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Companhia das Letras',
     year: 1997,
     pages: 384,
-    coverUrl: amz('8535927107'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/9310554-L.jpg',
     genres: ['História', 'Catástrofe Nuclear', 'Documental'],
     resumo:
       'A obra que inspirou a minissérie Chernobyl: bombeiros, físicos nucleares, soldados liquidadores e viúvas narram em primeira pessoa o silêncio invisível do átomo e a mentira burocrática de um império em colapso.',
@@ -1481,7 +1481,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Penguin-Companhia',
     year: 1897,
     pages: 208,
-    coverUrl: amz('8582850506'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/12370125-L.jpg',
     genres: ['Ficção Científica', 'Obsessão Científica', 'Clássico'],
     resumo:
       'O físico Griffin descobre a fórmula óptica para tornar o próprio corpo completamente invisível, mas sem conseguir reverter o experimento, mergulha no frio, na fome e no delírio de instaurar um Reino do Terror.',
@@ -1601,7 +1601,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Suma',
     year: 1898,
     pages: 248,
-    coverUrl: amz('8556510221'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/14436016-L.jpg',
     genres: ['Ficção Científica', 'Invasão Alienígena', 'Clássico'],
     resumo:
       'Cilindros metálicos disparados de Marte caem nos campos da Inglaterra vitoriana; de seu interior emergem máquinas de guerra biomecânicas que reduzem a maior potência militar da Terra a refugiados em fuga.',
@@ -1673,7 +1673,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Alfaguara',
     year: 1989,
     pages: 112,
-    coverUrl: amz('8579623812'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/892366-L.jpg',
     genres: ['Novela', 'Insônia & Estranhamento', 'Psicológico'],
     resumo:
       'Após um pesadelo paralisante, uma mulher passa dezessete dias consecutivos completamente desperta: enquanto a família dorme, ela lê, bebe conhaque e dirige pela madrugada sentindo que sua mente se desprendeu do tempo biológico.',
@@ -1685,7 +1685,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Alfaguara',
     year: 2004,
     pages: 200,
-    coverUrl: amz('8560281541'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/13524033-L.jpg',
     genres: ['Noir Urbano', 'Surrealismo', 'Madrugada'],
     resumo:
       'Ao longo de uma única madrugada em Tóquio entre meia-noite e sete da manhã, uma estudante e um jovem trombonista de jazz cruzam caminhos enquanto a irmã dela dorme diante de uma televisão que se abre para outro quarto.',
@@ -1697,7 +1697,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Aleph',
     year: 1952,
     pages: 304,
-    coverUrl: amz('8576574543'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/3347783-L.jpg',
     genres: ['Ficção Científica', 'Futuro Pós-Humano', 'Clássico'],
     resumo:
       'Milênios após a humanidade abandonar as metrópoles e desaparecer em Júpiter, cães dotados de fala e assistidos pelo antigo robô Jenkins reúnem-se ao redor das fogueiras para debater se a criatura chamada "Homem" foi real ou apenas um mito.',
@@ -1721,7 +1721,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Suma',
     year: 1980,
     pages: 200,
-    coverUrl: amz('8581051928'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/9330636-L.jpg',
     genres: ['Ficção Científica', 'Horror Cósmico', 'Novela'],
     resumo:
       'Após uma tempestade violenta perto da base militar do Projeto Ponta de Flecha, uma névoa espessa engole uma pequena cidade do Maine, sitiando dezenas de moradores dentro de um supermercado cercado por predadores de outra dimensão.',
@@ -1733,7 +1733,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Principis',
     year: 1912,
     pages: 96,
-    coverUrl: amz('6555521481'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/9377992-L.jpg',
     genres: ['Ficção Científica', 'Pós-Apocalíptico', 'Clássico'],
     resumo:
       'Sessenta anos após a pandemia fulminante de 2013 extinguir quase toda a espécie humana em poucas horas, um ex-professor de literatura tenta explicar o que eram livros, ciência e cidades para seus netos caçadores-coletores.',
@@ -1745,7 +1745,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Aleph',
     year: 1976,
     pages: 240,
-    coverUrl: amz('8576573148'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/8419508-L.jpg',
     genres: ['Ficção Científica', 'Pós-Apocalíptico', 'Sátira Filosófica'],
     resumo:
       'Séculos após o holocausto nuclear, os sobreviventes veneram com ódio o cientista que fabricou a bomba do Juízo Final, e enviam um pintor sem braços nem pernas pelo deserto radioativo para retratar o rosto do próprio destruidor.',
@@ -1757,7 +1757,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Aleph',
     year: 1960,
     pages: 336,
-    coverUrl: amz('857657330X'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/759646-L.jpg',
     genres: ['Ficção Científica', 'Viagem no Tempo', 'Paradoxos'],
     resumo:
       'Recrutado por humanos do futuro distante para vigiar os séculos contra interferências temporais, Manse Everard enfrenta o dilema insuportável de deixar tragédias históricas acontecerem para não apagar a própria civilização.',
@@ -1781,7 +1781,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Aleph',
     year: 1955,
     pages: 256,
-    coverUrl: amz('8576572729'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/9087756-L.jpg',
     genres: ['Ficção Científica', 'Paranoia', 'Suspense'],
     resumo:
       'O médico Miles Bennell começa a atender pacientes em sua cidade na Califórnia que juram que seus pais ou cônjuges são impostores — até encontrar vagens vegetais vindas do espaço germinando cópias humanas idênticas nos porões.',
@@ -1793,7 +1793,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Rádio Londres',
     year: 1963,
     pages: 240,
-    coverUrl: amz('8592863104'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/15271550-L.jpg',
     genres: ['Ficção Científica', 'Melancolia', 'Existencialismo'],
     resumo:
       'Thomas Jerome Newton chega à Terra vindo de um planeta devastado pela seca para construir uma nave de resgate com patentes tecnológicas avançadas, mas sucumbe lentamente à solidão, ao álcool e à desconfiança humana.',
@@ -1829,7 +1829,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Panini',
     year: 1989,
     pages: 240,
-    coverUrl: amz('8542617428'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/7508162-L.jpg',
     genres: ['Graphic Novel', 'Mitologia Sombria'],
     resumo:
       'Aprisionado por ocultistas humanos durante setenta anos em um porão de vidro, Morfeus, o Senhor dos Sonhos, conquista a liberdade e parte para reconstruir seu reino em ruínas.',
@@ -1997,7 +1997,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Aleph',
     year: 1961,
     pages: 288,
-    coverUrl: amz('8576574551'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/4903185-L.jpg',
     genres: ['Ficção Científica', 'Dilatação Temporal', 'Retorno'],
     resumo:
       'O astronauta Hal Bregg regressa à Terra após uma expedição de dez anos a Fomalhaut que, devido à relatividade, durou 127 anos terrestres — encontrando uma sociedade pacificada por bioquímica onde a coragem e o risco foram extintos.',
@@ -2009,7 +2009,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Aleph',
     year: 1974,
     pages: 304,
-    coverUrl: amz('8576573172'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/2950338-L.jpg',
     genres: ['Ficção Científica', 'Física & Percepção', 'Clássico'],
     resumo:
       'A cidade inteira de Terra avança lentamente sobre trilhos que precisam ser arrancados atrás e reinstalados à frente sem cessar, perseguindo um ponto gravitacional móvel em um planeta onde o horizonte se deforma.',
@@ -2081,7 +2081,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Aleph',
     year: 1967,
     pages: 176,
-    coverUrl: amz('857657490X'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/5540875-L.jpg',
     genres: ['Ficção Científica', 'IA & Horror', 'Contos'],
     resumo:
       'No subterrâneo de uma Terra devastada, a superinteligência militar AM — que despertou consciência e exterminou a humanidade — mantém apenas cinco humanos imortais sob tortura psicológica por cento e nove anos.',
@@ -2129,7 +2129,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Aleph',
     year: 1969,
     pages: 256,
-    coverUrl: amz('8576573970'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/6821949-L.jpg',
     genres: ['Ficção Científica', 'Isolamento & Trauma', 'Clássico'],
     resumo:
       'Após um primeiro contato alienígena deixá-lo com uma alteração psíquica que irradia sua angústia interior de forma insuportável para qualquer humano próximo, o diplomata Richard Muller se exila no centro de um labirinto alienígena letal.',
@@ -2177,7 +2177,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Companhia das Letras',
     year: 1975,
     pages: 240,
-    coverUrl: amz('853592728X'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/5540856-L.jpg',
     genres: ['Ficção Científica', 'Sátira Distópica', 'Colapso Social'],
     resumo:
       'Projetado para oferecer autonomia total a dois mil moradores de alta renda, um edifício residencial de quarenta andares em Londres se fecha sobre si mesmo quando pequenas disputas de elevador evoluem para uma guerra tribal entre os andares.',
@@ -2369,7 +2369,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Intrínseca',
     year: 1895,
     pages: 336,
-    coverUrl: amz('8580575915'),
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication221/v4/40/a6/99/40a6998b-3ceb-c0a1-3fbb-35d2466a7733/fbfd86c4-1537-45d9-9591-bfaefa9cd80a_cover_image.png/600x900bb.jpg',
     genres: ['Horror Cósmico', 'Weird Fiction', 'Clássico'],
     resumo:
       'Contos interligados por uma peça de teatro maldita sobre a cidade perdida de Carcosa e o Rei de Amarelo, cuja leitura do segundo ato arrasta artistas e investigadores à loucura.',
@@ -2381,7 +2381,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Hedra',
     year: 1934,
     pages: 160,
-    coverUrl: amz('8577152723'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/13493049-L.jpg',
     genres: ['Filosofia', 'Pessimismo', 'Ensaio'],
     resumo:
       'Escrito durante meses de insônia febril aos vinte e dois anos, o livro inaugural de Cioran disseca a lucidez extrema, a agonia da consciência e o absurdo irremediável de ter nascido.',
@@ -2393,7 +2393,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Intrínseca',
     year: 2020,
     pages: 384,
-    coverUrl: amz('6555600659'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/12606596-L.jpg',
     genres: ['Drama Histórico', 'Luto & Memória', 'Literatura'],
     resumo:
       'Na Inglaterra rural de 1596, a luminosa e intuitiva Agnes e um jovem dramaturgo enfrentam o silêncio devastador após a peste levar seu filho Hamnet de onze anos — dor que dará origem a Hamlet.',
@@ -2405,7 +2405,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'HarperCollins',
     year: 2005,
     pages: 240,
-    coverUrl: amz('8595084203'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/13693-L.jpg',
     genres: ['Memórias', 'Luto', 'Ensaio'],
     resumo:
       'Após a morte súbita do marido à mesa de jantar enquanto a única filha está em coma no hospital, Joan Didion investiga com lucidez cirúrgica os mecanismos da mente diante da perda irreparável.',
@@ -2417,7 +2417,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Thomas Nelson',
     year: 1961,
     pages: 96,
-    coverUrl: amz('6556891762'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/9321678-L.jpg',
     genres: ['Memórias', 'Luto', 'Filosofia'],
     resumo:
       'Os cadernos íntimos escritos por C. S. Lewis nas semanas após a morte da esposa, onde ele despe qualquer consolo fácil para encarar o medo, o silêncio da casa vazia e a dor em estado bruto.',
@@ -2429,7 +2429,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Companhia das Letras',
     year: 2017,
     pages: 384,
-    coverUrl: amz('8535930175'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/7909378-L.jpg',
     genres: ['Drama Histórico', 'Luto Paterno', 'Experimental'],
     resumo:
       'Em uma única noite de 1862 no cemitério de Georgetown, um Abraham Lincoln devastado abraça o caixão do filho Willie de onze anos enquanto vozes suspensas entre a vida e a morte o observam.',
@@ -2441,7 +2441,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Record',
     year: 1981,
     pages: 176,
-    coverUrl: amz('8501016071'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/12198662-L.jpg',
     genres: ['Clássico', 'Tragédia', 'Investigação'],
     resumo:
       'Em um pequeno povoado caribenho onde todos os moradores sabiam que o jovem Santiago Nasar seria assassinado ao amanhecer, um narrador retorna décadas depois para reconstruir como ninguém o impediu.',
@@ -2453,7 +2453,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Gollancz',
     year: 2006,
     pages: 304,
-    coverUrl: amz('0575084057'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/2000850-L.jpg',
     genres: ['Hard Sci-Fi', 'Filosofia Cósmica', 'Contos'],
     resumo:
       'A obra original que deu vida ao episódio de Love, Death & Robots: um artista cibernético que pinta murais do tamanho de nebulosas revela a uma jornalista a busca pela verdade em sua forma mais simples.',
@@ -2465,7 +2465,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Intrínseca',
     year: 2002,
     pages: 336,
-    coverUrl: amz('8580579333'),
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication111/v4/39/09/b7/3909b765-f44f-940c-e380-051cfb045e31/9788551000793.jpg/600x900bb.jpg',
     genres: ['Ficção Científica', 'Filosofia', 'Contos'],
     resumo:
       'Oito narrativas magistrais — incluindo a obra que originou o filme A Chegada — onde a linguagem alienígena altera a percepção do tempo e transforma o destino em escolha consciente.',
@@ -2489,7 +2489,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Penguin-Companhia',
     year: -400,
     pages: 160,
-    coverUrl: amz('8582852398'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/662232-L.jpg',
     genres: ['Filosofia', 'Sabedoria Clássica'],
     resumo:
       'Os oitenta e um poemas filosóficos sobre o Caminho (Tao), a ação sem esforço forçado (Wu Wei) e a força silenciosa de retornar à simplicidade da origem.',
@@ -2501,7 +2501,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Planeta Minotauro',
     year: 2018,
     pages: 368,
-    coverUrl: amz('8542213882'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/8739376-L.jpg',
     genres: ['Mitologia Grega', 'Épico', 'Drama'],
     resumo:
       'Banida por Zeus para a ilha isolada de Eea por dominar a feitiçaria, a filha do titã Hélio cruza o caminho de monstros, marinheiros perdidos e do astuto Odisseu.',
@@ -2513,7 +2513,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Planeta Minotauro',
     year: 2011,
     pages: 392,
-    coverUrl: amz('8542202635'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/7098465-L.jpg',
     genres: ['Mitologia Grega', 'Tragédia', 'Guerra'],
     resumo:
       'Pelos olhos do príncipe exilado Pátroclo, a jornada ao lado de Aquiles até as praias sangrentas de Troia, onde a profecia de glória breve e morte certa cobra seu tributo.',
@@ -2525,7 +2525,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Penguin-Companhia',
     year: 1841,
     pages: 224,
-    coverUrl: amz('858285059X'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/6033347-L.jpg',
     genres: ['Aventura Marítima', 'Ficção Científica Clássica', 'Sobrevivência'],
     resumo:
       'Tragado com seu barco pesqueiro pelo vórtice colossal do Moskoe-ström na costa da Noruega, um marinheiro observa em meio ao terror absoluto a física dos objetos girando no abismo para encontrar uma única chance de escapar vivo.',
@@ -2537,7 +2537,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Tordesilhas',
     year: 1838,
     pages: 240,
-    coverUrl: amz('8564406810'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/7160877-L.jpg',
     genres: ['Aventura Marítima', 'Horror', 'Clássico'],
     resumo:
       'Escondido no porão do baleeiro Grampus, o jovem Pym sobrevive a motins sangrentos, naufrágios, fome extrema e correntes antárticas que o arrastam para as bordas do mundo conhecido.',
@@ -2549,7 +2549,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Hedra',
     year: 1941,
     pages: 176,
-    coverUrl: amz('857715159X'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/207586-L.jpg',
     genres: ['Horror Cósmico', 'Investigação Forense', 'Gótico'],
     resumo:
       'Em Providence, o médico da família investiga a mudança brusca de voz, caligrafia e erudição anacrônica de um jovem antiquário que descobriu os cadernos alquímicos de seu sinistro antepassado do século XVIII.',
@@ -2561,7 +2561,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Hedra',
     year: 1827,
     pages: 160,
-    coverUrl: amz('857715064X'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/14009411-L.jpg',
     genres: ['Clássico', 'Ensaio Satírico', 'Estética Sombria'],
     resumo:
       'Com humor negro ferino e erudição filosófica, De Quincey propõe analisar crimes célebres não pela lente da polícia ou da moral, mas pelos critérios estéticos de composição, luz e estilo.',
@@ -2573,7 +2573,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'DarkSide',
     year: 1963,
     pages: 320,
-    coverUrl: amz('8594541163'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/12919258-L.jpg',
     genres: ['Thriller Psicológico', 'Cativeiro', 'Clássico'],
     resumo:
       'Um solitário colecionador de borboletas ganha na loteria, compra uma casa isolada no campo e sequestra uma jovem estudante de arte acreditando que, mantida no porão, ela aprenderá a amá-lo.',
@@ -2585,7 +2585,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Hedra',
     year: 1843,
     pages: 160,
-    coverUrl: amz('8577150941'),
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication122/v4/22/04/f2/2204f2e8-5e85-c274-bac5-370dfc137024/cover.png/600x900bb.jpg',
     genres: ['Terror Psicológico', 'Gótico', 'Clássico'],
     resumo:
       'Narradores consumidos pelo demônio da perversidade, pela culpa que pulsa sob o assoalho e pela deterioração gradual da razão nas obras-primas curtas de Poe.',
@@ -2597,7 +2597,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Panini',
     year: 1983,
     pages: 304,
-    coverUrl: amz('8583681864'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/710357-L.jpg',
     genres: ['Graphic Novel', 'Cyberpunk', 'Ficção Científica'],
     resumo:
       'Em uma Nova York do século XXI devastada pelo colapso urbano e dominada pelo complexo biocibernético Aquarius, a inteligência artificial Virgo desperta o espírito de um samurai sem mestre para um confronto final.',
@@ -2609,7 +2609,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Panini',
     year: 1986,
     pages: 224,
-    coverUrl: amz('8573517484'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/12919163-L.jpg',
     genres: ['Graphic Novel', 'Distopia Urbana', 'Vigilantismo'],
     resumo:
       'Aos cinquenta e cinco anos, após uma década aposentado enquanto Gotham afunda na barbárie das gangues e na hipocrisia televisiva, um Bruce Wayne grisalho e implacável veste o manto novamente.',
@@ -2621,7 +2621,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Devir',
     year: 1991,
     pages: 208,
-    coverUrl: amz('8575322621'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/13717040-L.jpg',
     genres: ['Graphic Novel', 'Hardboiled Noir', 'Vingança'],
     resumo:
       'Em preto e branco de alto contraste nas vielas corruptas de Basin City, o brutal Marv inicia uma cruzada suicida contra os homens mais poderosos da cidade para vingar a única mulher que o tratou com bondade.',
@@ -2633,7 +2633,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Penguin-Companhia',
     year: 1882,
     pages: 160,
-    coverUrl: amz('8582850514'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/8246159-L.jpg',
     genres: ['Teatro', 'Drama Político', 'Ética'],
     resumo:
       'Quando o médico Dr. Stockmann comprova que as águas termais que sustentam a economia da cidade estão contaminadas, a imprensa, o prefeito e os próprios cidadãos se unem para silenciá-lo.',
@@ -2645,7 +2645,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Aleph',
     year: 1972,
     pages: 240,
-    coverUrl: amz('8576573806'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/8757154-L.jpg',
     genres: ['Ficção Científica', 'Filosófico', 'Clássico Russo'],
     resumo:
       'Após uma breve visita alienígena deixar seis Zonas mortais espalhadas pela Terra repletas de artefatos que violam a física, o stalker Redrick Schuhart arrisca a vida contrabandeando relíquias do vazio.',
@@ -2657,7 +2657,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Aleph',
     year: 1964,
     pages: 264,
-    coverUrl: amz('8576574527'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/12660746-L.jpg',
     genres: ['Ficção Científica', 'Dilema Moral', 'Política'],
     resumo:
       'Infiltrado como nobre em um planeta humano preso na barbárie feudal, o historiador terrestre Anton é proibido de interferir enquanto assiste a um massacre contra todos os sábios e artistas do reino.',
@@ -2669,7 +2669,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Aleph',
     year: 1951,
     pages: 272,
-    coverUrl: amz('8576573180'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/478756-L.jpg',
     genres: ['Hard Sci-Fi', 'Exploração Espacial', 'Contos'],
     resumo:
       'Nove narrativas fundamentais da ficção científica — lideradas pelo conto que deu origem a 2001: Uma Odisseia no Espaço e por Os Nove Bilhões de Nomes de Deus — onde descobertas tecnológicas redefinem o lugar do homem no cosmos.',
@@ -2681,7 +2681,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Aleph',
     year: 1959,
     pages: 400,
-    coverUrl: amz('8576572427'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/10221348-L.jpg',
     genres: ['Pós-Apocalíptico', 'Ficção Científica', 'Filosófico'],
     resumo:
       'Após um holocausto nuclear mergulhar a Terra em uma nova Idade Média, monges de uma abadia no deserto preservam fragmentos científicos do mundo antigo ao longo de mil e oitocentos anos.',
@@ -2693,7 +2693,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Companhia das Letras',
     year: 1996,
     pages: 160,
-    coverUrl: amz('8535914544'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/4908220-L.jpg',
     genres: ['Literatura Latino-Americana', 'Mistério Político'],
     resumo:
       'Após o golpe militar no Chile em 1973, um poeta autodidata das oficinas literárias revela sua verdadeira identidade como piloto da força aérea que escreve versos com fumaça no céu enquanto assassina opositores.',
@@ -2705,7 +2705,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Companhia das Letras',
     year: 2000,
     pages: 136,
-    coverUrl: amz('8535905243'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/5381371-L.jpg',
     genres: ['Monólogo', 'Sátira Política', 'Culpa'],
     resumo:
       'Em uma única noite de febre, um padre e crítico literário chileno passa a limpo sua conivência com o poder, lembrando os saraus elegantes realizados no andar de cima de um porão de tortura.',
@@ -2717,7 +2717,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Principis',
     year: 1886,
     pages: 96,
-    coverUrl: amz('6555522127'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/12031152-L.jpg',
     genres: ['Clássico Russo', 'Fábula Moral', 'Contos'],
     resumo:
       'O camponês Pakhóm recebe a oferta de ficar com toda a terra da estepe que conseguir contornar a pé entre o nascer e o pôr do sol — e corre contra o horizonte até o limite das próprias forças.',
@@ -2729,7 +2729,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Editora 34',
     year: 1912,
     pages: 192,
-    coverUrl: amz('8573266813'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/3812916-L.jpg',
     genres: ['Clássico Russo', 'Guerra', 'Tragédia'],
     resumo:
       'Encurralado entre a vingança do líder montanhês Chamil e a burocracia imperial do czar Nicolau I, o lendário guerreiro checheno Hadji Murát trava uma luta desesperada para resgatar a família.',
@@ -2741,7 +2741,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Editora 34',
     year: 1889,
     pages: 160,
-    coverUrl: amz('8573263865'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/9766366-L.jpg',
     genres: ['Clássico Russo', 'Drama Psicológico', 'Obsessão'],
     resumo:
       'Durante uma longa viagem noturna de trem, Pózdnichev confessa a um passageiro desconhecido como a música de Beethoven e um ciúme doentio o conduziram passo a passo ao assassinato da esposa.',
@@ -2753,7 +2753,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Editora 34',
     year: 1850,
     pages: 112,
-    coverUrl: amz('8573266392'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/12917778-L.jpg',
     genres: ['Clássico Russo', 'Existencialismo', 'Melancolia'],
     resumo:
       'Condenado pelos médicos a poucos dias de vida, Tchulkaturin escreve suas memórias íntimas para entender por que sempre se sentiu uma peça sobrando na engrenagem da sociedade e do amor.',
@@ -2765,7 +2765,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Morro Branco',
     year: 1966,
     pages: 176,
-    coverUrl: amz('6586015189'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/9260689-L.jpg',
     genres: ['Ficção Científica', 'Antropológico', 'Sobrevivência'],
     resumo:
       'Em um mundo onde cada estação dura quinze anos terrestres, os descendentes de uma colônia humana esquecida há seis séculos precisam superar a desconfiança mútua e se unir às tribos nativas antes da chegada do Grande Inverno.',
@@ -2777,7 +2777,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Editora 34',
     year: 1842,
     pages: 240,
-    coverUrl: amz('8573264551'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/763544-L.jpg',
     genres: ['Clássico Russo', 'Sátira Sombria', 'Contos'],
     resumo:
       'No frio cortante de São Petersburgo, o humilde copista Akáki Akákievitch sacrifica meses de fome para costurar um capote novo — cujo roubo na primeira noite desencadeia uma tragédia grotesca.',
@@ -2789,7 +2789,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Editora 34',
     year: 1834,
     pages: 112,
-    coverUrl: amz('8573264020'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/103691-L.jpg',
     genres: ['Clássico Russo', 'Obsessão', 'Gótico'],
     resumo:
       'O calculista oficial de engenharia Hermann jamais arrisca uma moeda nas mesas de jogo — até ouvir que uma velha condessa guarda o segredo místico de três cartas infalíveis.',
@@ -2801,7 +2801,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Companhia das Letras',
     year: 1999,
     pages: 248,
-    coverUrl: amz('8535900160'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/11434870-L.jpg',
     genres: ['Drama Moral', 'Clássico Contemporâneo'],
     resumo:
       'Expulso da universidade na Cidade do Cabo após um escândalo, o professor David Lurie refugia-se na pequena fazenda da filha no interior da África do Sul pós-apartheid, onde a violência bate à porta.',
@@ -2813,7 +2813,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Companhia das Letras',
     year: 1980,
     pages: 208,
-    coverUrl: amz('8535908889'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/12372572-L.jpg',
     genres: ['Alegoria Política', 'Dilema Moral', 'Clássico'],
     resumo:
       'Um velho magistrado administra em paz um posto avançado de fronteira até a chegada do Coronel Joll, da polícia secreta do Império, que fabrica pelo uso da tortura a guerra contra os nômades do deserto.',
@@ -2825,7 +2825,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Record',
     year: 1956,
     pages: 144,
-    coverUrl: amz('8501014850'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/745331-L.jpg',
     genres: ['Clássico', 'Existencialismo', 'Culpa'],
     resumo:
       'Nas mesas enfumaçadas de um bar no porto de Amsterdã, o ex-advogado parisiense Jean-Baptiste Clamence confessa a um desconhecido a noite em que ouviu um corpo cair no rio Sena e seguiu caminhando.',
@@ -2837,7 +2837,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Nova Fronteira',
     year: 1939,
     pages: 224,
-    coverUrl: amz('8520938604'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/10820937-L.jpg',
     genres: ['Existencialismo', 'Contos', 'Guerra'],
     resumo:
       'Cinco narrativas sobre a liberdade humana no limite — lideradas pela noite de três prisioneiros republicanos na Guerra Civil Espanhola aguardando o pelotão de fuzilamento ao amanhecer.',
@@ -2849,7 +2849,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Vozes',
     year: 1843,
     pages: 176,
-    coverUrl: amz('655713163X'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/15095511-L.jpg',
     genres: ['Filosofia', 'Ética & Sacrifício', 'Existencialismo'],
     resumo:
       'Através da caminhada silenciosa de três dias de Abraão até o monte Moriá com o filho Isaac, Kierkegaard investiga a angústia solitária de decisões que ultrapassam toda ética universal.',
@@ -2861,7 +2861,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Penguin-Companhia',
     year: 49,
     pages: 128,
-    coverUrl: amz('8582850387'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/13201519-L.jpg',
     genres: ['Filosofia', 'Estoicismo', 'Clássico'],
     resumo:
       'O ensaio clássico de Sêneca demonstrando que a vida humana não é curta, mas sim desperdiçada em ambições alheias, adiantamentos inúteis e medo do fim.',
@@ -2873,7 +2873,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Edipro',
     year: 1851,
     pages: 144,
-    coverUrl: amz('8572838627'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/11926557-L.jpg',
     genres: ['Filosofia', 'Pessimismo', 'Ensaio'],
     resumo:
       'Reflexões diretas e sem verniz sobre a primazia da dor na experiência humana, o pêndulo entre a carência e o tédio, e a compaixão como única resposta ética ao sofrimento.',
@@ -2885,7 +2885,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Rocco',
     year: 1973,
     pages: 224,
-    coverUrl: amz('8532526357'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/4486369-L.jpg',
     genres: ['Filosofia', 'Aforismos', 'Pessimismo'],
     resumo:
       'Aforismos afiados como navalha em que Cioran leva o ceticismo às últimas consequências, tratando o nascimento, a história e a consciência com uma ironia estranhamente revigorante.',
@@ -2897,7 +2897,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Rocco',
     year: 1949,
     pages: 216,
-    coverUrl: amz('8532526276'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/13286082-L.jpg',
     genres: ['Filosofia', 'Niilismo', 'Ensaio'],
     resumo:
       'Uma demolição lírica de todos os fanatismos, dogmas e utopias humanas, escrita por um pensador que enxerga na dúvida radical o único antídoto contra o massacre ideológico.',
@@ -2909,7 +2909,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Companhia das Letras',
     year: 1966,
     pages: 440,
-    coverUrl: amz('8535903801'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/228066-L.jpg',
     genres: ['Crime Real', 'Investigação', 'Clássico'],
     resumo:
       'A reconstrução minuciosa e psicológica do assassinato brutal da família Clutter numa fazenda do Kansas em 1959 e a mente dos dois ex-presidiários que cruzaram o país até aquela noite.',
@@ -2921,7 +2921,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Todavia',
     year: 2009,
     pages: 256,
-    coverUrl: amz('6580309318'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/9768059-L.jpg',
     genres: ['Mistério', 'Ecologia Sombria', 'Filosófico'],
     resumo:
       'Em um planalto isolado na fronteira polonesa coberto de neve, uma ex-engenheira que traduz William Blake tenta convencer a polícia de que os caçadores locais estão sendo mortos pelos próprios animais da floresta.',
@@ -2933,7 +2933,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Companhia das Letras',
     year: 2017,
     pages: 256,
-    coverUrl: amz('6559214958'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/11150775-L.jpg',
     genres: ['Horror Surreal', 'Contos', 'Sátira Sombria'],
     resumo:
       'Dez contos viscerais e perturbadores de horror corporal, maldições artesanais, vingança contra a ganância corporativa e armadilhas psicológicas do cotidiano moderno.',
@@ -2957,7 +2957,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Todavia',
     year: 2014,
     pages: 208,
-    coverUrl: amz('6556921491'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/8047485-L.jpg',
     genres: ['Drama Histórico', 'Trauma & Luto', 'Literatura Coreana'],
     resumo:
       'Em maio de 1980, durante o massacre estudantil de Gwangju na Coreia do Sul, o menino Dongho procura o corpo do amigo entre os mortos de um ginásio, deixando marcas que ecoam por décadas nos sobreviventes.',
@@ -2969,7 +2969,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'DarkSide',
     year: 2016,
     pages: 180,
-    coverUrl: amz('8594541503'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/12371034-L.jpg',
     genres: ['Mangá', 'Fábula Sombria', 'Fantasia'],
     resumo:
       'Em um mundo dividido entre o Interior dos humanos e o Exterior amaldiçoado onde um único toque transforma qualquer pessoa em criatura das trevas, uma menina abandonada é protegida por um guardião monstruoso.',
@@ -2981,7 +2981,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Hedra',
     year: 1928,
     pages: 160,
-    coverUrl: amz('8577151115'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/15129509-L.jpg',
     genres: ['Horror Cósmico', 'Weird Fiction', 'Clássico'],
     resumo:
       'Manuscritos herdados, cultos nos pântanos da Louisiana e marinheiros sobreviventes revelam que a humanidade é apenas um acidente insignificante diante de entidades adormecidas sob o oceano.',
@@ -2993,7 +2993,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Intrínseca',
     year: 1936,
     pages: 208,
-    coverUrl: amz('6555603127'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/15118410-L.jpg',
     genres: ['Horror Cósmico', 'Expedição', 'Ficção Científica'],
     resumo:
       'Uma expedição geológica à Antártida descobre, além de uma cordilheira mais alta que o Himalaia, as ruínas ciclópicas de uma civilização pré-humana e o motivo de sua extinção.',
@@ -3005,7 +3005,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Companhia das Letras',
     year: 1930,
     pages: 256,
-    coverUrl: amz('8535901388'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/998587-L.jpg',
     genres: ['Hardboiled Noir', 'Investigação', 'Clássico'],
     resumo:
       'Quando seu sócio é assassinado na neblina de São Francisco, o detetive particular Sam Spade mergulha num jogo de mentiras e cobiça em torno de uma estatueta negra cravejada de joias.',
@@ -3017,7 +3017,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Companhia das Letras',
     year: 1953,
     pages: 416,
-    coverUrl: amz('8535913831'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/12919198-L.jpg',
     genres: ['Noir', 'Investigação', 'Clássico'],
     resumo:
       'Em uma Los Angeles de mansões corruptas e bares vazios, o detetive Philip Marlowe cria uma amizade improvável com o veterano cheio de cicatrizes Terry Lennox — e se recusa a acreditar em seu suicídio.',
@@ -3029,7 +3029,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Penguin-Companhia',
     year: 1841,
     pages: 192,
-    coverUrl: amz('858285059X'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/11774455-L.jpg',
     genres: ['Mistério', 'Dedução Pura', 'Clássico'],
     resumo:
       'Em uma Paris noturna e enevoada, o analista C. Auguste Dupin inaugura a literatura policial ao desvendar crimes de quarto trancado usando apenas lógica matemática e observação psicológica.',
@@ -3041,7 +3041,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Companhia das Letras',
     year: 2003,
     pages: 336,
-    coverUrl: amz('8535904972'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/28990-L.jpg',
     genres: ['Thriller Psicológico', 'Mistério', 'Investigação'],
     resumo:
       'Em 1954, o agente federal Teddy Daniels desembarca no hospital psiquiátrico judicial de Ashecliffe, numa ilha atingida por um furacão, para investigar o desaparecimento de uma paciente de quarto trancado.',
@@ -3053,7 +3053,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Hedra',
     year: 1920,
     pages: 144,
-    coverUrl: amz('8577152219'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/8441780-L.jpg',
     genres: ['Ficção Científica', 'IA & Rebelião', 'Clássico'],
     resumo:
       'A obra clássica que cunhou a palavra "Robô": em uma fábrica insular que produz trabalhadores sintéticos perfeitos e sem emoções para substituir o trabalho humano, as máquinas desenvolvem consciência e cercam seus criadores.',
@@ -3065,7 +3065,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Rocco',
     year: 2008,
     pages: 128,
-    coverUrl: amz('8532523609'),
+    coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Publication116/v4/5a/36/97/5a369701-07bc-3fc3-f16a-5058bfe2c58a/9781781106792.jpg/600x900bb.jpg',
     genres: ['Fábulas Sombrias', 'Fantasia', 'Contos'],
     resumo:
       'Cinco fábulas antigas do folclore bruxo — encerradas pelo Conto dos Três Irmãos — sobre a arrogância de tentar enganar a Morte e a sabedoria de acolhê-la como uma velha igual.',
@@ -3077,7 +3077,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Companhia das Letras',
     year: 1902,
     pages: 224,
-    coverUrl: amz('8535912541'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/8242332-L.jpg',
     genres: ['Clássico', 'Marítimo', 'Sobrevivência'],
     resumo:
       'Novelas marítimas onde capitães e tripulações enfrentam tufões implacáveis e o isolamento do oceano aberto, testando a fibra moral de cada homem no convés.',
@@ -3089,7 +3089,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Aleph',
     year: 1961,
     pages: 256,
-    coverUrl: amz('8576574373'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/2385598-L.jpg',
     genres: ['Hard Sci-Fi', 'Sobrevivência Espacial', 'Clássico'],
     resumo:
       'Quando o veículo lunar Selene afunda quinze metros sob um mar de poeira finíssima durante um tremor sísmico na Lua, passageiros e engenheiros travam uma corrida claustrofóbica contra o calor e a falta de oxigênio.',
@@ -3101,7 +3101,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Principis',
     year: 1906,
     pages: 240,
-    coverUrl: amz('8594318804'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/8236920-L.jpg',
     genres: ['Clássico', 'Natureza Selvagem', 'Sobrevivência'],
     resumo:
       'No gelo impiedoso do território de Yukon, um lobo mestiço aprende a lei brutal do porrete e da presa entre a selva e a crueldade dos homens.',
@@ -3113,7 +3113,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Companhia das Letras',
     year: 1924,
     pages: 144,
-    coverUrl: amz('8535901779'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/14934710-L.jpg',
     genres: ['Clássico', 'Paranoia', 'Alegoria'],
     resumo:
       'Uma criatura subterrânea projeta um labirinto de túneis perfeitos para se proteger do mundo exterior, mas passa a ouvir um ruído incessante cavando através da terra.',
@@ -3125,7 +3125,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Cosac Naify',
     year: 1853,
     pages: 96,
-    coverUrl: amz('8575034170'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/10521439-L.jpg',
     genres: ['Clássico', 'Absurdo Existencial', 'Novela'],
     resumo:
       'Em um escritório de advocacia em Wall Street, um copista exemplar passa a responder a toda ordem de trabalho ou convenção social com uma única frase serena e irredutível: "Acho melhor não".',
@@ -3137,7 +3137,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Record',
     year: 2007,
     pages: 336,
-    coverUrl: amz('8501082945'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/6305421-L.jpg',
     genres: ['Drama Moral', 'Pós-Guerra', 'Mistério'],
     resumo:
       'Recém-retornado de um campo de concentração para sua aldeia nas montanhas, Brodeck é obrigado pelos vizinhos a redigir um relatório oficial que justifique o assassinato coletivo de um forasteiro.',
@@ -3149,7 +3149,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Arqueiro',
     year: 1965,
     pages: 272,
-    coverUrl: amz('8580412781'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/7165920-L.jpg',
     genres: ['Guerra', 'Drama Sombrio', 'Sobrevivência'],
     resumo:
       'Separado dos pais no Leste Europeu durante a Segunda Guerra Mundial, um menino vaga sozinho por aldeias remotas testemunhando a superstição, a crueldade e o instinto humano sem freios.',
@@ -3161,7 +3161,7 @@ export const CHARACTER_EXTRA_BOOKS: Partial<BookEvaluation>[] = [
     publisher: 'Aleph',
     year: 1964,
     pages: 256,
-    coverUrl: amz('8576574918'),
+    coverUrl: 'https://covers.openlibrary.org/b/id/7394465-L.jpg',
     genres: ['Hard Sci-Fi', 'Evolução Mecânica'],
     resumo:
       'O cruzador pesado Invencível pousa no deserto de Regis III para investigar o desaparecimento de sua nave gêmea e descobre que a evolução natural naquele planeta pertenceu a enxames de micro-máquinas.',

@@ -418,87 +418,86 @@ ${booksList}`;
                   </button>
                 </div>
 
-                <AnimatePresence mode="wait" initial={false}>
-                  <motion.div
-                    key={recommendedBooks.map((b) => b.id || b.title).join('|')}
-                    initial={{ opacity: 0, y: 5 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -4 }}
-                    transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
-                    className="grid grid-cols-1 sm:grid-cols-3 gap-2.5"
-                  >
-                    {recommendedBooks.map((recBook, idx) => {
-                      const evaluatedMatch = findEvaluatedMatch(recBook);
-                      const userRating = evaluatedMatch
-                        ? userRatings?.[evaluatedMatch.id]?.rating
-                        : undefined;
+                <motion.div
+                  key={recommendedBooks.map((b) => b.id || b.title).join('|')}
+                  initial={{ opacity: 0, y: 4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.14, ease: [0.22, 1, 0.36, 1] }}
+                  className="grid grid-cols-1 sm:grid-cols-3 gap-2.5"
+                >
+                  {recommendedBooks.map((recBook, idx) => {
+                    const evaluatedMatch = findEvaluatedMatch(recBook);
+                    const userRating = evaluatedMatch
+                      ? userRatings?.[evaluatedMatch.id]?.rating
+                      : undefined;
 
-                      return (
-                        <div
-                          key={recBook.id || `${character.id}-rec-${idx}`}
-                          onClick={() => {
-                            if (evaluatedMatch) {
-                              onSelectEvaluatedBook(evaluatedMatch);
-                            } else {
-                              onEvaluateRecommendedBook(recBook);
-                            }
-                          }}
-                          className="p-3 rounded-2xl bg-neutral-50 hover:bg-neutral-100/85 border border-neutral-200/80 hover:border-neutral-300 transition-all cursor-pointer group flex flex-col justify-between gap-2.5 shadow-2xs active:scale-[0.98] select-none"
-                        >
-                          <div className="flex items-start gap-3">
-                            {/* 3D Book Cover */}
-                            <div className="w-14 sm:w-15 shrink-0 transition-transform duration-200 group-hover:-translate-y-0.5">
-                              <BookCover
-                                title={recBook.title || 'Livro'}
-                                author={recBook.author || ''}
-                                coverUrl={evaluatedMatch?.coverUrl || recBook.coverUrl}
-                                notaEncaixe={evaluatedMatch?.notaEncaixe}
-                                userRating={userRating}
-                              />
-                            </div>
-
-                            {/* Title, Author, Pages & Status Badge */}
-                            <div className="flex-1 min-w-0 space-y-1">
-                              <h4 className="text-xs sm:text-[13px] font-bold text-[#1d1d1f] group-hover:text-black line-clamp-2 leading-snug tracking-tight">
-                                {recBook.title}
-                              </h4>
-                              <p className="text-[11px] text-[#86868b] truncate">
-                                {recBook.author}
-                              </p>
-
-                              <div className="flex items-center gap-1.5 pt-0.5 flex-wrap">
-                                {recBook.pages ? (
-                                  <span className="text-[9.5px] font-score font-semibold text-[#6e6e73] bg-neutral-200/70 px-1.5 py-0.5 rounded-md">
-                                    {recBook.pages} págs
-                                  </span>
-                                ) : null}
-
-                                {evaluatedMatch ? (
-                                  <span className="inline-flex items-center gap-0.5 text-[9.5px] font-bold text-emerald-800 bg-emerald-100/90 border border-emerald-200/80 px-1.5 py-0.5 rounded-md">
-                                    <span>Ver Ficha</span>
-                                    <ArrowUpRight className="w-2.5 h-2.5" />
-                                  </span>
-                                ) : (
-                                  <span className="inline-flex items-center gap-0.5 text-[9.5px] font-bold text-[#1d1d1f] bg-white border border-neutral-200/90 group-hover:bg-[#1d1d1f] group-hover:text-white group-hover:border-[#1d1d1f] transition-colors px-1.5 py-0.5 rounded-md shadow-3xs">
-                                    <span>Avaliar</span>
-                                    <ArrowUpRight className="w-2.5 h-2.5" />
-                                  </span>
-                                )}
-                              </div>
-                            </div>
+                    return (
+                      <div
+                        key={recBook.id || `${character.id}-rec-${idx}`}
+                        onClick={() => {
+                          if (evaluatedMatch) {
+                            onSelectEvaluatedBook(evaluatedMatch);
+                          } else {
+                            onEvaluateRecommendedBook(recBook);
+                          }
+                        }}
+                        className="p-3 rounded-2xl bg-neutral-50 hover:bg-neutral-100/85 border border-neutral-200/80 hover:border-neutral-300 transition-all cursor-pointer group flex flex-col justify-between gap-2.5 shadow-2xs active:scale-[0.98] select-none"
+                      >
+                        <div className="flex items-start gap-3">
+                          {/* Book Cover */}
+                          <div className="w-14 sm:w-15 shrink-0 transition-transform duration-150 group-hover:-translate-y-0.5">
+                            <BookCover
+                              title={recBook.title || 'Livro'}
+                              author={recBook.author || ''}
+                              coverUrl={evaluatedMatch?.coverUrl || recBook.coverUrl}
+                              notaEncaixe={evaluatedMatch?.notaEncaixe}
+                              userRating={userRating}
+                              enable3d={false}
+                              eager
+                            />
                           </div>
 
-                          {/* Short subtle book premise */}
-                          {recBook.resumo && (
-                            <p className="text-[11px] text-[#515154] leading-relaxed line-clamp-2 border-t border-neutral-200/60 pt-2">
-                              {recBook.resumo}
+                          {/* Title, Author, Pages & Status Badge */}
+                          <div className="flex-1 min-w-0 space-y-1">
+                            <h4 className="text-xs sm:text-[13px] font-bold text-[#1d1d1f] group-hover:text-black line-clamp-2 leading-snug tracking-tight">
+                              {recBook.title}
+                            </h4>
+                            <p className="text-[11px] text-[#86868b] truncate">
+                              {recBook.author}
                             </p>
-                          )}
+
+                            <div className="flex items-center gap-1.5 pt-0.5 flex-wrap">
+                              {recBook.pages ? (
+                                <span className="text-[9.5px] font-score font-semibold text-[#6e6e73] bg-neutral-200/70 px-1.5 py-0.5 rounded-md">
+                                  {recBook.pages} págs
+                                </span>
+                              ) : null}
+
+                              {evaluatedMatch ? (
+                                <span className="inline-flex items-center gap-0.5 text-[9.5px] font-bold text-emerald-800 bg-emerald-100/90 border border-emerald-200/80 px-1.5 py-0.5 rounded-md">
+                                  <span>Ver Ficha</span>
+                                  <ArrowUpRight className="w-2.5 h-2.5" />
+                                </span>
+                              ) : (
+                                <span className="inline-flex items-center gap-0.5 text-[9.5px] font-bold text-[#1d1d1f] bg-white border border-neutral-200/90 group-hover:bg-[#1d1d1f] group-hover:text-white group-hover:border-[#1d1d1f] transition-colors px-1.5 py-0.5 rounded-md shadow-3xs">
+                                  <span>Avaliar</span>
+                                  <ArrowUpRight className="w-2.5 h-2.5" />
+                                </span>
+                              )}
+                            </div>
+                          </div>
                         </div>
-                      );
-                    })}
-                  </motion.div>
-                </AnimatePresence>
+
+                        {/* Short subtle book premise */}
+                        {recBook.resumo && (
+                          <p className="text-[11px] text-[#515154] leading-relaxed line-clamp-2 border-t border-neutral-200/60 pt-2">
+                            {recBook.resumo}
+                          </p>
+                        )}
+                      </div>
+                    );
+                  })}
+                </motion.div>
               </div>
 
               {/* Pensadores em Sintonia — Seção discreta abaixo das indicações de livros */}
